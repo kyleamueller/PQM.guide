@@ -1,0 +1,53 @@
+---
+title: "Text.Upper"
+slug: "text-upper"
+category: "Text"
+description: "Converts all characters in a text value to uppercase."
+syntax: "Text.Upper(text as nullable text, optional culture as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The input text with all characters converted to uppercase."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to convert to uppercase."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code (e.g., \"en-US\") that determines locale-specific casing rules."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-lower"
+  - "text-proper"
+---
+
+## Remarks
+
+`Text.Upper` converts every character in a text value to its uppercase equivalent. This is useful for standardizing text data before comparisons or grouping — for example, ensuring that "east", "East", and "EAST" all become "EAST".
+
+For locale-sensitive casing (e.g., Turkish İ/i), pass the appropriate culture code as the second argument.
+
+## Examples
+
+### Example 1: Uppercase employee names
+
+Convert the mixed-case FullName column to uppercase.
+
+Input: `Employees`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Employees, 3), {"FullName"}),
+    {"FullName", Text.Upper, type text}
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"ALICE SMITH"},{"FullName":"BOB JONES"},{"FullName":"CHARLIE BROWN"}]}
+-->

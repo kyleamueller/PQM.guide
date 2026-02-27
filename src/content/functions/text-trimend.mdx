@@ -1,0 +1,51 @@
+---
+title: "Text.TrimEnd"
+slug: "text-trimend"
+category: "Text"
+description: "Removes trailing whitespace (or specified characters) from a text value."
+syntax: "Text.TrimEnd(text as nullable text, optional trim as any) as nullable text"
+returnType: "text"
+returnDescription: "The text with trailing whitespace or specified characters removed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to trim from the end."
+  - name: "trim"
+    type: "any"
+    required: false
+    description: "A single character or list of characters to trim from the end. Defaults to whitespace."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-trim"
+  - "text-trimstart"
+---
+
+## Remarks
+
+`Text.TrimEnd` removes characters from the end of a text value only. By default it removes whitespace, but you can pass a character or list of characters to trim instead.
+
+## Examples
+
+### Example 1: Trim trailing characters
+
+Remove trailing whitespace from customer email addresses.
+
+Input: `Customers`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Customers, 3), {"Email"}),
+    "Trimmed", each Text.TrimEnd([Email]), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"Email","type":"text"},{"name":"Trimmed","type":"text"}],"rows":[{"Email":"alice@example.com","Trimmed":"alice@example.com"},{"Email":"bob@example.com","Trimmed":"bob@example.com"},{"Email":"charlie@example.com","Trimmed":"charlie@example.com"}]}
+-->

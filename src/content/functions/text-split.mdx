@@ -1,0 +1,56 @@
+---
+title: "Text.Split"
+slug: "text-split"
+category: "Text"
+description: "Splits a text value into a list of text values using a specified separator."
+syntax: "Text.Split(text as text, separator as text) as list"
+returnType: "list"
+returnDescription: "A list of text values produced by splitting the input text at each occurrence of the separator."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to split."
+  - name: "separator"
+    type: "text"
+    required: true
+    description: "The delimiter text to split on."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-combine"
+  - "splitter-splittextbydelimiter"
+---
+
+## Remarks
+
+`Text.Split` divides a text value at every occurrence of the separator, returning a list. This is useful for extracting parts of structured text — for example, splitting a full name into first and last names, or splitting a delimited string into individual values.
+
+For more advanced splitting (e.g., splitting by any of several delimiters, or by character transitions), use the `Splitter` functions.
+
+## Examples
+
+### Example 1: Split full names into first and last
+
+Split employee full names on the space character and extract the first and last name parts.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.AddColumn(
+        Table.SelectColumns(Table.FirstN(Employees, 3), {"FullName"}),
+        "FirstName", each Text.Proper(Text.Split([FullName], " "){0}), type text
+    ),
+    "LastName", each Text.Proper(Text.Split([FullName], " "){1}), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"FirstName","type":"text"},{"name":"LastName","type":"text"}],"rows":[{"FullName":"alice smith","FirstName":"Alice","LastName":"Smith"},{"FullName":"BOB JONES","FirstName":"Bob","LastName":"Jones"},{"FullName":"Charlie Brown","FirstName":"Charlie","LastName":"Brown"}]}
+-->

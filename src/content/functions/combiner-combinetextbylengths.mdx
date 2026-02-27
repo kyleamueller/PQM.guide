@@ -1,0 +1,53 @@
+---
+title: "Combiner.CombineTextByLengths"
+slug: "combiner-combinetextbylengths"
+category: "Combiner"
+description: "Returns a function that combines a list of text values by padding or truncating each to a fixed length."
+syntax: "Combiner.CombineTextByLengths(lengths as list, optional quoteStyle as nullable number) as function"
+returnType: "function"
+returnDescription: "A function that takes a list of text values and combines them into a fixed-width string."
+parameters:
+  - name: "lengths"
+    type: "list"
+    required: true
+    description: "A list of integers specifying the fixed width for each text value. Values shorter than their length are padded with spaces; longer values are truncated."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "A QuoteStyle value specifying how to handle quoting. Defaults to QuoteStyle.None."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "combiner-combinetextbydelimiter"
+  - "combiner-combinetextbyeachdelimiter"
+---
+
+## Remarks
+
+`Combiner.CombineTextByLengths` returns a **function** that produces fixed-width output. Each value in the input list is padded with trailing spaces or truncated to match the corresponding length. This is useful for generating fixed-width file formats or aligning columnar text output.
+
+## Examples
+
+### Example 1: Create fixed-width output from Sales data
+
+Produce fixed-width strings with 10 characters for CustomerName and 12 characters for Product.
+
+Input: `Sales`
+
+```powerquery
+let
+    Subset = Table.SelectColumns(Table.FirstN(Sales, 3), {"CustomerName", "Product"}),
+    CombinerFn = Combiner.CombineTextByLengths({10, 12}),
+    Combined = Table.ToList(Subset, CombinerFn)
+in
+    #table({"FixedWidth"}, List.Transform(Combined, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"FixedWidth","type":"text"}],"rows":[{"FixedWidth":"Alice     Widget A    "},{"FixedWidth":"Bob       Gadget B    "},{"FixedWidth":"Charlie   Widget C    "}]}
+-->

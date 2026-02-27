@@ -1,0 +1,66 @@
+---
+title: "Time.Second"
+slug: "time-second"
+category: "Time"
+description: "Returns the second component from a time, datetime, or datetimezone value."
+syntax: "Time.Second(dateTime as any) as nullable number"
+returnType: "number"
+returnDescription: "The second component (0 through 59)."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The time, datetime, or datetimezone value to extract the second from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-hour"
+  - "time-minute"
+  - "time-from"
+---
+
+## Remarks
+
+`Time.Second` returns the second component as a number from 0 to 59 from a `time`, `datetime`, or `datetimezone` value. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract second from OrderLog Timestamp
+
+Extract the second from each Timestamp in the OrderLog table.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 4),
+        {"LogID", "Timestamp"}
+    ),
+    "Second", each Time.Second([Timestamp]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"Second","type":"number"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","Second":0},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","Second":0},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","Second":0},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","Second":0}]}
+-->
+
+### Example 2: Extract second from a scalar time
+
+Return the second from a time value that includes seconds.
+
+```powerquery
+#table(
+    type table [Time = time, Second = number],
+    {{#time(14, 30, 45), Time.Second(#time(14, 30, 45))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Time","type":"time"},{"name":"Second","type":"number"}],"rows":[{"Time":"14:30:45","Second":45}]}
+-->

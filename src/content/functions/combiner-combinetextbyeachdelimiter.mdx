@@ -1,0 +1,53 @@
+---
+title: "Combiner.CombineTextByEachDelimiter"
+slug: "combiner-combinetextbyeachdelimiter"
+category: "Combiner"
+description: "Returns a function that combines a list of text values using a sequence of delimiters, one per position."
+syntax: "Combiner.CombineTextByEachDelimiter(delimiters as list, optional quoteStyle as nullable number) as function"
+returnType: "function"
+returnDescription: "A function that takes a list of text values and combines them using a different delimiter between each consecutive pair."
+parameters:
+  - name: "delimiters"
+    type: "list"
+    required: true
+    description: "A list of text delimiters. The first delimiter is used between the first and second values, the second delimiter between the second and third, and so on."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "A QuoteStyle value specifying how to handle quoting. Defaults to QuoteStyle.None."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "combiner-combinetextbydelimiter"
+  - "combiner-combinetextbylengths"
+---
+
+## Remarks
+
+`Combiner.CombineTextByEachDelimiter` returns a **function** that uses a different delimiter at each join position. For example, given delimiters `{" - ", ": "}`, the first and second values are joined with `" - "` and the second and third with `": "`. This is useful when building structured strings where different separators are needed between fields.
+
+## Examples
+
+### Example 1: Combine with positional delimiters
+
+Build a formatted string from Product, Category, and Region using different delimiters at each position.
+
+Input: `Sales`
+
+```powerquery
+let
+    Subset = Table.SelectColumns(Table.FirstN(Sales, 3), {"Product", "Category", "Region"}),
+    CombinerFn = Combiner.CombineTextByEachDelimiter({" | ", " -> "}),
+    Combined = Table.ToList(Subset, CombinerFn)
+in
+    #table({"Formatted"}, List.Transform(Combined, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Formatted","type":"text"}],"rows":[{"Formatted":"Widget A | Widgets -> East"},{"Formatted":"Gadget B | Gadgets -> West"},{"Formatted":"Widget C | Widgets -> East"}]}
+-->

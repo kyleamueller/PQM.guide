@@ -1,0 +1,82 @@
+---
+title: "Json.Document"
+slug: "json-document"
+category: "Accessing Data"
+description: "Parses JSON text into M values (records, lists, text, numbers, logicals, or null)."
+syntax: "Json.Document(jsonText as any, optional encoding as nullable number) as any"
+returnType: "any"
+returnDescription: "The M value (record, list, table, text, number, logical, or null) parsed from the JSON content."
+parameters:
+  - name: "jsonText"
+    type: "any"
+    required: true
+    description: "The JSON text or binary content to parse."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The text encoding (e.g., TextEncoding.Utf8). Defaults to UTF-8."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "csv-document"
+  - "web-contents"
+  - "record-field"
+---
+
+## Remarks
+
+`Json.Document` converts a JSON string (or binary) into M values. JSON objects become M records, JSON arrays become M lists, and scalar types map to their M equivalents (text, number, logical, null).
+
+This function is most commonly used with `Web.Contents` to consume REST APIs:
+
+```powerquery
+let
+    Response = Web.Contents("https://api.example.com/data"),
+    Parsed = Json.Document(Response)
+in
+    Parsed
+```
+
+After parsing, you typically use `Record.Field` to access specific keys, or `Table.FromRecords` to convert a list of records into a table.
+
+Nested JSON objects remain as nested records or lists, which you can expand using `Table.ExpandRecordColumn` or `Table.ExpandListColumn`.
+
+## Examples
+
+### Example 1: Parse a JSON array into a table
+
+Parse inline JSON text representing a list of records and convert it to a table.
+
+```powerquery
+let
+    JsonText = "[{""Name"":""Alice"",""Score"":95},{""Name"":""Bob"",""Score"":82}]",
+    Parsed = Json.Document(JsonText),
+    AsTable = Table.FromRecords(Parsed)
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Score","type":"number"}],"rows":[{"Name":"Alice","Score":95},{"Name":"Bob","Score":82}]}
+-->
+
+### Example 2: Parse a JSON object
+
+Parse a single JSON object and extract values from the resulting record.
+
+```powerquery
+let
+    JsonText = "{""status"":""ok"",""count"":42}",
+    Parsed = Json.Document(JsonText)
+in
+    #table({"Field", "Value"}, {{"status", Parsed[status]}, {"count", Text.From(Parsed[count])}})
+```
+
+<!--output
+{"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"status","Value":"ok"},{"Field":"count","Value":"42"}]}
+-->

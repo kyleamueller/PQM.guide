@@ -1,0 +1,72 @@
+---
+title: "DateTimeZone.From"
+slug: "datetimezone-from"
+category: "DateTimeZone"
+description: "Converts a value to a datetimezone."
+syntax: "DateTimeZone.From(value as any, optional culture as nullable text) as nullable datetimezone"
+returnType: "datetimezone"
+returnDescription: "A datetimezone value converted from the given input."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts text, date, datetime, and number values."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "Culture code for locale-specific parsing (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-tolocal"
+  - "datetimezone-toutc"
+  - "datetime-from"
+---
+
+## Remarks
+
+`DateTimeZone.From` converts text, date, datetime, or number values into a `datetimezone`. When converting from a `datetime` that has no timezone information, the local timezone offset is applied. Text values are parsed according to standard datetime formats with timezone offsets, or the specified `culture`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert OrderLog Timestamp to datetimezone
+
+Add a UTC timezone offset to the Timestamp values from OrderLog.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 4),
+        {"LogID", "Timestamp"}
+    ),
+    "TimestampUTC",
+    each DateTimeZone.From([Timestamp]),
+    type datetimezone
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"TimestampUTC","type":"datetimezone"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","TimestampUTC":"2024-01-15T09:30:00+00:00"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","TimestampUTC":"2024-01-16T14:15:00+00:00"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","TimestampUTC":"2024-01-18T11:00:00+00:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","TimestampUTC":"2024-01-20T08:45:00+00:00"}]}
+-->
+
+### Example 2: Convert a text string with timezone to datetimezone
+
+Convert a literal text value including a timezone offset.
+
+```powerquery
+#table(
+    type table [Result = datetimezone],
+    {{DateTimeZone.From("2024-03-15T14:30:00-05:00")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetimezone"}],"rows":[{"Result":"2024-03-15T14:30:00-05:00"}]}
+-->

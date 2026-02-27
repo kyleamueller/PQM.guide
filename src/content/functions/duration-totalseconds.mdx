@@ -1,0 +1,71 @@
+---
+title: "Duration.TotalSeconds"
+slug: "duration-totalseconds"
+category: "Duration"
+description: "Returns the total number of seconds represented by a duration value."
+syntax: "Duration.TotalSeconds(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The total number of seconds as a number."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to convert to total seconds."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-seconds"
+  - "duration-totaldays"
+  - "duration-from"
+---
+
+## Remarks
+
+`Duration.TotalSeconds` returns the total elapsed time of a `duration` value expressed as a number of seconds. Unlike `Duration.Seconds`, which returns only the seconds component (0 through 59), `Duration.TotalSeconds` converts the entire duration to seconds. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert DurationMinutes to total seconds
+
+Convert the DurationMinutes from OrderLog into durations and compute total seconds.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            OrderLog,
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "TotalSeconds",
+    each Duration.TotalSeconds(#duration(0, 0, [DurationMinutes], 0)),
+    type number
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"TotalSeconds","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"TotalSeconds":103500},{"LogID":"L004","DurationMinutes":2745,"TotalSeconds":164700},{"LogID":"L006","DurationMinutes":1065,"TotalSeconds":63900},{"LogID":"L008","DurationMinutes":2670,"TotalSeconds":160200}]}
+-->
+
+### Example 2: Total seconds from a scalar duration
+
+Return the total seconds for a duration value.
+
+```powerquery
+#table(
+    type table [Duration = duration, TotalSeconds = number],
+    {{#duration(0, 2, 30, 15), Duration.TotalSeconds(#duration(0, 2, 30, 15))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"TotalSeconds","type":"number"}],"rows":[{"Duration":"0.02:30:15","TotalSeconds":9015}]}
+-->

@@ -1,0 +1,59 @@
+---
+title: "List.Accumulate"
+slug: "list-accumulate"
+category: "List"
+description: "Accumulates a result by applying a function to each item in a list, starting from an initial seed value."
+syntax: "List.Accumulate(list as list, seed as any, accumulator as function) as any"
+returnType: "any"
+returnDescription: "The final accumulated value after processing all items in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of items to process."
+  - name: "seed"
+    type: "any"
+    required: true
+    description: "The initial value to start accumulating from."
+  - name: "accumulator"
+    type: "function"
+    required: true
+    description: "A function (state, current) => newState that combines each item with the accumulated state."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-transform"
+  - "list-generate"
+  - "list-sum"
+---
+
+## Remarks
+
+`List.Accumulate` is M's "reduce" or "fold" function. It processes each item in a list sequentially, carrying forward a state value that gets updated by the accumulator function. The final state is returned.
+
+This is one of the most powerful list functions — it can implement running totals, string building, multi-step replacements, and any logic that requires carrying state across items.
+
+## Examples
+
+### Example 1: Sum quantities manually
+
+Calculate the total quantity across all sales using List.Accumulate.
+
+Input: `Sales`
+
+```powerquery
+let
+    Quantities = Table.Column(Sales, "Quantity"),
+    Total = List.Accumulate(Quantities, 0, (state, current) => state + current)
+in
+    #table({"TotalQuantity"}, {{Total}})
+```
+
+<!--output
+{"columns":[{"name":"TotalQuantity","type":"number"}],"rows":[{"TotalQuantity":35}]}
+-->

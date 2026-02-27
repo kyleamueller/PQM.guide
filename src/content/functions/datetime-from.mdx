@@ -1,0 +1,70 @@
+---
+title: "DateTime.From"
+slug: "datetime-from"
+category: "DateTime"
+description: "Converts a value to a datetime."
+syntax: "DateTime.From(value as any, optional culture as nullable text) as nullable datetime"
+returnType: "datetime"
+returnDescription: "A datetime value converted from the given input."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts text, date, datetimezone, and number values."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "Culture code for locale-specific parsing (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-date"
+  - "datetime-time"
+  - "datetime-localnow"
+---
+
+## Remarks
+
+`DateTime.From` converts text, date, datetimezone, or number values into a `datetime`. Text values are parsed according to standard datetime formats or the specified `culture`. Number values are interpreted as OLE Automation dates (days since December 30, 1899). If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert OrderDate to datetime
+
+Convert the date values from the Sales table into full datetime values.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 4),
+        {"OrderID", "OrderDate"}
+    ),
+    "OrderDateTime", each DateTime.From([OrderDate]), type datetime
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"OrderDateTime","type":"datetime"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","OrderDateTime":"2024-01-15T00:00:00"},{"OrderID":2,"OrderDate":"2024-01-18","OrderDateTime":"2024-01-18T00:00:00"},{"OrderID":3,"OrderDate":"2024-02-01","OrderDateTime":"2024-02-01T00:00:00"},{"OrderID":4,"OrderDate":"2024-02-10","OrderDateTime":"2024-02-10T00:00:00"}]}
+-->
+
+### Example 2: Convert a text string to a datetime
+
+Convert a literal text value to a datetime.
+
+```powerquery
+#table(
+    type table [Result = datetime],
+    {{DateTime.From("2024-03-15 14:30:00")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T14:30:00"}]}
+-->

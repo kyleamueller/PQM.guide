@@ -1,0 +1,52 @@
+---
+title: "List.Distinct"
+slug: "list-distinct"
+category: "List"
+description: "Returns a list with duplicate values removed."
+syntax: "List.Distinct(list as list, optional equationCriteria as any) as list"
+returnType: "list"
+returnDescription: "A list containing only unique values, preserving the order of first occurrence."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to deduplicate."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "A comparer function for custom equality testing."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-contains"
+  - "list-count"
+  - "table-distinct"
+---
+
+## Remarks
+
+`List.Distinct` removes duplicate values from a list, keeping the first occurrence of each unique value. Use a comparer function like `Comparer.OrdinalIgnoreCase` for case-insensitive deduplication.
+
+## Examples
+
+### Example 1: Get unique product categories
+
+Extract the distinct categories from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Categories = List.Distinct(Table.Column(Sales, "Category"))
+in
+    #table({"Category"}, List.Transform(Categories, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Category","type":"text"}],"rows":[{"Category":"Widgets"},{"Category":"Gadgets"},{"Category":"Misc"}]}
+-->

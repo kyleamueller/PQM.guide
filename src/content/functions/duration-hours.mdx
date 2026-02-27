@@ -1,0 +1,71 @@
+---
+title: "Duration.Hours"
+slug: "duration-hours"
+category: "Duration"
+description: "Returns the hours component from a duration value."
+syntax: "Duration.Hours(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The hours component (0 through 23)."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to extract the hours component from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-days"
+  - "duration-minutes"
+  - "duration-seconds"
+---
+
+## Remarks
+
+`Duration.Hours` returns the hours component (0 through 23) from a `duration` value. This is the hour portion after removing whole days, not the total hours. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract hours from OrderLog durations
+
+Convert DurationMinutes to a duration and extract the hours component.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            OrderLog,
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "Hours",
+    each Duration.Hours(#duration(0, 0, [DurationMinutes], 0)),
+    Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Hours","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Hours":4},{"LogID":"L004","DurationMinutes":2745,"Hours":21},{"LogID":"L006","DurationMinutes":1065,"Hours":17},{"LogID":"L008","DurationMinutes":2670,"Hours":20}]}
+-->
+
+### Example 2: Extract hours from a scalar duration
+
+Return the hours component of a literal duration.
+
+```powerquery
+#table(
+    type table [Duration = duration, Hours = number],
+    {{#duration(2, 14, 30, 0), Duration.Hours(#duration(2, 14, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"Hours","type":"number"}],"rows":[{"Duration":"2.14:30:00","Hours":14}]}
+-->

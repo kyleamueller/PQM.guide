@@ -1,0 +1,49 @@
+---
+title: "Number.IsOdd"
+slug: "number-isodd"
+category: "Number"
+description: "Returns true if a number is odd."
+syntax: "Number.IsOdd(number as number) as logical"
+returnType: "logical"
+returnDescription: "true if the number is odd; false otherwise."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to check."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-iseven"
+  - "number-mod"
+---
+
+## Remarks
+
+`Number.IsOdd` returns `true` when a number is not divisible by 2, and `false` otherwise. This is a shorthand for `Number.Mod(number, 2) <> 0`.
+
+Use this alongside `Number.IsEven` for parity-based filtering, or to split datasets into alternating groups.
+
+## Examples
+
+### Example 1: Filter to odd-numbered ProductIDs
+
+Select only products with odd ProductIDs.
+
+Input: `Products`
+
+```powerquery
+Table.SelectColumns(
+    Table.SelectRows(Products, each Number.IsOdd([ProductID])),
+    {"ProductID", "ProductName", "Price"}
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Price","type":"number"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Price":25},{"ProductID":3,"ProductName":"Widget C","Price":15},{"ProductID":5,"ProductName":"Thingamajig E","Price":120}]}
+-->

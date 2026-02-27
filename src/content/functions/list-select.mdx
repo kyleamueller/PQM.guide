@@ -1,0 +1,53 @@
+---
+title: "List.Select"
+slug: "list-select"
+category: "List"
+description: "Returns items from a list that match a condition."
+syntax: "List.Select(list as list, selection as function) as list"
+returnType: "list"
+returnDescription: "A list containing only the items that satisfy the condition."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to filter."
+  - name: "selection"
+    type: "function"
+    required: true
+    description: "A function that returns true for items to keep."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-contains"
+  - "list-removeitems"
+  - "list-transform"
+---
+
+## Remarks
+
+`List.Select` filters a list by applying a condition function to each item, returning only items where the function returns `true`. This is the list equivalent of `Table.SelectRows`.
+
+## Examples
+
+### Example 1: Select high prices
+
+Filter the product prices to only include values above 30.
+
+Input: `Products`
+
+```powerquery
+let
+    Prices = Table.Column(Products, "Price"),
+    HighPrices = List.Select(Prices, each _ > 30)
+in
+    #table({"Price"}, List.Transform(HighPrices, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":50},{"Price":75},{"Price":120}]}
+-->

@@ -1,0 +1,52 @@
+---
+title: "List.Sort"
+slug: "list-sort"
+category: "List"
+description: "Sorts the items in a list according to the specified criteria."
+syntax: "List.Sort(list as list, optional comparisonCriteria as any) as list"
+returnType: "list"
+returnDescription: "A sorted list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to sort."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: false
+    description: "An Order value (Order.Ascending or Order.Descending) or a comparer function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-first"
+  - "list-last"
+  - "table-sort"
+---
+
+## Remarks
+
+`List.Sort` sorts a list in ascending order by default. Pass `Order.Descending` for descending order, or provide a custom comparison function for advanced sorting.
+
+## Examples
+
+### Example 1: Sort prices descending
+
+Sort the product prices from highest to lowest.
+
+Input: `Products`
+
+```powerquery
+let
+    Prices = List.Sort(Table.Column(Products, "Price"), Order.Descending)
+in
+    #table({"Price"}, List.Transform(Prices, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":120},{"Price":75},{"Price":50},{"Price":25},{"Price":15}]}
+-->

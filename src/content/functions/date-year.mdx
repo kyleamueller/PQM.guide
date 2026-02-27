@@ -1,0 +1,65 @@
+---
+title: "Date.Year"
+slug: "date-year"
+category: "Date"
+description: "Returns the year from a date value."
+syntax: "Date.Year(dateTime as any) as nullable number"
+returnType: "number"
+returnDescription: "The year component of the date."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date value to extract the year from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-month"
+  - "date-day"
+---
+
+## Remarks
+
+`Date.Year` returns the year component as a whole number from a `date`, `datetime`, or `datetimezone` value. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract the year from OrderDate
+
+Extract the year from each OrderDate in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "Year", each Date.Year([OrderDate]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Year","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Year":2024},{"OrderID":2,"OrderDate":"2024-01-18","Year":2024},{"OrderID":3,"OrderDate":"2024-02-01","Year":2024},{"OrderID":4,"OrderDate":"2024-02-10","Year":2024},{"OrderID":5,"OrderDate":"2024-03-05","Year":2024}]}
+-->
+
+### Example 2: Extract the year from a scalar value
+
+Return the year from a single date value.
+
+```powerquery
+#table(
+    type table [Date = date, Year = number],
+    {{#date(2024, 3, 5), Date.Year(#date(2024, 3, 5))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"Year","type":"number"}],"rows":[{"Date":"2024-03-05","Year":2024}]}
+-->

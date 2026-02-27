@@ -1,0 +1,81 @@
+---
+title: "Type.ForFunction"
+slug: "type-forfunction"
+category: "Type"
+description: "Creates a function type from a signature record and minimum parameter count."
+syntax: "Type.ForFunction(signature as record, min as number) as type"
+returnType: "type"
+returnDescription: "A function type matching the specified signature."
+parameters:
+  - name: "signature"
+    type: "record"
+    required: true
+    description: "A record with ReturnType (a type) and Parameters (a list of records with Name, Type, and optional Description)."
+  - name: "min"
+    type: "number"
+    required: true
+    description: "The minimum number of required parameters."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-is"
+  - "type-tablerow"
+  - "function-from"
+---
+
+## Remarks
+
+`Type.ForFunction` constructs a function type from a descriptive record. The `signature` record has two fields:
+
+- `ReturnType` — the return type of the function.
+- `Parameters` — a list of records, each with `Name` (text), `Type` (type), and optionally `Description` (text).
+
+The `min` parameter specifies how many of the parameters are required. Parameters beyond `min` are treated as optional.
+
+This function is typically used with `Function.From` to create dynamically typed custom functions, or with `Value.ReplaceType` to add parameter metadata to an existing function so it renders properly in the Power Query UI.
+
+### Typical pattern
+
+```powerquery
+let
+    Signature = [
+        ReturnType = type text,
+        Parameters = {
+            [Name = "input", Type = type text, Description = "The input text"],
+            [Name = "prefix", Type = type text, Description = "Optional prefix"]
+        }
+    ],
+    FnType = Type.ForFunction(Signature, 1)  // 1 required, 1 optional
+in
+    FnType
+```
+
+## Examples
+
+### Example 1: Create a function type and verify it
+
+Build a function type signature and confirm it is a function type.
+
+```powerquery
+let
+    Signature = [
+        ReturnType = type number,
+        Parameters = {
+            [Name = "a", Type = type number],
+            [Name = "b", Type = type number]
+        }
+    ],
+    FnType = Type.ForFunction(Signature, 2),
+    IsFunction = Type.Is(FnType, type function)
+in
+    #table({"Description", "IsFunction"}, {{"type function (a as number, b as number) as number", IsFunction}})
+```
+
+<!--output
+{"columns":[{"name":"Description","type":"text"},{"name":"IsFunction","type":"logical"}],"rows":[{"Description":"type function (a as number, b as number) as number","IsFunction":true}]}
+-->

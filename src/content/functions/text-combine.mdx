@@ -1,0 +1,54 @@
+---
+title: "Text.Combine"
+slug: "text-combine"
+category: "Text"
+description: "Joins a list of text values into a single text value with an optional separator."
+syntax: "Text.Combine(texts as list, optional separator as nullable text) as text"
+returnType: "text"
+returnDescription: "A single text value created by joining all items in the list."
+parameters:
+  - name: "texts"
+    type: "list"
+    required: true
+    description: "A list of text values to combine."
+  - name: "separator"
+    type: "text"
+    required: false
+    description: "A text value to insert between each item. If omitted, items are concatenated directly."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-split"
+  - "combiner-combinetextbydelimiter"
+---
+
+## Remarks
+
+`Text.Combine` concatenates a list of text values into a single string. Pass a separator to insert a delimiter between each value — for example, a comma, space, or newline.
+
+Null values in the list are skipped (not included in the output). If all values are null, the result is an empty string.
+
+## Examples
+
+### Example 1: Combine customer cities
+
+Join all customer cities into a comma-separated string.
+
+Input: `Customers`
+
+```powerquery
+let
+    Cities = Table.Column(Customers, "City"),
+    Combined = Text.Combine(Cities, ", ")
+in
+    #table({"CityList"}, {{Combined}})
+```
+
+<!--output
+{"columns":[{"name":"CityList","type":"text"}],"rows":[{"CityList":"New York, Chicago, Houston, Seattle"}]}
+-->

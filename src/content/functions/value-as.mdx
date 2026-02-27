@@ -1,0 +1,55 @@
+---
+title: "Value.As"
+slug: "value-as"
+category: "Value"
+description: "Asserts that a value is compatible with a specified type, raising an error if not."
+syntax: "Value.As(value as any, type as type) as any"
+returnType: "any"
+returnDescription: "The original value if it is compatible with the specified type. Raises an error otherwise."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to assert and cast."
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The type to assert compatibility with."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-is"
+  - "value-type"
+  - "value-replacetype"
+---
+
+## Remarks
+
+`Value.As` returns the value unchanged if it is compatible with the specified type. If the value is not compatible, an error is raised. This is useful as a runtime assertion to ensure data quality and catch type mismatches early in a query pipeline.
+
+Unlike `Value.Is` which returns a boolean, `Value.As` either passes through the value or throws an error. Use `Value.Is` for conditional logic and `Value.As` for strict enforcement.
+
+## Examples
+
+### Example 1: Assert Sales UnitPrice values are numbers
+
+Use `Value.As` to confirm that UnitPrice values from Sales are numbers, then display them.
+
+Input: `Sales`
+
+```powerquery
+let
+    Prices = Table.Column(Table.FirstN(Sales, 4), "UnitPrice"),
+    Asserted = List.Transform(Prices, each Value.As(_, type number))
+in
+    #table({"UnitPrice"}, List.Transform(Asserted, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"UnitPrice","type":"number"}],"rows":[{"UnitPrice":25},{"UnitPrice":50},{"UnitPrice":15},{"UnitPrice":75}]}
+-->

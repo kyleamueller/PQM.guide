@@ -1,0 +1,49 @@
+---
+title: "Record.FieldNames"
+slug: "record-fieldnames"
+category: "Record"
+description: "Returns a list of field names from a record."
+syntax: "Record.FieldNames(record as record) as list"
+returnType: "list"
+returnDescription: "A list of text values representing the field names."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record whose field names to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fieldvalues"
+  - "record-field"
+  - "table-columnnames"
+---
+
+## Remarks
+
+`Record.FieldNames` returns the field names of a record as a list of text values. The names are returned in the same order they appear in the record. This is useful for inspecting the structure of a record or dynamically iterating over its fields. To access a single row as a record from a table, use the `table{index}` syntax — for example, `Sales{0}` returns the first row as a record.
+
+## Examples
+
+### Example 1: Get field names from the first Sales row
+
+Return all field names from the first row of the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstRow = Sales{0},
+    Names = Record.FieldNames(FirstRow)
+in
+    #table({"FieldName"}, List.Transform(Names, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"FieldName","type":"text"}],"rows":[{"FieldName":"OrderID"},{"FieldName":"CustomerName"},{"FieldName":"Product"},{"FieldName":"Category"},{"FieldName":"UnitPrice"},{"FieldName":"Quantity"},{"FieldName":"OrderDate"},{"FieldName":"Region"}]}
+-->

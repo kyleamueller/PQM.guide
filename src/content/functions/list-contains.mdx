@@ -1,0 +1,59 @@
+---
+title: "List.Contains"
+slug: "list-contains"
+category: "List"
+description: "Returns true if a list contains a specified value."
+syntax: "List.Contains(list as list, value as any, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if the value is found in the list, false otherwise."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to search."
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to search for."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "A comparer function for custom equality testing."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-containsany"
+  - "list-select"
+  - "list-distinct"
+---
+
+## Remarks
+
+`List.Contains` checks whether a specific value exists in a list. This is commonly used inside `Table.SelectRows` to filter rows where a column value is in a predefined set of values — similar to SQL's `IN` operator.
+
+## Examples
+
+### Example 1: Filter by a list of regions
+
+Select only sales from East or North regions using List.Contains.
+
+Input: `Sales`
+
+```powerquery
+let
+    TargetRegions = {"East", "North"}
+in
+    Table.SelectColumns(
+        Table.SelectRows(Sales, each List.Contains(TargetRegions, [Region])),
+        {"OrderID", "CustomerName", "Region"}
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Region":"East"},{"OrderID":3,"CustomerName":"Charlie","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Region":"North"},{"OrderID":6,"CustomerName":"Bob","Region":"East"},{"OrderID":8,"CustomerName":"Diana","Region":"North"}]}
+-->

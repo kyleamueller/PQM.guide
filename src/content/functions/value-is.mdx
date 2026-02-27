@@ -1,0 +1,62 @@
+---
+title: "Value.Is"
+slug: "value-is"
+category: "Value"
+description: "Checks whether a value is compatible with a specified type."
+syntax: "Value.Is(value as any, type as type) as logical"
+returnType: "logical"
+returnDescription: "True if the value is compatible with the specified type, otherwise false."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to check."
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The type to check against (e.g., type number, type text, type date)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-as"
+  - "value-fromtext"
+---
+
+## Remarks
+
+`Value.Is` returns `true` if a value is compatible with the specified type, and `false` otherwise. This is useful for type-checking before performing type-specific operations, or for building conditional logic that handles mixed-type columns.
+
+Common type checks include `type number`, `type text`, `type logical`, `type date`, `type record`, `type list`, and `type table`.
+
+## Examples
+
+### Example 1: Check if Sales OrderID values are numbers
+
+Verify the type of values in the OrderID column from Sales.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstRow = Table.First(Sales),
+    CheckOrderID = Value.Is(FirstRow[OrderID], type number),
+    CheckName = Value.Is(FirstRow[CustomerName], type number)
+in
+    #table(
+        {"Field", "Value", "IsNumber"},
+        {
+            {"OrderID", Text.From(FirstRow[OrderID]), Text.From(CheckOrderID)},
+            {"CustomerName", FirstRow[CustomerName], Text.From(CheckName)}
+        }
+    )
+```
+
+<!--output
+{"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"},{"name":"IsNumber","type":"text"}],"rows":[{"Field":"OrderID","Value":"1","IsNumber":"true"},{"Field":"CustomerName","Value":"Alice","IsNumber":"false"}]}
+-->

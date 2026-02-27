@@ -1,0 +1,81 @@
+---
+title: "Uri.Parts"
+slug: "uri-parts"
+category: "URI"
+description: "Parses an absolute URI into a record of its component parts."
+syntax: "Uri.Parts(absoluteUri as text) as record"
+returnType: "record"
+returnDescription: "A record containing the URI components: Scheme, Host, Port, Path, Query, Fragment, and more."
+parameters:
+  - name: "absoluteUri"
+    type: "text"
+    required: true
+    description: "The absolute URI to parse."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "uri-buildquerystring"
+  - "uri-escapedatastring"
+---
+
+## Remarks
+
+`Uri.Parts` breaks an absolute URI into its components and returns them as a record with the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `Scheme` | text | The protocol (e.g., `"https"`). |
+| `Host` | text | The hostname (e.g., `"www.example.com"`). |
+| `Port` | number | The port number (e.g., `443`). |
+| `Path` | text | The path segment (e.g., `"/api/data"`). |
+| `Query` | record | Query string parameters as a record (e.g., `[page = "1"]`). |
+| `Fragment` | text | The fragment identifier after `#`. |
+
+This function is useful for extracting specific parts of URLs stored in your data — for example, pulling the domain from a list of web addresses, or extracting query-string parameters.
+
+## Examples
+
+### Example 1: Parse a URL into components
+
+Extract the scheme, host, path, and query parameters from a URL.
+
+```powerquery
+let
+    Url = "https://api.example.com:8080/data/items?category=electronics&page=2",
+    Parts = Uri.Parts(Url)
+in
+    #table(
+        {"Component", "Value"},
+        {
+            {"Scheme", Parts[Scheme]},
+            {"Host", Parts[Host]},
+            {"Port", Text.From(Parts[Port])},
+            {"Path", Parts[Path]}
+        }
+    )
+```
+
+<!--output
+{"columns":[{"name":"Component","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Component":"Scheme","Value":"https"},{"Component":"Host","Value":"api.example.com"},{"Component":"Port","Value":"8080"},{"Component":"Path","Value":"/data/items"}]}
+-->
+
+### Example 2: Extract domain from URLs in a table
+
+Parse URLs and extract just the host.
+
+```powerquery
+let
+    Source = #table({"Page"}, {{"https://shop.example.com/products/123"}, {"https://blog.example.com/posts/hello"}}),
+    Added = Table.AddColumn(Source, "Domain", each Uri.Parts([Page])[Host], type text)
+in
+    Added
+```
+
+<!--output
+{"columns":[{"name":"Page","type":"text"},{"name":"Domain","type":"text"}],"rows":[{"Page":"https://shop.example.com/products/123","Domain":"shop.example.com"},{"Page":"https://blog.example.com/posts/hello","Domain":"blog.example.com"}]}
+-->

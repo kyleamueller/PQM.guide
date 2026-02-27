@@ -1,0 +1,55 @@
+---
+title: "Text.StartsWith"
+slug: "text-startswith"
+category: "Text"
+description: "Returns true if a text value starts with a specified substring."
+syntax: "Text.StartsWith(text as nullable text, substring as text, optional comparer as nullable function) as nullable logical"
+returnType: "logical"
+returnDescription: "true if the text starts with the substring, false otherwise."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to check."
+  - name: "substring"
+    type: "text"
+    required: true
+    description: "The substring to match at the beginning."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "A comparer function to control case sensitivity."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-endswith"
+  - "text-contains"
+---
+
+## Remarks
+
+`Text.StartsWith` checks whether a text value begins with a given substring. Like `Text.Contains`, the comparison is case-sensitive by default.
+
+## Examples
+
+### Example 1: Filter log entries by action prefix
+
+Find order log entries where the Notes start with "New order".
+
+Input: `OrderLog`
+
+```powerquery
+Table.SelectColumns(
+    Table.SelectRows(OrderLog, each Text.StartsWith([Notes], "New order")),
+    {"LogID", "Action", "Notes"}
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Action","type":"text"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L001","Action":"Created","Notes":"New order: Widget A"},{"LogID":"L003","Action":"Created","Notes":"New order: Gadget B"},{"LogID":"L005","Action":"Created","Notes":"New order: Widget C"},{"LogID":"L007","Action":"Created","Notes":"New order: Gadget D"}]}
+-->

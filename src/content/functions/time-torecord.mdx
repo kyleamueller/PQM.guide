@@ -1,0 +1,72 @@
+---
+title: "Time.ToRecord"
+slug: "time-torecord"
+category: "Time"
+description: "Converts a time value to a record containing its parts."
+syntax: "Time.ToRecord(time as time) as record"
+returnType: "record"
+returnDescription: "A record with Hour, Minute, and Second fields."
+parameters:
+  - name: "time"
+    type: "time"
+    required: true
+    description: "The time value to convert to a record."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-hour"
+  - "time-minute"
+  - "time-second"
+  - "datetime-torecord"
+---
+
+## Remarks
+
+`Time.ToRecord` converts a `time` value into a record with the fields `Hour`, `Minute`, and `Second`. Each field contains the corresponding numeric component from the time value.
+
+## Examples
+
+### Example 1: Convert an OrderLog time to a record
+
+Extract the time from the first OrderLog Timestamp and convert it to a record.
+
+Input: `OrderLog`
+
+```powerquery
+let
+    FirstRow = Table.First(OrderLog),
+    TimeValue = DateTime.Time(FirstRow[Timestamp]),
+    Rec = Time.ToRecord(TimeValue)
+in
+    #table(
+        type table [Hour = number, Minute = number, Second = number],
+        {{Rec[Hour], Rec[Minute], Rec[Second]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Hour":9,"Minute":30,"Second":0}]}
+-->
+
+### Example 2: Convert a scalar time to a record
+
+Convert a literal time value into its component parts.
+
+```powerquery
+let
+    Rec = Time.ToRecord(#time(14, 30, 45))
+in
+    #table(
+        type table [Hour = number, Minute = number, Second = number],
+        {{Rec[Hour], Rec[Minute], Rec[Second]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Hour":14,"Minute":30,"Second":45}]}
+-->

@@ -1,0 +1,49 @@
+---
+title: "Number.Sqrt"
+slug: "number-sqrt"
+category: "Number"
+description: "Returns the square root of a number."
+syntax: "Number.Sqrt(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The square root of the number."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to compute the square root of."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-power"
+  - "number-round"
+---
+
+## Remarks
+
+`Number.Sqrt` returns the square root of a non-negative number. If the input is negative, an error is raised. This function is often combined with `Number.Round` to produce cleaner results.
+
+Common use cases include distance calculations, standard deviation formulas, and normalising values by their magnitude.
+
+## Examples
+
+### Example 1: Square root of product prices
+
+Calculate the square root of each product price, rounded to two decimal places.
+
+Input: `Products`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Products, {"ProductName", "Price"}),
+    "SqrtPrice", each Number.Round(Number.Sqrt([Price]), 2), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"SqrtPrice","type":"number"}],"rows":[{"ProductName":"Widget A","Price":25,"SqrtPrice":5},{"ProductName":"Gadget B","Price":50,"SqrtPrice":7.07},{"ProductName":"Widget C","Price":15,"SqrtPrice":3.87},{"ProductName":"Gadget D","Price":75,"SqrtPrice":8.66},{"ProductName":"Thingamajig E","Price":120,"SqrtPrice":10.95}]}
+-->

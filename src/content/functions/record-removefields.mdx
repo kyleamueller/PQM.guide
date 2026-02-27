@@ -1,0 +1,56 @@
+---
+title: "Record.RemoveFields"
+slug: "record-removefields"
+category: "Record"
+description: "Returns a record with the specified fields removed."
+syntax: "Record.RemoveFields(record as record, fields as any, optional missingField as nullable number) as record"
+returnType: "record"
+returnDescription: "A record without the specified fields."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to remove fields from."
+  - name: "fields"
+    type: "any"
+    required: true
+    description: "A field name or list of field names to remove."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "A MissingField enum value that controls behavior when a specified field does not exist. Options are MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-selectfields"
+  - "record-fieldnames"
+  - "table-removecolumns"
+---
+
+## Remarks
+
+`Record.RemoveFields` returns a new record with the specified fields excluded. This is the record-level equivalent of `Table.RemoveColumns`. Use the optional `missingField` parameter to control what happens when a field you try to remove does not exist — by default an error is raised, but you can choose to ignore missing fields with `MissingField.Ignore`.
+
+## Examples
+
+### Example 1: Remove OrderDate and Region from a Sales row
+
+Remove the OrderDate and Region fields from the first Sales row.
+
+Input: `Sales`
+
+```powerquery
+let
+    Trimmed = Record.RemoveFields(Sales{0}, {"OrderDate", "Region"})
+in
+    Record.ToTable(Trimmed)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4}]}
+-->

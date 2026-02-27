@@ -1,0 +1,56 @@
+---
+title: "Record.SelectFields"
+slug: "record-selectfields"
+category: "Record"
+description: "Returns a record containing only the specified fields."
+syntax: "Record.SelectFields(record as record, fields as any, optional missingField as nullable number) as record"
+returnType: "record"
+returnDescription: "A record with only the specified fields."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to select fields from."
+  - name: "fields"
+    type: "any"
+    required: true
+    description: "A field name or list of field names to keep."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "A MissingField enum value that controls behavior when a specified field does not exist. Options are MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-removefields"
+  - "record-fieldnames"
+  - "table-selectcolumns"
+---
+
+## Remarks
+
+`Record.SelectFields` returns a new record containing only the fields you specify. This is the record-level equivalent of `Table.SelectColumns`. The optional `missingField` parameter controls what happens when a requested field does not exist in the record: raise an error (default), silently ignore it, or include it with a `null` value.
+
+## Examples
+
+### Example 1: Select a few fields from a Sales row
+
+Keep only the OrderID, Product, and UnitPrice fields from the first Sales row.
+
+Input: `Sales`
+
+```powerquery
+let
+    Selected = Record.SelectFields(Sales{0}, {"OrderID", "Product", "UnitPrice"})
+in
+    Record.ToTable(Selected)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"UnitPrice","Value":25}]}
+-->

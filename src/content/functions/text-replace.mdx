@@ -1,0 +1,58 @@
+---
+title: "Text.Replace"
+slug: "text-replace"
+category: "Text"
+description: "Replaces all occurrences of a substring within a text value."
+syntax: "Text.Replace(text as nullable text, old as text, new as text) as nullable text"
+returnType: "text"
+returnDescription: "The text with all occurrences of the old substring replaced by the new substring."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The original text value."
+  - name: "old"
+    type: "text"
+    required: true
+    description: "The substring to find and replace."
+  - name: "new"
+    type: "text"
+    required: true
+    description: "The replacement text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-remove"
+  - "text-contains"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Text.Replace` finds all occurrences of a substring and replaces them with a new value. The comparison is case-sensitive. To remove a substring entirely, pass an empty string `""` as the replacement.
+
+For replacing values at the table level (across entire columns), use `Table.ReplaceValue` with `Replacer.ReplaceText` instead.
+
+## Examples
+
+### Example 1: Clean phone numbers
+
+Remove dashes from phone numbers by replacing them with empty strings.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Employees, 3), {"Phone"}),
+    "Cleaned", each Text.Replace([Phone], "-", ""), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"Phone","type":"text"},{"name":"Cleaned","type":"text"}],"rows":[{"Phone":"(555) 123-4567","Cleaned":"(555) 1234567"},{"Phone":"(555) 234-5678","Cleaned":"(555) 2345678"},{"Phone":"(555) 345-6789","Cleaned":"(555) 3456789"}]}
+-->

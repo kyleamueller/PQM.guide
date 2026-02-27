@@ -1,0 +1,54 @@
+---
+title: "Binary.From"
+slug: "binary-from"
+category: "Binary"
+description: "Converts a value to its binary representation."
+syntax: "Binary.From(value as any, optional encoding as nullable number) as nullable binary"
+returnType: "binary"
+returnDescription: "The binary representation of the given value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert to binary."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The text encoding to use when converting text values (e.g., TextEncoding.Utf8)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-fromtext"
+  - "binary-totext"
+  - "text-from"
+---
+
+## Remarks
+
+`Binary.From` converts a value to its binary representation. When the input is text, it encodes the text using the specified encoding (defaulting to UTF-8). When the input is already binary, it is returned as-is.
+
+This function is useful when you need to prepare content for POST requests with `Web.Contents`, or when working with binary data transformations.
+
+## Examples
+
+### Example 1: Convert text to binary and back
+
+Convert a text value to binary, then verify by converting back to text via Base64.
+
+```powerquery
+let
+    TextValue = "Hello, World!",
+    AsBinary = Binary.From(TextValue),
+    AsBase64 = Binary.ToText(AsBinary, BinaryEncoding.Base64)
+in
+    #table({"Input", "Base64"}, {{TextValue, AsBase64}})
+```
+
+<!--output
+{"columns":[{"name":"Input","type":"text"},{"name":"Base64","type":"text"}],"rows":[{"Input":"Hello, World!","Base64":"SGVsbG8sIFdvcmxkIQ=="}]}
+-->

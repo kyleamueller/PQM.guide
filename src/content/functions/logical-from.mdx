@@ -1,0 +1,59 @@
+---
+title: "Logical.From"
+slug: "logical-from"
+category: "Logical"
+description: "Converts a value to a logical (true/false)."
+syntax: "Logical.From(value as any) as nullable logical"
+returnType: "logical"
+returnDescription: "A logical value derived from the input. 0 becomes false, any other number becomes true."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert to a logical. Numbers: 0 is false, non-zero is true. Text: \"true\"/\"false\" are converted. Logical values are returned as-is."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "logical-fromtext"
+  - "logical-totext"
+---
+
+## Remarks
+
+`Logical.From` converts a value to a logical (`true` or `false`). The conversion rules are:
+
+- **Numbers:** `0` converts to `false`, any non-zero number converts to `true`.
+- **Text:** `"true"` and `"false"` (case-insensitive) are converted to their logical equivalents.
+- **Logical:** Returned unchanged.
+- **null:** Returns `null`.
+
+An error is raised if the value cannot be converted (e.g., non-boolean text like `"hello"`).
+
+## Examples
+
+### Example 1: Convert quantities to logical flags
+
+Convert Sales Quantity values to logicals to demonstrate that non-zero numbers become true.
+
+Input: `Sales`
+
+```powerquery
+let
+    Values = {0, 1, 4, -1},
+    Results = List.Transform(Values, each Logical.From(_)),
+    TextResults = List.Transform(Results, each Text.From(_))
+in
+    #table(
+        {"InputValue", "AsLogical"},
+        List.Zip({List.Transform(Values, each Text.From(_)), TextResults})
+    )
+```
+
+<!--output
+{"columns":[{"name":"InputValue","type":"text"},{"name":"AsLogical","type":"text"}],"rows":[{"InputValue":"0","AsLogical":"false"},{"InputValue":"1","AsLogical":"true"},{"InputValue":"4","AsLogical":"true"},{"InputValue":"-1","AsLogical":"true"}]}
+-->

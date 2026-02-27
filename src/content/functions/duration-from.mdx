@@ -1,0 +1,69 @@
+---
+title: "Duration.From"
+slug: "duration-from"
+category: "Duration"
+description: "Converts a value to a duration."
+syntax: "Duration.From(value as any) as nullable duration"
+returnType: "duration"
+returnDescription: "A duration value converted from the given input."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts text, number, datetime, and datetimezone values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-days"
+  - "duration-hours"
+  - "duration-totaldays"
+---
+
+## Remarks
+
+`Duration.From` converts text or number values into a `duration`. Number values are interpreted as days (e.g., 1.5 represents 1 day and 12 hours). Text values must be in the format `d.hh:mm:ss`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert DurationMinutes to duration
+
+Convert the DurationMinutes values from OrderLog into proper duration values using `#duration`.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            OrderLog,
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "Duration", each #duration(0, 0, [DurationMinutes], 0), type duration
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Duration","type":"duration"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Duration":"1.04:45:00"},{"LogID":"L004","DurationMinutes":2745,"Duration":"1.21:45:00"},{"LogID":"L006","DurationMinutes":1065,"Duration":"0.17:45:00"},{"LogID":"L008","DurationMinutes":2670,"Duration":"1.20:30:00"}]}
+-->
+
+### Example 2: Convert a number to a duration
+
+Convert a numeric value representing days to a duration.
+
+```powerquery
+#table(
+    type table [Days = number, Duration = duration],
+    {{1.5, Duration.From(1.5)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Days","type":"number"},{"name":"Duration","type":"duration"}],"rows":[{"Days":1.5,"Duration":"1.12:00:00"}]}
+-->

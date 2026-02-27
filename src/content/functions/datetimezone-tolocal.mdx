@@ -1,0 +1,75 @@
+---
+title: "DateTimeZone.ToLocal"
+slug: "datetimezone-tolocal"
+category: "DateTimeZone"
+description: "Converts a datetimezone value to the local timezone."
+syntax: "DateTimeZone.ToLocal(dateTimeZone as nullable datetimezone) as nullable datetimezone"
+returnType: "datetimezone"
+returnDescription: "The datetimezone value converted to the local timezone."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "The datetimezone value to convert to local time."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-toutc"
+  - "datetimezone-from"
+  - "datetime-localnow"
+---
+
+## Remarks
+
+`DateTimeZone.ToLocal` converts a `datetimezone` value to the local timezone of the machine where the query is executed. The date and time are adjusted to reflect the local timezone offset, including daylight saving time if applicable. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert UTC timestamps to local time
+
+Convert UTC datetimezone values from OrderLog to local time. The output depends on the timezone of the machine running the query. This example assumes a UTC-5 (EST) local timezone.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 4),
+        {"LogID", "Timestamp"}
+    ),
+    "LocalTime",
+    each DateTimeZone.ToLocal(
+        DateTimeZone.From(
+            DateTime.From([Timestamp]) & #datetimezone(1900, 1, 1, 0, 0, 0, 0, 0)
+        )
+    ),
+    type datetimezone
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"LocalTime","type":"datetimezone"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","LocalTime":"2024-01-15T04:30:00-05:00"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","LocalTime":"2024-01-16T09:15:00-05:00"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","LocalTime":"2024-01-18T06:00:00-05:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","LocalTime":"2024-01-20T03:45:00-05:00"}]}
+-->
+
+### Example 2: Convert a UTC datetimezone to local
+
+Convert a single UTC datetimezone to the local timezone (assumes UTC-5).
+
+```powerquery
+#table(
+    type table [UTC = datetimezone, Local = datetimezone],
+    {{
+        #datetimezone(2024, 3, 15, 18, 0, 0, 0, 0),
+        DateTimeZone.ToLocal(#datetimezone(2024, 3, 15, 18, 0, 0, 0, 0))
+    }}
+)
+```
+
+<!--output
+{"columns":[{"name":"UTC","type":"datetimezone"},{"name":"Local","type":"datetimezone"}],"rows":[{"UTC":"2024-03-15T18:00:00+00:00","Local":"2024-03-15T13:00:00-05:00"}]}
+-->

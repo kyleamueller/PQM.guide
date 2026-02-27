@@ -1,0 +1,66 @@
+---
+title: "List.Generate"
+slug: "list-generate"
+category: "List"
+description: "Generates a list of values using an initial value, a condition, a next function, and an optional selector."
+syntax: "List.Generate(initial as function, condition as function, next as function, optional selector as nullable function) as list"
+returnType: "list"
+returnDescription: "A list of generated values."
+parameters:
+  - name: "initial"
+    type: "function"
+    required: true
+    description: "A function that returns the initial state value."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "A function that returns true to continue generating, false to stop."
+  - name: "next"
+    type: "function"
+    required: true
+    description: "A function that produces the next state value from the current state."
+  - name: "selector"
+    type: "function"
+    required: false
+    description: "An optional function that transforms each state value into the output value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-accumulate"
+  - "list-transform"
+---
+
+## Remarks
+
+`List.Generate` creates a list by repeatedly applying a "next" function to a state value, continuing while a condition is true. It is M's equivalent of a `while` loop.
+
+Common use cases include generating date sequences, paginating API calls, and building custom number ranges.
+
+## Examples
+
+### Example 1: Generate a date range
+
+Generate a list of the first 5 dates starting from the earliest order date.
+
+Input: `Sales`
+
+```powerquery
+let
+    StartDate = List.Min(Table.Column(Sales, "OrderDate")),
+    Dates = List.Generate(
+        () => StartDate,
+        each _ <= Date.AddDays(StartDate, 4),
+        each Date.AddDays(_, 1)
+    )
+in
+    #table({"Date"}, List.Transform(Dates, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"}],"rows":[{"Date":"2024-01-15"},{"Date":"2024-01-16"},{"Date":"2024-01-17"},{"Date":"2024-01-18"},{"Date":"2024-01-19"}]}
+-->

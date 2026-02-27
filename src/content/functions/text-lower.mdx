@@ -1,0 +1,51 @@
+---
+title: "Text.Lower"
+slug: "text-lower"
+category: "Text"
+description: "Converts all characters in a text value to lowercase."
+syntax: "Text.Lower(text as nullable text, optional culture as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The input text with all characters converted to lowercase."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to convert to lowercase."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code (e.g., \"en-US\") that determines locale-specific casing rules."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-upper"
+  - "text-proper"
+---
+
+## Remarks
+
+`Text.Lower` converts every character in a text value to its lowercase equivalent. This is commonly used to normalize text before case-insensitive comparisons or deduplication.
+
+## Examples
+
+### Example 1: Lowercase employee names
+
+Convert the mixed-case FullName column to lowercase.
+
+Input: `Employees`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Employees, 3), {"FullName"}),
+    {"FullName", Text.Lower, type text}
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"alice smith"},{"FullName":"bob jones"},{"FullName":"charlie brown"}]}
+-->

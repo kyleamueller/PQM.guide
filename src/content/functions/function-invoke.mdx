@@ -1,0 +1,73 @@
+---
+title: "Function.Invoke"
+slug: "function-invoke"
+category: "Function"
+description: "Invokes a function with a list of arguments."
+syntax: "Function.Invoke(function as function, args as list) as any"
+returnType: "any"
+returnDescription: "The result of calling the function with the provided arguments."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "The function to invoke."
+  - name: "args"
+    type: "list"
+    required: true
+    description: "A list of argument values to pass to the function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "expression-evaluate"
+  - "function-from"
+---
+
+## Remarks
+
+`Function.Invoke` calls a function by passing its arguments as a list rather than positionally. This is useful when:
+
+- The function to call is stored in a variable or selected dynamically at runtime.
+- The argument list is constructed programmatically (e.g., from a record or table).
+- You need to abstract over functions with different arities.
+
+Each element in the `args` list corresponds to a positional parameter of the function. For optional parameters you want to skip, include `null` in the corresponding list position.
+
+## Examples
+
+### Example 1: Invoke Text.Upper dynamically
+
+Call `Text.Upper` by passing it as a function value with its argument in a list.
+
+```powerquery
+let
+    Func = Text.Upper,
+    Result = Function.Invoke(Func, {"hello world"})
+in
+    #table({"Function", "Result"}, {{"Text.Upper", Result}})
+```
+
+<!--output
+{"columns":[{"name":"Function","type":"text"},{"name":"Result","type":"text"}],"rows":[{"Function":"Text.Upper","Result":"HELLO WORLD"}]}
+-->
+
+### Example 2: Dynamically choose a function
+
+Select a function based on a condition and invoke it.
+
+```powerquery
+let
+    Operation = "lower",
+    Func = if Operation = "upper" then Text.Upper else Text.Lower,
+    Result = Function.Invoke(Func, {"Power Query"})
+in
+    #table({"Operation", "Input", "Result"}, {{Operation, "Power Query", Result}})
+```
+
+<!--output
+{"columns":[{"name":"Operation","type":"text"},{"name":"Input","type":"text"},{"name":"Result","type":"text"}],"rows":[{"Operation":"lower","Input":"Power Query","Result":"power query"}]}
+-->

@@ -1,0 +1,70 @@
+---
+title: "Date.From"
+slug: "date-from"
+category: "Date"
+description: "Converts a value to a date."
+syntax: "Date.From(value as any, optional culture as nullable text) as nullable date"
+returnType: "date"
+returnDescription: "The date converted from the given value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert to a date. Accepts text, datetime, datetimezone, and number values."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "Optional culture code for locale-aware text parsing (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-year"
+  - "date-month"
+  - "date-day"
+---
+
+## Remarks
+
+`Date.From` converts text, datetime, datetimezone, or number values into a `date`. Text values are parsed according to standard date formats or the specified `culture`. Number values are interpreted as OLE Automation dates (days since December 30, 1899). If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert text dates to date values
+
+Convert the HireDate text values from Employees into proper date values.
+
+Input: `Employees`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(
+        Table.FirstN(Employees, 3),
+        {"FullName", "HireDate"}
+    ),
+    {{"HireDate", each Date.From(_), type date}}
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"}],"rows":[{"FullName":"John Smith","HireDate":"2021-03-15"},{"FullName":"Sara Johnson","HireDate":"2019-07-01"},{"FullName":"Mike Davis","HireDate":"2022-01-10"}]}
+-->
+
+### Example 2: Convert a text string to a date
+
+Convert a literal text value to a date using `Date.From`.
+
+```powerquery
+#table(
+    type table [Result = date],
+    {{Date.From("2024-06-15")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-06-15"}]}
+-->

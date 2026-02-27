@@ -1,0 +1,58 @@
+---
+title: "Type.TableRow"
+slug: "type-tablerow"
+category: "Type"
+description: "Returns the row type of a table type."
+syntax: "Type.TableRow(table as type) as type"
+returnType: "type"
+returnDescription: "The record type representing a single row of the table type."
+parameters:
+  - name: "table"
+    type: "type"
+    required: true
+    description: "A table type to extract the row type from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-is"
+  - "type-listitem"
+  - "type-forfunction"
+---
+
+## Remarks
+
+`Type.TableRow` extracts the row type (a record type) from a table type. The returned record type describes the structure of a single row — its field names and their types.
+
+For example, given `type table [Name = text, Age = number]`, `Type.TableRow` returns a record type equivalent to `type [Name = text, Age = number]`.
+
+This is useful for:
+
+- Introspecting table schemas programmatically.
+- Building generic functions that adapt to the structure of their input tables.
+- Combining with `Type.ForFunction` to construct function signatures dynamically.
+
+If the input type is not a table type, the function raises an error.
+
+## Examples
+
+### Example 1: Inspect row type of a table type
+
+Extract the row type and verify it is a record type.
+
+```powerquery
+let
+    MyTableType = type table [Name = text, Score = number],
+    RowType = Type.TableRow(MyTableType),
+    IsRecord = Type.Is(RowType, type record)
+in
+    #table({"TableType", "RowType IsRecord"}, {{"type table [Name, Score]", IsRecord}})
+```
+
+<!--output
+{"columns":[{"name":"TableType","type":"text"},{"name":"RowType IsRecord","type":"logical"}],"rows":[{"TableType":"type table [Name, Score]","RowType IsRecord":true}]}
+-->

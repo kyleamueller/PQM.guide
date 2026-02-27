@@ -1,0 +1,59 @@
+---
+title: "Splitter.SplitTextByDelimiter"
+slug: "splitter-splittextbydelimiter"
+category: "Splitter"
+description: "Returns a function that splits text by a specified delimiter."
+syntax: "Splitter.SplitTextByDelimiter(delimiter as text, optional quoteStyle as nullable number) as function"
+returnType: "function"
+returnDescription: "A function that takes a text value and returns a list of text parts split on the delimiter."
+parameters:
+  - name: "delimiter"
+    type: "text"
+    required: true
+    description: "The text delimiter to split on."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "A QuoteStyle value specifying how to handle quoted sections. Defaults to QuoteStyle.None."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbyeachdelimiter"
+  - "splitter-splittextbyanydelimiter"
+  - "text-split"
+---
+
+## Remarks
+
+`Splitter.SplitTextByDelimiter` returns a **function** that splits text at every occurrence of the specified delimiter. It is most commonly used as an argument to `Table.SplitColumn` to break a single column into multiple columns.
+
+The optional `quoteStyle` parameter controls how quoted sections are handled. Use `QuoteStyle.Csv` to respect CSV quoting rules where delimiters inside quotes are ignored.
+
+## Examples
+
+### Example 1: Split employee names on space
+
+Split the FullName column from Employees into FirstName and LastName columns using a space delimiter.
+
+Input: `Employees`
+
+```powerquery
+Table.SelectColumns(
+    Table.SplitColumn(
+        Table.SelectColumns(Table.FirstN(Employees, 4), {"FullName"}),
+        "FullName",
+        Splitter.SplitTextByDelimiter(" "),
+        {"FirstName", "LastName"}
+    ),
+    {"FirstName", "LastName"}
+)
+```
+
+<!--output
+{"columns":[{"name":"FirstName","type":"text"},{"name":"LastName","type":"text"}],"rows":[{"FirstName":"alice","LastName":"smith"},{"FirstName":"BOB","LastName":"JONES"},{"FirstName":"Charlie","LastName":"Brown"},{"FirstName":"diana","LastName":"PRINCE"}]}
+-->

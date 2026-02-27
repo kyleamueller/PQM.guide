@@ -1,0 +1,64 @@
+---
+title: "Value.FromText"
+slug: "value-fromtext"
+category: "Value"
+description: "Converts a text value to a typed value based on its content."
+syntax: "Value.FromText(value as any, optional culture as nullable text) as any"
+returnType: "any"
+returnDescription: "A value interpreted from the text input. Numbers, dates, logicals, and other types are automatically detected."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The text value to convert."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code (e.g., \"en-US\") that influences how the text is parsed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-is"
+  - "logical-fromtext"
+  - "number-from"
+---
+
+## Remarks
+
+`Value.FromText` attempts to interpret a text string and convert it to the most appropriate typed value. It can detect numbers, dates, logicals, and other types from their text representation. An optional culture parameter controls locale-specific parsing rules for numbers and dates.
+
+This function is useful when processing text-based data sources where all values arrive as text and need to be converted to their proper types.
+
+## Examples
+
+### Example 1: Parse various text values into typed values
+
+Convert text representations of different value types and verify the results.
+
+Input: `Sales`
+
+```powerquery
+let
+    TextValues = {"42", "true", "3.14"},
+    Parsed = List.Transform(TextValues, each Value.FromText(_)),
+    TypeNames = List.Transform(Parsed, each
+        if Value.Is(_, type number) then "number"
+        else if Value.Is(_, type logical) then "logical"
+        else "other"
+    )
+in
+    #table(
+        {"InputText", "ParsedValue", "DetectedType"},
+        List.Zip({TextValues, List.Transform(Parsed, each Text.From(_)), TypeNames})
+    )
+```
+
+<!--output
+{"columns":[{"name":"InputText","type":"text"},{"name":"ParsedValue","type":"text"},{"name":"DetectedType","type":"text"}],"rows":[{"InputText":"42","ParsedValue":"42","DetectedType":"number"},{"InputText":"true","ParsedValue":"true","DetectedType":"logical"},{"InputText":"3.14","ParsedValue":"3.14","DetectedType":"number"}]}
+-->

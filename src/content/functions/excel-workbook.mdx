@@ -1,0 +1,77 @@
+---
+title: "Excel.Workbook"
+slug: "excel-workbook"
+category: "Accessing Data"
+description: "Returns the contents of an Excel workbook as a navigation table."
+syntax: "Excel.Workbook(workbook as binary, optional useHeaders as any, optional delayTypes as nullable logical) as table"
+returnType: "table"
+returnDescription: "A navigation table listing the sheets, tables, and named ranges in the workbook."
+parameters:
+  - name: "workbook"
+    type: "binary"
+    required: true
+    description: "The binary content of an Excel workbook (.xlsx or .xls)."
+  - name: "useHeaders"
+    type: "any"
+    required: false
+    description: "When true, the first row of each sheet is treated as column headers. Can also be null."
+  - name: "delayTypes"
+    type: "logical"
+    required: false
+    description: "When true, type detection is deferred until data is accessed, which can improve performance."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "file-contents"
+  - "csv-document"
+---
+
+## Remarks
+
+`Excel.Workbook` reads the binary content of an Excel file and returns a **navigation table** with the following columns:
+
+| Column | Type | Description |
+|---|---|---|
+| `Name` | text | The name of the sheet, table, or named range. |
+| `Data` | table | The data contained within that item. |
+| `Item` | text | The type of item: `"Sheet"`, `"Table"`, or `"DefinedName"`. |
+| `Kind` | text | Same as Item (included for compatibility). |
+| `Hidden` | logical | Whether the sheet or item is hidden. |
+
+### Common patterns
+
+**Load a specific sheet by name:**
+
+```powerquery
+let
+    Source = Excel.Workbook(File.Contents("C:\Data\report.xlsx"), true),
+    SalesSheet = Source{[Item = "Sheet", Name = "Sales"]}[Data]
+in
+    SalesSheet
+```
+
+**Load a named table:**
+
+```powerquery
+let
+    Source = Excel.Workbook(File.Contents("C:\Data\report.xlsx"), true),
+    OrdersTable = Source{[Item = "Table", Name = "tblOrders"]}[Data]
+in
+    OrdersTable
+```
+
+### Notes
+
+- Pass `true` for `useHeaders` to promote the first row of each sheet to column headers automatically.
+- Setting `delayTypes` to `true` can improve performance for large workbooks by deferring type inference.
+- The navigation table includes all sheets, named tables, and defined names. Use row filtering (`{[Item = "Sheet", Name = "..."]}`) to drill into a specific item.
+- Hidden sheets appear in the result with `Hidden = true`. Filter them out if needed.
+
+## Examples
+
+Since `Excel.Workbook` requires a file on disk, live output examples are not shown. See the Remarks section above for typical usage patterns.

@@ -1,0 +1,54 @@
+---
+title: "Splitter.SplitTextByCharacterTransition"
+slug: "splitter-splittextbycharactertransition"
+category: "Splitter"
+description: "Returns a function that splits text at transitions between character types."
+syntax: "Splitter.SplitTextByCharacterTransition(before as anynonnull, after as anynonnull) as function"
+returnType: "function"
+returnDescription: "A function that takes a text value and returns a list of text parts split where the character type transitions from before to after."
+parameters:
+  - name: "before"
+    type: "anynonnull"
+    required: true
+    description: "A character classification function or list of characters. The split occurs where a character matching before is followed by a character matching after."
+  - name: "after"
+    type: "anynonnull"
+    required: true
+    description: "A character classification function or list of characters. The split occurs where a character matching before is followed by a character matching after."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbydelimiter"
+  - "splitter-splittextbyanydelimiter"
+---
+
+## Remarks
+
+`Splitter.SplitTextByCharacterTransition` returns a **function** that splits text at the boundary where one character type transitions to another. You specify the `before` and `after` character classifications using functions like `Character.IsLetter` and `Character.IsNumber`, or by providing lists of characters.
+
+This is especially useful for splitting strings that combine letters and digits without a delimiter — for example, splitting "ABC123" into "ABC" and "123".
+
+## Examples
+
+### Example 1: Split where letters transition to digits
+
+Split product codes that combine text and numbers, such as splitting "Widget123" at the letter-to-digit boundary.
+
+Input: `Sales`
+
+```powerquery
+let
+    SplitFn = Splitter.SplitTextByCharacterTransition(Character.IsLetter, Character.IsNumber),
+    Parts = SplitFn("WidgetA100")
+in
+    #table({"TextPart", "NumberPart"}, {{Parts{0}, Parts{1}}})
+```
+
+<!--output
+{"columns":[{"name":"TextPart","type":"text"},{"name":"NumberPart","type":"text"}],"rows":[{"TextPart":"WidgetA","NumberPart":"100"}]}
+-->

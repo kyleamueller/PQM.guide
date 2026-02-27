@@ -1,0 +1,55 @@
+---
+title: "Text.EndsWith"
+slug: "text-endswith"
+category: "Text"
+description: "Returns true if a text value ends with a specified substring."
+syntax: "Text.EndsWith(text as nullable text, substring as text, optional comparer as nullable function) as nullable logical"
+returnType: "logical"
+returnDescription: "true if the text ends with the substring, false otherwise."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to check."
+  - name: "substring"
+    type: "text"
+    required: true
+    description: "The substring to match at the end."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "A comparer function to control case sensitivity."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-startswith"
+  - "text-contains"
+---
+
+## Remarks
+
+`Text.EndsWith` checks whether a text value ends with a given substring. Like `Text.Contains`, the comparison is case-sensitive by default.
+
+## Examples
+
+### Example 1: Filter log entries ending with "express"
+
+Find order log entries where the Notes end with "express".
+
+Input: `OrderLog`
+
+```powerquery
+Table.SelectColumns(
+    Table.SelectRows(OrderLog, each Text.EndsWith([Notes], "express")),
+    {"LogID", "OrderID", "Notes"}
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L002","OrderID":1,"Notes":"Shipped via express"},{"LogID":"L008","OrderID":4,"Notes":"Shipped via express"}]}
+-->

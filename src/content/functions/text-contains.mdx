@@ -1,0 +1,58 @@
+---
+title: "Text.Contains"
+slug: "text-contains"
+category: "Text"
+description: "Returns true if a text value contains a specified substring."
+syntax: "Text.Contains(text as nullable text, substring as text, optional comparer as nullable function) as nullable logical"
+returnType: "logical"
+returnDescription: "true if the text contains the substring, false otherwise."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to search within."
+  - name: "substring"
+    type: "text"
+    required: true
+    description: "The substring to search for."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "A comparer function (e.g., Comparer.OrdinalIgnoreCase) to control case sensitivity."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-startswith"
+  - "text-endswith"
+  - "text-replace"
+---
+
+## Remarks
+
+`Text.Contains` checks whether a text value includes a given substring. By default, the comparison is case-sensitive. Pass `Comparer.OrdinalIgnoreCase` as the third argument for case-insensitive matching.
+
+This function is commonly used inside `Table.SelectRows` to filter rows based on partial text matches.
+
+## Examples
+
+### Example 1: Filter orders by product name
+
+Find all Sales rows where the Product contains "Widget".
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.SelectRows(Sales, each Text.Contains([Product], "Widget")),
+    {"OrderID", "Product", "Category"}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"Category","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A","Category":"Widgets"},{"OrderID":3,"Product":"Widget C","Category":"Widgets"},{"OrderID":5,"Product":"Widget A","Category":"Widgets"},{"OrderID":8,"Product":"Widget C","Category":"Widgets"}]}
+-->

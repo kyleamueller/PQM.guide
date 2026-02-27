@@ -1,0 +1,47 @@
+---
+title: "Text.Length"
+slug: "text-length"
+category: "Text"
+description: "Returns the number of characters in a text value."
+syntax: "Text.Length(text as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "The number of characters in the text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to measure."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-trim"
+  - "text-contains"
+---
+
+## Remarks
+
+`Text.Length` returns the number of characters in a text value, including spaces and special characters. Returns null if the input is null.
+
+## Examples
+
+### Example 1: Get product name lengths
+
+Calculate the length of each product name.
+
+Input: `Products`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Products, {"ProductName"}),
+    "NameLength", each Text.Length([ProductName]), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"NameLength","type":"number"}],"rows":[{"ProductName":"Widget A","NameLength":8},{"ProductName":"Gadget B","NameLength":8},{"ProductName":"Widget C","NameLength":8},{"ProductName":"Gadget D","NameLength":8},{"ProductName":"Thingamajig E","NameLength":13}]}
+-->

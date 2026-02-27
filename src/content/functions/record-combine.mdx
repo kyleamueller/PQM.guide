@@ -1,0 +1,51 @@
+---
+title: "Record.Combine"
+slug: "record-combine"
+category: "Record"
+description: "Merges a list of records into a single record."
+syntax: "Record.Combine(records as list) as record"
+returnType: "record"
+returnDescription: "A single record containing all fields from the input records."
+parameters:
+  - name: "records"
+    type: "list"
+    required: true
+    description: "A list of records to merge into one. If multiple records share the same field name, the value from the last record in the list is used."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fieldnames"
+  - "record-selectfields"
+  - "record-removefields"
+  - "table-combine"
+---
+
+## Remarks
+
+`Record.Combine` merges a list of records into a single record containing all unique fields. When two or more records share the same field name, the value from the last record in the list takes precedence. This is useful for combining fields from different sources — for example, merging a Sales row with a Customers row to create a unified record. Be mindful of overlapping field names; rename or remove duplicates beforehand if you need to preserve both values.
+
+## Examples
+
+### Example 1: Combine fields from Sales and Customers rows
+
+Merge the first Sales row with the first Customers row. Overlapping fields are resolved by the last record.
+
+Input: `Sales`, `Customers`
+
+```powerquery
+let
+    SalesRow = Record.SelectFields(Sales{0}, {"OrderID", "Product", "UnitPrice"}),
+    CustomerRow = Record.SelectFields(Customers{0}, {"CustomerID", "Name", "City"}),
+    Combined = Record.Combine({SalesRow, CustomerRow})
+in
+    Record.ToTable(Combined)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"UnitPrice","Value":25},{"Name":"CustomerID","Value":1},{"Name":"Name","Value":"Alice"},{"Name":"City","Value":"New York"}]}
+-->

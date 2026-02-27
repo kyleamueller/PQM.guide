@@ -1,0 +1,53 @@
+---
+title: "Text.Remove"
+slug: "text-remove"
+category: "Text"
+description: "Removes all occurrences of specified characters from a text value."
+syntax: "Text.Remove(text as nullable text, removeChars as any) as nullable text"
+returnType: "text"
+returnDescription: "The text with all specified characters removed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to remove characters from."
+  - name: "removeChars"
+    type: "any"
+    required: true
+    description: "A single character or list of characters to remove."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-replace"
+  - "text-trim"
+---
+
+## Remarks
+
+`Text.Remove` strips all occurrences of one or more characters from a text value. Unlike `Text.Replace`, which replaces substrings, `Text.Remove` works with individual characters — pass a list of characters to remove multiple character types at once.
+
+This is ideal for stripping non-numeric characters from phone numbers, removing punctuation, or cleaning formatting characters.
+
+## Examples
+
+### Example 1: Extract digits from phone numbers
+
+Remove all non-digit characters from phone numbers.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Employees, 3), {"Phone"}),
+    "DigitsOnly", each Text.Remove([Phone], {"(", ")", " ", "-"}), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"Phone","type":"text"},{"name":"DigitsOnly","type":"text"}],"rows":[{"Phone":"(555) 123-4567","DigitsOnly":"5551234567"},{"Phone":"(555) 234-5678","DigitsOnly":"5552345678"},{"Phone":"(555) 345-6789","DigitsOnly":"5553456789"}]}
+-->

@@ -1,0 +1,71 @@
+---
+title: "Duration.Days"
+slug: "duration-days"
+category: "Duration"
+description: "Returns the whole days component from a duration value."
+syntax: "Duration.Days(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The whole number of days in the duration."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to extract the days component from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-hours"
+  - "duration-minutes"
+  - "duration-totaldays"
+---
+
+## Remarks
+
+`Duration.Days` returns the whole number of days from a `duration` value. This is the day component only, not the total days as a decimal. For the total elapsed days including fractions, use `Duration.TotalDays`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract days from OrderLog durations
+
+Convert DurationMinutes to a duration and extract the whole days component.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            OrderLog,
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "Days",
+    each Duration.Days(#duration(0, 0, [DurationMinutes], 0)),
+    Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Days","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Days":1},{"LogID":"L004","DurationMinutes":2745,"Days":1},{"LogID":"L006","DurationMinutes":1065,"Days":0},{"LogID":"L008","DurationMinutes":2670,"Days":1}]}
+-->
+
+### Example 2: Extract days from a scalar duration
+
+Return the days component of a literal duration.
+
+```powerquery
+#table(
+    type table [Duration = duration, Days = number],
+    {{#duration(3, 5, 30, 0), Duration.Days(#duration(3, 5, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"Days","type":"number"}],"rows":[{"Duration":"3.05:30:00","Days":3}]}
+-->

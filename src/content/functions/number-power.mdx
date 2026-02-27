@@ -1,0 +1,53 @@
+---
+title: "Number.Power"
+slug: "number-power"
+category: "Number"
+description: "Raises a number to a specified power."
+syntax: "Number.Power(number as nullable number, power as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The result of raising number to the given power."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The base number."
+  - name: "power"
+    type: "number"
+    required: true
+    description: "The exponent to raise the base to."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-sqrt"
+  - "number-abs"
+---
+
+## Remarks
+
+`Number.Power` raises the first argument to the power of the second. For example, `Number.Power(2, 3)` returns 8. Fractional exponents are supported — `Number.Power(x, 0.5)` is equivalent to `Number.Sqrt(x)`. Negative exponents return reciprocals.
+
+This is useful for mathematical transformations such as squaring values for variance calculations or applying exponential scaling.
+
+## Examples
+
+### Example 1: Square each product price
+
+Calculate the square of each product's price.
+
+Input: `Products`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Products, {"ProductName", "Price"}),
+    "PriceSquared", each Number.Power([Price], 2), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"PriceSquared","type":"number"}],"rows":[{"ProductName":"Widget A","Price":25,"PriceSquared":625},{"ProductName":"Gadget B","Price":50,"PriceSquared":2500},{"ProductName":"Widget C","Price":15,"PriceSquared":225},{"ProductName":"Gadget D","Price":75,"PriceSquared":5625},{"ProductName":"Thingamajig E","Price":120,"PriceSquared":14400}]}
+-->

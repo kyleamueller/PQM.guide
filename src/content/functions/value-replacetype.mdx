@@ -1,0 +1,64 @@
+---
+title: "Value.ReplaceType"
+slug: "value-replacetype"
+category: "Value"
+description: "Replaces the type metadata of a value without converting the value itself."
+syntax: "Value.ReplaceType(value as any, type as type) as any"
+returnType: "any"
+returnDescription: "The original value with its type metadata replaced by the specified type."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose type metadata to replace."
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The new type to assign. This replaces the metadata but does not convert the value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-is"
+  - "value-as"
+---
+
+## Remarks
+
+`Value.ReplaceType` replaces the type metadata attached to a value without performing any conversion. The underlying data remains unchanged — only the type annotation is updated. This is commonly used to:
+
+- Assign a custom record type with field-level documentation to a record or table row.
+- Attach function type metadata (parameter names, descriptions) to custom functions.
+- Override the inferred type of a table to provide more specific column type information.
+
+**Important:** This does not convert or validate the value. If you assign an incompatible type, the value may cause errors downstream when the type is checked.
+
+## Examples
+
+### Example 1: Assign a custom record type to a Sales row
+
+Create a typed record from the first row of Sales with explicit type annotations.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstRow = Table.First(Table.SelectColumns(Table.FirstN(Sales, 1), {"CustomerName", "Product", "Region"})),
+    CustomType = type [CustomerName = text, Product = text, Region = text],
+    Typed = Value.ReplaceType(FirstRow, CustomType),
+    IsMatch = Value.Is(Typed, CustomType)
+in
+    #table(
+        {"CustomerName", "Product", "Region", "TypeAssigned"},
+        {{Typed[CustomerName], Typed[Product], Typed[Region], Text.From(IsMatch)}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"},{"name":"TypeAssigned","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"East","TypeAssigned":"true"}]}
+-->

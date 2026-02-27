@@ -1,0 +1,71 @@
+---
+title: "Time.From"
+slug: "time-from"
+category: "Time"
+description: "Converts a value to a time."
+syntax: "Time.From(value as any, optional culture as nullable text) as nullable time"
+returnType: "time"
+returnDescription: "A time value converted from the given input."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts text, datetime, datetimezone, and number values."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "Culture code for locale-specific parsing (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-hour"
+  - "time-minute"
+  - "time-second"
+  - "datetime-time"
+---
+
+## Remarks
+
+`Time.From` converts text, datetime, datetimezone, or number values into a `time`. Text values are parsed according to standard time formats or the specified `culture`. Number values are interpreted as fractional days (e.g., 0.5 represents 12:00:00 PM). If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract time from OrderLog Timestamp
+
+Convert the Timestamp column in OrderLog to time-only values using `Time.From`.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 5),
+        {"LogID", "Timestamp"}
+    ),
+    "TimeOnly", each Time.From([Timestamp]), type time
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"TimeOnly","type":"time"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","TimeOnly":"09:30:00"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","TimeOnly":"14:15:00"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","TimeOnly":"11:00:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","TimeOnly":"08:45:00"},{"LogID":"L005","Timestamp":"2024-02-01T16:20:00","TimeOnly":"16:20:00"}]}
+-->
+
+### Example 2: Convert a text string to a time
+
+Convert a literal text value to a time.
+
+```powerquery
+#table(
+    type table [Result = time],
+    {{Time.From("14:30:00")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"14:30:00"}]}
+-->
