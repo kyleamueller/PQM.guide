@@ -11,7 +11,7 @@ PQM.guide is open to contributions from the Power Query community. Whether you w
 ### Quick edits
 
 1. Fork this repository
-2. Find the function file you want to edit in `src/content/functions/` (e.g., `table-group.mdx`)
+2. Find the function file you want to edit in `src/content/functions/` (e.g., `table-addcolumn.mdx`)
 3. Make your changes and submit a pull request
 
 ### Adding a new function page
@@ -45,7 +45,3 @@ If you're not comfortable with pull requests, you can:
 - [React 19](https://react.dev)
 - [Tailwind CSS 4](https://tailwindcss.com)
 - TypeScript, MDX, PrismJS
-
-## License
-
-See [LICENSE](LICENSE) for details.
