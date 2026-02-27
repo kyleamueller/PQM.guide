@@ -1,0 +1,65 @@
+---
+title: "Table.Pivot"
+slug: "table-pivot"
+category: "Table"
+description: "Rotates distinct values from an attribute column into new column headers, aggregating corresponding values."
+syntax: "Table.Pivot(table as table, pivotValues as list, attributeColumn as text, valueColumn as text, optional aggregationFunction as nullable function) as table"
+returnType: "table"
+returnDescription: "A table with distinct values from the attribute column transformed into column headers, with aggregated values from the value column."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to pivot."
+  - name: "pivotValues"
+    type: "list"
+    required: true
+    description: "A list of values from the attribute column that become new column headers."
+  - name: "attributeColumn"
+    type: "text"
+    required: true
+    description: "The column whose distinct values are pivoted into column headers."
+  - name: "valueColumn"
+    type: "text"
+    required: true
+    description: "The column whose values populate the new pivoted columns."
+  - name: "aggregationFunction"
+    type: "function"
+    required: false
+    description: "An optional aggregation function applied when multiple values exist for a pivot combination (e.g., List.Sum)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-unpivot"
+  - "table-unpivotothercolumns"
+---
+
+## Remarks
+
+`Table.Pivot` transforms a tall, narrow table into a wide table by turning distinct values from the `attributeColumn` into new columns. The `pivotValues` list specifies which values become column headers, and the `valueColumn` provides the data that fills the new columns.
+
+When multiple rows map to the same pivot combination, you must supply an `aggregationFunction` (such as `List.Sum` or `List.Count`) to resolve the conflict. Without an aggregation function, duplicate combinations cause an error.
+
+## Examples
+
+### Example 1: Pivot Category into columns with Quantity values
+
+Pivot the Category column into new column headers, summing Quantity values per Region.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(Sales, {"Region", "Category", "Quantity"})
+in
+    Table.Pivot(Source, {"Widgets", "Gadgets", "Misc"}, "Category", "Quantity", List.Sum)
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"text"},{"name":"Widgets","type":"number"},{"name":"Gadgets","type":"number"},{"name":"Misc","type":"number"}],"rows":[{"Region":"East","Widgets":14,"Gadgets":null,"Misc":1},{"Region":"West","Widgets":6,"Gadgets":5,"Misc":null},{"Region":"North","Widgets":8,"Gadgets":1,"Misc":null}]}
+-->

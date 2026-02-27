@@ -1,0 +1,81 @@
+---
+title: "Table.SelectRows"
+slug: "table-selectrows"
+category: "Table"
+description: "Returns a table of rows from the input table that match a selection condition."
+syntax: "Table.SelectRows(table as table, condition as function) as table"
+returnType: "table"
+returnDescription: "A table containing only the rows where the condition function returns true."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to filter."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "A function evaluated for each row. Rows where this returns true are included in the result."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-sort"
+  - "table-addcolumn"
+  - "table-removecolumns"
+---
+
+## Remarks
+
+`Table.SelectRows` evaluates the condition function for each row in the input table. The condition receives the current row as a record, and you access column values using bracket notation like `[ColumnName]`.
+
+The `each` keyword is syntactic sugar for `(_) =>`, making conditions more readable. For example, `each [Region] = "East"` is equivalent to `(_) => _[Region] = "East"`.
+
+You can combine multiple conditions using `and` and `or` operators.
+
+## Examples
+
+### Example 1: Filter rows by text value
+
+Select only the rows where Region is "East".
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(Sales, each [Region] = "East")
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.00,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"}]}
+-->
+
+### Example 2: Filter rows by numeric comparison
+
+Select rows where Quantity is greater than 3.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(Sales, each [Quantity] > 3)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
+-->
+
+### Example 3: Filter with multiple conditions
+
+Select rows where the Category is "Gadgets" and UnitPrice is greater than 50.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(Sales, each [Category] = "Gadgets" and [UnitPrice] > 50)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"}]}
+-->

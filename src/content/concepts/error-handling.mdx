@@ -1,0 +1,91 @@
+---
+title: "Error Handling"
+slug: "error-handling"
+description: "How to handle errors gracefully in M using try, otherwise, and error records."
+relatedConcepts:
+  - "type-system"
+  - "missingfield-handling"
+relatedFunctions:
+  - "table-selectrows"
+  - "table-addcolumn"
+---
+
+Errors in Power Query M are values, not exceptions. When an expression produces an error, the error propagates through the query until something handles it. Understanding this model is key to building robust, refresh-safe queries.
+
+### The try Expression
+
+`try` evaluates an expression and captures the result — whether it succeeds or fails — as a record:
+
+```powerquery
+try Number.FromText("abc")
+// Result: [HasError = true, Error = [Reason = "DataFormat.Error", ...]]
+
+try Number.FromText("42")
+// Result: [HasError = false, Value = 42]
+```
+
+The result always has a `HasError` field. If `true`, the `Error` field contains a record with `Reason`, `Message`, and `Detail`. If `false`, the `Value` field contains the successful result.
+
+### try ... otherwise
+
+The most common pattern combines `try` with `otherwise` to provide a fallback value:
+
+```powerquery
+try Number.FromText([Amount]) otherwise 0
+```
+
+This attempts the conversion and returns `0` if it fails. It is widely used in `Table.AddColumn` to handle dirty data:
+
+```powerquery
+Table.AddColumn(
+    Source,
+    "ParsedAmount",
+    each try Number.FromText([RawAmount]) otherwise null,
+    type nullable number
+)
+```
+
+### try ... catch
+
+For more control, `try ... catch` gives you access to the error record:
+
+```powerquery
+try Number.FromText([Amount]) catch (e) => "Error: " & e[Message]
+```
+
+This lets you log or transform the error message rather than simply replacing it with a default value.
+
+### Raising Errors
+
+You can raise your own errors using the `error` expression:
+
+```powerquery
+if [Quantity] < 0
+then error Error.Record("Validation", "Quantity cannot be negative", [Quantity])
+else [Quantity]
+```
+
+`Error.Record` creates a structured error with a reason, message, and optional detail value.
+
+### Cell-Level Errors
+
+In Power Query tables, errors can exist at the cell level. A column might have valid values in most rows but errors in a few. These show up as red error icons in the Power Query Editor.
+
+To find error rows, use:
+
+```powerquery
+Table.SelectRows(Source, each try [ColumnName] is error otherwise false)
+```
+
+To replace errors with a default value across an entire column:
+
+```powerquery
+Table.ReplaceErrorValues(Source, {{"ColumnName", null}})
+```
+
+### Best Practices
+
+1. **Use `try ... otherwise` for data conversions** where source data may be dirty or inconsistent.
+2. **Prefer `try ... catch`** when you need to log or transform the error rather than silently swallowing it.
+3. **Do not wrap everything in try.** Only handle errors where you expect them. Unexpected errors should propagate so you can find and fix root causes.
+4. **Use `Error.Record`** to create descriptive, structured errors rather than plain text strings.

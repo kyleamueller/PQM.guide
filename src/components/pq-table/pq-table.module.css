@@ -1,0 +1,143 @@
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--pq-border);
+  border-radius: 4px;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  background: var(--pq-bg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.caption {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pq-text-secondary);
+  background: var(--pq-header-bg);
+  border-bottom: 1px solid var(--pq-border);
+  text-align: left;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Header */
+.headerRow {
+  background: var(--pq-header-bg);
+}
+
+.headerCell {
+  padding: 5px 10px;
+  font-weight: 600;
+  color: var(--pq-text-primary);
+  border-bottom: 2px solid var(--pq-border-strong);
+  border-right: 1px solid var(--pq-border);
+  text-align: left;
+  user-select: none;
+}
+
+.headerCell:last-child {
+  border-right: none;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typeIcon {
+  flex-shrink: 0;
+  color: var(--pq-type-icon);
+  opacity: 0.75;
+}
+
+.columnName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Body rows */
+.row {
+  background: var(--pq-bg);
+}
+
+.rowAlt {
+  background: var(--pq-row-alt);
+}
+
+.row:hover,
+.rowAlt:hover {
+  background: var(--pq-row-hover);
+}
+
+/* Cells */
+.cell {
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--pq-border);
+  border-right: 1px solid var(--pq-border);
+  color: var(--pq-text-primary);
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell:last-child {
+  border-right: none;
+}
+
+.cellNumber {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cellDate {
+  font-variant-numeric: tabular-nums;
+}
+
+.cellLogicalTrue {
+  color: var(--pq-logical-true);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.cellLogicalFalse {
+  color: var(--pq-logical-false);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.cellNull {
+  color: var(--pq-null-text);
+  font-style: italic;
+}
+
+/* Row number column */
+.rowNumberCell {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--pq-border);
+  border-right: 1px solid var(--pq-border-strong);
+  color: var(--pq-text-secondary);
+  font-size: 11px;
+  text-align: right;
+  background: var(--pq-header-bg);
+  user-select: none;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.rowNumberHeader {
+  padding: 5px 8px;
+  border-bottom: 2px solid var(--pq-border-strong);
+  border-right: 1px solid var(--pq-border-strong);
+  background: var(--pq-header-bg);
+  width: 1%;
+}
+

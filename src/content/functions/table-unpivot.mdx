@@ -1,0 +1,66 @@
+---
+title: "Table.Unpivot"
+slug: "table-unpivot"
+category: "Table"
+description: "Transforms specified columns into attribute-value pairs, normalizing a wide table into a tall, narrow format."
+syntax: "Table.Unpivot(table as table, pivotColumns as list, attributeColumn as text, valueColumn as text) as table"
+returnType: "table"
+returnDescription: "A table with the specified columns unpivoted into rows of attribute-value pairs."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing columns to unpivot."
+  - name: "pivotColumns"
+    type: "list"
+    required: true
+    description: "A list of column names to unpivot into rows."
+  - name: "attributeColumn"
+    type: "text"
+    required: true
+    description: "The name of the new column that holds the original column names."
+  - name: "valueColumn"
+    type: "text"
+    required: true
+    description: "The name of the new column that holds the values from the unpivoted columns."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-pivot"
+  - "table-unpivotothercolumns"
+---
+
+## Remarks
+
+`Table.Unpivot` converts selected columns into rows, producing a pair of new columns: one for the original column names (the attribute column) and one for their values (the value column). All columns not listed in `pivotColumns` are repeated for each unpivoted row.
+
+This is the inverse of `Table.Pivot` and is useful for normalizing wide datasets where measures are spread across multiple columns into a format suitable for analysis or visualization.
+
+**Important:** Null values are silently removed during an unpivot operation — any cell that contains null will not produce a row in the output. If you need to preserve the fact that a value was missing, replace nulls with a placeholder (e.g., `0` or `"N/A"`) using `Table.ReplaceValue` before unpivoting.
+
+## Examples
+
+### Example 1: Unpivot UnitPrice and Quantity into attribute-value pairs
+
+Convert the UnitPrice and Quantity columns into rows with a Measure column holding the original column name and a Value column holding the amounts.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(
+        Table.FirstN(Sales, 3),
+        {"Product", "UnitPrice", "Quantity"}
+    )
+in
+    Table.Unpivot(Source, {"UnitPrice", "Quantity"}, "Measure", "Value")
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Product":"Widget A","Measure":"UnitPrice","Value":25},{"Product":"Widget A","Measure":"Quantity","Value":4},{"Product":"Gadget B","Measure":"UnitPrice","Value":50},{"Product":"Gadget B","Measure":"Quantity","Value":2},{"Product":"Widget C","Measure":"UnitPrice","Value":15},{"Product":"Widget C","Measure":"Quantity","Value":10}]}
+-->

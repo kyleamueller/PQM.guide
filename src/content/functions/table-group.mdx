@@ -1,0 +1,103 @@
+---
+title: "Table.Group"
+slug: "table-group"
+category: "Table"
+description: "Groups rows by key columns and applies aggregation functions to produce summary results."
+syntax: "Table.Group(table as table, key as any, aggregatedColumns as any, optional groupKind as nullable number, optional comparer as nullable function) as table"
+returnType: "table"
+returnDescription: "A table with one row per unique key value, with additional columns for aggregated results."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to group."
+  - name: "key"
+    type: "any"
+    required: true
+    description: "A column name or list of column names to group by."
+  - name: "aggregatedColumns"
+    type: "any"
+    required: true
+    description: "A list of {newColumnName, aggregationFunction} pairs defining the aggregations."
+  - name: "groupKind"
+    type: "number"
+    required: false
+    description: "GroupKind.Global (default) or GroupKind.Local for contiguous grouping."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "An optional comparer function for key comparison."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-sort"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.Group` groups rows that share the same values in the specified key column(s), then applies aggregation functions to produce summary columns. Common aggregation patterns include `List.Count` for counting rows, `List.Sum` for summing values, and `List.Average` for averages.
+
+The `aggregatedColumns` parameter takes a list of lists, where each inner list contains the new column name and a function that receives the grouped sub-table.
+
+If your data is already sorted and groups are contiguous (all rows for each key value appear together), use `GroupKind.Local` as the fourth argument for better performance. Otherwise, the default `GroupKind.Global` scans the entire table.
+
+If you sort a table before grouping, wrap the sorted table in `Table.Buffer` first. Without buffering, `Table.Group` does not guarantee that the row order from the preceding sort is preserved, which can lead to unexpected results.
+
+When using the "All Rows" aggregation pattern (`each _`), always include a type annotation as the third element in the aggregation list (e.g., `{"AllRows", each _, type table}`) to improve performance and readability.
+
+## Examples
+
+### Example 1: Count rows by group
+
+Count the number of orders per Region.
+
+Input: `Sales`
+
+```powerquery
+Table.Group(Sales, "Region", {{"OrderCount", each Table.RowCount(_), Int64.Type}})
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"text"},{"name":"OrderCount","type":"number"}],"rows":[{"Region":"East","OrderCount":3},{"Region":"West","OrderCount":3},{"Region":"North","OrderCount":2}]}
+-->
+
+### Example 2: Sum values by group
+
+Calculate the total Quantity ordered per Category.
+
+Input: `Sales`
+
+```powerquery
+Table.Group(Sales, "Category", {{"TotalQuantity", each List.Sum([Quantity]), type number}})
+```
+
+<!--output
+{"columns":[{"name":"Category","type":"text"},{"name":"TotalQuantity","type":"number"}],"rows":[{"Category":"Widgets","TotalQuantity":28},{"Category":"Gadgets","TotalQuantity":6},{"Category":"Misc","TotalQuantity":1}]}
+-->
+
+### Example 3: Multiple aggregations
+
+Group by Region and calculate both order count and average UnitPrice.
+
+Input: `Sales`
+
+```powerquery
+Table.Group(
+    Sales,
+    "Region",
+    {
+        {"OrderCount", each Table.RowCount(_), Int64.Type},
+        {"AvgPrice", each List.Average([UnitPrice]), type number}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"text"},{"name":"OrderCount","type":"number"},{"name":"AvgPrice","type":"number"}],"rows":[{"Region":"East","OrderCount":3,"AvgPrice":53.33},{"Region":"West","OrderCount":3,"AvgPrice":41.67},{"Region":"North","OrderCount":2,"AvgPrice":45.00}]}
+-->

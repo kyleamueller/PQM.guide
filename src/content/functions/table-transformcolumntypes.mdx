@@ -1,0 +1,72 @@
+---
+title: "Table.TransformColumnTypes"
+slug: "table-transformcolumntypes"
+category: "Table"
+description: "Transforms the types of the specified columns in a table."
+syntax: "Table.TransformColumnTypes(table as table, typeTransformations as list, optional culture as nullable text) as table"
+returnType: "table"
+returnDescription: "The input table with the specified columns converted to the given types."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose column types are to be transformed."
+  - name: "typeTransformations"
+    type: "list"
+    required: true
+    description: "A list of column name and type pairs, each specified as {columnName, newType}."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "Optional culture string used for locale-sensitive type conversions (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-removecolumns"
+---
+
+## Remarks
+
+`Table.TransformColumnTypes` changes the data type of one or more columns. The `typeTransformations` parameter is a list of lists, where each inner list contains the column name and the target type (e.g., `{{"OrderID", type text}}`).
+
+If a value cannot be converted to the target type, it results in an error for that cell. Use the optional `culture` parameter to control locale-specific formatting during conversion.
+
+If you have multiple "Changed Type" steps in your query, consolidate them into a single `Table.TransformColumnTypes` call. Multiple separate type-change steps add unnecessary overhead and make the query harder to maintain.
+
+When working with a database source (SQL Server, Oracle, etc.), be aware that `Table.TransformColumnTypes` can break [query folding](/concepts/query-folding). If the type change happens after a foldable step, the engine may pull all data locally before applying the conversion. In database scenarios, prefer handling type conversions in the source query or use `Table.TransformColumns` with a conversion function instead.
+
+## Examples
+
+### Example 1: Change a single column type
+
+Convert the OrderID column from number to text.
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumnTypes(Sales, {{"OrderID", type text}})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"text"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"}]}
+-->
+
+### Example 2: Change multiple column types at once
+
+Convert both UnitPrice and Quantity to text.
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumnTypes(Sales, {{"UnitPrice", type text}, {"Quantity", type text}})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"text"},{"name":"Quantity","type":"text"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4","OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"2","OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10","OrderDate":"2024-02-01","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":"75","Quantity":"1","OrderDate":"2024-02-10","Region":"North"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"6","OrderDate":"2024-03-05","Region":"West"}]}
+-->

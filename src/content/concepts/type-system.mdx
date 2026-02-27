@@ -1,0 +1,72 @@
+---
+title: "Type System"
+slug: "type-system"
+description: "How M's type system works — primitive types, nullable types, type annotations, and their impact on performance."
+relatedConcepts:
+  - "each-keyword"
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-transformcolumntypes"
+---
+
+Every value in Power Query M has a type. Understanding the type system helps you write queries that are faster, more predictable, and easier to debug.
+
+### Primitive Types
+
+M has a small set of built-in primitive types:
+
+- `type text` — strings
+- `type number` — integers and decimals
+- `type logical` — `true` or `false`
+- `type date`, `type time`, `type datetime`, `type datetimezone`, `type duration` — temporal values
+- `type binary` — raw byte sequences
+- `type null` — the null value
+- `type any` — accepts any value (the "I don't know" type)
+
+### Nullable Types
+
+By default, primitive types do not accept null. To allow null, use the `nullable` keyword:
+
+```powerquery
+type nullable text    // accepts text values or null
+type nullable number  // accepts numbers or null
+```
+
+In practice, most table columns should be nullable since real-world data frequently contains missing values.
+
+### Type Annotations on Columns
+
+When adding columns with `Table.AddColumn`, always specify the type as the fourth argument:
+
+```powerquery
+Table.AddColumn(Sales, "Total", each [UnitPrice] * [Quantity], type number)
+```
+
+This matters for two reasons:
+
+1. **Performance.** Without a type annotation, the engine must inspect every row to infer the column's type, which adds overhead — especially on large datasets.
+2. **Clarity.** The type annotation documents the expected output right where the column is defined, making the step self-documenting.
+
+### Table Types
+
+Tables themselves have types that describe their column structure:
+
+```powerquery
+type table [Name = text, Age = number, Active = logical]
+```
+
+You can use `Value.Type` to inspect a table's type at runtime, and `Type.TableSchema` to get a table describing each column's name, type, and other metadata.
+
+### Type Conversions
+
+`Table.TransformColumnTypes` changes the storage type of columns. This is different from converting values — it tells the engine how to interpret the data:
+
+```powerquery
+Table.TransformColumnTypes(Source, {{"Amount", type number}, {"Name", type text}})
+```
+
+If a value cannot be converted (e.g., the text `"abc"` to a number), the cell produces an error. Use `try`/`otherwise` patterns to handle conversion failures gracefully.
+
+### The any Type
+
+`type any` means "no type constraint." While convenient, it prevents the engine from optimizing operations on that column. Avoid `type any` when you know the actual type — prefer explicit annotations for better performance and clearer intent.
