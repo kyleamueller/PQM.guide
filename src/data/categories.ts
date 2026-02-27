@@ -9,7 +9,6 @@ export const categories: Category[] = [
   { slug: "datetime", name: "DateTime", description: "Functions for working with combined date and time values." },
   { slug: "datetimezone", name: "DateTimeZone", description: "Functions for date/time values with timezone information." },
   { slug: "duration", name: "Duration", description: "Functions for working with time duration values." },
-  { slug: "error-handling", name: "Error Handling", description: "Functions for handling and recovering from errors." },
   { slug: "expression", name: "Expression", description: "Functions for evaluating and working with expressions." },
   { slug: "function", name: "Function", description: "Functions for working with function values." },
   { slug: "lines", name: "Lines", description: "Functions for converting text to and from lists of lines." },
