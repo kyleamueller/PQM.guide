@@ -17,6 +17,7 @@ export default function ThemeToggle() {
       className="theme-toggle"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      title={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
       {isDark ? (
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
