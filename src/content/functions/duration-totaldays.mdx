@@ -1,0 +1,71 @@
+---
+title: "Duration.TotalDays"
+slug: "duration-totaldays"
+category: "Duration"
+description: "Returns the total number of days represented by a duration value."
+syntax: "Duration.TotalDays(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The total number of days as a decimal."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to convert to total days."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-days"
+  - "duration-totalseconds"
+  - "duration-from"
+---
+
+## Remarks
+
+`Duration.TotalDays` returns the total elapsed time of a `duration` value expressed as a decimal number of days. Unlike `Duration.Days`, which returns only the whole day component, `Duration.TotalDays` includes fractional days. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert DurationMinutes to total days
+
+Convert the DurationMinutes from OrderLog into durations and compute the total days as a decimal.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            OrderLog,
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "TotalDays",
+    each Duration.TotalDays(#duration(0, 0, [DurationMinutes], 0)),
+    type number
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"TotalDays","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"TotalDays":1.197916666666667},{"LogID":"L004","DurationMinutes":2745,"TotalDays":1.90625},{"LogID":"L006","DurationMinutes":1065,"TotalDays":0.739583333333333},{"LogID":"L008","DurationMinutes":2670,"TotalDays":1.854166666666667}]}
+-->
+
+### Example 2: Total days from a scalar duration
+
+Return the total days for a duration that includes hours and minutes.
+
+```powerquery
+#table(
+    type table [Duration = duration, TotalDays = number],
+    {{#duration(2, 12, 0, 0), Duration.TotalDays(#duration(2, 12, 0, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"TotalDays","type":"number"}],"rows":[{"Duration":"2.12:00:00","TotalDays":2.5}]}
+-->

@@ -1,0 +1,66 @@
+---
+title: "Date.StartOfYear"
+slug: "date-startofyear"
+category: "Date"
+description: "Returns the first day of the year for a given date."
+syntax: "Date.StartOfYear(dateTime as any) as any"
+returnType: "any"
+returnDescription: "The first day of the year containing the input date."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to find the start of the year for."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-endofyear"
+  - "date-startofmonth"
+  - "date-year"
+---
+
+## Remarks
+
+`Date.StartOfYear` returns January 1 of the year for the given `date`, `datetime`, or `datetimezone` value. The return type matches the input type. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Find the start of year for each hire date
+
+Get January 1 of each employee's hire year.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Employees, 4),
+        {"FullName", "HireDate"}
+    ),
+    "YearStart", each Date.StartOfYear([HireDate]), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"},{"name":"YearStart","type":"date"}],"rows":[{"FullName":"John Smith","HireDate":"2021-03-15","YearStart":"2021-01-01"},{"FullName":"Sara Johnson","HireDate":"2019-07-01","YearStart":"2019-01-01"},{"FullName":"Mike Davis","HireDate":"2022-01-10","YearStart":"2022-01-01"},{"FullName":"Emily Chen","HireDate":"2023-06-20","YearStart":"2023-01-01"}]}
+-->
+
+### Example 2: Start of year from a scalar value
+
+Return January 1 for a specific date.
+
+```powerquery
+#table(
+    type table [Date = date, StartOfYear = date],
+    {{#date(2024, 4, 15), Date.StartOfYear(#date(2024, 4, 15))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"StartOfYear","type":"date"}],"rows":[{"Date":"2024-04-15","StartOfYear":"2024-01-01"}]}
+-->

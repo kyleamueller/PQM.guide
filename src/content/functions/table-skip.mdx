@@ -1,0 +1,52 @@
+---
+title: "Table.Skip"
+slug: "table-skip"
+category: "Table"
+description: "Skips the first N rows of a table, or rows matching a condition."
+syntax: "Table.Skip(table as table, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "A table with the first N rows removed, or the leading rows that satisfied the condition removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to skip rows from."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many rows to skip, or a function that skips rows while the condition is true."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-firstn"
+  - "table-lastn"
+  - "table-range"
+  - "table-promoteheaders"
+---
+
+## Remarks
+
+`Table.Skip` removes rows from the beginning of a table. When passed a number, it skips exactly that many rows. When passed a condition function, it skips consecutive rows from the top while the condition is true — it stops skipping at the first row that fails the condition.
+
+This is the complement of `Table.FirstN`: where `Table.FirstN` keeps the first N rows, `Table.Skip` removes them. A common use case is skipping header or metadata rows in files that have non-tabular content at the top.
+
+## Examples
+
+### Example 1: Skip the first 5 rows
+
+Return everything after the first 5 rows.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.Skip(Sales, 5), {"OrderID", "CustomerName", "Product"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E"},{"OrderID":7,"CustomerName":"Charlie","Product":"Widget C"},{"OrderID":8,"CustomerName":"Diana","Product":"Gadget B"}]}
+-->

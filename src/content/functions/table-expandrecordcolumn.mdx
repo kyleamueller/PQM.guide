@@ -1,0 +1,65 @@
+---
+title: "Table.ExpandRecordColumn"
+slug: "table-expandrecordcolumn"
+category: "Table"
+description: "Expands a column of records into individual columns."
+syntax: "Table.ExpandRecordColumn(table as table, column as text, fieldNames as list, optional newColumnNames as nullable list) as table"
+returnType: "table"
+returnDescription: "A table with the specified record column replaced by individual columns for each field."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing a record column to expand."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name of the column containing records to expand."
+  - name: "fieldNames"
+    type: "list"
+    required: true
+    description: "A list of field names from the records to expand into columns."
+  - name: "newColumnNames"
+    type: "list"
+    required: false
+    description: "Optional list of new column names for the expanded fields. Must match the length of fieldNames."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-expandtablecolumn"
+  - "table-addcolumn"
+  - "table-fromrecords"
+---
+
+## Remarks
+
+`Table.ExpandRecordColumn` replaces a column of records with individual columns for each specified field. This commonly occurs when working with JSON or API data that contains nested objects, or when a custom column returns a record with multiple computed values.
+
+Use the optional `newColumnNames` parameter to rename fields during expansion — for example, to add a prefix and avoid name collisions with existing columns.
+
+Unlike `Table.ExpandTableColumn` (which expands nested tables), this function expands records — single rows of named fields.
+
+## Examples
+
+### Example 1: Expand computed record fields
+
+Add a record column with calculated values, then expand it into separate columns.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "CustomerName", "UnitPrice", "Quantity"}),
+    WithCalc = Table.AddColumn(Source, "Calc", each [Total = [UnitPrice] * [Quantity], DoubleQty = [Quantity] * 2])
+in
+    Table.ExpandRecordColumn(WithCalc, "Calc", {"Total", "DoubleQty"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Total","type":"number"},{"name":"DoubleQty","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4,"Total":100,"DoubleQty":8},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2,"Total":100,"DoubleQty":4},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10,"Total":150,"DoubleQty":20}]}
+-->

@@ -1,0 +1,71 @@
+---
+title: "Date.AddMonths"
+slug: "date-addmonths"
+category: "Date"
+description: "Adds a specified number of months to a date value."
+syntax: "Date.AddMonths(dateTime as any, numberOfMonths as number) as any"
+returnType: "any"
+returnDescription: "The date resulting from adding the specified number of months to the input date."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to add months to."
+  - name: "numberOfMonths"
+    type: "number"
+    required: true
+    description: "The number of months to add. Use negative values to subtract months."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-adddays"
+  - "date-addyears"
+  - "date-startofmonth"
+  - "date-endofmonth"
+---
+
+## Remarks
+
+`Date.AddMonths` adds or subtracts a whole number of months from a `date`, `datetime`, or `datetimezone` value. If the resulting day would exceed the number of days in the target month, the day is clamped to the last day of that month (e.g., adding 1 month to January 31 yields February 28 or 29).
+
+## Examples
+
+### Example 1: Add 3 months to each OrderDate
+
+Project each Sales OrderDate forward by three months.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "Plus3Months", each Date.AddMonths([OrderDate], 3), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Plus3Months","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Plus3Months":"2024-04-15"},{"OrderID":2,"OrderDate":"2024-01-18","Plus3Months":"2024-04-18"},{"OrderID":3,"OrderDate":"2024-02-01","Plus3Months":"2024-05-01"},{"OrderID":4,"OrderDate":"2024-02-10","Plus3Months":"2024-05-10"},{"OrderID":5,"OrderDate":"2024-03-05","Plus3Months":"2024-06-05"}]}
+-->
+
+### Example 2: Subtract 1 month from a date
+
+Move a date back by one month.
+
+```powerquery
+#table(
+    type table [OriginalDate = date, PreviousMonth = date],
+    {{#date(2024, 3, 31), Date.AddMonths(#date(2024, 3, 31), -1)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"OriginalDate","type":"date"},{"name":"PreviousMonth","type":"date"}],"rows":[{"OriginalDate":"2024-03-31","PreviousMonth":"2024-02-29"}]}
+-->

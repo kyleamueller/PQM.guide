@@ -1,0 +1,73 @@
+---
+title: "Binary.FromText"
+slug: "binary-fromtext"
+category: "Binary"
+description: "Decodes text encoded as Base64 or hexadecimal into a binary value."
+syntax: "Binary.FromText(text as nullable text, optional encoding as nullable number) as nullable binary"
+returnType: "binary"
+returnDescription: "The binary value decoded from the text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The Base64 or hex-encoded text to decode."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The binary encoding format: BinaryEncoding.Base64 (default) or BinaryEncoding.Hex."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-totext"
+  - "binary-from"
+---
+
+## Remarks
+
+`Binary.FromText` decodes a text string that represents binary data in Base64 or hexadecimal format. The `encoding` parameter determines which format to expect:
+
+- `BinaryEncoding.Base64` (default) — standard Base64 encoding (e.g., `"SGVsbG8="`).
+- `BinaryEncoding.Hex` — hexadecimal encoding (e.g., `"48656C6C6F"`).
+
+This is commonly used when APIs return binary data encoded as Base64 strings (e.g., image data, file attachments).
+
+## Examples
+
+### Example 1: Decode Base64 text
+
+Decode a Base64 string back into text by piping through Lines.FromBinary.
+
+```powerquery
+let
+    Base64Text = "SGVsbG8gV29ybGQ=",
+    Decoded = Binary.FromText(Base64Text, BinaryEncoding.Base64),
+    AsText = Text.FromBinary(Decoded)
+in
+    #table({"Encoded", "Decoded"}, {{Base64Text, AsText}})
+```
+
+<!--output
+{"columns":[{"name":"Encoded","type":"text"},{"name":"Decoded","type":"text"}],"rows":[{"Encoded":"SGVsbG8gV29ybGQ=","Decoded":"Hello World"}]}
+-->
+
+### Example 2: Decode hexadecimal text
+
+Decode a hex-encoded string.
+
+```powerquery
+let
+    HexText = "48656C6C6F",
+    Decoded = Binary.FromText(HexText, BinaryEncoding.Hex),
+    AsText = Text.FromBinary(Decoded)
+in
+    #table({"Hex", "Decoded"}, {{HexText, AsText}})
+```
+
+<!--output
+{"columns":[{"name":"Hex","type":"text"},{"name":"Decoded","type":"text"}],"rows":[{"Hex":"48656C6C6F","Decoded":"Hello"}]}
+-->

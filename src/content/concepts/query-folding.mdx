@@ -1,0 +1,39 @@
+---
+title: "Query Folding"
+slug: "query-folding"
+description: "How Power Query translates M steps into native data source queries for dramatically better performance."
+relatedConcepts:
+  - "lazy-evaluation"
+relatedFunctions:
+  - "table-transformcolumntypes"
+  - "table-selectrows"
+  - "table-removecolumns"
+  - "table-sort"
+---
+
+Query folding is the process by which Power Query translates your M transformation steps into a native query that runs directly on the data source (e.g., SQL for a database, OData for a web service). When steps fold, the data source does the heavy lifting — filtering, sorting, and transforming data before it ever reaches your machine.
+
+### Why It Matters
+
+Without query folding, Power Query downloads the entire dataset into memory and processes every step locally. For a table with millions of rows, this can mean the difference between a refresh that takes seconds and one that takes minutes (or fails entirely due to memory limits).
+
+### How to Check If a Step Folds
+
+In the Power Query Editor, right-click any step in the Applied Steps pane. If you see **"View Native Query"** and it is not grayed out, that step (and all steps above it) have been folded into a single native query. If the option is grayed out, folding has been broken at or before that step.
+
+### What Breaks Query Folding
+
+Not all M functions can be translated into native queries. Common folding-breakers include:
+
+- `Table.TransformColumnTypes` after a database source — the engine cannot translate M type conversions into SQL. Use `Table.TransformColumns` with a conversion function instead, or handle types in the source query.
+- `Table.AddColumn` with complex M logic — simple arithmetic may fold, but `if`/`then`/`else` or custom functions usually do not.
+- `Table.Buffer` — by design, this forces data into memory and breaks the folding chain.
+- `Table.Pivot` and `Table.Unpivot` — these rarely fold because most data sources lack a native equivalent.
+- Any step that uses a custom function or references another query.
+
+### Best Practices
+
+1. **Do foldable operations first.** Place filters (`Table.SelectRows`), column selection (`Table.SelectColumns`, `Table.RemoveColumns`), and sorts (`Table.Sort`) as early as possible in your query, before any steps that break folding.
+2. **Check the native query.** After building your query, right-click the last step and verify whether "View Native Query" is available. If not, walk backward through your steps to find where folding breaks.
+3. **Avoid unnecessary type changes.** The auto-generated "Changed Type" step from the UI often breaks folding. If your data source already has the correct types, consider removing it.
+4. **Use query parameters for filters.** Parameterized filters (e.g., `Table.SelectRows(Source, each [Date] >= StartDate)`) can fold when the parameter value is a simple scalar.

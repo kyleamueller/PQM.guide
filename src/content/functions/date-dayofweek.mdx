@@ -1,0 +1,75 @@
+---
+title: "Date.DayOfWeek"
+slug: "date-dayofweek"
+category: "Date"
+description: "Returns the day of the week for a given date."
+syntax: "Date.DayOfWeek(dateTime as any, optional firstDayOfWeek as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "A number from 0 to 6 representing the day of the week."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to find the day of the week for."
+  - name: "firstDayOfWeek"
+    type: "number"
+    required: false
+    description: "A Day.Type value indicating the first day of the week. Defaults to Day.Sunday (0). Use Day.Monday (1) for ISO weeks."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-day"
+  - "date-month"
+  - "date-year"
+---
+
+## Remarks
+
+`Date.DayOfWeek` returns a number from 0 to 6 indicating the day of the week for the given date. By default, 0 represents Sunday and 6 represents Saturday. You can change which day is considered the first day of the week by passing a `Day.Type` value (e.g., `Day.Monday`) as the second argument, which shifts the numbering so that the specified day becomes 0. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Find the day of week for each OrderDate
+
+Show the day-of-week number (Sunday = 0) for each OrderDate in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "DayOfWeek", each Date.DayOfWeek([OrderDate], Day.Sunday), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DayOfWeek","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DayOfWeek":1},{"OrderID":2,"OrderDate":"2024-01-18","DayOfWeek":4},{"OrderID":3,"OrderDate":"2024-02-01","DayOfWeek":4},{"OrderID":4,"OrderDate":"2024-02-10","DayOfWeek":6},{"OrderID":5,"OrderDate":"2024-03-05","DayOfWeek":2}]}
+-->
+
+### Example 2: Use Monday as the first day of the week
+
+Return day-of-week numbers with Monday as 0 (ISO standard).
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 4),
+        {"OrderID", "OrderDate"}
+    ),
+    "DayOfWeekMon", each Date.DayOfWeek([OrderDate], Day.Monday), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DayOfWeekMon","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DayOfWeekMon":0},{"OrderID":2,"OrderDate":"2024-01-18","DayOfWeekMon":3},{"OrderID":3,"OrderDate":"2024-02-01","DayOfWeekMon":3},{"OrderID":4,"OrderDate":"2024-02-10","DayOfWeekMon":5}]}
+-->

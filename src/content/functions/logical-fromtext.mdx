@@ -1,0 +1,52 @@
+---
+title: "Logical.FromText"
+slug: "logical-fromtext"
+category: "Logical"
+description: "Converts a text value to a logical (true/false)."
+syntax: "Logical.FromText(text as text) as nullable logical"
+returnType: "logical"
+returnDescription: "A logical value parsed from the text input."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "A text value to convert. Must be \"true\" or \"false\" (case-insensitive)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "logical-from"
+  - "logical-totext"
+---
+
+## Remarks
+
+`Logical.FromText` converts the text strings `"true"` and `"false"` (case-insensitive) to their corresponding logical values. Any other text input raises an error. This is useful when importing data from text-based sources where boolean values are stored as strings.
+
+## Examples
+
+### Example 1: Parse text boolean values
+
+Convert text representations of booleans to actual logical values.
+
+Input: `Products`
+
+```powerquery
+let
+    Values = {"true", "false", "TRUE", "False"},
+    Results = List.Transform(Values, each Logical.FromText(_)),
+    TextResults = List.Transform(Results, each Text.From(_))
+in
+    #table(
+        {"InputText", "AsLogical"},
+        List.Zip({Values, TextResults})
+    )
+```
+
+<!--output
+{"columns":[{"name":"InputText","type":"text"},{"name":"AsLogical","type":"text"}],"rows":[{"InputText":"true","AsLogical":"true"},{"InputText":"false","AsLogical":"false"},{"InputText":"TRUE","AsLogical":"true"},{"InputText":"False","AsLogical":"false"}]}
+-->

@@ -1,0 +1,81 @@
+---
+title: "Expression.Evaluate"
+slug: "expression-evaluate"
+category: "Expression"
+description: "Evaluates a Power Query M expression provided as text at runtime."
+syntax: "Expression.Evaluate(document as text, optional environment as nullable record) as any"
+returnType: "any"
+returnDescription: "The result of evaluating the M expression."
+parameters:
+  - name: "document"
+    type: "text"
+    required: true
+    description: "The M expression text to evaluate."
+  - name: "environment"
+    type: "record"
+    required: false
+    description: "A record of names and values available to the expression during evaluation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "function-invoke"
+---
+
+## Remarks
+
+`Expression.Evaluate` compiles and executes an M expression provided as a text string. This enables dynamic or meta-programming scenarios where the expression to run is not known at design time.
+
+The `environment` parameter is critical — it defines which names (functions, values, types) are available inside the evaluated expression. Without an environment, the expression has access only to built-in constants and operators. To make standard library functions available, pass `#shared` as the environment:
+
+```powerquery
+Expression.Evaluate("Text.Upper(""hello"")", #shared)
+```
+
+Or pass a custom environment with specific bindings:
+
+```powerquery
+Expression.Evaluate("x + y", [x = 10, y = 20])
+```
+
+### Important notes
+
+- The evaluated expression runs in an isolated scope. It cannot access `let` bindings or step names from the surrounding query unless you explicitly pass them in the environment record.
+- `#shared` provides access to all standard library functions and any other queries in the workbook.
+- Use this sparingly — dynamic evaluation can make queries harder to debug and may prevent query folding.
+
+## Examples
+
+### Example 1: Evaluate a simple arithmetic expression
+
+Evaluate a text expression with a custom environment.
+
+```powerquery
+let
+    Result = Expression.Evaluate("a * b + c", [a = 5, b = 4, c = 3])
+in
+    #table({"Expression", "Result"}, {{"a * b + c  (a=5, b=4, c=3)", Result}})
+```
+
+<!--output
+{"columns":[{"name":"Expression","type":"text"},{"name":"Result","type":"number"}],"rows":[{"Expression":"a * b + c  (a=5, b=4, c=3)","Result":23}]}
+-->
+
+### Example 2: Evaluate with standard library functions
+
+Use `#shared` to make library functions available.
+
+```powerquery
+let
+    Result = Expression.Evaluate("Text.Reverse(""Power Query"")", #shared)
+in
+    #table({"Input", "Reversed"}, {{"Power Query", Result}})
+```
+
+<!--output
+{"columns":[{"name":"Input","type":"text"},{"name":"Reversed","type":"text"}],"rows":[{"Input":"Power Query","Reversed":"yreuQ rewoP"}]}
+-->

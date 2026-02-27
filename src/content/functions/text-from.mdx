@@ -1,0 +1,54 @@
+---
+title: "Text.From"
+slug: "text-from"
+category: "Text"
+description: "Converts a value to its text representation."
+syntax: "Text.From(value as any, optional culture as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The text representation of the value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert to text."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code (e.g., \"en-US\") that determines locale-specific formatting."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-from"
+  - "date-from"
+  - "text-combine"
+---
+
+## Remarks
+
+`Text.From` converts a value of any type to its text representation. Numbers, dates, logicals, and other types are formatted as text strings. Pass a culture code to control locale-specific formatting (e.g., decimal separators, date formats).
+
+This is commonly used when concatenating non-text values with text — for example, building a label like "Order #" & Text.From([OrderID]).
+
+## Examples
+
+### Example 1: Convert order IDs to text
+
+Create a formatted order label by converting the numeric OrderID to text.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Product"}),
+    "Label", each "Order #" & Text.From([OrderID]), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"Label","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A","Label":"Order #1"},{"OrderID":2,"Product":"Gadget B","Label":"Order #2"},{"OrderID":3,"Product":"Widget C","Label":"Order #3"}]}
+-->

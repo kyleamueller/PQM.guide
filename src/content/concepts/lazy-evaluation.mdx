@@ -1,0 +1,49 @@
+---
+title: "Lazy Evaluation & Table.Buffer"
+slug: "lazy-evaluation"
+description: "How M evaluates expressions on demand, and when you need Table.Buffer to force eager evaluation."
+relatedConcepts:
+  - "query-folding"
+relatedFunctions:
+  - "table-sort"
+  - "table-group"
+---
+
+Power Query M uses **lazy evaluation** (also called deferred evaluation). This means expressions are not computed until their results are actually needed. A step in your query does not run when it is defined — it runs when a downstream step (or the final output) requests its data.
+
+### Why This Matters
+
+Lazy evaluation is usually a good thing. It allows the engine to optimize your query by skipping unnecessary work. But it also means that **row order is not guaranteed to be preserved** between steps unless the downstream operation explicitly depends on it.
+
+This is the root cause of a common gotcha: sorting a table and then grouping or removing duplicates, only to find the results are not in the expected order.
+
+### The Table.Buffer Solution
+
+`Table.Buffer` forces Power Query to fully evaluate a table and store the result in memory. This "materializes" the table at that point, locking in the current row order and values.
+
+```powerquery
+let
+    Sorted = Table.Sort(Sales, {"UnitPrice", Order.Ascending}),
+    Buffered = Table.Buffer(Sorted),
+    Grouped = Table.Group(Buffered, "Category", {{"MinPrice", each List.Min([UnitPrice]), type number}})
+in
+    Grouped
+```
+
+Without `Table.Buffer` in the example above, `Table.Group` might re-evaluate the source without preserving the sort, leading to unpredictable results.
+
+### When to Use Table.Buffer
+
+- **Before `Table.Group`** if you sorted the table and need the sort order to affect grouping behavior.
+- **Before `Table.RemoveDuplicates`** if you sorted first to control which duplicate row is kept.
+- **When referencing the same table multiple times** in a query — buffering avoids re-evaluating the table for each reference.
+
+### When Not to Use Table.Buffer
+
+- On very large datasets that may not fit in memory.
+- When query folding is active — `Table.Buffer` breaks the folding chain by pulling data into memory.
+- When the downstream operation does not depend on row order.
+
+### BufferMode.Delayed
+
+`Table.Buffer` accepts an optional `BufferMode` parameter. `BufferMode.Delayed` defers the actual buffering until the table is first accessed, which can improve performance in some scenarios where the buffered table may not always be needed.

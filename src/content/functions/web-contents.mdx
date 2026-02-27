@@ -1,0 +1,99 @@
+---
+title: "Web.Contents"
+slug: "web-contents"
+category: "Accessing Data"
+description: "Downloads content from a URL as binary."
+syntax: "Web.Contents(url as text, optional options as nullable record) as binary"
+returnType: "binary"
+returnDescription: "The binary content downloaded from the URL."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL to download content from."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An options record controlling headers, query parameters, request method, and more."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "json-document"
+  - "csv-document"
+  - "xml-document"
+---
+
+## Remarks
+
+`Web.Contents` fetches content from a URL and returns it as a binary value. You then pipe the result to a parser such as `Json.Document`, `Csv.Document`, or `Xml.Document` to convert it into a usable M value.
+
+### Options record fields
+
+The optional `options` record supports the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `Query` | record | Append query-string parameters to the URL. e.g., `[Query = [page = "1", size = "50"]]` |
+| `Headers` | record | HTTP headers to include. e.g., `[Headers = [Authorization = "Bearer token123"]]` |
+| `Content` | binary | Supplying this field changes the request from GET to POST. The value becomes the POST body. |
+| `RelativePath` | text | A path segment appended to the base URL. Useful for dynamic endpoint construction. |
+| `Timeout` | duration | Override the default request timeout. e.g., `#duration(0, 0, 30, 0)` for 30 seconds. |
+| `ManualStatusHandling` | list | A list of HTTP status codes (e.g., `{404, 500}`) that should not raise an error, allowing you to handle them in M code. |
+| `IsRetry` | logical | Set to `true` to ignore any cached response and re-fetch from the server. |
+
+### Important notes
+
+- `Web.Contents` **breaks query folding** — any transformations applied after it run entirely in the M engine.
+- In the Power BI Service, the base URL must be a **static string literal** for data source credentials to bind correctly. Use `RelativePath` and `Query` for dynamic parts.
+- For paginated APIs, combine `Web.Contents` with `List.Generate` or a recursive function to fetch multiple pages.
+
+### Typical usage patterns
+
+**GET request with query parameters:**
+
+```powerquery
+let
+    Source = Web.Contents("https://api.example.com/data", [
+        Query = [category = "electronics", page = "1"],
+        Headers = [Accept = "application/json"]
+    ]),
+    Parsed = Json.Document(Source)
+in
+    Parsed
+```
+
+**POST request with a JSON body:**
+
+```powerquery
+let
+    Body = Json.FromValue([name = "Test", value = 42]),
+    Source = Web.Contents("https://api.example.com/items", [
+        Content = Body,
+        Headers = [#"Content-Type" = "application/json"]
+    ]),
+    Parsed = Json.Document(Source)
+in
+    Parsed
+```
+
+**Handling specific HTTP status codes manually:**
+
+```powerquery
+let
+    Response = Web.Contents("https://api.example.com/item/999", [
+        ManualStatusHandling = {404}
+    ]),
+    Status = Value.Metadata(Response)[Response.Status],
+    Result = if Status = 404 then "Not Found" else Json.Document(Response)
+in
+    Result
+```
+
+## Examples
+
+Since `Web.Contents` requires network access, live output examples are not shown. See the Remarks section above for typical usage patterns.

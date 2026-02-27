@@ -1,0 +1,67 @@
+---
+title: "Table.ExpandTableColumn"
+slug: "table-expandtablecolumn"
+category: "Table"
+description: "Expands a column of nested tables into individual columns in the parent table."
+syntax: "Table.ExpandTableColumn(table as table, column as text, columnNames as list, optional newColumnNames as nullable list) as table"
+returnType: "table"
+returnDescription: "The input table with the specified nested table column expanded into separate columns."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing a column of nested tables."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name of the column containing nested tables to expand."
+  - name: "columnNames"
+    type: "list"
+    required: true
+    description: "A list of column names from the nested table to extract."
+  - name: "newColumnNames"
+    type: "list"
+    required: false
+    description: "Optional list of new names for the expanded columns. If omitted, the original nested column names are used."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-expandrecordcolumn"
+---
+
+## Remarks
+
+`Table.ExpandTableColumn` takes a column that contains nested tables (typically the result of `Table.NestedJoin` or `Table.Group`) and flattens selected columns from those nested tables into the parent table.
+
+Use the optional `newColumnNames` parameter to rename the expanded columns in the same step, rather than adding a separate `Table.RenameColumns` call. This keeps your query concise and reduces unnecessary steps.
+
+Only expand the columns you actually need. Expanding all columns from a nested table and then removing most of them wastes processing time.
+
+## Examples
+
+### Example 1: Expand columns from a join result
+
+Join Sales to Customers and expand the City and State columns with renamed headers.
+
+Input: `Sales`
+
+```powerquery
+let
+    Joined = Table.NestedJoin(
+        Table.SelectColumns(Table.FirstN(Sales, 3), {"CustomerName", "Product"}),
+        "CustomerName", Customers, "Name",
+        "CustData", JoinKind.LeftOuter
+    )
+in
+    Table.ExpandTableColumn(Joined, "CustData", {"City", "State"}, {"Customer City", "Customer State"})
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Customer City","type":"text"},{"name":"Customer State","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Customer City":"New York","Customer State":"NY"},{"CustomerName":"Bob","Product":"Gadget B","Customer City":"Chicago","Customer State":"IL"},{"CustomerName":"Charlie","Product":"Widget C","Customer City":"Houston","Customer State":"TX"}]}
+-->

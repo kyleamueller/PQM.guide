@@ -1,0 +1,50 @@
+---
+title: "List.Combine"
+slug: "list-combine"
+category: "List"
+description: "Merges multiple lists into a single list."
+syntax: "List.Combine(lists as list) as list"
+returnType: "list"
+returnDescription: "A single list containing all items from the input lists, in order."
+parameters:
+  - name: "lists"
+    type: "list"
+    required: true
+    description: "A list of lists to combine into one."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-removeitems"
+  - "text-combine"
+  - "table-combine"
+---
+
+## Remarks
+
+`List.Combine` concatenates multiple lists into a single flat list. This is useful when you need to merge column values from different tables, or when building a combined list from multiple sources.
+
+## Examples
+
+### Example 1: Combine customer names from two tables
+
+Merge customer names from Sales and Customers tables into one list.
+
+Input: `Sales`, `Customers`
+
+```powerquery
+let
+    SalesNames = List.Distinct(Table.Column(Sales, "CustomerName")),
+    CustomerNames = Table.Column(Customers, "Name"),
+    Combined = List.Distinct(List.Combine({SalesNames, CustomerNames}))
+in
+    #table({"Name"}, List.Transform(Combined, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"}],"rows":[{"Name":"Alice"},{"Name":"Bob"},{"Name":"Charlie"},{"Name":"Diana"}]}
+-->

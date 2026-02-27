@@ -1,0 +1,48 @@
+---
+title: "Logical.ToText"
+slug: "logical-totext"
+category: "Logical"
+description: "Converts a logical value to its text representation."
+syntax: "Logical.ToText(logicalValue as nullable logical) as nullable text"
+returnType: "text"
+returnDescription: "The text string \"true\" or \"false\"."
+parameters:
+  - name: "logicalValue"
+    type: "logical"
+    required: true
+    description: "The logical value to convert to text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "logical-from"
+  - "logical-fromtext"
+  - "text-from"
+---
+
+## Remarks
+
+`Logical.ToText` converts `true` to `"true"` and `false` to `"false"`. This is useful when you need to include a logical value in a text concatenation or display a boolean column as human-readable text.
+
+## Examples
+
+### Example 1: Convert InStock logical to text
+
+Convert the InStock logical column in the Products table to a text column.
+
+Input: `Products`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Products, {"ProductName", "InStock"}),
+    {"InStock", each Logical.ToText(_), type text}
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"InStock","type":"text"}],"rows":[{"ProductName":"Widget A","InStock":"true"},{"ProductName":"Gadget B","InStock":"true"},{"ProductName":"Widget C","InStock":"false"},{"ProductName":"Gadget D","InStock":"true"},{"ProductName":"Thingamajig E","InStock":"false"}]}
+-->

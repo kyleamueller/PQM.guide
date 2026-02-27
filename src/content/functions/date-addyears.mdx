@@ -1,0 +1,71 @@
+---
+title: "Date.AddYears"
+slug: "date-addyears"
+category: "Date"
+description: "Adds a specified number of years to a date value."
+syntax: "Date.AddYears(dateTime as any, numberOfYears as number) as any"
+returnType: "any"
+returnDescription: "The date resulting from adding the specified number of years to the input date."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to add years to."
+  - name: "numberOfYears"
+    type: "number"
+    required: true
+    description: "The number of years to add. Use negative values to subtract years."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-adddays"
+  - "date-addmonths"
+  - "date-startofyear"
+  - "date-endofyear"
+---
+
+## Remarks
+
+`Date.AddYears` adds or subtracts a whole number of years from a `date`, `datetime`, or `datetimezone` value. If the original date is February 29 and the target year is not a leap year, the result is clamped to February 28.
+
+## Examples
+
+### Example 1: Calculate employee tenure milestones
+
+Add 5 years to each employee's HireDate to find their 5-year anniversary.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Employees, 4),
+        {"FullName", "HireDate"}
+    ),
+    "FiveYearAnniversary", each Date.AddYears([HireDate], 5), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"},{"name":"FiveYearAnniversary","type":"date"}],"rows":[{"FullName":"John Smith","HireDate":"2021-03-15","FiveYearAnniversary":"2026-03-15"},{"FullName":"Sara Johnson","HireDate":"2019-07-01","FiveYearAnniversary":"2024-07-01"},{"FullName":"Mike Davis","HireDate":"2022-01-10","FiveYearAnniversary":"2027-01-10"},{"FullName":"Emily Chen","HireDate":"2023-06-20","FiveYearAnniversary":"2028-06-20"}]}
+-->
+
+### Example 2: Subtract years from a date
+
+Move a date back by 2 years.
+
+```powerquery
+#table(
+    type table [OriginalDate = date, TwoYearsAgo = date],
+    {{#date(2024, 4, 1), Date.AddYears(#date(2024, 4, 1), -2)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"OriginalDate","type":"date"},{"name":"TwoYearsAgo","type":"date"}],"rows":[{"OriginalDate":"2024-04-01","TwoYearsAgo":"2022-04-01"}]}
+-->

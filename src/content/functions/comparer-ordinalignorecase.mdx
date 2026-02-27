@@ -1,0 +1,48 @@
+---
+title: "Comparer.OrdinalIgnoreCase"
+slug: "comparer-ordinalignorecase"
+category: "Comparer"
+description: "A case-insensitive ordinal comparer function."
+syntax: "Comparer.OrdinalIgnoreCase as function"
+returnType: "function"
+returnDescription: "A comparer function that performs case-insensitive ordinal comparisons."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "comparer-ordinal"
+  - "comparer-fromculture"
+  - "list-distinct"
+---
+
+## Remarks
+
+`Comparer.OrdinalIgnoreCase` is a built-in comparer **function** that performs case-insensitive ordinal comparisons. It treats uppercase and lowercase versions of the same letter as equal (e.g., "A" equals "a").
+
+This comparer is commonly used with `List.Distinct` to deduplicate text that differs only by casing, and with `List.Sort` or `Table.Sort` to produce case-insensitive sorted results.
+
+## Examples
+
+### Example 1: Case-insensitive distinct on employee names
+
+Demonstrate that `List.Distinct` with `Comparer.OrdinalIgnoreCase` treats differently-cased duplicates as equal. Here we add a duplicate "ALICE SMITH" to show the deduplication.
+
+Input: `Employees`
+
+```powerquery
+let
+    Names = Table.Column(Employees, "FullName"),
+    NamesWithDup = List.Combine({Names, {"ALICE SMITH"}}),
+    Unique = List.Distinct(NamesWithDup, Comparer.OrdinalIgnoreCase)
+in
+    #table({"FullName"}, List.Transform(Unique, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"alice smith"},{"FullName":"BOB JONES"},{"FullName":"Charlie Brown"},{"FullName":"diana PRINCE"},{"FullName":"Eve Martinez"},{"FullName":"frank lee"}]}
+-->

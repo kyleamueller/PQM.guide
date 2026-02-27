@@ -1,0 +1,75 @@
+---
+title: "Uri.BuildQueryString"
+slug: "uri-buildquerystring"
+category: "URI"
+description: "Builds a URL query string from a record of key-value pairs."
+syntax: "Uri.BuildQueryString(query as record) as text"
+returnType: "text"
+returnDescription: "A URL-encoded query string."
+parameters:
+  - name: "query"
+    type: "record"
+    required: true
+    description: "A record whose field names and values become query string parameters."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "uri-parts"
+  - "uri-escapedatastring"
+  - "web-contents"
+---
+
+## Remarks
+
+`Uri.BuildQueryString` converts a record into a URL-encoded query string (without the leading `?`). Each field name becomes a parameter key, and each field value becomes the parameter value. Special characters in both keys and values are automatically percent-encoded.
+
+This is useful when constructing URLs programmatically, especially in combination with `Web.Contents`:
+
+```powerquery
+let
+    BaseUrl = "https://api.example.com/search",
+    Params = [q = "power query", page = "1", limit = "50"],
+    FullUrl = BaseUrl & "?" & Uri.BuildQueryString(Params)
+in
+    FullUrl
+// Result: "https://api.example.com/search?q=power+query&page=1&limit=50"
+```
+
+## Examples
+
+### Example 1: Build a query string from parameters
+
+Convert a record of parameters into a URL query string.
+
+```powerquery
+let
+    Params = [category = "Electronics", sort = "price", order = "asc"],
+    QueryString = Uri.BuildQueryString(Params)
+in
+    #table({"QueryString"}, {{QueryString}})
+```
+
+<!--output
+{"columns":[{"name":"QueryString","type":"text"}],"rows":[{"QueryString":"category=Electronics&sort=price&order=asc"}]}
+-->
+
+### Example 2: Handle special characters
+
+Build a query string with values that need encoding.
+
+```powerquery
+let
+    Params = [search = "hello world", tag = "A&B"],
+    QueryString = Uri.BuildQueryString(Params)
+in
+    #table({"QueryString"}, {{QueryString}})
+```
+
+<!--output
+{"columns":[{"name":"QueryString","type":"text"}],"rows":[{"QueryString":"search=hello+world&tag=A%26B"}]}
+-->

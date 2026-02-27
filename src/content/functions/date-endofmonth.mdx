@@ -1,0 +1,66 @@
+---
+title: "Date.EndOfMonth"
+slug: "date-endofmonth"
+category: "Date"
+description: "Returns the last day of the month for a given date."
+syntax: "Date.EndOfMonth(dateTime as any) as any"
+returnType: "any"
+returnDescription: "The last day of the month containing the input date."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to find the end of the month for."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-startofmonth"
+  - "date-endofyear"
+  - "date-month"
+---
+
+## Remarks
+
+`Date.EndOfMonth` returns the last day of the month for the given `date`, `datetime`, or `datetimezone` value. The return type matches the input type. This is useful for calculating month-end reporting periods or payment due dates. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Find the end of each order's month
+
+Get the last day of the month for each OrderDate in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "MonthEnd", each Date.EndOfMonth([OrderDate]), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"MonthEnd","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","MonthEnd":"2024-01-31"},{"OrderID":2,"OrderDate":"2024-01-18","MonthEnd":"2024-01-31"},{"OrderID":3,"OrderDate":"2024-02-01","MonthEnd":"2024-02-29"},{"OrderID":4,"OrderDate":"2024-02-10","MonthEnd":"2024-02-29"},{"OrderID":5,"OrderDate":"2024-03-05","MonthEnd":"2024-03-31"}]}
+-->
+
+### Example 2: End of month for February in a leap year
+
+Demonstrate that 2024 is a leap year and February ends on the 29th.
+
+```powerquery
+#table(
+    type table [Date = date, EndOfMonth = date],
+    {{#date(2024, 2, 1), Date.EndOfMonth(#date(2024, 2, 1))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"EndOfMonth","type":"date"}],"rows":[{"Date":"2024-02-01","EndOfMonth":"2024-02-29"}]}
+-->

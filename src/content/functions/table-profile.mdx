@@ -1,0 +1,55 @@
+---
+title: "Table.Profile"
+slug: "table-profile"
+category: "Table"
+description: "Returns a profile of the values in each column of a table."
+syntax: "Table.Profile(table as table, optional additionalAggregates as nullable list) as table"
+returnType: "table"
+returnDescription: "A table with one row per column, containing statistics like min, max, average, count, and distinct count."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to profile."
+  - name: "additionalAggregates"
+    type: "list"
+    required: false
+    description: "Optional list of additional aggregate functions to include in the profile."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-schema"
+  - "table-columnnames"
+  - "table-rowcount"
+---
+
+## Remarks
+
+`Table.Profile` generates summary statistics for each column in a table. The output includes columns like `Column`, `Min`, `Max`, `Average`, `StandardDeviation`, `Count`, `NullCount`, and `DistinctCount`. The statistics computed depend on the column's data type — for example, `Average` and `StandardDeviation` are only meaningful for numeric columns.
+
+This function is useful for data exploration and quality checks — quickly identifying columns with nulls, unexpected ranges, or low cardinality.
+
+## Examples
+
+### Example 1: Profile the Sales table
+
+Get the profile statistics for selected columns.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(Sales, {"UnitPrice", "Quantity", "Region"}),
+    Profiled = Table.Profile(Source)
+in
+    Table.SelectColumns(Profiled, {"Column", "Min", "Max", "Average", "Count", "DistinctCount"})
+```
+
+<!--output
+{"columns":[{"name":"Column","type":"text"},{"name":"Min","type":"any"},{"name":"Max","type":"any"},{"name":"Average","type":"number"},{"name":"Count","type":"number"},{"name":"DistinctCount","type":"number"}],"rows":[{"Column":"UnitPrice","Min":15,"Max":120,"Average":46.875,"Count":8,"DistinctCount":5},{"Column":"Quantity","Min":1,"Max":10,"Average":4.875,"Count":8,"DistinctCount":7},{"Column":"Region","Min":"East","Max":"West","Average":null,"Count":8,"DistinctCount":3}]}
+-->

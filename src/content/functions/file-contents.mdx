@@ -1,0 +1,59 @@
+---
+title: "File.Contents"
+slug: "file-contents"
+category: "Accessing Data"
+description: "Returns the contents of a file as binary."
+syntax: "File.Contents(path as text) as binary"
+returnType: "binary"
+returnDescription: "The binary content of the file."
+parameters:
+  - name: "path"
+    type: "text"
+    required: true
+    description: "The full file path to read."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "csv-document"
+  - "excel-workbook"
+  - "json-document"
+  - "xml-document"
+---
+
+## Remarks
+
+`File.Contents` reads a file from the local file system (or a network share) and returns its contents as a binary value. On its own, binary is not useful — you pipe it into a parser function to interpret the data:
+
+| File type | Parser function |
+|---|---|
+| CSV / TSV | `Csv.Document(File.Contents("..."), [Delimiter = ","])` |
+| Excel | `Excel.Workbook(File.Contents("..."), true)` |
+| JSON | `Json.Document(File.Contents("..."))` |
+| XML | `Xml.Document(File.Contents("..."))` |
+| Plain text | `Lines.FromBinary(File.Contents("..."))` |
+
+### Important notes
+
+- `File.Contents` is available in **Power BI Desktop** and **Excel Desktop** only. It is **not supported** in the Power BI Service, Excel Online, or Dataflows because these cloud environments do not have access to local file paths.
+- For cloud-based scenarios, use a gateway or switch to `Web.Contents`, `SharePoint.Contents`, or another cloud-compatible data source.
+- The path must be a fully qualified path (e.g., `"C:\Data\sales.csv"` or `"\\server\share\file.xlsx"`).
+
+### Typical pattern
+
+```powerquery
+let
+    Source = File.Contents("C:\Reports\quarterly.csv"),
+    Parsed = Csv.Document(Source, [Delimiter = ",", Encoding = TextEncoding.Utf8]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```
+
+## Examples
+
+Since `File.Contents` requires access to a local file, live output examples are not shown. See the Remarks section above for typical usage patterns.

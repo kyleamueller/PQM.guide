@@ -1,0 +1,71 @@
+---
+title: "Duration.Minutes"
+slug: "duration-minutes"
+category: "Duration"
+description: "Returns the minutes component from a duration value."
+syntax: "Duration.Minutes(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The minutes component (0 through 59)."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to extract the minutes component from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-hours"
+  - "duration-seconds"
+  - "duration-days"
+---
+
+## Remarks
+
+`Duration.Minutes` returns the minutes component (0 through 59) from a `duration` value. This is the minute portion after removing whole days and hours. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract minutes from OrderLog durations
+
+Convert DurationMinutes to a duration and extract the minutes component.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            OrderLog,
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "MinutesPart",
+    each Duration.Minutes(#duration(0, 0, [DurationMinutes], 0)),
+    Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"MinutesPart","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"MinutesPart":45},{"LogID":"L004","DurationMinutes":2745,"MinutesPart":45},{"LogID":"L006","DurationMinutes":1065,"MinutesPart":45},{"LogID":"L008","DurationMinutes":2670,"MinutesPart":30}]}
+-->
+
+### Example 2: Extract minutes from a scalar duration
+
+Return the minutes component of a literal duration.
+
+```powerquery
+#table(
+    type table [Duration = duration, Minutes = number],
+    {{#duration(1, 8, 25, 30), Duration.Minutes(#duration(1, 8, 25, 30))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"Minutes","type":"number"}],"rows":[{"Duration":"1.08:25:30","Minutes":25}]}
+-->

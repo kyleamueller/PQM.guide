@@ -1,0 +1,66 @@
+---
+title: "Table.Sort"
+slug: "table-sort"
+category: "Table"
+description: "Sorts the rows of a table using one or more comparison criteria."
+syntax: "Table.Sort(table as table, comparisonCriteria as any) as table"
+returnType: "table"
+returnDescription: "A table with the same columns and rows, sorted according to the specified criteria."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to sort."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: true
+    description: "A column name, a {column, Order} pair, or a list of such pairs for multi-column sorting."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-selectrows"
+  - "table-group"
+---
+
+## Remarks
+
+`Table.Sort` reorders rows based on one or more columns. Use `Order.Ascending` or `Order.Descending` to control sort direction. When sorting by multiple columns, the first criterion is primary.
+
+If only a column name is provided, the sort defaults to ascending order.
+
+If you use `Table.Sort` before `Table.RemoveDuplicates` or `Table.Group`, wrap the sorted table in `Table.Buffer` first. Without buffering, the sort order is not guaranteed to be preserved by downstream operations, which can lead to unexpected results (e.g., keeping the wrong duplicate row).
+
+## Examples
+
+### Example 1: Sort ascending by one column
+
+Sort the Sales table by UnitPrice in ascending order.
+
+Input: `Sales`
+
+```powerquery
+Table.Sort(Sales, {"UnitPrice", Order.Ascending})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"},{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.00,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"}]}
+-->
+
+### Example 2: Sort descending
+
+Sort the Sales table by Quantity in descending order.
+
+Input: `Sales`
+
+```powerquery
+Table.Sort(Sales, {"Quantity", Order.Descending})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.00,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"}]}
+-->

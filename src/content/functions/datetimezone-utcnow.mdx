@@ -1,0 +1,65 @@
+---
+title: "DateTimeZone.UtcNow"
+slug: "datetimezone-utcnow"
+category: "DateTimeZone"
+description: "Returns the current date and time in UTC."
+syntax: "DateTimeZone.UtcNow() as datetimezone"
+returnType: "datetimezone"
+returnDescription: "The current UTC date and time."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-localnow"
+  - "datetimezone-tolocal"
+  - "datetimezone-toutc"
+---
+
+## Remarks
+
+`DateTimeZone.UtcNow` returns the current date and time in UTC (Coordinated Universal Time) with a +00:00 offset. The value changes each time the query runs, so it cannot be used for reproducible results. It is commonly used for adding refresh timestamps or computing elapsed time relative to a fixed reference point.
+
+## Examples
+
+### Example 1: Display the current UTC datetime
+
+Return the current UTC datetimezone as a single-row table. The actual output depends on when the query runs.
+
+```powerquery
+#table(
+    type table [CurrentUTC = datetimezone],
+    {{DateTimeZone.UtcNow()}}
+)
+```
+
+<!--output
+{"columns":[{"name":"CurrentUTC","type":"datetimezone"}],"rows":[{"CurrentUTC":"2024-07-15T15:30:00+00:00"}]}
+-->
+
+### Example 2: Add a UTC refresh timestamp to Sales
+
+Add a column with the UTC refresh time to the Sales table. Uses a fixed value to show the pattern.
+
+Input: `Sales`
+
+```powerquery
+let
+    UtcNow = #datetimezone(2024, 7, 15, 15, 30, 0, 0, 0) // DateTimeZone.UtcNow()
+in
+    Table.AddColumn(
+        Table.SelectColumns(
+            Table.FirstN(Sales, 3),
+            {"OrderID", "CustomerName"}
+        ),
+        "RefreshUTC", each UtcNow, type datetimezone
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"RefreshUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"CustomerName":"John Smith","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":2,"CustomerName":"Sara Johnson","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":3,"CustomerName":"Mike Davis","RefreshUTC":"2024-07-15T15:30:00+00:00"}]}
+-->

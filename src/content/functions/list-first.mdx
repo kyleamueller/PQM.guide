@@ -1,0 +1,52 @@
+---
+title: "List.First"
+slug: "list-first"
+category: "List"
+description: "Returns the first item in a list, or a default value if the list is empty."
+syntax: "List.First(list as list, optional defaultValue as any) as any"
+returnType: "any"
+returnDescription: "The first item in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to get the first item from."
+  - name: "defaultValue"
+    type: "any"
+    required: false
+    description: "The value to return if the list is empty. If omitted and the list is empty, an error is raised."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-last"
+  - "list-range"
+  - "table-firstn"
+---
+
+## Remarks
+
+`List.First` returns the first item from a list. Provide a default value to handle empty lists gracefully instead of raising an error. This is commonly used inside `Table.Group` aggregations — for example, `each List.First([Product])` to get the first product in each group.
+
+## Examples
+
+### Example 1: Get the first customer name
+
+Return the first customer name from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstCustomer = List.First(Table.Column(Sales, "CustomerName"))
+in
+    #table({"FirstCustomer"}, {{FirstCustomer}})
+```
+
+<!--output
+{"columns":[{"name":"FirstCustomer","type":"text"}],"rows":[{"FirstCustomer":"Alice"}]}
+-->

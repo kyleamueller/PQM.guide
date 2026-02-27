@@ -1,0 +1,52 @@
+---
+title: "List.Sum"
+slug: "list-sum"
+category: "List"
+description: "Returns the sum of all items in a list."
+syntax: "List.Sum(list as list, optional precision as nullable number) as any"
+returnType: "any"
+returnDescription: "The sum of all numeric items in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of numbers to sum."
+  - name: "precision"
+    type: "number"
+    required: false
+    description: "Optional precision type (e.g., Precision.Decimal or Precision.Double)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-average"
+  - "list-count"
+  - "list-accumulate"
+---
+
+## Remarks
+
+`List.Sum` calculates the total of all numeric values in a list. Null values are ignored. This is commonly used inside `Table.Group` aggregations — for example, `each List.Sum([Quantity])` to sum quantities per group.
+
+## Examples
+
+### Example 1: Sum all quantities
+
+Calculate the total quantity across all sales.
+
+Input: `Sales`
+
+```powerquery
+let
+    Total = List.Sum(Table.Column(Sales, "Quantity"))
+in
+    #table({"TotalQuantity"}, {{Total}})
+```
+
+<!--output
+{"columns":[{"name":"TotalQuantity","type":"number"}],"rows":[{"TotalQuantity":35}]}
+-->

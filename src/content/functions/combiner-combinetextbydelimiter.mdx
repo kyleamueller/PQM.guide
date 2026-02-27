@@ -1,0 +1,56 @@
+---
+title: "Combiner.CombineTextByDelimiter"
+slug: "combiner-combinetextbydelimiter"
+category: "Combiner"
+description: "Returns a function that combines a list of text values using a specified delimiter."
+syntax: "Combiner.CombineTextByDelimiter(delimiter as text, optional quoteStyle as nullable number) as function"
+returnType: "function"
+returnDescription: "A function that takes a list of text values and combines them into a single text string separated by the specified delimiter."
+parameters:
+  - name: "delimiter"
+    type: "text"
+    required: true
+    description: "The text delimiter to insert between each value."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "A QuoteStyle value specifying how to handle quoting. Defaults to QuoteStyle.None."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "combiner-combinetextbyeachdelimiter"
+  - "combiner-combinetextbylengths"
+  - "text-combine"
+---
+
+## Remarks
+
+`Combiner.CombineTextByDelimiter` returns a **function** — it does not combine text directly. The returned function accepts a list of text values and joins them with the specified delimiter. This is commonly used as an argument to `Table.ToList` to merge each row's values into a single delimited string.
+
+The optional `quoteStyle` parameter controls whether values containing the delimiter are quoted. Use `QuoteStyle.Csv` to apply CSV-style quoting.
+
+## Examples
+
+### Example 1: Combine Sales columns into delimited text
+
+Merge CustomerName, Product, and Region from the first 4 rows of Sales into comma-separated strings.
+
+Input: `Sales`
+
+```powerquery
+let
+    Subset = Table.SelectColumns(Table.FirstN(Sales, 4), {"CustomerName", "Product", "Region"}),
+    CombinerFn = Combiner.CombineTextByDelimiter(", "),
+    Combined = Table.ToList(Subset, CombinerFn)
+in
+    #table({"CombinedText"}, List.Transform(Combined, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"CombinedText","type":"text"}],"rows":[{"CombinedText":"Alice, Widget A, East"},{"CombinedText":"Bob, Gadget B, West"},{"CombinedText":"Charlie, Widget C, East"},{"CombinedText":"Alice, Gadget D, North"}]}
+-->

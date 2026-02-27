@@ -1,0 +1,52 @@
+---
+title: "Record.Field"
+slug: "record-field"
+category: "Record"
+description: "Returns the value of a specific field from a record."
+syntax: "Record.Field(record as record, field as text) as any"
+returnType: "any"
+returnDescription: "The value of the specified field."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to retrieve the field value from."
+  - name: "field"
+    type: "text"
+    required: true
+    description: "The name of the field to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fieldnames"
+  - "record-fieldvalues"
+  - "record-selectfields"
+---
+
+## Remarks
+
+`Record.Field` retrieves the value of a single field by name from a record. This is the functional equivalent of bracket-access notation (`record[FieldName]`), but allows the field name to be supplied dynamically as a text value — which is useful when field names are computed at runtime or stored in a variable.
+
+## Examples
+
+### Example 1: Get the Product from the first Sales row
+
+Return the Product field value from the first row of the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    ProductValue = Record.Field(Sales{0}, "Product")
+in
+    #table({"Product"}, {{ProductValue}})
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"}],"rows":[{"Product":"Widget A"}]}
+-->

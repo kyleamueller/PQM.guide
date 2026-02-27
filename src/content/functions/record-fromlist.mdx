@@ -1,0 +1,55 @@
+---
+title: "Record.FromList"
+slug: "record-fromlist"
+category: "Record"
+description: "Creates a record from a list of values and a set of field names."
+syntax: "Record.FromList(list as list, fields as any) as record"
+returnType: "record"
+returnDescription: "A record whose fields correspond to the provided names and values."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "A list of values to use as the field values."
+  - name: "fields"
+    type: "any"
+    required: true
+    description: "A list of field names, or a record type that defines the field names and types."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-tolist"
+  - "record-fieldnames"
+  - "record-fieldvalues"
+  - "table-fromrecords"
+---
+
+## Remarks
+
+`Record.FromList` constructs a record by pairing a list of values with a corresponding list of field names. The values list and the field names list must have the same number of items. The `fields` parameter can be either a simple list of text names or a record type that also specifies the data type for each field. This function is useful for dynamically building records from column names and values extracted at runtime.
+
+## Examples
+
+### Example 1: Create a record from column names and values
+
+Build a record using Sales column names and the values from the first Sales row.
+
+Input: `Sales`
+
+```powerquery
+let
+    Names = Table.ColumnNames(Sales),
+    Values = Record.FieldValues(Sales{0}),
+    NewRecord = Record.FromList(Values, Names)
+in
+    Record.ToTable(NewRecord)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
+-->

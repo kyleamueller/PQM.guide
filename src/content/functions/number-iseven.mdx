@@ -1,0 +1,49 @@
+---
+title: "Number.IsEven"
+slug: "number-iseven"
+category: "Number"
+description: "Returns true if a number is even."
+syntax: "Number.IsEven(number as number) as logical"
+returnType: "logical"
+returnDescription: "true if the number is even; false otherwise."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to check."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-isodd"
+  - "number-mod"
+---
+
+## Remarks
+
+`Number.IsEven` returns `true` when a number is divisible by 2 with no remainder, and `false` otherwise. This is a shorthand for `Number.Mod(number, 2) = 0`.
+
+A practical use case is applying alternating row styling logic, filtering even-numbered records, or splitting data into two groups based on ID parity.
+
+## Examples
+
+### Example 1: Check which OrderIDs are even
+
+Add a column indicating whether each OrderID is even.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 6), {"OrderID", "Product"}),
+    "IsEven", each Number.IsEven([OrderID]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"IsEven","type":"logical"}],"rows":[{"OrderID":1,"Product":"Widget A","IsEven":false},{"OrderID":2,"Product":"Gadget B","IsEven":true},{"OrderID":3,"Product":"Widget C","IsEven":false},{"OrderID":4,"Product":"Gadget D","IsEven":true},{"OrderID":5,"Product":"Widget A","IsEven":false},{"OrderID":6,"Product":"Thingamajig E","IsEven":true}]}
+-->

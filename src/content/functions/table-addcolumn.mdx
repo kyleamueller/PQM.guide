@@ -1,0 +1,73 @@
+---
+title: "Table.AddColumn"
+slug: "table-addcolumn"
+category: "Table"
+description: "Adds a new column with values computed from a function applied to each row."
+syntax: "Table.AddColumn(table as table, newColumnName as text, columnGenerator as function, optional columnType as nullable type) as table"
+returnType: "table"
+returnDescription: "The input table with an additional column whose values are computed by the columnGenerator function."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to add a column to."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name of the new column."
+  - name: "columnGenerator"
+    type: "function"
+    required: true
+    description: "A function evaluated for each row to produce the new column's value."
+  - name: "columnType"
+    type: "type"
+    required: false
+    description: "Optional type annotation for the new column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removecolumns"
+  - "table-renamecolumns"
+  - "table-transformcolumntypes"
+---
+
+## Remarks
+
+`Table.AddColumn` creates a new column by evaluating the `columnGenerator` function for each row. Use `each` with bracket notation to reference existing columns.
+
+Always specify the optional `columnType` parameter (the fourth argument). This improves performance by allowing the engine to optimize the query, and makes the step self-documenting by keeping the column name, transformation, and data type together in a single step rather than requiring a separate `Table.TransformColumnTypes` call afterward.
+
+## Examples
+
+### Example 1: Add a calculated column
+
+Add a TotalPrice column computed as UnitPrice times Quantity.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(Sales, "TotalPrice", each [UnitPrice] * [Quantity], type number)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"TotalPrice","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","TotalPrice":100.00},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","TotalPrice":100.00},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","TotalPrice":150.00},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North","TotalPrice":75.00},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West","TotalPrice":150.00}]}
+-->
+
+### Example 2: Add a text column
+
+Add an "IsExpensive" column that says "Yes" or "No" based on UnitPrice.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(Sales, "IsExpensive", each if [UnitPrice] >= 50 then "Yes" else "No", type text)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"IsExpensive","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","IsExpensive":"No"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","IsExpensive":"Yes"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","IsExpensive":"No"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North","IsExpensive":"Yes"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West","IsExpensive":"No"}]}
+-->

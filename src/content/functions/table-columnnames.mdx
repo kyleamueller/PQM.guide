@@ -1,0 +1,50 @@
+---
+title: "Table.ColumnNames"
+slug: "table-columnnames"
+category: "Table"
+description: "Returns the column names of a table as a list of text values."
+syntax: "Table.ColumnNames(table as table) as list"
+returnType: "list"
+returnDescription: "A list of text values representing the column names, in order."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose column names to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-hascolumns"
+  - "table-selectcolumns"
+  - "table-renamecolumns"
+---
+
+## Remarks
+
+`Table.ColumnNames` returns the column names of a table as a list of text values, preserving the column order. This is useful for dynamic operations where you need to reference columns programmatically — for example, selecting all columns except a few, or building dynamic unpivot operations.
+
+A common pattern is combining `Table.ColumnNames` with `List.RemoveItems` to get all column names except certain ones, then passing the result to `Table.SelectColumns` or `Table.UnpivotOtherColumns`.
+
+## Examples
+
+### Example 1: List column names
+
+Get the column names from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Names = Table.ColumnNames(Sales)
+in
+    #table({"ColumnName"}, List.Transform(Names, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"ColumnName","type":"text"}],"rows":[{"ColumnName":"OrderID"},{"ColumnName":"CustomerName"},{"ColumnName":"Product"},{"ColumnName":"Category"},{"ColumnName":"UnitPrice"},{"ColumnName":"Quantity"},{"ColumnName":"OrderDate"},{"ColumnName":"Region"}]}
+-->

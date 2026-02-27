@@ -1,0 +1,72 @@
+---
+title: "Table.RemoveDuplicates"
+slug: "table-removeduplicates"
+category: "Table"
+description: "Removes duplicate rows from a table based on one or more key columns."
+syntax: "Table.RemoveDuplicates(table as table, optional columns as any, optional equationCriteria as any) as table"
+returnType: "table"
+returnDescription: "A table with duplicate rows removed, keeping the first occurrence of each unique key."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to deduplicate."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "A column name or list of column names to check for duplicates. If omitted, all columns are compared."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional comparer function for custom equality logic."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-distinct"
+  - "table-sort"
+  - "table-group"
+---
+
+## Remarks
+
+`Table.RemoveDuplicates` keeps the first occurrence of each unique combination of key column values and removes subsequent duplicates. When no columns are specified, the entire row is compared.
+
+If you need to control **which** duplicate row is kept (e.g., keep the most recent or the lowest price), sort the table first with `Table.Sort` and then wrap the result in `Table.Buffer` before calling `Table.RemoveDuplicates`. Without `Table.Buffer`, the sort order is not guaranteed to be preserved, which means you may not keep the intended row.
+
+## Examples
+
+### Example 1: Remove duplicate customers
+
+Remove rows with duplicate CustomerName values, keeping the first occurrence.
+
+Input: `Sales`
+
+```powerquery
+Table.RemoveDuplicates(Sales, {"CustomerName"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"}]}
+-->
+
+### Example 2: Remove duplicates by multiple columns
+
+Remove rows with duplicate Category and Region combinations.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.RemoveDuplicates(Sales, {"Category", "Region"}),
+    {"CustomerName", "Category", "Region"}
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Category","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Category":"Widgets","Region":"East"},{"CustomerName":"Bob","Category":"Gadgets","Region":"West"},{"CustomerName":"Alice","Category":"Gadgets","Region":"North"},{"CustomerName":"Diana","Category":"Widgets","Region":"West"},{"CustomerName":"Bob","Category":"Misc","Region":"East"},{"CustomerName":"Diana","Category":"Widgets","Region":"North"}]}
+-->

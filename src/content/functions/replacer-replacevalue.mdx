@@ -1,0 +1,49 @@
+---
+title: "Replacer.ReplaceValue"
+slug: "replacer-replacevalue"
+category: "Replacer"
+description: "A replacer function that performs exact match replacement of entire cell values."
+syntax: "Replacer.ReplaceValue as function"
+returnType: "function"
+returnDescription: "A replacer function that replaces a cell value only when it exactly matches the old value."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "replacer-replacetext"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Replacer.ReplaceValue` is a built-in replacer **function** used as an argument to `Table.ReplaceValue`. It performs **exact match** replacement — the entire cell value must equal `oldValue` for the replacement to occur.
+
+**Key difference from `Replacer.ReplaceText`:** `Replacer.ReplaceValue` matches and replaces the whole cell value, while `Replacer.ReplaceText` performs substring replacement within text values. Use `Replacer.ReplaceValue` when replacing nulls, numbers, or exact text matches. Use `Replacer.ReplaceText` for find-and-replace within strings.
+
+## Examples
+
+### Example 1: Replace exact region values
+
+Replace the exact region value "West" with "Western" in the Sales table. Only cells whose entire value is "West" are affected.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.ReplaceValue(
+        Table.FirstN(Sales, 4),
+        "West", "Western",
+        Replacer.ReplaceValue, {"Region"}
+    ),
+    {"CustomerName", "Product", "Region"}
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"East"},{"CustomerName":"Bob","Product":"Gadget B","Region":"Western"},{"CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"CustomerName":"Alice","Product":"Gadget D","Region":"North"}]}
+-->

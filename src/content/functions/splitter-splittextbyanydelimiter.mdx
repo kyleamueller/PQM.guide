@@ -1,0 +1,56 @@
+---
+title: "Splitter.SplitTextByAnyDelimiter"
+slug: "splitter-splittextbyanydelimiter"
+category: "Splitter"
+description: "Returns a function that splits text at any occurrence of any delimiter in a list."
+syntax: "Splitter.SplitTextByAnyDelimiter(delimiters as list, optional quoteStyle as nullable number, optional startAtEnd as nullable logical) as function"
+returnType: "function"
+returnDescription: "A function that takes a text value and returns a list of text parts split on any of the specified delimiters."
+parameters:
+  - name: "delimiters"
+    type: "list"
+    required: true
+    description: "A list of text delimiters. The text is split at every occurrence of any delimiter in this list."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "A QuoteStyle value specifying how to handle quoted sections. Defaults to QuoteStyle.None."
+  - name: "startAtEnd"
+    type: "logical"
+    required: false
+    description: "If true, splits are applied starting from the end of the text. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbydelimiter"
+  - "splitter-splittextbyeachdelimiter"
+---
+
+## Remarks
+
+`Splitter.SplitTextByAnyDelimiter` returns a **function** that splits text at every occurrence of any delimiter in the provided list. All delimiters are treated equivalently — the text is split wherever any of them appear. This is useful when your data may use inconsistent separators (e.g., commas, semicolons, or pipes).
+
+## Examples
+
+### Example 1: Split on multiple possible delimiters
+
+Split employee phone numbers that may use dashes or dots as separators.
+
+Input: `Employees`
+
+```powerquery
+let
+    SplitFn = Splitter.SplitTextByAnyDelimiter({"-", "."}),
+    PhoneParts = SplitFn("555-867-5309")
+in
+    #table({"Part1", "Part2", "Part3"}, {{PhoneParts{0}, PhoneParts{1}, PhoneParts{2}}})
+```
+
+<!--output
+{"columns":[{"name":"Part1","type":"text"},{"name":"Part2","type":"text"},{"name":"Part3","type":"text"}],"rows":[{"Part1":"555","Part2":"867","Part3":"5309"}]}
+-->

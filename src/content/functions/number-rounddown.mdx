@@ -1,0 +1,53 @@
+---
+title: "Number.RoundDown"
+slug: "number-rounddown"
+category: "Number"
+description: "Rounds a number down toward zero (floor)."
+syntax: "Number.RoundDown(number as nullable number, optional digits as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The number rounded down to the specified precision."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to round down."
+  - name: "digits"
+    type: "number"
+    required: false
+    description: "Number of decimal places (default 0)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-round"
+  - "number-roundup"
+---
+
+## Remarks
+
+`Number.RoundDown` always rounds toward zero, truncating any fractional part beyond the specified number of digits. When `digits` is omitted it defaults to 0, producing an integer. This behaves like a floor function for positive numbers.
+
+Use this when you need to assign items to discrete buckets — for example, grouping prices into $10 bands by rounding down to the nearest ten.
+
+## Examples
+
+### Example 1: Floor product prices to nearest ten
+
+Round each product price down to the nearest ten to create a price tier.
+
+Input: `Products`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Products, {"ProductName", "Price"}),
+    "PriceTier", each Number.RoundDown([Price], -1), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"PriceTier","type":"number"}],"rows":[{"ProductName":"Widget A","Price":25,"PriceTier":20},{"ProductName":"Gadget B","Price":50,"PriceTier":50},{"ProductName":"Widget C","Price":15,"PriceTier":10},{"ProductName":"Gadget D","Price":75,"PriceTier":70},{"ProductName":"Thingamajig E","Price":120,"PriceTier":120}]}
+-->

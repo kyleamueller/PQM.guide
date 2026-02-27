@@ -1,0 +1,63 @@
+---
+title: "Value.Type"
+slug: "value-type"
+category: "Value"
+description: "Returns the type of a value."
+syntax: "Value.Type(value as any) as type"
+returnType: "type"
+returnDescription: "The type of the given value (e.g., Number.Type, Text.Type, Logical.Type)."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose type to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-is"
+  - "value-as"
+  - "value-replacetype"
+---
+
+## Remarks
+
+`Value.Type` returns the M type of a value. This is useful for inspecting column values at runtime, building dynamic logic based on value types, or debugging type-related issues. Common return types include `Number.Type`, `Text.Type`, `Logical.Type`, `Date.Type`, and `Table.Type`.
+
+Note that `Value.Type` returns an opaque type value. To display it meaningfully, you typically compare it using `Value.Is` or convert it to a description string with metadata functions.
+
+## Examples
+
+### Example 1: Check types of Sales column values
+
+Inspect the types of values from different columns in the first row of Sales.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstRow = Table.First(Sales),
+    TypeName = (val) =>
+        if Value.Is(val, type number) then "number"
+        else if Value.Is(val, type text) then "text"
+        else if Value.Is(val, type date) then "date"
+        else "other"
+in
+    #table(
+        {"Column", "Value", "Type"},
+        {
+            {"OrderID", Text.From(FirstRow[OrderID]), TypeName(FirstRow[OrderID])},
+            {"CustomerName", FirstRow[CustomerName], TypeName(FirstRow[CustomerName])},
+            {"UnitPrice", Text.From(FirstRow[UnitPrice]), TypeName(FirstRow[UnitPrice])},
+            {"OrderDate", Text.From(FirstRow[OrderDate]), TypeName(FirstRow[OrderDate])}
+        }
+    )
+```
+
+<!--output
+{"columns":[{"name":"Column","type":"text"},{"name":"Value","type":"text"},{"name":"Type","type":"text"}],"rows":[{"Column":"OrderID","Value":"1","Type":"number"},{"Column":"CustomerName","Value":"Alice","Type":"text"},{"Column":"UnitPrice","Value":"25","Type":"number"},{"Column":"OrderDate","Value":"1/15/2024","Type":"date"}]}
+-->

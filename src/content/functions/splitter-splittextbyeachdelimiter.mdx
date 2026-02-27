@@ -1,0 +1,67 @@
+---
+title: "Splitter.SplitTextByEachDelimiter"
+slug: "splitter-splittextbyeachdelimiter"
+category: "Splitter"
+description: "Returns a function that splits text using a different delimiter at each split position."
+syntax: "Splitter.SplitTextByEachDelimiter(delimiters as list, optional quoteStyle as nullable number, optional startAtEnd as nullable logical) as function"
+returnType: "function"
+returnDescription: "A function that takes a text value and returns a list of text parts, using a different delimiter for each successive split."
+parameters:
+  - name: "delimiters"
+    type: "list"
+    required: true
+    description: "A list of text delimiters. The first delimiter is used for the first split, the second for the next split, and so on."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "A QuoteStyle value specifying how to handle quoted sections. Defaults to QuoteStyle.None."
+  - name: "startAtEnd"
+    type: "logical"
+    required: false
+    description: "If true, splits are applied starting from the end of the text. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbydelimiter"
+  - "splitter-splittextbyanydelimiter"
+---
+
+## Remarks
+
+`Splitter.SplitTextByEachDelimiter` returns a **function** that applies a sequence of delimiters in order. The first delimiter splits the text into two parts, the second delimiter splits the remainder, and so on. The number of resulting parts is always one more than the number of delimiters.
+
+Set `startAtEnd` to `true` to apply delimiters from right to left, which is useful for splitting text where the last portions have a known structure but earlier parts may contain the delimiter.
+
+## Examples
+
+### Example 1: Split formatted text with positional delimiters
+
+Split a constructed "Name - Product / Region" string using different delimiters at each position.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.AddColumn(
+        Table.FirstN(Sales, 3),
+        "Combo", each [CustomerName] & " - " & [Product] & " / " & [Region], type text
+    ),
+    SplitFn = Splitter.SplitTextByEachDelimiter({" - ", " / "})
+in
+    Table.SelectColumns(
+        Table.SplitColumn(
+            Table.SelectColumns(Source, {"Combo"}),
+            "Combo", SplitFn, {"Name", "Product", "Region"}
+        ),
+        {"Name", "Product", "Region"}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"Name":"Alice","Product":"Widget A","Region":"East"},{"Name":"Bob","Product":"Gadget B","Region":"West"},{"Name":"Charlie","Product":"Widget C","Region":"East"}]}
+-->

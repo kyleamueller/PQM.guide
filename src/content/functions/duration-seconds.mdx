@@ -1,0 +1,71 @@
+---
+title: "Duration.Seconds"
+slug: "duration-seconds"
+category: "Duration"
+description: "Returns the seconds component from a duration value."
+syntax: "Duration.Seconds(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The seconds component (0 through 59)."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to extract the seconds component from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-minutes"
+  - "duration-hours"
+  - "duration-totalseconds"
+---
+
+## Remarks
+
+`Duration.Seconds` returns the seconds component (0 through 59) from a `duration` value. This is the seconds portion after removing whole days, hours, and minutes. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract seconds from OrderLog durations
+
+Convert DurationMinutes to a duration and extract the seconds component. Since DurationMinutes contains whole minutes, the seconds component is always 0.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(
+            Table.FirstN(OrderLog, 4),
+            each [DurationMinutes] <> null
+        ),
+        {"LogID", "DurationMinutes"}
+    ),
+    "Seconds",
+    each Duration.Seconds(#duration(0, 0, [DurationMinutes], 0)),
+    Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Seconds","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Seconds":0},{"LogID":"L004","DurationMinutes":2745,"Seconds":0}]}
+-->
+
+### Example 2: Extract seconds from a scalar duration
+
+Return the seconds component of a literal duration that includes seconds.
+
+```powerquery
+#table(
+    type table [Duration = duration, Seconds = number],
+    {{#duration(1, 8, 25, 42), Duration.Seconds(#duration(1, 8, 25, 42))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"Seconds","type":"number"}],"rows":[{"Duration":"1.08:25:42","Seconds":42}]}
+-->

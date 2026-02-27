@@ -1,0 +1,66 @@
+---
+title: "Time.Hour"
+slug: "time-hour"
+category: "Time"
+description: "Returns the hour component from a time, datetime, or datetimezone value."
+syntax: "Time.Hour(dateTime as any) as nullable number"
+returnType: "number"
+returnDescription: "The hour component (0 through 23)."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The time, datetime, or datetimezone value to extract the hour from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-minute"
+  - "time-second"
+  - "time-from"
+---
+
+## Remarks
+
+`Time.Hour` returns the hour component as a number from 0 to 23 from a `time`, `datetime`, or `datetimezone` value. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract hour from OrderLog Timestamp
+
+Extract the hour from each Timestamp in the OrderLog table.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 5),
+        {"LogID", "Timestamp"}
+    ),
+    "Hour", each Time.Hour([Timestamp]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"Hour","type":"number"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","Hour":9},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","Hour":14},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","Hour":11},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","Hour":8},{"LogID":"L005","Timestamp":"2024-02-01T16:20:00","Hour":16}]}
+-->
+
+### Example 2: Extract hour from a scalar time
+
+Return the hour from a single time value.
+
+```powerquery
+#table(
+    type table [Time = time, Hour = number],
+    {{#time(14, 30, 0), Time.Hour(#time(14, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Time","type":"time"},{"name":"Hour","type":"number"}],"rows":[{"Time":"14:30:00","Hour":14}]}
+-->

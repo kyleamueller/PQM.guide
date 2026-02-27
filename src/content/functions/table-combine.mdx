@@ -1,0 +1,56 @@
+---
+title: "Table.Combine"
+slug: "table-combine"
+category: "Table"
+description: "Appends multiple tables into a single table by stacking their rows."
+syntax: "Table.Combine(tables as list, optional columns as any) as table"
+returnType: "table"
+returnDescription: "A single table containing all rows from the input tables."
+parameters:
+  - name: "tables"
+    type: "list"
+    required: true
+    description: "A list of tables to combine."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "Optional column specification to control the output schema. Use this to select or reorder columns in the combined result."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-selectcolumns"
+---
+
+## Remarks
+
+`Table.Combine` appends (stacks) the rows of two or more tables into a single table. This is the M equivalent of the "Append Queries" operation in the Power Query Editor UI.
+
+The output columns are the union of all columns across the input tables. If a table does not have a column that another table has, the values for that column are `null` in the combined result.
+
+Use the optional `columns` parameter to specify which columns to include in the output, rather than adding a separate `Table.SelectColumns` or `Table.RemoveColumns` step afterward. This keeps the query concise.
+
+## Examples
+
+### Example 1: Append two subsets of a table
+
+Split Sales into two subsets (first 3 and last 3 rows) and recombine them.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstPart = Table.SelectColumns(Table.FirstN(Sales, 3), {"CustomerName", "Product"}),
+    LastPart = Table.SelectColumns(Table.LastN(Sales, 3), {"CustomerName", "Product"})
+in
+    Table.Combine({FirstPart, LastPart})
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A"},{"CustomerName":"Bob","Product":"Gadget B"},{"CustomerName":"Charlie","Product":"Widget C"},{"CustomerName":"Bob","Product":"Thingamajig E"},{"CustomerName":"Charlie","Product":"Gadget B"},{"CustomerName":"Diana","Product":"Widget C"}]}
+-->

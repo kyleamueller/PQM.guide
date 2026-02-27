@@ -1,0 +1,75 @@
+---
+title: "Number.Round"
+slug: "number-round"
+category: "Number"
+description: "Rounds a number to a specified number of digits."
+syntax: "Number.Round(number as nullable number, optional digits as nullable number, optional roundingMode as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The rounded number."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to round."
+  - name: "digits"
+    type: "number"
+    required: false
+    description: "Number of decimal places (default 0)."
+  - name: "roundingMode"
+    type: "number"
+    required: false
+    description: "Rounding mode (RoundingMode.Up, .Down, .AwayFromZero, .ToEven)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-rounddown"
+  - "number-roundup"
+  - "number-abs"
+---
+
+## Remarks
+
+`Number.Round` rounds a number to the specified number of fractional digits. When `digits` is omitted it defaults to 0 (round to the nearest integer). The optional `roundingMode` parameter controls tie-breaking behaviour — `RoundingMode.ToEven` (banker's rounding) is the default.
+
+This is commonly used to clean up calculated columns such as averages, percentages, or unit conversions where excessive decimal places are not meaningful.
+
+## Examples
+
+### Example 1: Round salary in thousands to 1 decimal
+
+Divide each employee's salary by 1000 and round to one decimal place.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Employees, 4), {"FullName", "Salary"}),
+    "SalaryK", each Number.Round([Salary] / 1000, 1), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"Salary","type":"number"},{"name":"SalaryK","type":"number"}],"rows":[{"FullName":"alice smith","Salary":55000,"SalaryK":55},{"FullName":"BOB JONES","Salary":95000,"SalaryK":95},{"FullName":"Charlie Brown","Salary":72000,"SalaryK":72},{"FullName":"diana PRINCE","Salary":68000,"SalaryK":68}]}
+-->
+
+### Example 2: Round product prices to nearest ten
+
+Round each product price to the nearest ten (digits = -1).
+
+Input: `Products`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Products, 5), {"ProductName", "Price"}),
+    "RoundedPrice", each Number.Round([Price], -1), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"RoundedPrice","type":"number"}],"rows":[{"ProductName":"Widget A","Price":25,"RoundedPrice":20},{"ProductName":"Gadget B","Price":50,"RoundedPrice":50},{"ProductName":"Widget C","Price":15,"RoundedPrice":20},{"ProductName":"Gadget D","Price":75,"RoundedPrice":80},{"ProductName":"Thingamajig E","Price":120,"RoundedPrice":120}]}
+-->

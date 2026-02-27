@@ -1,0 +1,56 @@
+---
+title: "List.ContainsAny"
+slug: "list-containsany"
+category: "List"
+description: "Returns true if a list contains any of the values in another list."
+syntax: "List.ContainsAny(list as list, values as list, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if any value from the second list is found in the first list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to search."
+  - name: "values"
+    type: "list"
+    required: true
+    description: "The list of values to check for."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "A comparer function for custom equality testing."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-contains"
+  - "list-containsall"
+---
+
+## Remarks
+
+`List.ContainsAny` returns `true` if at least one value from the second list appears in the first list. This is useful for checking membership against multiple possible values at once.
+
+## Examples
+
+### Example 1: Check for target categories
+
+Check whether the list of Sales categories contains any gadget-related category.
+
+Input: `Sales`
+
+```powerquery
+let
+    Categories = List.Distinct(Table.Column(Sales, "Category")),
+    HasGadgets = List.ContainsAny(Categories, {"Gadgets", "Electronics"})
+in
+    #table({"HasGadgets"}, {{HasGadgets}})
+```
+
+<!--output
+{"columns":[{"name":"HasGadgets","type":"logical"}],"rows":[{"HasGadgets":true}]}
+-->

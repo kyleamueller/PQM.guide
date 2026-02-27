@@ -1,0 +1,89 @@
+---
+title: "Table.ReplaceValue"
+slug: "table-replacevalue"
+category: "Table"
+description: "Replaces occurrences of a value in specified columns using a replacer function."
+syntax: "Table.ReplaceValue(table as table, oldValue as any, newValue as any, replacer as function, columnsToSearch as list) as table"
+returnType: "table"
+returnDescription: "The input table with the specified values replaced."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing values to replace."
+  - name: "oldValue"
+    type: "any"
+    required: true
+    description: "The value to search for."
+  - name: "newValue"
+    type: "any"
+    required: true
+    description: "The replacement value."
+  - name: "replacer"
+    type: "function"
+    required: true
+    description: "The replacer function: Replacer.ReplaceValue for exact match, or Replacer.ReplaceText for substring replacement."
+  - name: "columnsToSearch"
+    type: "list"
+    required: true
+    description: "A list of column names in which to perform the replacement."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-transformcolumns"
+  - "table-filldown"
+  - "table-addcolumn"
+---
+
+## Remarks
+
+`Table.ReplaceValue` searches for `oldValue` in the specified columns and replaces it with `newValue`. The `replacer` parameter determines the matching behavior:
+
+- `Replacer.ReplaceValue` — performs an exact match on the entire cell value. Use this for replacing nulls, numbers, or exact text matches.
+- `Replacer.ReplaceText` — performs a substring replacement within text values. Use this for find-and-replace operations within strings.
+
+If you have multiple replace operations on the same column, consider consolidating them into a single `Table.TransformColumns` call with a translation table or conditional logic. Multiple separate `Table.ReplaceValue` steps add unnecessary overhead.
+
+## Examples
+
+### Example 1: Replace exact values
+
+Replace the region value "East" with "Eastern" in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.ReplaceValue(Sales, "East", "Eastern", Replacer.ReplaceValue, {"Region"}),
+    {"CustomerName", "Product", "Region"}
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"Eastern"},{"CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"CustomerName":"Charlie","Product":"Widget C","Region":"Eastern"},{"CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"CustomerName":"Diana","Product":"Widget A","Region":"West"},{"CustomerName":"Bob","Product":"Thingamajig E","Region":"Eastern"},{"CustomerName":"Charlie","Product":"Gadget B","Region":"West"},{"CustomerName":"Diana","Product":"Widget C","Region":"North"}]}
+-->
+
+### Example 2: Replace null values
+
+Replace null values with a placeholder (useful before unpivoting).
+
+Input: `Sales`
+
+```powerquery
+let
+    WithNull = Table.ReplaceValue(
+        Table.SelectColumns(Table.FirstN(Sales, 4), {"CustomerName", "Region"}),
+        "North", null, Replacer.ReplaceValue, {"Region"}
+    )
+in
+    Table.ReplaceValue(WithNull, null, "Unknown", Replacer.ReplaceValue, {"Region"})
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"East"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"East"},{"CustomerName":"Alice","Region":"Unknown"}]}
+-->

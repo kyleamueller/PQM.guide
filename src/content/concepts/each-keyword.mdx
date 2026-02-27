@@ -1,0 +1,86 @@
+---
+title: "The each Keyword"
+slug: "each-keyword"
+description: "Understanding each as shorthand for single-parameter functions, and how bracket notation accesses row fields."
+relatedConcepts:
+  - "type-system"
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-selectrows"
+---
+
+The `each` keyword is one of the most common patterns in Power Query M, but it is also one of the most misunderstood. It is simply **syntactic sugar** (shorthand) for a function that takes a single parameter named `_`.
+
+### each Is a Function
+
+These two expressions are identical:
+
+```powerquery
+each [UnitPrice] * [Quantity]
+```
+
+```powerquery
+(_) => _[UnitPrice] * _[Quantity]
+```
+
+When you write `each`, the engine creates an anonymous function with one parameter called `_`. Inside the function body, the underscore is implicit — you can reference it directly or use bracket notation to access its fields.
+
+### Bracket Notation
+
+Inside an `each` block, `[ColumnName]` is shorthand for `_[ColumnName]`. This works because `_` is the current row (a record), and bracket notation accesses a field on that record.
+
+```powerquery
+// These are equivalent inside each:
+[UnitPrice]       // bracket notation (implicit _)
+_[UnitPrice]      // explicit _ reference
+```
+
+### Common Uses
+
+**Filtering rows** with `Table.SelectRows`:
+
+```powerquery
+Table.SelectRows(Sales, each [Region] = "East")
+```
+
+**Adding calculated columns** with `Table.AddColumn`:
+
+```powerquery
+Table.AddColumn(Sales, "Total", each [UnitPrice] * [Quantity], type number)
+```
+
+**Transforming values** with `List.Transform`:
+
+```powerquery
+List.Transform({1, 2, 3}, each _ * 10)
+// Result: {10, 20, 30}
+```
+
+Note that for lists, `_` is the current item (not a record), so bracket notation does not apply.
+
+### Nesting each
+
+When you nest `each` expressions, each level creates its own `_` scope. The inner `each` shadows the outer one. If you need to reference the outer scope, assign it to a named variable first:
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "Matches",
+    (outerRow) =>
+        Table.SelectRows(
+            OtherTable,
+            each [CustomerName] = outerRow[CustomerName]
+        ),
+    type table
+)
+```
+
+Here, the inner `each` refers to rows of `OtherTable`, while `outerRow` captures the current row from `Sales`.
+
+### When Not to Use each
+
+For functions that take multiple parameters, `each` does not apply. Use explicit parameter names instead:
+
+```powerquery
+List.Accumulate({1, 2, 3}, 0, (state, current) => state + current)
+```

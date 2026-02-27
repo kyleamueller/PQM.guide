@@ -1,0 +1,71 @@
+---
+title: "DateTime.ToRecord"
+slug: "datetime-torecord"
+category: "DateTime"
+description: "Converts a datetime value to a record containing its parts."
+syntax: "DateTime.ToRecord(dateTime as datetime) as record"
+returnType: "record"
+returnDescription: "A record with Year, Month, Day, Hour, Minute, and Second fields."
+parameters:
+  - name: "dateTime"
+    type: "datetime"
+    required: true
+    description: "The datetime value to convert to a record."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-from"
+  - "datetime-date"
+  - "datetime-time"
+  - "time-torecord"
+---
+
+## Remarks
+
+`DateTime.ToRecord` converts a `datetime` value into a record with the fields `Year`, `Month`, `Day`, `Hour`, `Minute`, and `Second`. Each field contains the corresponding numeric component from the datetime value.
+
+## Examples
+
+### Example 1: Convert an OrderLog Timestamp to a record
+
+Expand the first OrderLog Timestamp into its component fields.
+
+Input: `OrderLog`
+
+```powerquery
+let
+    FirstRow = Table.First(OrderLog),
+    Rec = DateTime.ToRecord(FirstRow[Timestamp])
+in
+    #table(
+        type table [Year = number, Month = number, Day = number, Hour = number, Minute = number, Second = number],
+        {{Rec[Year], Rec[Month], Rec[Day], Rec[Hour], Rec[Minute], Rec[Second]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Year":2024,"Month":1,"Day":15,"Hour":9,"Minute":30,"Second":0}]}
+-->
+
+### Example 2: Convert a scalar datetime to a record
+
+Convert a literal datetime into its component parts.
+
+```powerquery
+let
+    Rec = DateTime.ToRecord(#datetime(2024, 6, 15, 14, 30, 45))
+in
+    #table(
+        type table [Year = number, Month = number, Day = number, Hour = number, Minute = number, Second = number],
+        {{Rec[Year], Rec[Month], Rec[Day], Rec[Hour], Rec[Minute], Rec[Second]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Year":2024,"Month":6,"Day":15,"Hour":14,"Minute":30,"Second":45}]}
+-->

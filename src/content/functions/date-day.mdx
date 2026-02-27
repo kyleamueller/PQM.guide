@@ -1,0 +1,66 @@
+---
+title: "Date.Day"
+slug: "date-day"
+category: "Date"
+description: "Returns the day of the month from a date value."
+syntax: "Date.Day(dateTime as any) as nullable number"
+returnType: "number"
+returnDescription: "The day component of the date (1 through 31)."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date value to extract the day from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-year"
+  - "date-month"
+  - "date-dayofweek"
+---
+
+## Remarks
+
+`Date.Day` returns the day-of-month component as a number from 1 to 31 from a `date`, `datetime`, or `datetimezone` value. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract the day from OrderDate
+
+Extract the day of the month from each OrderDate in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "Day", each Date.Day([OrderDate]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Day","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Day":15},{"OrderID":2,"OrderDate":"2024-01-18","Day":18},{"OrderID":3,"OrderDate":"2024-02-01","Day":1},{"OrderID":4,"OrderDate":"2024-02-10","Day":10},{"OrderID":5,"OrderDate":"2024-03-05","Day":5}]}
+-->
+
+### Example 2: Extract the day from a scalar value
+
+Return the day from a single date value.
+
+```powerquery
+#table(
+    type table [Date = date, Day = number],
+    {{#date(2024, 4, 15), Date.Day(#date(2024, 4, 15))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"Day","type":"number"}],"rows":[{"Date":"2024-04-15","Day":15}]}
+-->

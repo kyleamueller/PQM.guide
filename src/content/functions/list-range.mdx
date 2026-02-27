@@ -1,0 +1,57 @@
+---
+title: "List.Range"
+slug: "list-range"
+category: "List"
+description: "Returns a subset of items from a list starting at a given offset."
+syntax: "List.Range(list as list, offset as number, optional count as nullable number) as list"
+returnType: "list"
+returnDescription: "A list containing items from the specified offset for the given count."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to take items from."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based index of the first item to return."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The number of items to return. If omitted, returns all items from the offset onward."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-first"
+  - "list-last"
+  - "table-range"
+---
+
+## Remarks
+
+`List.Range` returns a slice of a list, starting at a zero-based offset. This is the list equivalent of `Table.Range`.
+
+## Examples
+
+### Example 1: Get a range of products
+
+Get 3 products starting from the second item (offset 1).
+
+Input: `Products`
+
+```powerquery
+let
+    Names = Table.Column(Products, "ProductName"),
+    Subset = List.Range(Names, 1, 3)
+in
+    #table({"ProductName"}, List.Transform(Subset, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"}],"rows":[{"ProductName":"Gadget B"},{"ProductName":"Widget C"},{"ProductName":"Gadget D"}]}
+-->

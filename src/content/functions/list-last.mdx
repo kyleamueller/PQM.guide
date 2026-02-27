@@ -1,0 +1,52 @@
+---
+title: "List.Last"
+slug: "list-last"
+category: "List"
+description: "Returns the last item in a list, or a default value if the list is empty."
+syntax: "List.Last(list as list, optional defaultValue as any) as any"
+returnType: "any"
+returnDescription: "The last item in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to get the last item from."
+  - name: "defaultValue"
+    type: "any"
+    required: false
+    description: "The value to return if the list is empty."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-first"
+  - "list-range"
+  - "table-lastn"
+---
+
+## Remarks
+
+`List.Last` returns the last item from a list. Like `List.First`, provide a default value to handle empty lists gracefully.
+
+## Examples
+
+### Example 1: Get the last product name
+
+Return the last product name from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    LastProduct = List.Last(Table.Column(Sales, "Product"))
+in
+    #table({"LastProduct"}, {{LastProduct}})
+```
+
+<!--output
+{"columns":[{"name":"LastProduct","type":"text"}],"rows":[{"LastProduct":"Widget C"}]}
+-->

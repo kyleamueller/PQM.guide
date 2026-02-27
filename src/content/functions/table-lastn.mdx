@@ -1,0 +1,51 @@
+---
+title: "Table.LastN"
+slug: "table-lastn"
+category: "Table"
+description: "Returns the last N rows from a table, or rows matching a condition from the end."
+syntax: "Table.LastN(table as table, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "A table containing the last N rows, or the last rows that satisfy the condition."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to take rows from."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many rows to return, or a function that returns rows from the end while the condition is true."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-firstn"
+  - "table-skip"
+  - "table-range"
+---
+
+## Remarks
+
+`Table.LastN` returns rows from the end of a table. When passed a number, it returns that many rows from the bottom. When passed a condition function, it scans backward from the last row and returns consecutive rows while the condition is true.
+
+This is the complement of `Table.FirstN`. Use `Table.LastN` to get the most recent rows from a date-sorted table, or to grab a trailing set of records.
+
+## Examples
+
+### Example 1: Get last 2 rows
+
+Return the last 2 rows of the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.LastN(Sales, 2), {"OrderID", "CustomerName", "Product", "Region"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"OrderID":7,"CustomerName":"Charlie","Product":"Widget C","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Gadget B","Region":"North"}]}
+-->

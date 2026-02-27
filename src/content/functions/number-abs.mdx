@@ -1,0 +1,47 @@
+---
+title: "Number.Abs"
+slug: "number-abs"
+category: "Number"
+description: "Returns the absolute value of a number."
+syntax: "Number.Abs(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The absolute (non-negative) value of the number."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number whose absolute value is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-round"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Abs` returns the non-negative magnitude of a number. If the input is positive or zero it is returned unchanged; if negative, the sign is removed. This is useful when computing differences where direction does not matter — for example, finding how far each value deviates from an average.
+
+## Examples
+
+### Example 1: Absolute difference from a target salary
+
+Calculate how far each employee's salary is from a target of 70000, ignoring whether it is above or below.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Employees, 4), {"FullName", "Salary"}),
+    "GapFrom70K", each Number.Abs([Salary] - 70000), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"Salary","type":"number"},{"name":"GapFrom70K","type":"number"}],"rows":[{"FullName":"alice smith","Salary":55000,"GapFrom70K":15000},{"FullName":"BOB JONES","Salary":95000,"GapFrom70K":25000},{"FullName":"Charlie Brown","Salary":72000,"GapFrom70K":2000},{"FullName":"diana PRINCE","Salary":68000,"GapFrom70K":2000}]}
+-->

@@ -1,0 +1,95 @@
+---
+title: "Csv.Document"
+slug: "csv-document"
+category: "Accessing Data"
+description: "Parses CSV text into a table."
+syntax: "Csv.Document(source as any, optional columns as any, optional delimiter as any, optional extraValues as nullable number, optional encoding as nullable number) as table"
+returnType: "table"
+returnDescription: "A table parsed from the CSV content."
+parameters:
+  - name: "source"
+    type: "any"
+    required: true
+    description: "The CSV text or binary content to parse."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "The number of columns, a list of column names, a table type, or an options record."
+  - name: "delimiter"
+    type: "any"
+    required: false
+    description: "The column delimiter. Defaults to comma (\",\")."
+  - name: "extraValues"
+    type: "number"
+    required: false
+    description: "How to handle extra values per row (ExtraValues.Error, ExtraValues.Ignore, or ExtraValues.List)."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The text encoding of the source (e.g., TextEncoding.Utf8)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "json-document"
+  - "lines-fromtext"
+  - "file-contents"
+---
+
+## Remarks
+
+`Csv.Document` parses CSV (comma-separated values) text or binary content into a table. It is most commonly used in combination with `File.Contents` or `Web.Contents` to load external CSV files:
+
+```powerquery
+Csv.Document(File.Contents("C:\Data\sales.csv"), [Delimiter = ",", Encoding = TextEncoding.Utf8])
+```
+
+The `columns` parameter accepts several forms:
+- A **number** — the expected column count (columns are named Column1, Column2, etc.).
+- A **list of text** — column names to assign.
+- A **table type** — defines both column names and types in one step.
+- An **options record** — with fields like `Delimiter`, `Encoding`, `CsvStyle`, and `QuoteStyle`.
+
+When the first row contains headers, wrap the result in `Table.PromoteHeaders` to use it as column names.
+
+`CsvStyle.QuoteAlways` and `CsvStyle.QuoteAfterDelimiter` control how quoted fields are handled. `QuoteStyle.Csv` (the default) treats double-quotes as field wrappers; `QuoteStyle.None` treats them as literal characters.
+
+## Examples
+
+### Example 1: Parse inline CSV text
+
+Parse a simple CSV string with headers.
+
+```powerquery
+let
+    CsvText = "Name,Age,City#(lf)Alice,30,Seattle#(lf)Bob,25,Portland",
+    Parsed = Csv.Document(CsvText, [Delimiter = ","]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"text"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":"30","City":"Seattle"},{"Name":"Bob","Age":"25","City":"Portland"}]}
+-->
+
+### Example 2: Parse with a typed schema
+
+Parse CSV text and apply column types using a table type.
+
+```powerquery
+let
+    CsvText = "Product,Price#(lf)Widget,9.99#(lf)Gadget,14.50",
+    Schema = type table [Product = text, Price = number],
+    Parsed = Csv.Document(CsvText, Schema)
+in
+    Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"Price","type":"text"}],"rows":[{"Product":"Widget","Price":"9.99"},{"Product":"Gadget","Price":"14.50"}]}
+-->

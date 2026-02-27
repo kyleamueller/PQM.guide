@@ -1,0 +1,78 @@
+---
+title: "Table.NestedJoin"
+slug: "table-nestedjoin"
+category: "Table"
+description: "Joins two tables on matching key columns and returns the matched rows from the second table as a nested table column."
+syntax: "Table.NestedJoin(table1 as table, key1 as any, table2 as table, key2 as any, newColumnName as text, optional joinKind as nullable number) as table"
+returnType: "table"
+returnDescription: "The first table with a new column containing matched rows from the second table."
+parameters:
+  - name: "table1"
+    type: "table"
+    required: true
+    description: "The primary (left) table."
+  - name: "key1"
+    type: "any"
+    required: true
+    description: "The join key column(s) from the first table."
+  - name: "table2"
+    type: "table"
+    required: true
+    description: "The secondary (right) table to join."
+  - name: "key2"
+    type: "any"
+    required: true
+    description: "The join key column(s) from the second table."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "Name of the new column that will contain the nested table of matched rows."
+  - name: "joinKind"
+    type: "number"
+    required: false
+    description: "The type of join: JoinKind.Inner, JoinKind.LeftOuter (default), JoinKind.RightOuter, JoinKind.FullOuter, JoinKind.LeftAnti, or JoinKind.RightAnti."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-expandtablecolumn"
+  - "table-join"
+  - "table-combine"
+---
+
+## Remarks
+
+`Table.NestedJoin` performs a merge operation between two tables based on matching key columns. The result is the first table with a new column appended, where each cell contains a nested table of the matching rows from the second table.
+
+This is the M equivalent of the "Merge Queries" operation in the Power Query Editor UI. After a nested join, you typically use `Table.ExpandTableColumn` to bring the desired columns from the nested table into the main table.
+
+The default join kind is `JoinKind.LeftOuter`, which keeps all rows from the first table and matches from the second. Rows with no match get an empty nested table. Use `JoinKind.Inner` to keep only rows that have matches in both tables.
+
+For multi-column joins, pass lists for both key parameters: `{"Col1", "Col2"}`.
+
+## Examples
+
+### Example 1: Join Sales to Customers
+
+Merge the Sales table with Customers on CustomerName = Name, then expand the City column.
+
+Input: `Sales`
+
+```powerquery
+let
+    Joined = Table.NestedJoin(
+        Table.FirstN(Sales, 4), "CustomerName",
+        Customers, "Name",
+        "CustomerInfo", JoinKind.LeftOuter
+    )
+in
+    Table.ExpandTableColumn(Joined, "CustomerInfo", {"City"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"City","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","City":"New York"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","City":"Chicago"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","City":"Houston"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North","City":"New York"}]}
+-->

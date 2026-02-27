@@ -1,0 +1,66 @@
+---
+title: "DateTime.LocalNow"
+slug: "datetime-localnow"
+category: "DateTime"
+description: "Returns the current local date and time."
+syntax: "DateTime.LocalNow() as datetime"
+returnType: "datetime"
+returnDescription: "The current local date and time."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-utcnow"
+  - "datetime-from"
+---
+
+## Remarks
+
+`DateTime.LocalNow` returns the current date and time on the machine where the query is executed. The value changes each time the query runs, so it cannot be used for reproducible results. It is commonly used for calculating elapsed time, adding refresh timestamps, or computing ages relative to the current moment.
+
+## Examples
+
+### Example 1: Display the current local datetime
+
+Return the current local datetime as a single-row table. The actual output depends on when the query runs.
+
+```powerquery
+#table(
+    type table [CurrentDateTime = datetime],
+    {{DateTime.LocalNow()}}
+)
+```
+
+<!--output
+{"columns":[{"name":"CurrentDateTime","type":"datetime"}],"rows":[{"CurrentDateTime":"2024-07-15T10:30:00"}]}
+-->
+
+### Example 2: Calculate days since each order
+
+Compute the number of whole days between each OrderDate and the current datetime.
+
+Input: `Sales`
+
+```powerquery
+let
+    Now = #datetime(2024, 7, 15, 10, 30, 0) // DateTime.LocalNow()
+in
+    Table.AddColumn(
+        Table.SelectColumns(
+            Table.FirstN(Sales, 4),
+            {"OrderID", "OrderDate"}
+        ),
+        "DaysSinceOrder",
+        each Duration.Days(Now - DateTime.From([OrderDate])),
+        Int64.Type
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DaysSinceOrder","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DaysSinceOrder":182},{"OrderID":2,"OrderDate":"2024-01-18","DaysSinceOrder":179},{"OrderID":3,"OrderDate":"2024-02-01","DaysSinceOrder":165},{"OrderID":4,"OrderDate":"2024-02-10","DaysSinceOrder":156}]}
+-->

@@ -1,0 +1,73 @@
+---
+title: "Binary.ToText"
+slug: "binary-totext"
+category: "Binary"
+description: "Encodes binary data as Base64 or hexadecimal text."
+syntax: "Binary.ToText(binary as nullable binary, optional encoding as nullable number) as nullable text"
+returnType: "text"
+returnDescription: "The text representation of the binary value."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to encode as text."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The encoding format: BinaryEncoding.Base64 (default) or BinaryEncoding.Hex."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-fromtext"
+  - "binary-from"
+---
+
+## Remarks
+
+`Binary.ToText` converts a binary value into a text string using either Base64 or hexadecimal encoding. This is the inverse of `Binary.FromText`.
+
+- `BinaryEncoding.Base64` (default) — produces a standard Base64 string.
+- `BinaryEncoding.Hex` — produces a hexadecimal string (uppercase).
+
+Common use cases include encoding file content for embedding in JSON payloads or generating checksums for display.
+
+## Examples
+
+### Example 1: Encode text as Base64
+
+Convert a plain text string to its Base64 representation.
+
+```powerquery
+let
+    Original = "Power Query",
+    AsBinary = Binary.From(Original),
+    Base64 = Binary.ToText(AsBinary, BinaryEncoding.Base64)
+in
+    #table({"Original", "Base64"}, {{Original, Base64}})
+```
+
+<!--output
+{"columns":[{"name":"Original","type":"text"},{"name":"Base64","type":"text"}],"rows":[{"Original":"Power Query","Base64":"UG93ZXIgUXVlcnk="}]}
+-->
+
+### Example 2: Encode text as hexadecimal
+
+Convert a text string to its hex-encoded form.
+
+```powerquery
+let
+    Original = "Hello",
+    AsBinary = Binary.From(Original),
+    Hex = Binary.ToText(AsBinary, BinaryEncoding.Hex)
+in
+    #table({"Original", "Hex"}, {{Original, Hex}})
+```
+
+<!--output
+{"columns":[{"name":"Original","type":"text"},{"name":"Hex","type":"text"}],"rows":[{"Original":"Hello","Hex":"48656C6C6F"}]}
+-->

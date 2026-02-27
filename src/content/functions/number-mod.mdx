@@ -1,0 +1,54 @@
+---
+title: "Number.Mod"
+slug: "number-mod"
+category: "Number"
+description: "Returns the remainder from dividing a number by a divisor."
+syntax: "Number.Mod(number as nullable number, divisor as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The remainder after integer division."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The dividend."
+  - name: "divisor"
+    type: "number"
+    required: true
+    description: "The divisor."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-iseven"
+  - "number-isodd"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Mod` returns the remainder of the division of `number` by `divisor`. This is equivalent to the mathematical modulo operation. A common use is classifying rows as odd or even based on an ID column, or cycling through groups for round-robin assignment.
+
+If `divisor` is zero, an error is raised.
+
+## Examples
+
+### Example 1: Flag odd and even OrderIDs
+
+Use mod 2 to determine whether each OrderID is odd or even.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 6), {"OrderID", "Product"}),
+    "OddEven", each if Number.Mod([OrderID], 2) = 0 then "Even" else "Odd", type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"OddEven","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A","OddEven":"Odd"},{"OrderID":2,"Product":"Gadget B","OddEven":"Even"},{"OrderID":3,"Product":"Widget C","OddEven":"Odd"},{"OrderID":4,"Product":"Gadget D","OddEven":"Even"},{"OrderID":5,"Product":"Widget A","OddEven":"Odd"},{"OrderID":6,"Product":"Thingamajig E","OddEven":"Even"}]}
+-->

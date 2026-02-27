@@ -1,0 +1,48 @@
+---
+title: "Record.ToList"
+slug: "record-tolist"
+category: "Record"
+description: "Converts a record to a list of its field values."
+syntax: "Record.ToList(record as record) as list"
+returnType: "list"
+returnDescription: "A list of the record's field values in field order."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to convert to a list."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fromlist"
+  - "record-fieldvalues"
+  - "record-fieldnames"
+---
+
+## Remarks
+
+`Record.ToList` converts a record into a list containing only the field values, in the same order the fields appear in the record. Unlike `Record.FieldValues`, which is functionally identical, `Record.ToList` is named to emphasize the conversion semantics. Use this when you need to pass a record's values into list-oriented functions or when serializing record data.
+
+## Examples
+
+### Example 1: Convert first Sales row to a list
+
+Convert the first row of the Sales table from a record into a list of values.
+
+Input: `Sales`
+
+```powerquery
+let
+    Values = Record.ToList(Sales{0})
+in
+    #table({"Value"}, List.Transform(Values, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":1},{"Value":"Alice"},{"Value":"Widget A"},{"Value":"Widgets"},{"Value":25},{"Value":4},{"Value":"2024-01-15"},{"Value":"East"}]}
+-->

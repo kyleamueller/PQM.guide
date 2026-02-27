@@ -1,0 +1,76 @@
+---
+title: "DateTimeZone.ToUtc"
+slug: "datetimezone-toutc"
+category: "DateTimeZone"
+description: "Converts a datetimezone value to UTC."
+syntax: "DateTimeZone.ToUtc(dateTimeZone as nullable datetimezone) as nullable datetimezone"
+returnType: "datetimezone"
+returnDescription: "The datetimezone value converted to UTC."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "The datetimezone value to convert to UTC."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-tolocal"
+  - "datetimezone-utcnow"
+  - "datetimezone-from"
+---
+
+## Remarks
+
+`DateTimeZone.ToUtc` converts a `datetimezone` value to UTC (Coordinated Universal Time) by adjusting the date and time according to the timezone offset and setting the offset to +00:00. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert timezone-aware values to UTC
+
+Convert datetimezone values with various offsets to UTC.
+
+```powerquery
+let
+    Source = #table(
+        type table [City = text, LocalTime = datetimezone],
+        {
+            {"New York", #datetimezone(2024, 1, 15, 9, 30, 0, -5, 0)},
+            {"London", #datetimezone(2024, 1, 15, 14, 30, 0, 0, 0)},
+            {"Tokyo", #datetimezone(2024, 1, 15, 23, 30, 0, 9, 0)}
+        }
+    )
+in
+    Table.AddColumn(
+        Source,
+        "UTC",
+        each DateTimeZone.ToUtc([LocalTime]),
+        type datetimezone
+    )
+```
+
+<!--output
+{"columns":[{"name":"City","type":"text"},{"name":"LocalTime","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"City":"New York","LocalTime":"2024-01-15T09:30:00-05:00","UTC":"2024-01-15T14:30:00+00:00"},{"City":"London","LocalTime":"2024-01-15T14:30:00+00:00","UTC":"2024-01-15T14:30:00+00:00"},{"City":"Tokyo","LocalTime":"2024-01-15T23:30:00+09:00","UTC":"2024-01-15T14:30:00+00:00"}]}
+-->
+
+### Example 2: Convert a single datetimezone to UTC
+
+Convert a single EST datetimezone value to UTC.
+
+```powerquery
+#table(
+    type table [EST = datetimezone, UTC = datetimezone],
+    {{
+        #datetimezone(2024, 3, 15, 10, 0, 0, -5, 0),
+        DateTimeZone.ToUtc(#datetimezone(2024, 3, 15, 10, 0, 0, -5, 0))
+    }}
+)
+```
+
+<!--output
+{"columns":[{"name":"EST","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"EST":"2024-03-15T10:00:00-05:00","UTC":"2024-03-15T15:00:00+00:00"}]}
+-->

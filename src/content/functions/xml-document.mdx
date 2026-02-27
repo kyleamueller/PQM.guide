@@ -1,0 +1,72 @@
+---
+title: "Xml.Document"
+slug: "xml-document"
+category: "Accessing Data"
+description: "Parses XML content into a nested table structure."
+syntax: "Xml.Document(contents as any, optional encoding as nullable number) as table"
+returnType: "table"
+returnDescription: "A table representing the XML document structure."
+parameters:
+  - name: "contents"
+    type: "any"
+    required: true
+    description: "The XML text or binary content to parse."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The text encoding of the content (e.g., TextEncoding.Utf8)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "csv-document"
+  - "json-document"
+  - "web-contents"
+---
+
+## Remarks
+
+`Xml.Document` parses XML content and returns a **nested table** representing the document structure. Each element in the XML becomes a row with the following columns:
+
+| Column | Type | Description |
+|---|---|---|
+| `Name` | text | The element tag name. |
+| `Namespace` | text | The XML namespace URI (empty string if none). |
+| `Value` | text | The text content of the element (null if it contains child elements). |
+| `Attributes` | table | A table of attribute name-value pairs for the element. |
+| `[Children]` | table | A nested table containing child elements, with the same column structure. |
+
+### Working with nested XML
+
+Because XML is hierarchical, the result is deeply nested. You typically need multiple expansion steps:
+
+1. Parse the XML to get the root-level table.
+2. Filter or select the element you need by `Name`.
+3. Expand the child table to drill deeper.
+4. Repeat until you reach the leaf data.
+
+### Typical pattern
+
+```powerquery
+let
+    Source = Xml.Document(File.Contents("C:\Data\orders.xml")),
+    Root = Source{0}[Value],              // drill into root element
+    Orders = Root{[Name = "Orders"]}[Value], // navigate to Orders node
+    Expanded = Table.ExpandTableColumn(Orders, "Value", {"Name", "Value"})
+in
+    Expanded
+```
+
+### Notes
+
+- For large XML files, consider using `Xml.Tables` instead, which provides a flattened view more suitable for tabular consumption.
+- Attributes are returned as a separate nested table on each element. Use `Table.ExpandTableColumn` on the `Attributes` column to access them.
+- Namespace-aware XML requires matching on the `Namespace` column when filtering elements.
+
+## Examples
+
+Since `Xml.Document` returns deeply nested structures that are difficult to demonstrate with inline text, live output examples are not shown. See the Remarks section above for typical usage patterns.

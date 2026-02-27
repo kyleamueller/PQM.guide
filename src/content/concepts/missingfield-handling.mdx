@@ -1,0 +1,61 @@
+---
+title: "MissingField Handling"
+slug: "missingfield-handling"
+description: "How to make your queries resilient to upstream column changes using MissingField options."
+relatedConcepts:
+  - "error-handling"
+relatedFunctions:
+  - "table-removecolumns"
+  - "table-renamecolumns"
+---
+
+Many table functions in Power Query accept an optional `MissingField` parameter that controls what happens when a referenced column does not exist. Using this parameter correctly is one of the simplest ways to make your queries more resilient to upstream changes.
+
+### The Problem
+
+When a data source changes — a column is renamed, removed, or added by someone else — your query can break during refresh. By default, most functions raise an error if a referenced column is missing:
+
+```powerquery
+// This will error if "OldColumn" doesn't exist:
+Table.RemoveColumns(Source, "OldColumn")
+```
+
+In production, this means a broken dashboard or a failed scheduled refresh, often for a column you were trying to remove anyway.
+
+### MissingField Options
+
+The `MissingField` type has three values:
+
+**`MissingField.Error`** (default) — Raises an error if the specified column does not exist. This is the strictest behavior and the default for most functions.
+
+**`MissingField.Ignore`** — Silently skips any column names that do not exist. The operation proceeds as if the missing column was never mentioned.
+
+```powerquery
+// Safe: won't error if "OldColumn" is already gone
+Table.RemoveColumns(Source, "OldColumn", MissingField.Ignore)
+```
+
+**`MissingField.UseNull`** — For operations that produce output columns (like `Table.SelectColumns`), creates the column with all null values if it does not exist in the source.
+
+```powerquery
+// If "Notes" doesn't exist, creates it as a null column
+Table.SelectColumns(Source, {"Name", "Amount", "Notes"}, MissingField.UseNull)
+```
+
+### Which Functions Support It
+
+The `MissingField` parameter is available on:
+
+- `Table.RemoveColumns` — use `MissingField.Ignore` to safely remove columns that may or may not exist
+- `Table.RenameColumns` — use `MissingField.Ignore` to skip renames for columns that are no longer present
+- `Table.SelectColumns` — use `MissingField.Ignore` or `MissingField.UseNull` depending on whether you need the column in the output
+- `Table.ReorderColumns` — use `MissingField.Ignore` to handle columns that may not be present
+- `Table.TransformColumns` — use `MissingField.Ignore` to skip transforms on missing columns
+- `Table.PrefixColumns` and `Table.ExpandRecordColumn` also support this parameter
+
+### Best Practices
+
+1. **Default to `MissingField.Ignore`** on `Table.RemoveColumns` and `Table.RenameColumns`. There is almost no reason to error when removing or renaming a column that is already gone.
+2. **Use `MissingField.UseNull`** on `Table.SelectColumns` when your downstream logic expects a fixed set of columns and can handle nulls.
+3. **Keep `MissingField.Error`** (the default) when a missing column indicates a genuine problem that should stop the refresh — for example, a critical key column that your entire query depends on.
+4. **Document your choice.** Adding the third argument makes your intent explicit to anyone reading the query, even when you are choosing the default behavior.

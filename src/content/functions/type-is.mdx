@@ -1,0 +1,58 @@
+---
+title: "Type.Is"
+slug: "type-is"
+category: "Type"
+description: "Checks whether a type is compatible with (a subtype of) another type."
+syntax: "Type.Is(type1 as type, type2 as type) as logical"
+returnType: "logical"
+returnDescription: "true if type1 is compatible with type2; false otherwise."
+parameters:
+  - name: "type1"
+    type: "type"
+    required: true
+    description: "The type to check."
+  - name: "type2"
+    type: "type"
+    required: true
+    description: "The base type to check compatibility against."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-listitem"
+  - "type-tablerow"
+---
+
+## Remarks
+
+`Type.Is` determines whether `type1` is compatible with (i.e., a subtype of or equal to) `type2`. This is the M equivalent of an "is-a" type check.
+
+For example, `Type.Is(type number, type number)` returns `true`, and `Type.Is(type text, type any)` also returns `true` because all types are subtypes of `any`.
+
+This function is useful in generic or meta-programming scenarios where you need to branch logic based on the type of a column or value.
+
+## Examples
+
+### Example 1: Check type compatibility
+
+Test various type relationships.
+
+```powerquery
+let
+    Checks = {
+        {"number vs number", Type.Is(type number, type number)},
+        {"text vs any", Type.Is(type text, type any)},
+        {"text vs number", Type.Is(type text, type number)},
+        {"record vs any", Type.Is(type record, type any)}
+    }
+in
+    #table({"Check", "Result"}, Checks)
+```
+
+<!--output
+{"columns":[{"name":"Check","type":"text"},{"name":"Result","type":"logical"}],"rows":[{"Check":"number vs number","Result":true},{"Check":"text vs any","Result":true},{"Check":"text vs number","Result":false},{"Check":"record vs any","Result":true}]}
+-->

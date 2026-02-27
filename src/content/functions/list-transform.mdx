@@ -1,0 +1,53 @@
+---
+title: "List.Transform"
+slug: "list-transform"
+category: "List"
+description: "Applies a function to each item in a list and returns the results."
+syntax: "List.Transform(list as list, transform as function) as list"
+returnType: "list"
+returnDescription: "A new list with the transform function applied to each item."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of items to transform."
+  - name: "transform"
+    type: "function"
+    required: true
+    description: "The function to apply to each item."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-select"
+  - "list-accumulate"
+  - "table-transformcolumns"
+---
+
+## Remarks
+
+`List.Transform` applies a function to every item in a list, returning a new list of the same length. This is equivalent to a "map" operation in other languages. Use `each` syntax for simple transformations.
+
+## Examples
+
+### Example 1: Double all quantities
+
+Double every quantity value from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Quantities = Table.Column(Table.FirstN(Sales, 4), "Quantity"),
+    Doubled = List.Transform(Quantities, each _ * 2)
+in
+    #table({"DoubledQty"}, List.Transform(Doubled, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"DoubledQty","type":"number"}],"rows":[{"DoubledQty":8},{"DoubledQty":4},{"DoubledQty":20},{"DoubledQty":2}]}
+-->

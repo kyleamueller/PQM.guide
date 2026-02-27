@@ -1,0 +1,72 @@
+---
+title: "Date.Month"
+slug: "date-month"
+category: "Date"
+description: "Returns the month from a date value."
+syntax: "Date.Month(dateTime as any) as nullable number"
+returnType: "number"
+returnDescription: "The month component of the date (1 through 12)."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date value to extract the month from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-year"
+  - "date-day"
+  - "date-startofmonth"
+  - "date-endofmonth"
+---
+
+## Remarks
+
+`Date.Month` returns the month component as a number from 1 (January) to 12 (December) from a `date`, `datetime`, or `datetimezone` value. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract the month from OrderDate
+
+Extract the month number from each OrderDate in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "Month", each Date.Month([OrderDate]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Month","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Month":1},{"OrderID":2,"OrderDate":"2024-01-18","Month":1},{"OrderID":3,"OrderDate":"2024-02-01","Month":2},{"OrderID":4,"OrderDate":"2024-02-10","Month":2},{"OrderID":5,"OrderDate":"2024-03-05","Month":3}]}
+-->
+
+### Example 2: Group Sales by month
+
+Count the number of orders per month.
+
+Input: `Sales`
+
+```powerquery
+Table.Group(
+    Sales,
+    {"OrderDate"},
+    {{"OrderCount", each Table.RowCount(_), Int64.Type}},
+    GroupKind.Local,
+    (a, b) => Byte.From(Date.Month(a[OrderDate]) <> Date.Month(b[OrderDate]))
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderDate","type":"date"},{"name":"OrderCount","type":"number"}],"rows":[{"OrderDate":"2024-01-15","OrderCount":2},{"OrderDate":"2024-02-01","OrderCount":2},{"OrderDate":"2024-03-05","OrderCount":2},{"OrderDate":"2024-04-01","OrderCount":2}]}
+-->

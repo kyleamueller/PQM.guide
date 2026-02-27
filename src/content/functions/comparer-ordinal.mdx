@@ -1,0 +1,47 @@
+---
+title: "Comparer.Ordinal"
+slug: "comparer-ordinal"
+category: "Comparer"
+description: "A case-sensitive ordinal comparer function."
+syntax: "Comparer.Ordinal as function"
+returnType: "function"
+returnDescription: "A comparer function that performs case-sensitive ordinal (byte-level) comparisons."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "comparer-ordinalignorecase"
+  - "comparer-fromculture"
+  - "list-sort"
+---
+
+## Remarks
+
+`Comparer.Ordinal` is a built-in comparer **function** that performs case-sensitive, byte-level comparisons. It does not account for linguistic or cultural sorting rules — uppercase letters sort before lowercase letters (e.g., "B" comes before "a" in ordinal order).
+
+Use `Comparer.Ordinal` as an argument to functions like `List.Sort`, `List.Distinct`, `Table.Distinct`, and `Table.Sort` when you need strict case-sensitive behavior.
+
+## Examples
+
+### Example 1: Case-sensitive sort of employee names
+
+Sort employee full names using ordinal comparison. Note that uppercase names sort before lowercase names because uppercase letters have lower byte values.
+
+Input: `Employees`
+
+```powerquery
+let
+    Names = Table.Column(Employees, "FullName"),
+    Sorted = List.Sort(Names, Comparer.Ordinal)
+in
+    #table({"FullName"}, List.Transform(Sorted, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"BOB JONES"},{"FullName":"Charlie Brown"},{"FullName":"Eve Martinez"},{"FullName":"alice smith"},{"FullName":"diana PRINCE"},{"FullName":"frank lee"}]}
+-->

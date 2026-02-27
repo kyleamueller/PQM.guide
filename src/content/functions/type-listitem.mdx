@@ -1,0 +1,51 @@
+---
+title: "Type.ListItem"
+slug: "type-listitem"
+category: "Type"
+description: "Returns the item type of a list type."
+syntax: "Type.ListItem(type as type) as type"
+returnType: "type"
+returnDescription: "The type of items contained in the list type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A list type to extract the item type from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-is"
+  - "type-tablerow"
+---
+
+## Remarks
+
+`Type.ListItem` extracts the element type from a list type. For example, given the type `type {number}` (a list of numbers), `Type.ListItem` returns `type number`.
+
+This is useful in advanced scenarios involving type introspection, such as building generic functions that need to understand the structure of their inputs.
+
+If the input is not a list type, the function raises an error.
+
+## Examples
+
+### Example 1: Extract item type from a list type
+
+Get the item type of a typed list and verify it.
+
+```powerquery
+let
+    ListType = type {text},
+    ItemType = Type.ListItem(ListType),
+    IsText = Type.Is(ItemType, type text)
+in
+    #table({"ListType", "ItemType IsText"}, {{"type {text}", IsText}})
+```
+
+<!--output
+{"columns":[{"name":"ListType","type":"text"},{"name":"ItemType IsText","type":"logical"}],"rows":[{"ListType":"type {text}","ItemType IsText":true}]}
+-->

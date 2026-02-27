@@ -1,0 +1,49 @@
+---
+title: "Record.FieldValues"
+slug: "record-fieldvalues"
+category: "Record"
+description: "Returns a list of field values from a record."
+syntax: "Record.FieldValues(record as record) as list"
+returnType: "list"
+returnDescription: "A list of values from the record, in field order."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record whose field values to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fieldnames"
+  - "record-field"
+  - "record-tolist"
+---
+
+## Remarks
+
+`Record.FieldValues` returns all values from a record as a list, preserving the order in which the fields appear. This is the value counterpart to `Record.FieldNames`. Together, these two functions let you decompose a record into parallel lists of names and values for dynamic processing or serialization.
+
+## Examples
+
+### Example 1: Get field values from the first Sales row
+
+Return all values from the first row of the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    FirstRow = Sales{0},
+    Values = Record.FieldValues(FirstRow)
+in
+    #table({"Value"}, List.Transform(Values, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":1},{"Value":"Alice"},{"Value":"Widget A"},{"Value":"Widgets"},{"Value":25},{"Value":4},{"Value":"2024-01-15"},{"Value":"East"}]}
+-->

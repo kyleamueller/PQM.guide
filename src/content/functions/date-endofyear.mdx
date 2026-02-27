@@ -1,0 +1,71 @@
+---
+title: "Date.EndOfYear"
+slug: "date-endofyear"
+category: "Date"
+description: "Returns the last day of the year for a given date."
+syntax: "Date.EndOfYear(dateTime as any) as any"
+returnType: "any"
+returnDescription: "The last day of the year containing the input date (December 31)."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to find the end of the year for."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-startofyear"
+  - "date-endofmonth"
+  - "date-year"
+---
+
+## Remarks
+
+`Date.EndOfYear` returns December 31 of the year for the given `date`, `datetime`, or `datetimezone` value. The return type matches the input type. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Find the end of year for each order date
+
+Get December 31 of each order's year.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "YearEnd", each Date.EndOfYear([OrderDate]), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"YearEnd","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","YearEnd":"2024-12-31"},{"OrderID":2,"OrderDate":"2024-01-18","YearEnd":"2024-12-31"},{"OrderID":3,"OrderDate":"2024-02-01","YearEnd":"2024-12-31"},{"OrderID":4,"OrderDate":"2024-02-10","YearEnd":"2024-12-31"},{"OrderID":5,"OrderDate":"2024-03-05","YearEnd":"2024-12-31"}]}
+-->
+
+### Example 2: End of year for different years
+
+Show the end of year for hire dates spanning multiple years.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Employees, 3),
+        {"FullName", "HireDate"}
+    ),
+    "YearEnd", each Date.EndOfYear([HireDate]), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"},{"name":"YearEnd","type":"date"}],"rows":[{"FullName":"John Smith","HireDate":"2021-03-15","YearEnd":"2021-12-31"},{"FullName":"Sara Johnson","HireDate":"2019-07-01","YearEnd":"2019-12-31"},{"FullName":"Mike Davis","HireDate":"2022-01-10","YearEnd":"2022-12-31"}]}
+-->

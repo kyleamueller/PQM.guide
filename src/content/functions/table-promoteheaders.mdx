@@ -1,0 +1,58 @@
+---
+title: "Table.PromoteHeaders"
+slug: "table-promoteheaders"
+category: "Table"
+description: "Promotes the first row of a table to column headers."
+syntax: "Table.PromoteHeaders(table as table, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table where the first row has been used as column names."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose first row should become column headers."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "Optional record with a PromoteAllScalars field (default false) to control whether non-text values are converted to text for use as headers."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-demoteheaders"
+  - "table-skip"
+  - "table-renamecolumns"
+---
+
+## Remarks
+
+`Table.PromoteHeaders` takes the values from the first row of a table and uses them as column names, then removes that row from the data. This is commonly used when importing data from CSV or Excel files where the first row contains column headers that Power Query did not automatically detect.
+
+When importing from Excel or CSV, explicitly set the Culture in the options record (e.g., `[PromoteAllScalars = true]`) to avoid ambiguity. Without this, date and number values in the header row may not convert to text consistently across different locales.
+
+After promoting headers, column types are typically set to `type any`. Always follow with a `Table.TransformColumnTypes` step to assign proper types.
+
+## Examples
+
+### Example 1: Promote first row to headers
+
+Demote current headers and then re-promote them to demonstrate the operation.
+
+Input: `Sales`
+
+```powerquery
+let
+    Demoted = Table.DemoteHeaders(
+        Table.SelectColumns(Table.FirstN(Sales, 2), {"CustomerName", "Product", "Region"})
+    )
+in
+    Table.PromoteHeaders(Demoted, [PromoteAllScalars = true])
+```
+
+<!--output
+{"columns":[{"name":"Alice","type":"any"},{"name":"Widget A","type":"any"},{"name":"East","type":"any"}],"rows":[{"Alice":"Bob","Widget A":"Gadget B","East":"West"}]}
+-->

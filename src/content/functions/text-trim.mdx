@@ -1,0 +1,54 @@
+---
+title: "Text.Trim"
+slug: "text-trim"
+category: "Text"
+description: "Removes leading and trailing whitespace (or specified characters) from a text value."
+syntax: "Text.Trim(text as nullable text, optional trim as any) as nullable text"
+returnType: "text"
+returnDescription: "The text with leading and trailing whitespace or specified characters removed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to trim."
+  - name: "trim"
+    type: "any"
+    required: false
+    description: "A single character or list of characters to trim. Defaults to whitespace."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-trimstart"
+  - "text-trimend"
+  - "text-clean"
+---
+
+## Remarks
+
+`Text.Trim` removes leading and trailing whitespace from a text value. Pass a character or list of characters as the second argument to trim specific characters instead of whitespace.
+
+This is one of the most common data-cleaning operations, useful for fixing imported text that has extra spaces.
+
+## Examples
+
+### Example 1: Trim whitespace from product names
+
+Trim any leading or trailing whitespace from the Product column.
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"Product"}),
+    {"Product", Text.Trim, type text}
+)
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"}],"rows":[{"Product":"Widget A"},{"Product":"Gadget B"},{"Product":"Widget C"}]}
+-->

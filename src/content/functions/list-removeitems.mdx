@@ -1,0 +1,53 @@
+---
+title: "List.RemoveItems"
+slug: "list-removeitems"
+category: "List"
+description: "Removes all occurrences of specified values from a list."
+syntax: "List.RemoveItems(list1 as list, list2 as list) as list"
+returnType: "list"
+returnDescription: "A list with all occurrences of the specified values removed."
+parameters:
+  - name: "list1"
+    type: "list"
+    required: true
+    description: "The original list."
+  - name: "list2"
+    type: "list"
+    required: true
+    description: "A list of values to remove from the first list."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-select"
+  - "list-contains"
+  - "table-columnnames"
+---
+
+## Remarks
+
+`List.RemoveItems` removes all occurrences of specific values from a list. A common pattern is combining `Table.ColumnNames` with `List.RemoveItems` to get all column names except certain ones, then passing the result to `Table.SelectColumns` or `Table.UnpivotOtherColumns`.
+
+## Examples
+
+### Example 1: Get columns except specific ones
+
+Get all Sales column names except OrderDate and Region.
+
+Input: `Sales`
+
+```powerquery
+let
+    AllCols = Table.ColumnNames(Sales),
+    Excluded = List.RemoveItems(AllCols, {"OrderDate", "Region"})
+in
+    #table({"ColumnName"}, List.Transform(Excluded, each {_}))
+```
+
+<!--output
+{"columns":[{"name":"ColumnName","type":"text"}],"rows":[{"ColumnName":"OrderID"},{"ColumnName":"CustomerName"},{"ColumnName":"Product"},{"ColumnName":"Category"},{"ColumnName":"UnitPrice"},{"ColumnName":"Quantity"}]}
+-->

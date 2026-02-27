@@ -1,0 +1,51 @@
+---
+title: "Text.TrimStart"
+slug: "text-trimstart"
+category: "Text"
+description: "Removes leading whitespace (or specified characters) from a text value."
+syntax: "Text.TrimStart(text as nullable text, optional trim as any) as nullable text"
+returnType: "text"
+returnDescription: "The text with leading whitespace or specified characters removed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to trim from the start."
+  - name: "trim"
+    type: "any"
+    required: false
+    description: "A single character or list of characters to trim from the beginning. Defaults to whitespace."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-trim"
+  - "text-trimend"
+---
+
+## Remarks
+
+`Text.TrimStart` removes characters from the beginning of a text value only. By default it removes whitespace, but you can pass a character or list of characters to trim instead.
+
+## Examples
+
+### Example 1: Trim leading characters
+
+Remove leading parentheses from phone numbers.
+
+Input: `Employees`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Employees, 3), {"Phone"}),
+    "Trimmed", each Text.TrimStart([Phone], {"("}), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"Phone","type":"text"},{"name":"Trimmed","type":"text"}],"rows":[{"Phone":"(555) 123-4567","Trimmed":"555) 123-4567"},{"Phone":"(555) 234-5678","Trimmed":"555) 234-5678"},{"Phone":"(555) 345-6789","Trimmed":"555) 345-6789"}]}
+-->

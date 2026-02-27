@@ -1,0 +1,50 @@
+---
+title: "Replacer.ReplaceText"
+slug: "replacer-replacetext"
+category: "Replacer"
+description: "A replacer function that performs substring replacement within text values."
+syntax: "Replacer.ReplaceText as function"
+returnType: "function"
+returnDescription: "A replacer function that finds and replaces a substring within text cell values."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "replacer-replacevalue"
+  - "table-replacevalue"
+  - "text-replace"
+---
+
+## Remarks
+
+`Replacer.ReplaceText` is a built-in replacer **function** used as an argument to `Table.ReplaceValue`. It performs **substring** replacement — it finds occurrences of `oldValue` within the text of each cell and replaces them with `newValue`, even if the cell contains additional text.
+
+Use `Replacer.ReplaceText` for partial text replacements (e.g., replacing "Widget" with "Component" inside product names). For replacing entire cell values, use `Replacer.ReplaceValue` instead.
+
+## Examples
+
+### Example 1: Substring replacement in product names
+
+Replace the substring "Widget" with "Component" in the Product column. This affects any product name containing "Widget" as part of its text.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.ReplaceValue(
+        Table.FirstN(Sales, 4),
+        "Widget", "Component",
+        Replacer.ReplaceText, {"Product"}
+    ),
+    {"CustomerName", "Product", "Category"}
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Component A","Category":"Widgets"},{"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets"},{"CustomerName":"Charlie","Product":"Component C","Category":"Widgets"},{"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets"}]}
+-->

@@ -1,0 +1,58 @@
+---
+title: "Table.FillDown"
+slug: "table-filldown"
+category: "Table"
+description: "Replaces null values in specified columns with the most recent non-null value above."
+syntax: "Table.FillDown(table as table, columns as list) as table"
+returnType: "table"
+returnDescription: "The input table with null values in the specified columns replaced by the last non-null value above."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing null values to fill."
+  - name: "columns"
+    type: "list"
+    required: true
+    description: "A list of column names in which to propagate non-null values downward."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fillup"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Table.FillDown` scans each specified column from top to bottom. When it encounters a null, it replaces it with the most recent non-null value from above in the same column. If the first value in a column is null, it remains null because there is no preceding value to propagate.
+
+This function is commonly used after operations like unpivoting or when importing data where group headers appear only once and subsequent rows are blank.
+
+## Examples
+
+### Example 1: Fill down a single column
+
+Sort Sales by Region, then replace "North" with null to simulate a grouped report where region headers only appear once. Table.FillDown restores the missing values from the nearest non-null value above.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(
+        Table.Sort(Sales, "Region"),
+        {"Region", "Product", "Quantity"}
+    ),
+    // Simulate a grouped export where "North" labels are missing
+    WithBlanks = Table.ReplaceValue(Source, "North", null, Replacer.ReplaceValue, {"Region"})
+in
+    Table.FillDown(WithBlanks, {"Region"})
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+-->

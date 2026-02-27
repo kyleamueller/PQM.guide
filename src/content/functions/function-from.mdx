@@ -1,0 +1,58 @@
+---
+title: "Function.From"
+slug: "function-from"
+category: "Function"
+description: "Creates a typed function wrapper that converts a unary function to match a specific function type signature."
+syntax: "Function.From(functionType as type, function as function) as function"
+returnType: "function"
+returnDescription: "A new function matching the specified type signature that delegates to the provided function."
+parameters:
+  - name: "functionType"
+    type: "type"
+    required: true
+    description: "The function type that defines the parameter names and types for the new function."
+  - name: "function"
+    type: "function"
+    required: true
+    description: "A unary function that receives a record of the named parameters."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "function-invoke"
+  - "type-forfunction"
+---
+
+## Remarks
+
+`Function.From` wraps a unary function (one that takes a single record argument) into a function with a typed multi-parameter signature. The wrapped function receives all named parameters as fields of a record.
+
+This is useful for:
+
+- Creating custom functions with documented parameter names and types that appear in the Power Query UI.
+- Building reusable function libraries where the parameter metadata is defined separately from the implementation.
+
+The `functionType` defines the shape of the resulting function (parameter names, types, and return type). The inner `function` receives a record with field names matching the parameter names.
+
+## Examples
+
+### Example 1: Create a typed addition function
+
+Create a two-parameter function from a type signature and a unary function.
+
+```powerquery
+let
+    AddType = type function (a as number, b as number) as number,
+    AddFn = Function.From(AddType, (args) => args[a] + args[b]),
+    Result = AddFn(10, 32)
+in
+    #table({"Expression", "Result"}, {{"AddFn(10, 32)", Result}})
+```
+
+<!--output
+{"columns":[{"name":"Expression","type":"text"},{"name":"Result","type":"number"}],"rows":[{"Expression":"AddFn(10, 32)","Result":42}]}
+-->

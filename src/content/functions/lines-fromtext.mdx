@@ -1,0 +1,57 @@
+---
+title: "Lines.FromText"
+slug: "lines-fromtext"
+category: "Lines"
+description: "Splits a text value into a list of lines."
+syntax: "Lines.FromText(text as text, optional quoteStyle as nullable number, optional includeLineSeparators as nullable logical) as list"
+returnType: "list"
+returnDescription: "A list of text values, one per line."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to split into lines."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "How quoted line breaks are handled: QuoteStyle.None (default) or QuoteStyle.Csv."
+  - name: "includeLineSeparators"
+    type: "logical"
+    required: false
+    description: "When true, line separator characters are included at the end of each line."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "lines-frombinary"
+  - "text-split"
+---
+
+## Remarks
+
+`Lines.FromText` splits a text value into a list of lines by breaking on line-feed characters (CR, LF, or CRLF). It is the text-input counterpart to `Lines.FromBinary`.
+
+This is simpler than `Text.Split(text, "#(lf)")` because it handles all common line-ending styles automatically (Windows CRLF, Unix LF, and legacy Mac CR).
+
+## Examples
+
+### Example 1: Split multi-line text
+
+Split a text value containing line breaks into individual lines.
+
+```powerquery
+let
+    Source = "Alice#(lf)Bob#(lf)Charlie#(lf)Diana",
+    Lines = Lines.FromText(Source),
+    AsTable = #table({"Index", "Line"}, List.Transform({0..List.Count(Lines)-1}, each {_ + 1, Lines{_}}))
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"Index","type":"number"},{"name":"Line","type":"text"}],"rows":[{"Index":1,"Line":"Alice"},{"Index":2,"Line":"Bob"},{"Index":3,"Line":"Charlie"},{"Index":4,"Line":"Diana"}]}
+-->

@@ -1,0 +1,49 @@
+---
+title: "List.Count"
+slug: "list-count"
+category: "List"
+description: "Returns the number of items in a list."
+syntax: "List.Count(list as list) as number"
+returnType: "number"
+returnDescription: "The number of items in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to count."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-first"
+  - "list-last"
+  - "table-rowcount"
+---
+
+## Remarks
+
+`List.Count` returns the total number of items in a list, including nulls. This is the list equivalent of `Table.RowCount`.
+
+## Examples
+
+### Example 1: Count distinct regions
+
+Count how many unique regions exist in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Regions = List.Distinct(Table.Column(Sales, "Region")),
+    Count = List.Count(Regions)
+in
+    #table({"DistinctRegions"}, {{Count}})
+```
+
+<!--output
+{"columns":[{"name":"DistinctRegions","type":"number"}],"rows":[{"DistinctRegions":3}]}
+-->

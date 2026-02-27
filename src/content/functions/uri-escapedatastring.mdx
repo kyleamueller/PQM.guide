@@ -1,0 +1,61 @@
+---
+title: "Uri.EscapeDataString"
+slug: "uri-escapedatastring"
+category: "URI"
+description: "Percent-encodes special characters in a text value for safe use in a URI."
+syntax: "Uri.EscapeDataString(data as text) as text"
+returnType: "text"
+returnDescription: "The percent-encoded text value."
+parameters:
+  - name: "data"
+    type: "text"
+    required: true
+    description: "The text value to percent-encode."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "uri-buildquerystring"
+  - "uri-parts"
+  - "web-contents"
+---
+
+## Remarks
+
+`Uri.EscapeDataString` applies percent-encoding to a text value, replacing characters that are not allowed in URI components (spaces, ampersands, slashes, etc.) with their `%XX` hex equivalents. For example, a space becomes `%20`, and `&` becomes `%26`.
+
+This is useful when embedding dynamic values directly into URL path segments or query parameters where `Uri.BuildQueryString` is not appropriate (e.g., in path segments):
+
+```powerquery
+let
+    ItemName = "Widget A/B",
+    Url = "https://api.example.com/items/" & Uri.EscapeDataString(ItemName)
+in
+    Url
+// Result: "https://api.example.com/items/Widget%20A%2FB"
+```
+
+Note: `Uri.BuildQueryString` already encodes values automatically, so you do not need to call `Uri.EscapeDataString` on values passed to `Uri.BuildQueryString`.
+
+## Examples
+
+### Example 1: Encode special characters for a URL
+
+Percent-encode text values containing special characters.
+
+```powerquery
+let
+    Values = {"Hello World", "A&B=C", "path/to/file", "100% done"},
+    Encoded = List.Transform(Values, each Uri.EscapeDataString(_)),
+    Rows = List.Transform({0..List.Count(Values)-1}, each {Values{_}, Encoded{_}})
+in
+    #table({"Original", "Encoded"}, Rows)
+```
+
+<!--output
+{"columns":[{"name":"Original","type":"text"},{"name":"Encoded","type":"text"}],"rows":[{"Original":"Hello World","Encoded":"Hello%20World"},{"Original":"A&B=C","Encoded":"A%26B%3DC"},{"Original":"path/to/file","Encoded":"path%2Fto%2Ffile"},{"Original":"100% done","Encoded":"100%25%20done"}]}
+-->

@@ -1,0 +1,55 @@
+---
+title: "Table.Range"
+slug: "table-range"
+category: "Table"
+description: "Returns a specified number of rows from a table starting at a given offset."
+syntax: "Table.Range(table as table, offset as number, optional count as nullable number) as table"
+returnType: "table"
+returnDescription: "A table containing rows from the specified offset for the given count."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based index of the first row to return."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The number of rows to return. If omitted, all rows from the offset onward are returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-firstn"
+  - "table-skip"
+  - "table-lastn"
+---
+
+## Remarks
+
+`Table.Range` returns a slice of rows from a table, starting at a zero-based offset. This is like combining `Table.Skip` and `Table.FirstN` — skip to the offset, then take a specific count.
+
+If `count` is omitted, all remaining rows from the offset onward are returned. If the offset plus count exceeds the number of rows, only the available rows are returned (no error is raised).
+
+## Examples
+
+### Example 1: Get rows 3 through 5
+
+Return 3 rows starting at offset 2 (the third row).
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.Range(Sales, 2, 3), {"OrderID", "CustomerName", "Product"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A"}]}
+-->

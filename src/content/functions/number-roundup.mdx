@@ -1,0 +1,71 @@
+---
+title: "Number.RoundUp"
+slug: "number-roundup"
+category: "Number"
+description: "Rounds a number up away from zero (ceiling)."
+syntax: "Number.RoundUp(number as nullable number, optional digits as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The number rounded up to the specified precision."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to round up."
+  - name: "digits"
+    type: "number"
+    required: false
+    description: "Number of decimal places (default 0)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-round"
+  - "number-rounddown"
+---
+
+## Remarks
+
+`Number.RoundUp` always rounds away from zero, increasing the magnitude of the number. When `digits` is omitted it defaults to 0, producing the next integer up. This behaves like a ceiling function for positive numbers.
+
+A common use case is estimating resource needs — for example, rounding up the number of shipping boxes required so you never under-allocate.
+
+## Examples
+
+### Example 1: Round up average price per unit to whole number
+
+Calculate the average price across all sales and round up to the nearest integer.
+
+Input: `Sales`
+
+```powerquery
+let
+    AvgPrice = List.Average(Table.Column(Sales, "UnitPrice")),
+    Rounded = Number.RoundUp(AvgPrice)
+in
+    #table({"AvgUnitPrice", "RoundedUp"}, {{AvgPrice, Rounded}})
+```
+
+<!--output
+{"columns":[{"name":"AvgUnitPrice","type":"number"},{"name":"RoundedUp","type":"number"}],"rows":[{"AvgUnitPrice":46.875,"RoundedUp":47}]}
+-->
+
+### Example 2: Round up quantities to the nearest five
+
+Round each order quantity up to the next multiple of 5 for batch packing.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"Product", "Quantity"}),
+    "BatchQty", each Number.RoundUp([Quantity] / 5) * 5, type number
+)
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"Quantity","type":"number"},{"name":"BatchQty","type":"number"}],"rows":[{"Product":"Widget A","Quantity":4,"BatchQty":5},{"Product":"Gadget B","Quantity":2,"BatchQty":5},{"Product":"Widget C","Quantity":10,"BatchQty":10},{"Product":"Gadget D","Quantity":1,"BatchQty":5}]}
+-->

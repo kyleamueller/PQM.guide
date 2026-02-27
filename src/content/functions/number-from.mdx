@@ -1,0 +1,68 @@
+---
+title: "Number.From"
+slug: "number-from"
+category: "Number"
+description: "Converts a value to a number."
+syntax: "Number.From(value as any, optional culture as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "The numeric representation of the value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert to a number."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code (e.g., \"en-US\") that determines locale-specific parsing."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-from"
+  - "number-round"
+---
+
+## Remarks
+
+`Number.From` converts a value of any type to a number. Text values are parsed as numbers (e.g., `"123.45"` becomes `123.45`). Logical values return `1` for `true` and `0` for `false`. Pass a culture code when the text uses locale-specific formatting such as comma decimal separators.
+
+If the value cannot be converted, an error is raised. This function is useful when importing data where numeric columns arrive as text.
+
+## Examples
+
+### Example 1: Convert logical InStock values to numbers
+
+Convert the logical InStock column into numeric 1/0 values.
+
+Input: `Products`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Products, 3), {"ProductName", "InStock"}),
+    "InStockNum", each Number.From([InStock]), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"ProductName","type":"text"},{"name":"InStock","type":"logical"},{"name":"InStockNum","type":"number"}],"rows":[{"ProductName":"Widget A","InStock":true,"InStockNum":1},{"ProductName":"Gadget B","InStock":true,"InStockNum":1},{"ProductName":"Widget C","InStock":false,"InStockNum":0}]}
+-->
+
+### Example 2: Convert text to number
+
+Parse a text value into a number and display the result.
+
+```powerquery
+let
+    Result = Number.From("95000")
+in
+    #table({"ParsedValue"}, {{Result}})
+```
+
+<!--output
+{"columns":[{"name":"ParsedValue","type":"number"}],"rows":[{"ParsedValue":95000}]}
+-->

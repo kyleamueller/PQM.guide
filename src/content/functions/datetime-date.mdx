@@ -1,0 +1,66 @@
+---
+title: "DateTime.Date"
+slug: "datetime-date"
+category: "DateTime"
+description: "Returns the date part from a datetime value."
+syntax: "DateTime.Date(dateTime as any) as nullable date"
+returnType: "date"
+returnDescription: "The date component of the given datetime."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The datetime value to extract the date from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-time"
+  - "datetime-from"
+  - "date-from"
+---
+
+## Remarks
+
+`DateTime.Date` extracts the date component from a `datetime` or `datetimezone` value, discarding the time portion. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract date from OrderLog Timestamp
+
+Extract the date part from each Timestamp in the OrderLog table.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 5),
+        {"LogID", "Timestamp"}
+    ),
+    "DateOnly", each DateTime.Date([Timestamp]), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DateOnly","type":"date"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","DateOnly":"2024-01-15"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DateOnly":"2024-01-16"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","DateOnly":"2024-01-18"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DateOnly":"2024-01-20"},{"LogID":"L005","Timestamp":"2024-02-01T16:20:00","DateOnly":"2024-02-01"}]}
+-->
+
+### Example 2: Extract date from a scalar datetime
+
+Return the date portion of a single datetime value.
+
+```powerquery
+#table(
+    type table [DateTime = datetime, DateOnly = date],
+    {{#datetime(2024, 3, 15, 14, 30, 0), DateTime.Date(#datetime(2024, 3, 15, 14, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DateTime","type":"datetime"},{"name":"DateOnly","type":"date"}],"rows":[{"DateTime":"2024-03-15T14:30:00","DateOnly":"2024-03-15"}]}
+-->

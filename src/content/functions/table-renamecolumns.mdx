@@ -1,0 +1,73 @@
+---
+title: "Table.RenameColumns"
+slug: "table-renamecolumns"
+category: "Table"
+description: "Renames one or more columns in a table."
+syntax: "Table.RenameColumns(table as table, renames as list, optional missingField as nullable number) as table"
+returnType: "table"
+returnDescription: "A table with the specified columns renamed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose columns are to be renamed."
+  - name: "renames"
+    type: "list"
+    required: true
+    description: "A list of rename pairs in the form {oldName, newName}, or a list of such pairs for multiple renames."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a specified column does not exist. Use MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-removecolumns"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.RenameColumns` returns a new table with the specified columns renamed. The `renames` parameter accepts a list of two-item lists, where each inner list contains the old column name and the new column name.
+
+To rename a single column, pass `{"OldName", "NewName"}`. To rename multiple columns, pass a list of pairs like `{{"OldName1", "NewName1"}, {"OldName2", "NewName2"}}`.
+
+If a specified column does not exist, an error is raised by default. As a best practice, use the optional `missingField` parameter with `MissingField.Ignore` to prevent broken refreshes if upstream columns change.
+
+If you have multiple rename steps in your query, consolidate them into a single `Table.RenameColumns` call with a list of pairs. Multiple separate rename steps add unnecessary overhead and make the query harder to maintain.
+
+## Examples
+
+### Example 1: Rename a single column
+
+Rename the CustomerName column to "Customer" in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.RenameColumns(Sales, {"CustomerName", "Customer"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Customer","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"Customer":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"Customer":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"Customer":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":4,"Customer":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":5,"Customer":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":6,"Customer":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.00,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"},{"OrderID":7,"Customer":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"Customer":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
+-->
+
+### Example 2: Rename multiple columns
+
+Rename UnitPrice to "Price" and Quantity to "Qty" in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.RenameColumns(Sales, {{"UnitPrice", "Price"}, {"Quantity", "Qty"}})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"Qty","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","Price":25.00,"Qty":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","Price":50.00,"Qty":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","Price":15.00,"Qty":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","Price":75.00,"Qty":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","Price":25.00,"Qty":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","Price":120.00,"Qty":1,"OrderDate":"2024-03-12","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","Price":50.00,"Qty":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","Price":15.00,"Qty":8,"OrderDate":"2024-04-15","Region":"North"}]}
+-->

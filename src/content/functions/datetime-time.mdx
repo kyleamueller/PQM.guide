@@ -1,0 +1,66 @@
+---
+title: "DateTime.Time"
+slug: "datetime-time"
+category: "DateTime"
+description: "Returns the time part from a datetime value."
+syntax: "DateTime.Time(dateTime as any) as nullable time"
+returnType: "time"
+returnDescription: "The time component of the given datetime."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The datetime value to extract the time from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-date"
+  - "time-from"
+  - "time-hour"
+---
+
+## Remarks
+
+`DateTime.Time` extracts the time component from a `datetime` or `datetimezone` value, discarding the date portion. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Extract time from OrderLog Timestamp
+
+Extract the time part from each Timestamp in the OrderLog table.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(OrderLog, 5),
+        {"LogID", "Timestamp"}
+    ),
+    "TimeOnly", each DateTime.Time([Timestamp]), type time
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"TimeOnly","type":"time"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","TimeOnly":"09:30:00"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","TimeOnly":"14:15:00"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","TimeOnly":"11:00:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","TimeOnly":"08:45:00"},{"LogID":"L005","Timestamp":"2024-02-01T16:20:00","TimeOnly":"16:20:00"}]}
+-->
+
+### Example 2: Extract time from a scalar datetime
+
+Return the time portion of a single datetime value.
+
+```powerquery
+#table(
+    type table [DateTime = datetime, TimeOnly = time],
+    {{#datetime(2024, 3, 15, 14, 30, 45), DateTime.Time(#datetime(2024, 3, 15, 14, 30, 45))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DateTime","type":"datetime"},{"name":"TimeOnly","type":"time"}],"rows":[{"DateTime":"2024-03-15T14:30:45","TimeOnly":"14:30:45"}]}
+-->

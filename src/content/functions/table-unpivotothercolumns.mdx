@@ -1,0 +1,63 @@
+---
+title: "Table.UnpivotOtherColumns"
+slug: "table-unpivotothercolumns"
+category: "Table"
+description: "Unpivots all columns except the specified ones into attribute-value pairs."
+syntax: "Table.UnpivotOtherColumns(table as table, pivotColumns as list, attributeColumn as text, valueColumn as text) as table"
+returnType: "table"
+returnDescription: "A table with all non-specified columns unpivoted into rows of attribute-value pairs."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing columns to unpivot."
+  - name: "pivotColumns"
+    type: "list"
+    required: true
+    description: "A list of column names to keep as-is (not unpivoted)."
+  - name: "attributeColumn"
+    type: "text"
+    required: true
+    description: "The name of the new column that holds the original column names."
+  - name: "valueColumn"
+    type: "text"
+    required: true
+    description: "The name of the new column that holds the values from the unpivoted columns."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-unpivot"
+  - "table-pivot"
+---
+
+## Remarks
+
+`Table.UnpivotOtherColumns` is the complement of `Table.Unpivot`. Instead of specifying which columns to unpivot, you specify which columns to **keep** — everything else gets unpivoted into attribute-value pairs.
+
+This is generally preferred over `Table.Unpivot` when the source table may gain new columns over time (e.g., new months, new product lines). With `Table.UnpivotOtherColumns`, new columns are automatically unpivoted without changing your query. With `Table.Unpivot`, you would need to update the column list manually.
+
+**Important:** Like `Table.Unpivot`, null values are silently removed during the unpivot operation. Replace nulls with a placeholder using `Table.ReplaceValue` before unpivoting if you need to preserve missing values.
+
+## Examples
+
+### Example 1: Unpivot all columns except Product
+
+Keep only the Product column fixed and unpivot UnitPrice and Quantity into rows.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(Table.FirstN(Sales, 3), {"Product", "UnitPrice", "Quantity"})
+in
+    Table.UnpivotOtherColumns(Source, {"Product"}, "Measure", "Value")
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Product":"Widget A","Measure":"UnitPrice","Value":25},{"Product":"Widget A","Measure":"Quantity","Value":4},{"Product":"Gadget B","Measure":"UnitPrice","Value":50},{"Product":"Gadget B","Measure":"Quantity","Value":2},{"Product":"Widget C","Measure":"UnitPrice","Value":15},{"Product":"Widget C","Measure":"Quantity","Value":10}]}
+-->
