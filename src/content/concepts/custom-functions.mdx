@@ -1,0 +1,163 @@
+---
+title: "Custom Functions"
+slug: "custom-functions"
+description: "How to create reusable custom functions in M to modularize your code, reduce duplication, and build shareable function libraries."
+relatedConcepts:
+  - "each-keyword"
+  - "type-system"
+relatedFunctions:
+  - "function-invoke"
+  - "function-from"
+  - "expression-evaluate"
+---
+
+One of the most powerful features of the M language is the ability to define your own functions. Custom functions let you encapsulate logic into reusable building blocks, making your queries cleaner, easier to maintain, and shareable across projects.
+
+### Defining a Custom Function
+
+A function in M is defined with the `=>` (goes-to) syntax. The parameters go on the left, the body on the right:
+
+```powerquery
+let
+    AddTax = (amount as number, rate as number) as number =>
+        amount * (1 + rate),
+
+    Result = AddTax(100, 0.08)
+    // Result: 108
+in
+    Result
+```
+
+You can assign a function to a variable just like any other value. Once defined, call it by name with parentheses.
+
+### Single-Parameter Shorthand
+
+For functions that take a single parameter, you can use the `each` keyword as shorthand. These are equivalent:
+
+```powerquery
+(row) => row[UnitPrice] * row[Quantity]
+
+each [UnitPrice] * [Quantity]
+```
+
+This is why `each` appears so often in `Table.AddColumn`, `Table.SelectRows`, and `List.Transform` — those functions all expect a single-parameter function as an argument.
+
+### Optional Parameters
+
+Use `optional` to make parameters non-required. Check for missing values with the null-coalescing pattern:
+
+```powerquery
+let
+    TrimAndClean = (text as text, optional lower as logical) as text =>
+        let
+            ShouldLower = if lower = null then false else lower,
+            Trimmed = Text.Trim(text),
+            Result = if ShouldLower then Text.Lower(Trimmed) else Trimmed
+        in
+            Result
+in
+    TrimAndClean("  Hello World  ")       // "Hello World"
+    // TrimAndClean("  Hello World  ", true)  // "hello world"
+```
+
+### Adding Type Information
+
+Typed parameters and return types make your functions self-documenting and help catch mistakes early. You can also add a `Documentation.Name` and `Documentation.Description` via metadata so the function shows up with a friendly name in the Power Query UI:
+
+```powerquery
+let
+    PadLeft = (text as text, length as number, optional char as text) as text =>
+        let
+            PadChar = if char = null then "0" else char,
+            Padding = Text.Repeat(PadChar, length - Text.Length(text))
+        in
+            Padding & text,
+
+    Typed = Value.ReplaceType(
+        PadLeft,
+        type function (
+            text as text,
+            length as number,
+            optional char as text
+        ) as text
+            meta [
+                Documentation.Name = "PadLeft",
+                Documentation.Description = "Pads a text value on the left to a specified length."
+            ]
+    )
+in
+    Typed
+```
+
+### Recursive Functions
+
+M supports recursive functions using the `@` operator to reference the function within its own body:
+
+```powerquery
+let
+    Factorial = (n as number) as number =>
+        if n <= 1 then 1 else n * @Factorial(n - 1)
+in
+    Factorial(5)
+    // Result: 120
+```
+
+The `@` prefix tells the engine to look up the function by name in the current scope, which is necessary because the function has not finished being defined at the point where it references itself.
+
+### Modularizing Your Queries
+
+Instead of repeating the same transformation logic across multiple queries, extract it into a function and invoke it wherever needed:
+
+```powerquery
+// Reusable cleaning function
+let
+    CleanCurrency = (text as text) as number =>
+        Number.FromText(
+            Text.Remove(text, {"$", ",", " "})
+        )
+in
+    CleanCurrency
+```
+
+Once saved as its own query (e.g., `CleanCurrency`), you can call it from any other query:
+
+```powerquery
+Table.TransformColumns(
+    Sales,
+    {"RawPrice", CleanCurrency, type number}
+)
+```
+
+This pattern keeps individual queries focused on their purpose and avoids duplicating logic that would need to be updated in multiple places.
+
+### Building a Function Library
+
+Custom functions become even more powerful when packaged as a reusable library. A common pattern is to store functions in a record, making them accessible as a namespace:
+
+```powerquery
+let
+    MyLibrary = [
+        TrimAndClean = (text as text) as text =>
+            Text.Trim(Text.Clean(text)),
+
+        ExtractDigits = (text as text) as text =>
+            Text.Select(text, {"0".."9"}),
+
+        ParseCurrency = (text as text) as number =>
+            Number.FromText(Text.Remove(text, {"$", ",", " "}))
+    ]
+in
+    MyLibrary
+```
+
+Each function is then callable as `MyLibrary[TrimAndClean]("some text")`.
+
+For a real-world example of this pattern at scale, see Imke Feldmann's [ImkeF/M](https://github.com/ImkeF/M) repository on GitHub — a collection of over 100 custom M functions organized by category (Table, Text, Date, List, Statistics, and more). Functions like `Table.SolveParentChild` and `Text.RemoveHtmlTags` demonstrate how custom functions can solve complex problems that have no built-in equivalent, and how packaging them in a shared repository makes them reusable across projects and teams.
+
+### Best Practices
+
+1. **Name functions clearly.** Use verb-noun naming like `CleanCurrency` or `ParseDate` so the intent is obvious at the call site.
+2. **Type your parameters and return values.** This catches errors early and documents expected inputs.
+3. **Use `optional` parameters with defaults** rather than creating multiple similar functions.
+4. **Extract repeated logic** into a shared function as soon as you find yourself copying the same transformation between queries.
+5. **Add documentation metadata** via `Value.ReplaceType` so your functions show descriptions in the Power Query editor.
