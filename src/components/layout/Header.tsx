@@ -36,7 +36,7 @@ export default function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
       <div className="header-right">
         <ThemeToggle />
         <a
-          href="https://github.com"
+          href="https://github.com/kyleamueller/PQM.guide"
           className="header-link"
           target="_blank"
           rel="noopener noreferrer"

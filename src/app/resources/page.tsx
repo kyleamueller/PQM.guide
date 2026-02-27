@@ -36,6 +36,25 @@ export default function ResourcesPage() {
             tips throughout PQM.guide were informed by PQLint&apos;s rule set.
           </p>
         </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://marketplace.visualstudio.com/items?itemName=analysis-services.TMDL"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              TMDL VS Code Extension
+            </a>
+          </h3>
+          <p>
+            Microsoft&apos;s official VS Code extension for working with
+            Tabular Model Definition Language (TMDL) files. Includes M code
+            syntax highlighting, autocomplete, diagnostics, hover info, and
+            formatting for Power Query expressions embedded in TMDL documents —
+            making VS Code a first-class editor for M code.
+          </p>
+        </div>
       </section>
 
       <section style={{ marginBottom: 40 }}>
@@ -78,6 +97,25 @@ export default function ResourcesPage() {
             official docs remain the authoritative source for language semantics.
           </p>
         </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://www.thebiccountant.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              The BIccountant — Imke Feldmann
+            </a>
+          </h3>
+          <p>
+            A long-running blog packed with advanced Power Query techniques,
+            creative M solutions, and deep dives into real-world data
+            transformation challenges. Imke&apos;s posts frequently explore
+            lesser-known M patterns and push the boundaries of what&apos;s
+            possible in Power Query.
+          </p>
+        </div>
       </section>
 
       <section style={{ marginBottom: 40 }}>
@@ -110,6 +148,42 @@ export default function ResourcesPage() {
         <div className="resource-card">
           <h3>
             <a
+              href="https://github.com/ImkeF/M"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ImkeF/M — Custom M Function Library
+            </a>
+          </h3>
+          <p>
+            A collection of custom M functions for Power Query and Power BI
+            maintained by Imke Feldmann. These reusable functions can be
+            packaged as a library and cover common data transformation patterns
+            that go beyond the built-in standard library.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://github.com/ImkeF/M-Guide"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ImkeF/M-Guide — Native M Function Gotchas
+            </a>
+          </h3>
+          <p>
+            A collection of native M functions with unexpected behaviour and
+            their workarounds. An invaluable reference for understanding edge
+            cases and quirks in the standard M library that can trip up even
+            experienced developers.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
               href="https://dax.guide"
               target="_blank"
               rel="noopener noreferrer"
@@ -138,7 +212,7 @@ export default function ResourcesPage() {
         <p>
           Know of a resource that should be listed here?{" "}
           <a
-            href="https://github.com"
+            href="https://github.com/kyleamueller/PQM.guide/pulls"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -146,7 +220,7 @@ export default function ResourcesPage() {
           </a>{" "}
           or{" "}
           <a
-            href="https://github.com"
+            href="https://github.com/kyleamueller/PQM.guide/discussions"
             target="_blank"
             rel="noopener noreferrer"
           >
