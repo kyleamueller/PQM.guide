@@ -1,0 +1,148 @@
+---
+title: "Null Handling"
+slug: "null-handling"
+description: "How null values propagate through expressions, and practical patterns for dealing with missing data in M."
+relatedConcepts:
+  - "missingfield-handling"
+  - "error-handling"
+  - "control-structures"
+relatedFunctions:
+  - "table-replacevalue"
+  - "table-selectrows"
+  - "list-removeitems"
+---
+
+`null` in M represents the absence of a value. It is a first-class value with its own type, and it behaves differently from nulls in SQL, Python, or JavaScript. Understanding how null propagates through expressions is critical for writing correct queries.
+
+### Null Propagation
+
+Most operations involving null produce null as the result. This is called **null propagation**:
+
+```powerquery
+1 + null        // null
+"Hello " & null // null
+null > 5        // null
+```
+
+This differs from languages where null operations throw errors. In M, null silently propagates through arithmetic, text concatenation, and comparisons.
+
+### Does null = null?
+
+This is one of M's most important behaviors. The equality operator returns `true`:
+
+```powerquery
+null = null     // true
+```
+
+But relational operators return null:
+
+```powerquery
+null > null     // null
+null >= null    // null
+null < 5        // null
+```
+
+This means filtering with a comparison can silently drop rows where the column is null:
+
+```powerquery
+// This will NOT include rows where Quantity is null
+Table.SelectRows(Sales, each [Quantity] > 0)
+```
+
+If `[Quantity]` is null, the expression `null > 0` evaluates to null, which is not `true`, so the row is excluded.
+
+### Testing for Null
+
+Use the `= null` comparison to check for null values:
+
+```powerquery
+if [Value] = null then "Missing" else Text.From([Value])
+```
+
+Or use it in filters:
+
+```powerquery
+// Keep only rows where Region is not null
+Table.SelectRows(Sales, each [Region] <> null)
+```
+
+### Null Coalescing Patterns
+
+M does not have a dedicated null coalescing operator, but you can use `if` or the `??` shorthand (available in newer versions of the engine):
+
+```powerquery
+// Using if/then/else
+let
+    result = if [Notes] = null then "(no notes)" else [Notes]
+in
+    result
+
+// Using the ?? operator (where available)
+// [Notes] ?? "(no notes)"
+```
+
+### Replacing Nulls in Tables
+
+To replace null values across a column, use `Table.ReplaceValue` with `Replacer.ReplaceValue`:
+
+```powerquery
+Table.ReplaceValue(
+    Sales,
+    null,
+    0,
+    Replacer.ReplaceValue,
+    {"Quantity"}
+)
+```
+
+This replaces every null in the `Quantity` column with `0`.
+
+### Null in Aggregations
+
+Most aggregation functions ignore null values:
+
+```powerquery
+List.Sum({1, null, 3})      // 4  (null is skipped)
+List.Average({10, null, 20}) // 15 (null is skipped)
+List.Count({1, null, 3})    // 3  (null IS counted)
+```
+
+Note that `List.Count` counts all items including null, while `List.NonNullCount` counts only non-null items.
+
+### Null vs. MissingField
+
+Null and missing fields are different concepts in M:
+
+- **null** — The field exists but has no value
+- **MissingField** — The field does not exist on the record at all
+
+Accessing a missing field raises a `MissingField.Error` (unless handled). See the [MissingField Handling](/concepts/missingfield-handling) concept page for details.
+
+```powerquery
+let
+    record = [Name = "Widget", Price = null]
+in
+    record[Price]     // null (field exists, value is null)
+    // record[Color]  // Error: MissingField.Error
+```
+
+### Null in Type Ascription
+
+When assigning types to columns, use `nullable` to indicate a column may contain null values:
+
+```powerquery
+Table.TransformColumnTypes(Source, {
+    {"Quantity", type nullable number},
+    {"Region", type nullable text}
+})
+```
+
+Without `nullable`, the type system expects every value in that column to be non-null.
+
+### Best Practices
+
+1. **Always consider null** when writing filter conditions. If a column might contain nulls, decide whether those rows should be included or excluded.
+2. **Replace nulls early** in your transformation pipeline if downstream steps cannot handle them.
+3. **Use `nullable` types** on columns that may legitimately have missing values.
+4. **Prefer `List.NonNullCount`** over `List.Count` when you need to count actual data values.
+5. **Test with null data** to ensure your transformations handle edge cases correctly.

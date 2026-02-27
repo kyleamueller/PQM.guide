@@ -1,0 +1,158 @@
+---
+title: "Identifiers & Scoping"
+slug: "identifiers-and-scoping"
+description: "The three kinds of identifiers in M, how variable scope works, and how closures capture values from outer scopes."
+relatedConcepts:
+  - "let-in-expressions"
+  - "custom-functions"
+  - "sections-and-shared"
+relatedFunctions:
+  - "expression-evaluate"
+---
+
+Identifiers are the names you give to variables, steps, and fields in M. Understanding the different identifier types and how scoping works prevents subtle bugs and unlocks advanced patterns like closures.
+
+### Three Kinds of Identifiers
+
+**Regular identifiers** follow standard naming rules — they start with a letter or underscore, followed by letters, digits, underscores, or periods:
+
+```powerquery
+let
+    Source = Sales,
+    FilteredRows = Table.SelectRows(Source, each [Region] = "East")
+in
+    FilteredRows
+```
+
+**Quoted identifiers** are wrapped in `#"..."` and can contain any characters, including spaces and special symbols:
+
+```powerquery
+let
+    #"My Source Data" = Sales,
+    #"Filtered & Sorted" = Table.Sort(#"My Source Data", {"UnitPrice"})
+in
+    #"Filtered & Sorted"
+```
+
+The Power Query UI generates quoted identifiers for step names that contain spaces. They are functionally identical to regular identifiers — the quotes simply allow special characters.
+
+**Generalized identifiers** appear inside square brackets as field or column names:
+
+```powerquery
+each [Unit Price]     // Accesses the "Unit Price" field
+each [Order Date]     // Accesses the "Order Date" field
+```
+
+Inside brackets, spaces and most special characters are allowed without quoting.
+
+### Variable Scope
+
+A variable is visible (in scope) from the point of its definition to the end of the enclosing block. M uses **lexical scoping** — the scope is determined by the textual structure of the code, not by runtime behavior.
+
+In a `let...in` block, each variable can reference variables defined earlier in the same block:
+
+```powerquery
+let
+    x = 10,
+    y = x + 5,      // x is in scope
+    z = x + y        // both x and y are in scope
+in
+    z
+```
+
+A variable cannot reference one defined after it — there are no forward references.
+
+### Nested Scopes
+
+Inner scopes can access variables from outer scopes:
+
+```powerquery
+let
+    Threshold = 100,
+    GetExpensive = (source as table) as table =>
+        Table.SelectRows(source, each [UnitPrice] > Threshold)
+in
+    GetExpensive(Sales)   // Threshold is accessible inside the function
+```
+
+The function `GetExpensive` can see `Threshold` because it was defined in the enclosing `let` block.
+
+### Shadowing
+
+If an inner scope defines a variable with the same name as an outer variable, the inner definition **shadows** (hides) the outer one:
+
+```powerquery
+let
+    x = 10,
+    Result = let
+        x = 20       // Shadows the outer x
+    in
+        x             // 20, not 10
+in
+    Result
+```
+
+The outer `x` still exists and is unchanged, but the inner block cannot see it.
+
+### Closures
+
+When a function captures variables from its enclosing scope, it creates a **closure**. The function retains access to those variables even after the enclosing scope has finished evaluating:
+
+```powerquery
+let
+    MakeMultiplier = (factor as number) as function =>
+        (x as number) => x * factor,
+
+    Double = MakeMultiplier(2),
+    Triple = MakeMultiplier(3)
+in
+    Double(5)    // 10
+    // Triple(5) // 15
+```
+
+`MakeMultiplier` returns a function that "remembers" the `factor` parameter. `Double` permanently captures `factor = 2`, and `Triple` captures `factor = 3`.
+
+### Closures for Encapsulated State
+
+Closures enable patterns where you create objects with private state and a public interface:
+
+```powerquery
+let
+    MakeCounter = () as record =>
+        let
+            state = [count = 0],
+            Increment = () => [count = state[count] + 1],
+            GetCount = () => state[count]
+        in
+            [Increment = Increment, GetCount = GetCount]
+in
+    MakeCounter
+```
+
+This is M's approximation of object-oriented encapsulation.
+
+### The `@` Operator for Self-Reference
+
+Inside a recursive function, use `@` to reference the function itself:
+
+```powerquery
+let
+    Flatten = (list as list) as list =>
+        List.Combine(
+            List.Transform(list, each
+                if _ is list then @Flatten(_) else {_}
+            )
+        )
+in
+    Flatten({1, {2, 3}, {4, {5, 6}}})
+    // Result: {1, 2, 3, 4, 5, 6}
+```
+
+The `@` prefix is necessary because the function name is not yet fully defined when the function body references it.
+
+### Best Practices
+
+1. **Use regular identifiers** when possible. Reserve quoted identifiers for cases where column names or step names contain spaces.
+2. **Avoid shadowing** — it makes code confusing. Use distinct names for variables at different scope levels.
+3. **Use closures intentionally** for factory functions, partial application, and encapsulated state.
+4. **Be aware of `each` scoping.** Inside `each`, the `_` parameter shadows any outer `_`. For nested `each` expressions, use explicit parameter names instead.

@@ -1,0 +1,123 @@
+---
+title: "Metadata"
+slug: "metadata"
+description: "How to attach, read, and use metadata on M values — the mechanism behind function documentation, type facets, and custom annotations."
+relatedConcepts:
+  - "type-system"
+  - "custom-functions"
+relatedFunctions:
+  - "value-type"
+  - "value-replacetype"
+---
+
+Every value in M carries an associated **metadata record**. By default this record is empty, but you can attach arbitrary key-value pairs to any value using the `meta` keyword. Metadata is how Power Query implements function documentation, type facets, and other internal annotations.
+
+### Attaching Metadata
+
+Use the `meta` keyword to attach a record of metadata to a value:
+
+```powerquery
+let
+    myValue = 42 meta [Source = "Manual Entry", Notes = "Test data"]
+in
+    myValue   // Still evaluates to 42
+```
+
+The value itself is unchanged — `myValue` is still `42`. But it now carries hidden metadata alongside it.
+
+### Reading Metadata
+
+Use `Value.Metadata` to retrieve the metadata record:
+
+```powerquery
+let
+    myValue = 42 meta [Source = "Manual Entry"],
+    metaRecord = Value.Metadata(myValue)
+in
+    metaRecord   // [Source = "Manual Entry"]
+```
+
+If no metadata has been attached, `Value.Metadata` returns an empty record `[]`.
+
+### Metadata Does Not Affect Equality
+
+Two values with different metadata are still considered equal:
+
+```powerquery
+(42 meta [A = 1]) = (42 meta [B = 2])   // true
+```
+
+Metadata is "invisible" to comparisons, arithmetic, and all standard operations.
+
+### Function Documentation
+
+The most practical use of metadata is documenting custom functions so they display friendly names and descriptions in the Power Query editor:
+
+```powerquery
+let
+    MyFunction = (input as text) as text => Text.Upper(input),
+
+    Documented = Value.ReplaceType(
+        MyFunction,
+        type function (input as text) as text
+            meta [
+                Documentation.Name = "ToUpperCase",
+                Documentation.Description = "Converts text to uppercase.",
+                Documentation.LongDescription = "Takes a text value and returns it with all characters converted to uppercase.",
+                Documentation.Examples = {
+                    [
+                        Description = "Basic usage",
+                        Code = "ToUpperCase(""hello"")",
+                        Result = """HELLO"""
+                    ]
+                }
+            ]
+    )
+in
+    Documented
+```
+
+When this function is invoked in the Power Query editor, the UI displays the name, description, and examples from the metadata.
+
+### Common Documentation Keys
+
+| Key | Purpose |
+|---|---|
+| `Documentation.Name` | Display name for the function |
+| `Documentation.Description` | Short description shown in the UI |
+| `Documentation.LongDescription` | Extended description |
+| `Documentation.Examples` | List of example records with `Description`, `Code`, and `Result` fields |
+| `Documentation.Category` | Category grouping for the function |
+
+### Metadata on Types
+
+Type facets — such as whether a number is a currency, percentage, or date format — are stored as metadata on type values. When you set a column type in the Power Query UI, the engine attaches format metadata to the type:
+
+```powerquery
+type number meta [Formatting.Format = "Currency"]
+```
+
+This is how the same underlying `number` type can display differently depending on context.
+
+### Metadata Propagation
+
+Metadata does not automatically propagate through transformations. If you transform a value that carries metadata, the result typically has empty metadata:
+
+```powerquery
+let
+    original = 10 meta [Source = "Input"],
+    doubled = original * 2,
+    meta1 = Value.Metadata(original),   // [Source = "Input"]
+    meta2 = Value.Metadata(doubled)     // [] (empty)
+in
+    meta2
+```
+
+If you need to preserve metadata through a transformation, you must reattach it explicitly.
+
+### Best Practices
+
+1. **Document your custom functions** with `Documentation.Name` and `Documentation.Description` metadata so they are usable by others in the Power Query UI.
+2. **Use metadata for annotations** when you need to tag values with source information, versioning, or other context without affecting the value itself.
+3. **Do not rely on metadata propagation** — assume transformations strip metadata unless you explicitly preserve it.
+4. **Use `Value.ReplaceType`** combined with `meta` on the type to attach documentation to functions.

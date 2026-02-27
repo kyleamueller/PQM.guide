@@ -1,0 +1,127 @@
+---
+title: "Control Structures (if/then/else)"
+slug: "control-structures"
+description: "M's sole branching construct — if/then/else — and how to write clean conditional logic."
+relatedConcepts:
+  - "null-handling"
+  - "each-keyword"
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-selectrows"
+---
+
+M has exactly one branching construct: `if...then...else`. There are no switch statements, ternary operators, or pattern matching. Every conditional decision in M flows through this single structure.
+
+### Basic Syntax
+
+```powerquery
+if [Region] = "East" then "Eastern" else "Other"
+```
+
+The test expression must evaluate to a **logical value** (`true` or `false`). Unlike JavaScript or Python, M does not have "truthy" or "falsy" values — passing a number or text as the condition raises an error.
+
+```powerquery
+if 1 then "yes" else "no"   // Error: logical value expected
+```
+
+### Multi-Branch Conditions
+
+Since there is no `elseif` keyword, you nest `if` expressions in the `else` clause:
+
+```powerquery
+if [Region] = "East" then "Eastern Division"
+else if [Region] = "West" then "Western Division"
+else if [Region] = "North" then "Northern Division"
+else "Other"
+```
+
+The `else` clause is required — every `if` must have a corresponding `else`. This ensures the expression always produces a value, which is consistent with M's functional design.
+
+### Using if in Columns
+
+The most common use of `if` is inside `Table.AddColumn` to create calculated columns:
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "PriceCategory",
+    each if [UnitPrice] >= 20 then "Premium"
+         else if [UnitPrice] >= 10 then "Standard"
+         else "Budget",
+    type text
+)
+```
+
+### Combining Conditions
+
+Use `and`, `or`, and `not` to combine logical expressions:
+
+```powerquery
+if [Region] = "East" and [Quantity] > 5 then "High-volume East"
+else if [Region] = "West" or [Region] = "North" then "West/North"
+else "Other"
+```
+
+Operator precedence: `not` binds tightest, then `and`, then `or`. Use parentheses to make complex conditions clear:
+
+```powerquery
+if ([Region] = "East" or [Region] = "West") and [Quantity] > 5
+then "High volume"
+else "Standard"
+```
+
+### Null and Conditionals
+
+Be careful with null values in conditions. A comparison involving null returns null, not `false`:
+
+```powerquery
+// If [Region] is null, this evaluates to null — not false
+if [Region] = "East" then "East" else "Other"
+```
+
+When the condition is null (neither true nor false), M raises an error. To guard against this:
+
+```powerquery
+if [Region] <> null and [Region] = "East" then "East" else "Other"
+```
+
+Or test for null first:
+
+```powerquery
+if [Region] = null then "Unknown"
+else if [Region] = "East" then "East"
+else "Other"
+```
+
+### if as an Expression
+
+Since `if...then...else` is an expression (not a statement), it returns a value and can be used anywhere a value is expected:
+
+```powerquery
+let
+    Multiplier = if includesTax then 1.08 else 1.0,
+    Total = [UnitPrice] * [Quantity] * Multiplier
+in
+    Total
+```
+
+You can nest `if` expressions inside function arguments, list items, or record fields.
+
+### Best Practices
+
+1. **Always include `else`.** M requires it, and it forces you to think about the default case.
+2. **Guard against null** in conditions where the tested column might contain null values.
+3. **Use `List.Contains` for many-of checks** instead of chaining multiple `or` conditions:
+   ```powerquery
+   if List.Contains({"East", "West", "North"}, [Region])
+   then "Domestic" else "International"
+   ```
+4. **Keep conditions readable** by extracting complex logic into named steps:
+   ```powerquery
+   let
+       IsHighValue = [UnitPrice] >= 20 and [Quantity] >= 10,
+       Category = if IsHighValue then "Premium" else "Standard"
+   in
+       Category
+   ```
+5. **Prefer `Table.SelectRows`** over adding a boolean column and then filtering — it is more direct and may fold to the data source.
