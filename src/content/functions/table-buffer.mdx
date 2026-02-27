@@ -1,0 +1,59 @@
+---
+title: "Table.Buffer"
+slug: "table-buffer"
+category: "Table"
+description: "Buffers a table into memory, ensuring it is fully evaluated and its row order is preserved."
+syntax: "Table.Buffer(table as table, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "An in-memory copy of the table with its current row order locked in."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to buffer into memory."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "Optional record. Use [BufferMode = BufferMode.Delayed] to defer buffering until the table is first accessed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-sort"
+  - "table-group"
+  - "table-removeduplicates"
+---
+
+## Remarks
+
+`Table.Buffer` forces Power Query to fully evaluate a table and store it in memory. This is essential when you need to guarantee that the current row order is preserved by downstream operations, because M uses [lazy evaluation](/concepts/lazy-evaluation) and does not guarantee row order between steps by default.
+
+The most common use case is placing `Table.Buffer` between a `Table.Sort` and a subsequent `Table.Group` or `Table.RemoveDuplicates`. Without buffering, the sort order may not be preserved, leading to unexpected results.
+
+Be mindful of memory usage — `Table.Buffer` loads the entire table into memory. Avoid using it on very large datasets unless necessary. Use `BufferMode.Delayed` in the options record to defer buffering until the table is actually accessed, which can improve performance when the buffered table may not always be needed.
+
+Note that `Table.Buffer` breaks [query folding](/concepts/query-folding) by design, since it pulls data into memory.
+
+## Examples
+
+### Example 1: Preserve sort order before grouping
+
+Sort by UnitPrice, buffer the result, then group to get the cheapest product per category.
+
+Input: `Sales`
+
+```powerquery
+let
+    Sorted = Table.Sort(Sales, {"UnitPrice", Order.Ascending}),
+    Buffered = Table.Buffer(Sorted)
+in
+    Table.Group(Buffered, "Category", {{"CheapestProduct", each List.First([Product]), type text}, {"LowestPrice", each List.Min([UnitPrice]), type number}})
+```
+
+<!--output
+{"columns":[{"name":"Category","type":"text"},{"name":"CheapestProduct","type":"text"},{"name":"LowestPrice","type":"number"}],"rows":[{"Category":"Widgets","CheapestProduct":"Widget C","LowestPrice":15.00},{"Category":"Gadgets","CheapestProduct":"Gadget B","LowestPrice":50.00},{"Category":"Misc","CheapestProduct":"Thingamajig E","LowestPrice":120.00}]}
+-->

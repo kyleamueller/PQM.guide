@@ -1,0 +1,58 @@
+---
+title: "Table.ReorderColumns"
+slug: "table-reordercolumns"
+category: "Table"
+description: "Reorders columns in a table to a specified order."
+syntax: "Table.ReorderColumns(table as table, columnOrder as list, optional missingField as nullable number) as table"
+returnType: "table"
+returnDescription: "A table with columns rearranged in the specified order."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose columns to reorder."
+  - name: "columnOrder"
+    type: "list"
+    required: true
+    description: "A list of column names specifying the desired order. Columns not listed retain their relative order after the listed ones."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a listed column doesn't exist. Use MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-selectcolumns"
+  - "table-columnnames"
+  - "table-prefixcolumns"
+---
+
+## Remarks
+
+`Table.ReorderColumns` changes the column order without adding or removing columns. You only need to list the columns whose position you want to control — any unlisted columns keep their original relative order and appear after the listed ones.
+
+Use `MissingField.Ignore` when working with tables whose columns may vary, to avoid runtime errors if a column in your list doesn't exist.
+
+## Examples
+
+### Example 1: Move Product and Category to the front
+
+Reorder so Product and Category appear first, followed by all other columns in their original order.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.ReorderColumns(Table.FirstN(Sales, 3), {"Product", "Category"}),
+    {"Product", "Category", "OrderID", "CustomerName"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"}],"rows":[{"Product":"Widget A","Category":"Widgets","OrderID":1,"CustomerName":"Alice"},{"Product":"Gadget B","Category":"Gadgets","OrderID":2,"CustomerName":"Bob"},{"Product":"Widget C","Category":"Widgets","OrderID":3,"CustomerName":"Charlie"}]}
+-->

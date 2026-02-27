@@ -1,0 +1,54 @@
+---
+title: "Table.FillUp"
+slug: "table-fillup"
+category: "Table"
+description: "Fills null values in specified columns with the next non-null value below."
+syntax: "Table.FillUp(table as table, columns as list) as table"
+returnType: "table"
+returnDescription: "A table with null values in the specified columns replaced by the next non-null value from below."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table containing null values to fill."
+  - name: "columns"
+    type: "list"
+    required: true
+    description: "A list of column names to apply the fill-up operation to."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-filldown"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Table.FillUp` scans each specified column from bottom to top. When it encounters a null, it replaces it with the next non-null value from below. If the last value in a column is null, it remains null because there is no subsequent value to propagate.
+
+This is the complement of `Table.FillDown`. Use `Table.FillUp` when null values should inherit from the row beneath them, or combine both functions to fill nulls in both directions.
+
+## Examples
+
+### Example 1: Fill up a column
+
+Replace "East" with null, then fill upward from the next non-null value below.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(Table.FirstN(Sales, 4), {"CustomerName", "Region"}),
+    WithNulls = Table.ReplaceValue(Source, "East", null, Replacer.ReplaceValue, {"Region"})
+in
+    Table.FillUp(WithNulls, {"Region"})
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"West"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"North"},{"CustomerName":"Alice","Region":"North"}]}
+-->

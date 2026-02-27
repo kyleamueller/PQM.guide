@@ -1,0 +1,65 @@
+---
+title: "Table.IsEmpty"
+slug: "table-isempty"
+category: "Table"
+description: "Returns true if a table contains no rows."
+syntax: "Table.IsEmpty(table as table) as logical"
+returnType: "logical"
+returnDescription: "true if the table has zero rows, false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to check."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-rowcount"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.IsEmpty` returns `true` if the table has no rows. This is more readable and efficient than checking `Table.RowCount(table) = 0`. It is commonly used in conditional logic — for example, checking whether a filter returned any results before performing further operations.
+
+## Examples
+
+### Example 1: Check if filtered table is empty
+
+Filter Sales for a non-existent region and check whether the result is empty.
+
+Input: `Sales`
+
+```powerquery
+let
+    Filtered = Table.SelectRows(Sales, each [Region] = "South"),
+    IsEmpty = Table.IsEmpty(Filtered)
+in
+    #table({"IsEmpty"}, {{IsEmpty}})
+```
+
+<!--output
+{"columns":[{"name":"IsEmpty","type":"logical"}],"rows":[{"IsEmpty":true}]}
+-->
+
+### Example 2: Check a non-empty table
+
+Check whether the full Sales table is empty.
+
+Input: `Sales`
+
+```powerquery
+let
+    IsEmpty = Table.IsEmpty(Sales)
+in
+    #table({"IsEmpty"}, {{IsEmpty}})
+```
+
+<!--output
+{"columns":[{"name":"IsEmpty","type":"logical"}],"rows":[{"IsEmpty":false}]}
+-->

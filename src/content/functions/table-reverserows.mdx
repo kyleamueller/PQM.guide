@@ -1,0 +1,45 @@
+---
+title: "Table.ReverseRows"
+slug: "table-reverserows"
+category: "Table"
+description: "Reverses the order of rows in a table."
+syntax: "Table.ReverseRows(table as table) as table"
+returnType: "table"
+returnDescription: "A table with the rows in reverse order."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose rows to reverse."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-sort"
+  - "table-lastn"
+  - "table-buffer"
+---
+
+## Remarks
+
+`Table.ReverseRows` flips the row order of a table so the last row becomes the first and vice versa. This is useful for reversing a sort without specifying sort columns, or for processing data that was loaded in the wrong order.
+
+## Examples
+
+### Example 1: Reverse row order
+
+Reverse the first 4 rows of the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.ReverseRows(Table.FirstN(Sales, 4)), {"OrderID", "CustomerName", "Product"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B"},{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"}]}
+-->

@@ -1,0 +1,71 @@
+---
+title: "Table.SelectColumns"
+slug: "table-selectcolumns"
+category: "Table"
+description: "Returns a table with only the specified columns."
+syntax: "Table.SelectColumns(table as table, columns as any, optional missingField as nullable number) as table"
+returnType: "table"
+returnDescription: "A table containing only the specified columns, in the order listed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to select columns from."
+  - name: "columns"
+    type: "any"
+    required: true
+    description: "A column name or list of column names to keep."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a specified column does not exist. Use MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removecolumns"
+  - "table-reordercolumns"
+  - "table-renamecolumns"
+---
+
+## Remarks
+
+`Table.SelectColumns` returns a table containing only the columns you specify, in the order you list them. This is the complement of `Table.RemoveColumns` — use `Table.SelectColumns` when you want to keep a few columns from a wide table, and `Table.RemoveColumns` when you want to drop a few columns.
+
+The columns appear in the output in the same order you list them, so this function also serves as a way to reorder columns in a single step.
+
+As a best practice, always provide the third argument `MissingField.Ignore` to silently skip any columns that do not exist. This prevents broken refreshes if an upstream column is renamed or removed from the data source.
+
+## Examples
+
+### Example 1: Select specific columns
+
+Select only the Product, UnitPrice, and Quantity columns from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Sales, {"Product", "UnitPrice", "Quantity"})
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":25.00,"Quantity":4},{"Product":"Gadget B","UnitPrice":50.00,"Quantity":2},{"Product":"Widget C","UnitPrice":15.00,"Quantity":10},{"Product":"Gadget D","UnitPrice":75.00,"Quantity":1},{"Product":"Widget A","UnitPrice":25.00,"Quantity":6},{"Product":"Thingamajig E","UnitPrice":120.00,"Quantity":1},{"Product":"Gadget B","UnitPrice":50.00,"Quantity":3},{"Product":"Widget C","UnitPrice":15.00,"Quantity":8}]}
+-->
+
+### Example 2: Select and reorder columns
+
+Select CustomerName and Region columns, placing Region first.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Sales, {"Region", "CustomerName"})
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"text"},{"name":"CustomerName","type":"text"}],"rows":[{"Region":"East","CustomerName":"Alice"},{"Region":"West","CustomerName":"Bob"},{"Region":"East","CustomerName":"Charlie"},{"Region":"North","CustomerName":"Alice"},{"Region":"West","CustomerName":"Diana"},{"Region":"East","CustomerName":"Bob"},{"Region":"West","CustomerName":"Charlie"},{"Region":"North","CustomerName":"Diana"}]}
+-->

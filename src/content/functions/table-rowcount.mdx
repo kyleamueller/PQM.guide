@@ -1,0 +1,64 @@
+---
+title: "Table.RowCount"
+slug: "table-rowcount"
+category: "Table"
+description: "Returns the number of rows in a table."
+syntax: "Table.RowCount(table as table) as number"
+returnType: "number"
+returnDescription: "The number of rows in the table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to count rows in."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-isempty"
+  - "table-group"
+  - "table-firstn"
+---
+
+## Remarks
+
+`Table.RowCount` returns the total number of rows in a table as a single number. This is commonly used inside `Table.Group` aggregations to count the rows in each group, or in conditional logic to check the size of a table.
+
+Note that this function returns a scalar value (a number), not a table. To display the result as a table in an example, it is wrapped in a record-to-table conversion.
+
+## Examples
+
+### Example 1: Count rows in a table
+
+Count the total number of rows in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Count = Table.RowCount(Sales)
+in
+    #table({"RowCount"}, {{Count}})
+```
+
+<!--output
+{"columns":[{"name":"RowCount","type":"number"}],"rows":[{"RowCount":8}]}
+-->
+
+### Example 2: Count rows per group
+
+Count orders by region using Table.RowCount inside a group.
+
+Input: `Sales`
+
+```powerquery
+Table.Group(Sales, "Region", {{"Orders", each Table.RowCount(_), Int64.Type}})
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"text"},{"name":"Orders","type":"number"}],"rows":[{"Region":"East","Orders":3},{"Region":"West","Orders":3},{"Region":"North","Orders":2}]}
+-->

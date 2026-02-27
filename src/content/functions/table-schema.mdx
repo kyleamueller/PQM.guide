@@ -1,0 +1,47 @@
+---
+title: "Table.Schema"
+slug: "table-schema"
+category: "Table"
+description: "Returns a table describing the columns (schema) of the input table."
+syntax: "Table.Schema(table as table) as table"
+returnType: "table"
+returnDescription: "A table with one row per column, containing metadata such as name, position, type, and kind."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose schema to inspect."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-columnnames"
+  - "table-columntypes"
+  - "table-profile"
+---
+
+## Remarks
+
+`Table.Schema` returns a metadata table describing the structure of the input table. Each row represents one column and includes information like `Name`, `Position`, `TypeName`, `Kind`, `IsNullable`, and more. This is useful for inspecting or validating a table's structure programmatically.
+
+The schema table itself contains many columns. The most commonly used are `Name`, `Position`, `TypeName`, and `Kind`.
+
+## Examples
+
+### Example 1: Inspect column names and types
+
+Get the name and type of each column in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.Schema(Sales), {"Name", "Position", "TypeName"})
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"Number.Type"},{"Name":"CustomerName","Position":1,"TypeName":"Text.Type"},{"Name":"Product","Position":2,"TypeName":"Text.Type"},{"Name":"Category","Position":3,"TypeName":"Text.Type"},{"Name":"UnitPrice","Position":4,"TypeName":"Number.Type"},{"Name":"Quantity","Position":5,"TypeName":"Number.Type"},{"Name":"OrderDate","Position":6,"TypeName":"Date.Type"},{"Name":"Region","Position":7,"TypeName":"Text.Type"}]}
+-->

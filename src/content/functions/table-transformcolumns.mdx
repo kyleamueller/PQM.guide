@@ -1,0 +1,81 @@
+---
+title: "Table.TransformColumns"
+slug: "table-transformcolumns"
+category: "Table"
+description: "Applies transformation functions to the values in one or more columns."
+syntax: "Table.TransformColumns(table as table, transformOperations as list, optional defaultTransformation as nullable function, optional missingField as nullable number) as table"
+returnType: "table"
+returnDescription: "The input table with the specified columns transformed by the given functions."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose column values are to be transformed."
+  - name: "transformOperations"
+    type: "list"
+    required: true
+    description: "A list of {columnName, transformFunction} pairs, or {columnName, transformFunction, newType} triples."
+  - name: "defaultTransformation"
+    type: "function"
+    required: false
+    description: "A function to apply to all columns not listed in transformOperations."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a specified column does not exist. Use MissingField.Error (default) or MissingField.Ignore."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-transformcolumntypes"
+  - "table-addcolumn"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Table.TransformColumns` applies a function to every value in one or more columns. Unlike `Table.TransformColumnTypes` which changes the data type, this function transforms the actual values — for example, converting text to uppercase, rounding numbers, or extracting parts of a date.
+
+This function preserves [query folding](/concepts/query-folding) in scenarios where `Table.TransformColumnTypes` does not. When working with database sources, prefer `Table.TransformColumns` with a conversion function over `Table.TransformColumnTypes` for type-related transformations.
+
+Include the type as the third element in each transformation triple (e.g., `{"Column", Text.Upper, type text}`) to keep the column typed without needing a separate `Table.TransformColumnTypes` step.
+
+## Examples
+
+### Example 1: Transform text to uppercase
+
+Convert all CustomerName values to uppercase.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.TransformColumns(Sales, {{"CustomerName", Text.Upper, type text}}),
+    {"OrderID", "CustomerName", "Product"}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"ALICE","Product":"Widget A"},{"OrderID":2,"CustomerName":"BOB","Product":"Gadget B"},{"OrderID":3,"CustomerName":"CHARLIE","Product":"Widget C"},{"OrderID":4,"CustomerName":"ALICE","Product":"Gadget D"},{"OrderID":5,"CustomerName":"DIANA","Product":"Widget A"},{"OrderID":6,"CustomerName":"BOB","Product":"Thingamajig E"},{"OrderID":7,"CustomerName":"CHARLIE","Product":"Gadget B"},{"OrderID":8,"CustomerName":"DIANA","Product":"Widget C"}]}
+-->
+
+### Example 2: Round numeric values
+
+Round UnitPrice to the nearest whole number.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.TransformColumns(Sales, {{"UnitPrice", each Number.Round(_, 0), type number}}),
+    {"Product", "UnitPrice"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":25},{"Product":"Gadget B","UnitPrice":50},{"Product":"Widget C","UnitPrice":15},{"Product":"Gadget D","UnitPrice":75},{"Product":"Widget A","UnitPrice":25},{"Product":"Thingamajig E","UnitPrice":120},{"Product":"Gadget B","UnitPrice":50},{"Product":"Widget C","UnitPrice":15}]}
+-->

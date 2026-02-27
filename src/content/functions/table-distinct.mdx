@@ -1,0 +1,64 @@
+---
+title: "Table.Distinct"
+slug: "table-distinct"
+category: "Table"
+description: "Removes duplicate rows from a table based on all columns or specified criteria."
+syntax: "Table.Distinct(table as table, optional equationCriteria as any) as table"
+returnType: "table"
+returnDescription: "A table with duplicate rows removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to remove duplicate rows from."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "A column name, list of column names, or comparer function used to determine which columns to check for duplicates. If omitted, all columns are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removeduplicates"
+  - "table-group"
+---
+
+## Remarks
+
+`Table.Distinct` removes duplicate rows from a table. Without `equationCriteria`, rows must match on every column to be considered duplicates. Pass a column name or list of column names to deduplicate based on specific columns only — the first occurrence of each unique value is kept.
+
+`Table.Distinct` is similar to `Table.RemoveDuplicates`. The key difference is that `Table.Distinct` supports comparer functions in its criteria (e.g., `Comparer.OrdinalIgnoreCase` for case-insensitive matching), while `Table.RemoveDuplicates` takes a simple list of column names.
+
+## Examples
+
+### Example 1: Get distinct categories
+
+Extract the unique categories from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.Distinct(Table.SelectColumns(Sales, {"Category"}))
+```
+
+<!--output
+{"columns":[{"name":"Category","type":"text"}],"rows":[{"Category":"Widgets"},{"Category":"Gadgets"},{"Category":"Misc"}]}
+-->
+
+### Example 2: Distinct customers by name
+
+Get the first row per unique customer name.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.Distinct(Sales, "CustomerName"), {"CustomerName", "Product", "Region"})
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"East"},{"CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"CustomerName":"Diana","Product":"Widget A","Region":"West"}]}
+-->

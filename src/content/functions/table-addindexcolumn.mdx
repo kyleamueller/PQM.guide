@@ -1,0 +1,65 @@
+---
+title: "Table.AddIndexColumn"
+slug: "table-addindexcolumn"
+category: "Table"
+description: "Adds a sequential index column to a table."
+syntax: "Table.AddIndexColumn(table as table, newColumnName as text, optional initialValue as nullable number, optional increment as nullable number, optional columnType as nullable type) as table"
+returnType: "table"
+returnDescription: "The input table with an additional column containing sequential index values."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to add an index column to."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name of the new index column."
+  - name: "initialValue"
+    type: "number"
+    required: false
+    description: "The starting value of the index (default is 0)."
+  - name: "increment"
+    type: "number"
+    required: false
+    description: "The increment between consecutive index values (default is 1)."
+  - name: "columnType"
+    type: "type"
+    required: false
+    description: "Optional type annotation for the index column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-rowcount"
+---
+
+## Remarks
+
+`Table.AddIndexColumn` appends a new column with sequential numeric values. By default, the index starts at 0 and increments by 1. Use the optional parameters to start at a different value or use a custom increment.
+
+Index columns are useful for creating a unique row identifier, enabling row-number-based joins, or preserving original row order before operations that may reorder the data.
+
+## Examples
+
+### Example 1: Add a 1-based index
+
+Add a row number column starting at 1.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.AddIndexColumn(Table.FirstN(Sales, 5), "RowNum", 1, 1, Int64.Type),
+    {"RowNum", "CustomerName", "Product"}
+)
+```
+
+<!--output
+{"columns":[{"name":"RowNum","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"RowNum":1,"CustomerName":"Alice","Product":"Widget A"},{"RowNum":2,"CustomerName":"Bob","Product":"Gadget B"},{"RowNum":3,"CustomerName":"Charlie","Product":"Widget C"},{"RowNum":4,"CustomerName":"Alice","Product":"Gadget D"},{"RowNum":5,"CustomerName":"Diana","Product":"Widget A"}]}
+-->

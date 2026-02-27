@@ -1,0 +1,61 @@
+---
+title: "Table.DuplicateColumn"
+slug: "table-duplicatecolumn"
+category: "Table"
+description: "Duplicates a column in a table with a new name."
+syntax: "Table.DuplicateColumn(table as table, columnName as text, newColumnName as text, optional columnType as nullable type) as table"
+returnType: "table"
+returnDescription: "The input table with a new column that is a copy of the specified column."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table."
+  - name: "columnName"
+    type: "text"
+    required: true
+    description: "The name of the column to duplicate."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name of the new duplicate column."
+  - name: "columnType"
+    type: "type"
+    required: false
+    description: "Optional type for the new column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-renamecolumns"
+---
+
+## Remarks
+
+`Table.DuplicateColumn` creates a copy of an existing column with a new name. This is useful when you want to transform a column but also keep the original values — duplicate first, then transform the copy.
+
+The new column is appended to the end of the table. Use `Table.ReorderColumns` if you need it in a specific position.
+
+## Examples
+
+### Example 1: Duplicate a column for transformation
+
+Duplicate the Product column, then use the copy for further processing.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(
+    Table.DuplicateColumn(Table.FirstN(Sales, 3), "Product", "OriginalProduct"),
+    {"OrderID", "Product", "OriginalProduct"}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"OriginalProduct","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A","OriginalProduct":"Widget A"},{"OrderID":2,"Product":"Gadget B","OriginalProduct":"Gadget B"},{"OrderID":3,"Product":"Widget C","OriginalProduct":"Widget C"}]}
+-->

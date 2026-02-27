@@ -1,0 +1,68 @@
+---
+title: "Table.HasColumns"
+slug: "table-hascolumns"
+category: "Table"
+description: "Returns true if a table contains the specified column or columns."
+syntax: "Table.HasColumns(table as table, columns as any) as logical"
+returnType: "logical"
+returnDescription: "true if all specified columns exist in the table, false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to check."
+  - name: "columns"
+    type: "any"
+    required: true
+    description: "A column name (text) or a list of column names to check for."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-columnnames"
+  - "table-selectcolumns"
+---
+
+## Remarks
+
+`Table.HasColumns` checks whether a table contains one or more specified columns. When given a list of column names, it returns `true` only if all columns exist. This is useful for writing defensive queries that adapt to tables with varying schemas — for example, conditionally adding a step only when a certain column is present.
+
+## Examples
+
+### Example 1: Check for a single column
+
+Check whether the Sales table has a Region column.
+
+Input: `Sales`
+
+```powerquery
+let
+    HasRegion = Table.HasColumns(Sales, "Region")
+in
+    #table({"HasRegion"}, {{HasRegion}})
+```
+
+<!--output
+{"columns":[{"name":"HasRegion","type":"logical"}],"rows":[{"HasRegion":true}]}
+-->
+
+### Example 2: Check for a missing column
+
+Check whether the Sales table has a Discount column.
+
+Input: `Sales`
+
+```powerquery
+let
+    HasDiscount = Table.HasColumns(Sales, "Discount")
+in
+    #table({"HasDiscount"}, {{HasDiscount}})
+```
+
+<!--output
+{"columns":[{"name":"HasDiscount","type":"logical"}],"rows":[{"HasDiscount":false}]}
+-->

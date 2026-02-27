@@ -1,0 +1,59 @@
+---
+title: "Table.FromRecords"
+slug: "table-fromrecords"
+category: "Table"
+description: "Creates a table from a list of records."
+syntax: "Table.FromRecords(records as list, optional columns as any, optional missingField as nullable number) as table"
+returnType: "table"
+returnDescription: "A table where each record in the list becomes a row, with field names as column names."
+parameters:
+  - name: "records"
+    type: "list"
+    required: true
+    description: "A list of records to convert into table rows."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "A list of column names, a table type, or a number of columns. Controls the output column structure."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a record is missing a field. Use MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-torecords"
+  - "table-fromcolumns"
+  - "table-fromlist"
+---
+
+## Remarks
+
+`Table.FromRecords` converts a list of records into a table. Each record becomes a row, and each field name becomes a column. This is useful for building tables from JSON/API responses, or for constructing small lookup tables inline.
+
+Pass a `type table` value as the `columns` parameter to define column names and types in one step. Use `MissingField.UseNull` when records have inconsistent fields — missing fields will be filled with null instead of raising an error.
+
+## Examples
+
+### Example 1: Round-trip records back to table
+
+Convert Sales rows to records with `Table.ToRecords`, then rebuild the table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Source = Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "CustomerName", "Product"}),
+    AsRecords = Table.ToRecords(Source)
+in
+    Table.FromRecords(AsRecords)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"}]}
+-->

@@ -1,0 +1,52 @@
+---
+title: "Table.PrefixColumns"
+slug: "table-prefixcolumns"
+category: "Table"
+description: "Prefixes all column names in a table with a given text value."
+syntax: "Table.PrefixColumns(table as table, prefix as text) as table"
+returnType: "table"
+returnDescription: "A table with all column names prefixed by the specified text, separated by a period."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose columns to prefix."
+  - name: "prefix"
+    type: "text"
+    required: true
+    description: "The text to prepend to each column name, followed by a period separator."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-renamecolumns"
+  - "table-expandtablecolumn"
+  - "table-columnnames"
+---
+
+## Remarks
+
+`Table.PrefixColumns` renames every column in a table by adding a prefix followed by a period (e.g., `"Sales"` turns `"Product"` into `"Sales.Product"`). This is useful before combining or joining tables to avoid column name collisions — particularly when two tables share the same column names.
+
+## Examples
+
+### Example 1: Prefix column names
+
+Prefix columns in a subset of the Sales table with "Sales".
+
+Input: `Sales`
+
+```powerquery
+Table.PrefixColumns(
+    Table.SelectColumns(Table.FirstN(Sales, 2), {"OrderID", "Product", "Region"}),
+    "Sales"
+)
+```
+
+<!--output
+{"columns":[{"name":"Sales.OrderID","type":"number"},{"name":"Sales.Product","type":"text"},{"name":"Sales.Region","type":"text"}],"rows":[{"Sales.OrderID":1,"Sales.Product":"Widget A","Sales.Region":"East"},{"Sales.OrderID":2,"Sales.Product":"Gadget B","Sales.Region":"West"}]}
+-->

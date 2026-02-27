@@ -81,6 +81,30 @@ export default function ResourcesPage() {
       </section>
 
       <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontSize: 20, marginBottom: 16 }}>Books</h2>
+
+        <div className="resource-card">
+          <h3>M Is for (Data) Monkey — Ken Puls &amp; Miguel Escobar</h3>
+          <p>
+            A beginner-friendly guide to Power Query that introduces M through
+            practical, hands-on examples. Covers the fundamentals of
+            transforming and shaping data in Excel and Power BI, making it an
+            excellent starting point for anyone new to the language.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>The Definitive Guide to Power Query (M) — Greg Deckler, Rick de Groot &amp; Melissa de Korte</h3>
+          <p>
+            A thorough reference covering M from foundational concepts through
+            advanced patterns. Ideal for users who want to go beyond the UI and
+            write M code directly, with in-depth coverage of functions, types,
+            error handling, and query optimization.
+          </p>
+        </div>
+      </section>
+
+      <section style={{ marginBottom: 40 }}>
         <h2 style={{ fontSize: 20, marginBottom: 16 }}>Community</h2>
 
         <div className="resource-card">

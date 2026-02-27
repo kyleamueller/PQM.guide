@@ -1,0 +1,66 @@
+---
+title: "Table.FirstN"
+slug: "table-firstn"
+category: "Table"
+description: "Returns the first N rows from a table, or rows matching a condition."
+syntax: "Table.FirstN(table as table, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "A table containing the first N rows, or the first rows that satisfy the condition."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to take rows from."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many rows to return, or a function (each ...) that returns rows while the condition is true."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-lastn"
+  - "table-skip"
+  - "table-range"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.FirstN` returns rows from the beginning of a table. When passed a number, it returns exactly that many rows. When passed a condition function, it returns consecutive rows from the top while the condition is true — it stops at the first row that fails the condition.
+
+The condition form (`each [Column] > 0`) is different from `Table.SelectRows` — it stops scanning as soon as the condition fails, rather than checking every row.
+
+## Examples
+
+### Example 1: Get first 3 rows
+
+Return the first 3 rows of the Sales table.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "CustomerName", "Product", "Region"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Region":"East"}]}
+-->
+
+### Example 2: Take rows while condition is true
+
+Return rows from the top while UnitPrice is less than 100.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectColumns(Table.FirstN(Sales, each [UnitPrice] < 100), {"OrderID", "Product", "UnitPrice"})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","UnitPrice":25},{"OrderID":2,"Product":"Gadget B","UnitPrice":50},{"OrderID":3,"Product":"Widget C","UnitPrice":15},{"OrderID":4,"Product":"Gadget D","UnitPrice":75},{"OrderID":5,"Product":"Widget A","UnitPrice":25}]}
+-->
