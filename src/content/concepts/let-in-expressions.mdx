@@ -1,0 +1,112 @@
+---
+title: "let...in Expressions"
+slug: "let-in-expressions"
+description: "How let...in organizes M code into named steps, and why step order does not dictate evaluation order."
+relatedConcepts:
+  - "lazy-evaluation"
+  - "identifiers-and-scoping"
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-selectrows"
+---
+
+The `let...in` expression is the backbone of nearly every Power Query M query. It allows you to break a complex transformation into a sequence of named intermediate steps, making your code easier to read, debug, and maintain.
+
+### Basic Structure
+
+A `let...in` expression defines one or more named variables, then specifies which one to return:
+
+```powerquery
+let
+    Source = Csv.Document(File.Contents("data.csv")),
+    Promoted = Table.PromoteHeaders(Source),
+    Filtered = Table.SelectRows(Promoted, each [Region] = "East")
+in
+    Filtered
+```
+
+Each line inside `let` assigns a name to an expression. The `in` clause specifies the final output — typically the last step, but it can be any variable defined in the block.
+
+### let Is Optional
+
+This surprises many users: `let...in` is not required by the M language. A valid M query can be a single expression with no `let` at all:
+
+```powerquery
+Table.SelectRows(
+    Table.PromoteHeaders(
+        Csv.Document(File.Contents("data.csv"))
+    ),
+    each [Region] = "East"
+)
+```
+
+This is functionally identical to the `let...in` version above. The `let` block is syntactic sugar that gives names to intermediate results, making deeply nested expressions readable.
+
+### Step Order ≠ Execution Order
+
+Because M uses lazy evaluation, the order you write steps in `let` does not determine when they run. The engine evaluates expressions on demand — a step only runs when its result is needed by another step or by the `in` clause.
+
+```powerquery
+let
+    A = 1 + 1,         // May never run if nothing uses A
+    B = A * 10,         // Runs only if C or in needs B
+    C = B + 5           // Runs only if in needs C
+in
+    C
+```
+
+In this example, requesting `C` triggers `B`, which triggers `A`. If you changed `in` to return `A`, then `B` and `C` would never execute.
+
+### Referencing Earlier Steps
+
+Each step can reference any variable defined earlier in the same `let` block:
+
+```powerquery
+let
+    Source = Sales,
+    Filtered = Table.SelectRows(Source, each [Quantity] > 5),
+    Sorted = Table.Sort(Filtered, {"UnitPrice", Order.Descending}),
+    TopRows = Table.FirstN(Sorted, 3)
+in
+    TopRows
+```
+
+A step cannot reference a variable defined after it — M does not support forward references within `let`.
+
+### Returning Any Step
+
+The `in` clause does not have to return the last defined step. You can return any variable, which is useful for debugging:
+
+```powerquery
+let
+    Source = Sales,
+    Filtered = Table.SelectRows(Source, each [Region] = "East"),
+    Sorted = Table.Sort(Filtered, {"UnitPrice", Order.Descending})
+in
+    Filtered   // Return the intermediate step to inspect it
+```
+
+This technique helps isolate where a transformation goes wrong.
+
+### Nested let Expressions
+
+You can nest `let...in` inside another `let...in`. The inner block has access to variables from the outer scope:
+
+```powerquery
+let
+    Threshold = 100,
+    Result = let
+        Source = Sales,
+        Filtered = Table.SelectRows(Source, each [UnitPrice] > Threshold)
+    in
+        Filtered
+in
+    Result
+```
+
+### Best Practices
+
+1. **Give steps descriptive names** like `FilteredByRegion` or `AddedTotalColumn` rather than generic names like `Step1`, `Step2`.
+2. **Keep steps focused.** Each step should do one thing. This makes debugging easier since you can inspect any intermediate result.
+3. **Remember that step order is cosmetic.** The engine evaluates based on dependencies, not position. Do not rely on ordering for side effects.
+4. **Use `in` to debug** by temporarily returning an intermediate step to inspect its output.

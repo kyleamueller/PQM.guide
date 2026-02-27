@@ -1,0 +1,102 @@
+---
+title: "Sections & the Shared Environment"
+slug: "sections-and-shared"
+description: "The hidden organizational structure of M programs — sections, section members, and the #shared global environment."
+relatedConcepts:
+  - "identifiers-and-scoping"
+  - "custom-functions"
+relatedFunctions:
+  - "expression-evaluate"
+---
+
+Behind every Power Query project is a structure most users never see: **sections**. Understanding sections explains how queries reference each other, how the standard library is organized, and how `#shared` works.
+
+### What Is a Section?
+
+A section is a named container for a group of variable definitions (called **section members**). Each "query" you see in the Power Query Editor is actually a section member:
+
+```powerquery
+section MySection;
+
+shared Sales = Csv.Document(File.Contents("sales.csv"));
+shared CleanedSales = Table.SelectRows(Sales, each [Region] <> null);
+```
+
+The Power Query UI hides this syntax — when you edit a query in the Advanced Editor, you only see the expression (the right-hand side of the assignment). But behind the scenes, each query is a member of a section.
+
+### shared vs. Private Members
+
+Section members marked with `shared` are visible to other queries. Members without `shared` are private to their section:
+
+```powerquery
+section MySection;
+
+// Visible to other queries
+shared Customers = ...;
+
+// Only accessible within this section
+HelperFunction = (x) => x * 2;
+```
+
+In practice, the Power Query UI always creates shared members, so every query can reference every other query. But when writing M code directly or building custom connectors, the distinction matters.
+
+### The #shared Environment
+
+`#shared` is a special record that contains all shared section members plus the entire standard library. You can inspect it to discover every available function and query:
+
+```powerquery
+#shared
+```
+
+This returns a record with thousands of fields — every built-in function (`Table.AddColumn`, `Text.Upper`, etc.) and every query in your project.
+
+To check if a specific function exists:
+
+```powerquery
+Record.HasFields(#shared, "Table.AddColumn")   // true
+```
+
+To list all available function names:
+
+```powerquery
+Record.FieldNames(#shared)
+```
+
+### How Queries Reference Each Other
+
+When Query B references Query A by name, M resolves that name through the shared environment. This is why you can write:
+
+```powerquery
+// In Query B
+let
+    Source = Sales,    // References the "Sales" query by name
+    Filtered = Table.SelectRows(Source, each [Region] = "East")
+in
+    Filtered
+```
+
+`Sales` is resolved because it is a shared section member visible in the global environment.
+
+### Expression.Evaluate and #shared
+
+`Expression.Evaluate` compiles and runs an M expression from text. It takes an optional environment parameter — typically `#shared` — so the expression can access standard library functions:
+
+```powerquery
+Expression.Evaluate("1 + 2")                     // 3
+Expression.Evaluate("Text.Upper(""hello"")", #shared)  // "HELLO"
+```
+
+Without passing `#shared`, the evaluated expression cannot reference any built-in functions — it only has access to basic operators.
+
+### The Standard Library
+
+The M standard library (all the `Table.*`, `Text.*`, `List.*` functions, etc.) is loaded into the global environment before your queries run. This is why you can call `Table.AddColumn` without importing anything — it is already in `#shared`.
+
+Custom data connectors can extend the global environment by adding their own functions (e.g., `Salesforce.Accounts`, `GoogleAnalytics.Data`). These appear in `#shared` alongside the standard library.
+
+### Best Practices
+
+1. **Use `#shared` for exploration**, not production code. It is a powerful debugging tool but referencing it directly makes queries less portable.
+2. **Keep helper queries private** when building in environments that support it (custom connectors, TMDL). Not every query needs to be shared.
+3. **Pass `#shared` to `Expression.Evaluate`** when you need the evaluated expression to access standard library functions.
+4. **Understand that query names are identifiers** in the shared environment. Renaming a query changes its identifier, which can break references from other queries.

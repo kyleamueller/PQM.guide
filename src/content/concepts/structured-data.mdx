@@ -1,0 +1,135 @@
+---
+title: "Structured Data: Records, Lists & Tables"
+slug: "structured-data"
+description: "How M's three structured types — records, lists, and tables — relate to each other and how data flows between them."
+relatedConcepts:
+  - "type-system"
+  - "let-in-expressions"
+relatedFunctions:
+  - "record-fieldnames"
+  - "list-transform"
+  - "table-fromrecords"
+---
+
+M has three structured data types: **records**, **lists**, and **tables**. Understanding how they relate is fundamental to writing effective M code, because most transformations involve converting between these structures.
+
+### Records
+
+A record is a set of named fields, each holding a value. Think of it as a single row of data:
+
+```powerquery
+[Name = "Widget A", Category = "Gadgets", Price = 25.50]
+```
+
+Access fields with bracket notation:
+
+```powerquery
+let
+    row = [Name = "Widget A", Price = 25.50]
+in
+    row[Name]   // "Widget A"
+```
+
+Records are unordered — the fields have no guaranteed position. Two records with the same fields and values are equal regardless of field order.
+
+### Lists
+
+A list is an ordered sequence of values, wrapped in curly braces:
+
+```powerquery
+{1, 2, 3, 4, 5}
+{"East", "West", "North"}
+{true, 42, "mixed types are allowed"}
+```
+
+Lists are zero-indexed. Access items by position:
+
+```powerquery
+let
+    items = {"A", "B", "C"}
+in
+    items{0}   // "A"
+```
+
+Lists preserve order and allow duplicates — unlike records, position matters.
+
+### Tables
+
+A table is a **list of records** where every record has the same field names. This is the key insight: tables are not a separate concept from lists and records — they are built from them.
+
+```powerquery
+#table(
+    {"Name", "Price"},
+    {
+        {"Widget A", 25.50},
+        {"Widget B", 12.00}
+    }
+)
+```
+
+When you access a row from a table, you get a record. When you access a column, you get a list:
+
+```powerquery
+let
+    Source = Sales
+in
+    Source{0}                // First row as a record
+    // Source[Product]       // Product column as a list
+```
+
+### How They Relate
+
+The relationship flows naturally:
+
+- A **table** is a list of records (rows)
+- Each **row** is a record with field names matching the column headers
+- Each **column** is a list of values extracted from one field across all rows
+
+This is why `Table.FromRecords` creates a table from a list of records, and `Table.ToRecords` converts a table back into a list of records:
+
+```powerquery
+let
+    rows = {
+        [Name = "Alice", Dept = "Sales"],
+        [Name = "Bob", Dept = "Engineering"]
+    },
+    asTable = Table.FromRecords(rows)
+in
+    asTable
+```
+
+### Navigating Between Structures
+
+M provides functions to move between these types:
+
+| From | To | Function |
+|---|---|---|
+| Table | List of records | `Table.ToRecords` |
+| List of records | Table | `Table.FromRecords` |
+| Record | List of values | `Record.FieldValues` |
+| Record | List of names | `Record.FieldNames` |
+| Two lists | Record | `Record.FromList` |
+| Table column | List | `Table.Column` or `[ColumnName]` |
+
+### Streaming and Buffering
+
+An important subtlety: tables in M are often **streamed**, not materialized in memory. This means the engine reads rows on demand from the data source. A consequence is that accessing the same table twice might yield different data if the underlying source changed between accesses.
+
+To lock in a table's contents, use `Table.Buffer`:
+
+```powerquery
+let
+    Source = Sales,
+    Buffered = Table.Buffer(Source)
+in
+    Buffered   // Now safe to reference multiple times
+```
+
+See the [Lazy Evaluation](/concepts/lazy-evaluation) concept page for more on when and why to buffer.
+
+### Best Practices
+
+1. **Think in records, lists, and tables** — not rows, arrays, and spreadsheets. The M mental model is different from Excel or SQL.
+2. **Use `Table.FromRecords`** to construct tables from programmatically-generated data rather than hardcoding table literals.
+3. **Buffer tables** that you reference multiple times or where row order matters for downstream operations.
+4. **Prefer column operations** (`Table.TransformColumns`, `Table.AddColumn`) over row-by-row iteration whenever possible — they are more idiomatic and often fold to the data source.

@@ -1,0 +1,96 @@
+---
+title: "The M Paradigm"
+slug: "m-paradigm"
+description: "Why M is a functional language, what immutability means in practice, and how this shapes the way you write queries."
+relatedConcepts:
+  - "lazy-evaluation"
+  - "let-in-expressions"
+relatedFunctions:
+  - "list-accumulate"
+  - "list-generate"
+  - "table-buffer"
+---
+
+Power Query M is a **functional language** — closer in design to F# or Haskell than to VBA, Python, or SQL. Understanding its paradigm explains why the language works the way it does and prevents entire categories of bugs.
+
+### Functional, Not Imperative
+
+In imperative languages (VBA, Python, C#), you write step-by-step instructions that modify state:
+
+```
+// Pseudocode (imperative)
+x = 5
+x = x + 1    // x is now 6
+```
+
+In M, this is impossible. Variables are **immutable** — once a value is assigned, it cannot change:
+
+```powerquery
+let
+    x = 5,
+    y = x + 1   // y is 6, x is still 5
+in
+    y
+```
+
+You do not mutate `x`. Instead, you create a new variable `y` that holds the new value. Every transformation in M works this way: you produce new values rather than modifying existing ones.
+
+### Every Expression Returns a Value
+
+In M, everything is an expression that returns a value. There are no statements, loops, or void functions. Even `if...then...else` returns a value, and every step in a `let` block is an expression that evaluates to something.
+
+This is why `let` steps are connected by commas rather than semicolons — they are a list of value bindings, not a sequence of actions.
+
+### No Loops
+
+M has no `for`, `while`, or `do` loops. Iteration is achieved through functions that operate on collections:
+
+```powerquery
+// Transform every item in a list (replaces a for loop)
+List.Transform({1, 2, 3}, each _ * 10)
+// Result: {10, 20, 30}
+
+// Accumulate a running total (replaces a while loop)
+List.Accumulate({1, 2, 3, 4}, 0, (state, current) => state + current)
+// Result: 10
+```
+
+For more complex iteration, `List.Generate` creates sequences by repeatedly applying a function until a condition is met:
+
+```powerquery
+List.Generate(
+    () => 1,              // initial value
+    each _ <= 10,         // keep going while true
+    each _ * 2            // next value
+)
+// Result: {1, 2, 4, 8}
+```
+
+### Pure Functions
+
+Most M functions are **pure**: given the same inputs, they always produce the same output, and they have no side effects. This purity is what allows the engine to optimize your queries through lazy evaluation and query folding.
+
+The main exception is functions that read external data (`Web.Contents`, `Sql.Database`, `File.Contents`), which depend on external state.
+
+### Lazy Evaluation
+
+Because M is functional and (mostly) pure, the engine can evaluate expressions in any order. It chooses to use **lazy evaluation** — expressions are not computed until their results are actually needed. This is covered in detail on the [Lazy Evaluation](/concepts/lazy-evaluation) concept page.
+
+The practical implication: **step order in `let` does not determine execution order.** The engine follows the dependency graph, not the textual position of your steps.
+
+### Why This Matters
+
+Understanding M's paradigm helps you:
+
+- **Stop looking for loops.** Use `List.Transform`, `List.Accumulate`, `List.Generate`, and `Table.TransformColumns` instead.
+- **Stop trying to reassign variables.** Create new names for new values.
+- **Understand why step order is flexible.** The engine evaluates on demand, not top-to-bottom.
+- **Write foldable queries.** Pure, declarative transformations are easier for the engine to push to the data source.
+- **Debug effectively.** Since variables are immutable, you can inspect any step without worrying that a later step changed it.
+
+### Best Practices
+
+1. **Embrace transformation, not mutation.** Instead of modifying a table in place, think of each step as producing a new table derived from the previous one.
+2. **Use collection functions** (`List.Transform`, `Table.TransformColumns`) instead of trying to write loops.
+3. **Use `List.Accumulate`** when you need to build up a result by processing items one at a time — it is M's equivalent of a reduce/fold operation.
+4. **Keep functions pure** wherever possible. Avoid depending on external state inside transformation logic.
