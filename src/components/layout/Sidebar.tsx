@@ -5,14 +5,65 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { categories } from "@/data/categories";
 import { FunctionIndexEntry } from "@/lib/types";
+import {
+  Table20Filled,
+  TextFontSize20Filled,
+  NumberSymbol20Filled,
+  Calendar20Filled,
+  CalendarClock20Filled,
+  Earth20Filled,
+  Timer20Filled,
+  AppsListDetail20Filled,
+  Braces20Filled,
+  ToggleLeft20Filled,
+  Code20Filled,
+  DataUsage20Filled,
+  Tag20Filled,
+  MathFormatProfessional20Filled,
+  Database20Filled,
+  Merge20Filled,
+  ArrowSort20Filled,
+  ArrowRepeat120Filled,
+  ArrowSplit20Filled,
+  TextAlignLeft20Filled,
+  Globe20Filled,
+  Circle20Regular,
+} from "@fluentui/react-icons";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const categoryIcons: Record<string, React.ComponentType<any>> = {
+  "table":          Table20Filled,
+  "text":           TextFontSize20Filled,
+  "number":         NumberSymbol20Filled,
+  "date":           Calendar20Filled,
+  "datetime":       CalendarClock20Filled,
+  "datetimezone":   Earth20Filled,
+  "duration":       Timer20Filled,
+  "list":           AppsListDetail20Filled,
+  "record":         Braces20Filled,
+  "logical":        ToggleLeft20Filled,
+  "binary":         Code20Filled,
+  "type":           DataUsage20Filled,
+  "value":          Tag20Filled,
+  "function":       MathFormatProfessional20Filled,
+  "expression":     Code20Filled,
+  "accessing-data": Database20Filled,
+  "combiner":       Merge20Filled,
+  "comparer":       ArrowSort20Filled,
+  "replacer":       ArrowRepeat120Filled,
+  "splitter":       ArrowSplit20Filled,
+  "lines":          TextAlignLeft20Filled,
+  "uri":            Globe20Filled,
+};
 
 interface SidebarProps {
   functions: FunctionIndexEntry[];
   isOpen: boolean;
   onClose: () => void;
+  onSearchOpen: () => void;
 }
 
-export default function Sidebar({ functions, isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ functions, isOpen, onClose, onSearchOpen }: SidebarProps) {
   const pathname = usePathname();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["table"]));
 
@@ -36,9 +87,27 @@ export default function Sidebar({ functions, isOpen, onClose }: SidebarProps) {
     <>
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
       <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
+        {/* Logo */}
+        <Link href="/" className="sidebar-logo" onClick={onClose}>
+          <span className="logo-pq">PQ</span>
+          <span className="logo-m">M</span>
+          <span className="logo-guide">.guide</span>
+        </Link>
+
+        {/* Search */}
+        <button className="sidebar-search-trigger" onClick={() => { onSearchOpen(); onClose(); }}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+            <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
+            <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
+          <span>Search functions...</span>
+          <kbd>Ctrl+K</kbd>
+        </button>
+
+        {/* Nav */}
         <nav className="sidebar-nav">
           <div className="sidebar-section">
-            <Link href="/" className="sidebar-home" onClick={onClose}>
+            <Link href="/" className={`sidebar-home ${pathname === "/" ? "active" : ""}`} onClick={onClose}>
               Home
             </Link>
           </div>
@@ -71,45 +140,50 @@ export default function Sidebar({ functions, isOpen, onClose }: SidebarProps) {
           </div>
           <div className="sidebar-section">
             <div className="sidebar-section-title">Functions by Category</div>
-            {functionsByCategory.map((cat) => (
-              <div key={cat.slug} className="sidebar-category">
-                <button
-                  className={`sidebar-category-btn ${expandedCategories.has(cat.slug) ? "expanded" : ""}`}
-                  onClick={() => toggleCategory(cat.slug)}
-                >
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 10 10"
-                    fill="none"
-                    className="sidebar-chevron"
+            {functionsByCategory.map((cat) => {
+              const IconComponent = categoryIcons[cat.slug] ?? Circle20Regular;
+              return (
+                <div key={cat.slug} className="sidebar-category">
+                  <button
+                    className={`sidebar-category-btn ${expandedCategories.has(cat.slug) ? "expanded" : ""}`}
+                    onClick={() => toggleCategory(cat.slug)}
                   >
-                    <path d="M3 1.5L7 5L3 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                  <span>{cat.name}</span>
-                  {cat.functions.length > 0 && (
-                    <span className="sidebar-count">{cat.functions.length}</span>
+                    <IconComponent className="sidebar-category-icon" />
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 10 10"
+                      fill="none"
+                      className="sidebar-chevron"
+                    >
+                      <path d="M3 1.5L7 5L3 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <span>{cat.name}</span>
+                    {cat.functions.length > 0 && (
+                      <span className="sidebar-count">{cat.functions.length}</span>
+                    )}
+                  </button>
+                  {expandedCategories.has(cat.slug) && cat.functions.length > 0 && (
+                    <ul className="sidebar-function-list">
+                      {cat.functions.map((fn) => (
+                        <li key={fn.slug}>
+                          <Link
+                            href={`/functions/${fn.slug}`}
+                            className={`sidebar-function-link ${pathname === `/functions/${fn.slug}` ? "active" : ""}`}
+                            onClick={onClose}
+                          >
+                            {fn.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   )}
-                </button>
-                {expandedCategories.has(cat.slug) && cat.functions.length > 0 && (
-                  <ul className="sidebar-function-list">
-                    {cat.functions.map((fn) => (
-                      <li key={fn.slug}>
-                        <Link
-                          href={`/functions/${fn.slug}`}
-                          className={`sidebar-function-link ${pathname === `/functions/${fn.slug}` ? "active" : ""}`}
-                          onClick={onClose}
-                        >
-                          {fn.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </nav>
+
       </aside>
     </>
   );
