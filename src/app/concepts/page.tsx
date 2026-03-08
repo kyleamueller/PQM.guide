@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "Concepts",
   description:
     "Key Power Query M language concepts — query folding, lazy evaluation, the each keyword, type system, and more.",
+  openGraph: {
+    title: "Concepts | PQM.guide",
+    description:
+      "Key Power Query M language concepts — query folding, lazy evaluation, the each keyword, type system, and more.",
+    url: "/concepts",
+    type: "website",
+  },
 };
 
 export default function ConceptsPage() {

@@ -7,10 +7,13 @@ export function GET() {
   const concepts = getAllConcepts();
   const patterns = getAllPatterns();
 
+  const functionCount = functions.length;
+  const categoryCount = new Set(functions.map((f) => f.category)).size;
+
   const lines: string[] = [
     "# PQM.guide — Power Query M Language Reference",
     "",
-    "> Community-driven reference for the Power Query M language. 161 functions documented across 23 categories, with concept guides and practical examples. Built for humans and LLMs alike.",
+    `> Community-driven reference for the Power Query M language. ${functionCount} functions documented across ${categoryCount} categories, with concept guides and practical patterns. Built for humans and LLMs alike.`,
     "",
     "## How to Use This Site",
     "",
@@ -20,6 +23,7 @@ export function GET() {
     "- Search all functions at / (Ctrl+K)",
     "- Sample data tables used in examples: /sample-tables",
     "- Community resources and links: /resources",
+    "- Query M documentation via MCP at /api/mcp (JSON-RPC 2.0, Streamable HTTP)",
     "",
     "## Functions",
     "",

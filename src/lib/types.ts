@@ -59,6 +59,7 @@ export interface FunctionFrontmatter {
   parameters: FunctionParam[];
   compatibility: Compatibility;
   relatedFunctions: string[];
+  relatedConcepts?: string[];
 }
 
 export interface FunctionIndexEntry {
