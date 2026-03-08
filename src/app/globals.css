@@ -1057,13 +1057,22 @@ code {
   margin-bottom: 16px;
 }
 
-.usage-example-block pre {
+.usage-example-block {
   background: var(--code-bg);
   border: 1px solid var(--border-color);
   border-radius: 6px;
+  overflow: hidden;
+}
+
+.usage-example-block .sample-code-header {
+  background: var(--bg-secondary);
+}
+
+.usage-example-block pre {
   padding: 14px 18px;
   font-size: 14px;
   overflow-x: auto;
+  margin: 0;
 }
 
 .usage-example-block pre code {
