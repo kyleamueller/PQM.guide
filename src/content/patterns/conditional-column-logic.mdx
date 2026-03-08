@@ -1,0 +1,99 @@
+---
+title: "Conditional Column Logic"
+slug: "conditional-column-logic"
+description: "Use if/then/else inside Table.AddColumn to classify, label, and derive values from row data — the most common M transformation pattern."
+difficulty: "beginner"
+relatedFunctions:
+  - "table-addcolumn"
+  - "table-selectrows"
+  - "list-contains"
+relatedConcepts:
+  - "each-keyword"
+  - "null-handling"
+---
+
+### The Pattern
+
+Adding a column whose value depends on other columns in the same row is the most common thing you do in Power Query. The `each` shorthand combined with `if/then/else` handles most cases:
+
+```powerquery
+let
+    Source = Sales,
+    WithTier = Table.AddColumn(Source, "Tier",
+        each
+            if [Amount] >= 10000 then "Platinum"
+            else if [Amount] >= 5000 then "Gold"
+            else if [Amount] >= 1000 then "Silver"
+            else "Bronze",
+        type text)
+in
+    WithTier
+```
+
+The conditions are evaluated top to bottom — the first `true` branch wins. Always put the most specific conditions first.
+
+### Null-Safe Comparisons
+
+If a column can be null, comparisons against null return `null` (not `false`), which falls through to the `else` branch silently. Make it explicit:
+
+```powerquery
+Table.AddColumn(Source, "Status",
+    each
+        if [Amount] = null then "Unknown"
+        else if [Amount] >= 1000 then "High"
+        else "Low",
+    type text)
+```
+
+### Checking Membership with List.Contains
+
+When you need to match against a set of values, `List.Contains` is cleaner than chained `or` conditions:
+
+```powerquery
+let
+    HighValueProducts = {"Widget Pro", "Widget Max", "Widget Elite"},
+
+    WithFlag = Table.AddColumn(Sales, "IsPremium",
+        each List.Contains(HighValueProducts, [Product]),
+        type logical)
+in
+    WithFlag
+```
+
+### Combining Multiple Columns
+
+Conditions can reference any column in the same row:
+
+```powerquery
+Table.AddColumn(Orders, "Fulfillment",
+    each
+        if [Quantity] = 0 then "Out of Stock"
+        else if [ShipDate] = null then "Pending"
+        else if [ShipDate] <= [OrderDate] + #duration(2, 0, 0, 0) then "On Time"
+        else "Late",
+    type text)
+```
+
+### Returning Typed Values
+
+Always pass the output type as the fourth argument to `Table.AddColumn`. Without it, the engine must scan every row to infer the type, adding overhead on large tables:
+
+```powerquery
+// Good — engine knows the output type immediately
+Table.AddColumn(Source, "Discount", each if [Amount] > 500 then 0.1 else 0.0, type number)
+
+// Avoid — engine infers type at runtime
+Table.AddColumn(Source, "Discount", each if [Amount] > 500 then 0.1 else 0.0)
+```
+
+### Returning null vs. Omitting a Branch
+
+Omitting `else` in M is a syntax error. If you want "nothing" for some rows, return `null` explicitly:
+
+```powerquery
+Table.AddColumn(Source, "Bonus",
+    each if [Region] = "North" then [Amount] * 0.05 else null,
+    type nullable number)
+```
+
+Use `type nullable number` (not `type number`) when some rows can return null — this prevents type errors downstream.

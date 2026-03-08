@@ -1,0 +1,106 @@
+---
+title: "Error Recovery in Table Columns"
+slug: "error-recovery-table"
+description: "Use try/otherwise to recover from errors cell-by-cell in a column, preserving rows that would otherwise fail and optionally capturing the error message."
+difficulty: "intermediate"
+relatedFunctions:
+  - "table-transformcolumns"
+  - "table-addcolumn"
+  - "table-replacevalue"
+relatedConcepts:
+  - "error-handling"
+  - "null-handling"
+---
+
+### The Problem
+
+When you transform a column — converting text to numbers, parsing dates, calling a function — some cells may fail. By default, a single error in any cell causes the entire step to error. You need to handle bad cells individually without losing the whole row.
+
+### try/otherwise in Table.AddColumn
+
+The `try` expression evaluates its body and returns the result if it succeeds, or the `otherwise` fallback if it fails:
+
+```powerquery
+let
+    Source = Sales,
+    WithParsed = Table.AddColumn(Source, "AmountNum",
+        each try Number.From([RawAmount]) otherwise null,
+        type nullable number)
+in
+    WithParsed
+```
+
+Rows where `[RawAmount]` can't be converted to a number get `null` instead of an error.
+
+### Applying to an Existing Column with Table.TransformColumns
+
+To replace values in-place rather than adding a new column:
+
+```powerquery
+Table.TransformColumns(Source, {
+    {"Amount",   each try Number.From(_)    otherwise null, type nullable number},
+    {"OrderDate", each try Date.From(_)     otherwise null, type nullable date},
+    {"Quantity",  each try Int64.From(_)    otherwise 0,    Int64.Type}
+})
+```
+
+The third element in each sub-list is the output type. Specify it for performance and clarity.
+
+### Capturing the Error Message
+
+Sometimes you want to know *why* a cell failed, not just replace it with null. `try` without `otherwise` returns a record with `HasError`, `Value`, and `Error` fields:
+
+```powerquery
+let
+    Source = Sales,
+    WithResult = Table.AddColumn(Source, "ParseResult",
+        each try Number.From([RawAmount])),
+
+    // Extract values from the try record
+    WithValue = Table.AddColumn(WithResult, "ParsedAmount",
+        each if [ParseResult][HasError] then null else [ParseResult][Value],
+        type nullable number),
+
+    WithError = Table.AddColumn(WithValue, "ErrorMessage",
+        each if [ParseResult][HasError] then [ParseResult][Error][Message] else null,
+        type nullable text),
+
+    Cleaned = Table.RemoveColumns(WithError, {"ParseResult"})
+in
+    Cleaned
+```
+
+This gives you a `ParsedAmount` column and an `ErrorMessage` column side-by-side — useful for auditing data quality.
+
+### Bulk Error Replacement with Table.ReplaceErrorValues
+
+If errors already exist in a table (e.g., from a previous type conversion step), use `Table.ReplaceErrorValues` to substitute them in bulk:
+
+```powerquery
+Table.ReplaceErrorValues(Source, {
+    {"Amount",   0},
+    {"Quantity", 0},
+    {"Region",   "Unknown"}
+})
+```
+
+This replaces all errors in the specified columns with the given fallback values. It does not distinguish between different error types.
+
+### Filtering Out Error Rows
+
+If bad rows should be discarded entirely rather than patched:
+
+```powerquery
+let
+    WithFlag = Table.AddColumn(Source, "_ok",
+        each try (Number.From([Amount]) > 0) otherwise false,
+        type logical),
+    GoodRows = Table.SelectRows(WithFlag, each [_ok] = true),
+    Cleaned = Table.RemoveColumns(GoodRows, {"_ok"})
+in
+    Cleaned
+```
+
+### Performance Note
+
+`try/otherwise` has some overhead per cell because the engine must set up error handling for each evaluation. On very large tables, consider whether a type-check before conversion (`try Value.Is(_, type number)`) or an upstream data cleaning step might be more efficient.

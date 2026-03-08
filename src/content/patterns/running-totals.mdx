@@ -1,0 +1,145 @@
+---
+title: "Running Totals and Cumulative Calculations"
+slug: "running-totals"
+description: "Compute cumulative sums, running counts, and other window-style calculations in M using List.Generate or List.Accumulate — no built-in window function needed."
+difficulty: "intermediate"
+relatedFunctions:
+  - "list-accumulate"
+  - "list-generate"
+  - "table-addindexcolumn"
+  - "table-addcolumn"
+relatedConcepts:
+  - "m-paradigm"
+  - "custom-functions"
+---
+
+### The Problem
+
+M has no built-in `SUM(... OVER ROWS BETWEEN ...)` window function. Running totals require iterating over a list in order and carrying state forward — which is exactly what `List.Accumulate` and `List.Generate` are for.
+
+### Running Total with List.Generate
+
+`List.Generate` produces a list by running a loop, carrying state from one iteration to the next. Here we track both the current index and the accumulated sum:
+
+```powerquery
+let
+    Source = Sales,
+    Sorted = Table.Sort(Source, {{"OrderDate", Order.Ascending}}),
+    Amounts = Table.Column(Sorted, "Amount"),
+
+    RunningTotals = List.Generate(
+        () => [i = 0, total = 0.0],
+        each [i] < List.Count(Amounts),
+        each [i = [i] + 1, total = [total] + Amounts{[i]}],
+        each [total]
+    ),
+
+    WithIndex = Table.AddIndexColumn(Sorted, "_idx", 0, 1, Int64.Type),
+    WithTotal = Table.AddColumn(WithIndex, "RunningTotal",
+        each RunningTotals{[_idx]},
+        type number),
+    Result = Table.RemoveColumns(WithTotal, {"_idx"})
+in
+    Result
+```
+
+The fourth argument to `List.Generate` is the selector — what value to emit at each step. Here we emit `[total]` so the result list is the running sum at each position.
+
+### Running Total with List.Accumulate
+
+`List.Accumulate` is simpler when you only need the final series (not intermediate state branching):
+
+```powerquery
+let
+    Source = Sales,
+    Sorted = Table.Sort(Source, {{"OrderDate", Order.Ascending}}),
+    Amounts = Table.Column(Sorted, "Amount"),
+
+    // Build list of running totals by collecting each intermediate sum
+    RunningTotals =
+        List.Transform(
+            List.Generate(
+                () => 0,
+                each _ < List.Count(Amounts),
+                each _ + 1
+            ),
+            each List.Sum(List.FirstN(Amounts, _ + 1))
+        ),
+
+    WithIndex = Table.AddIndexColumn(Sorted, "_idx", 0, 1, Int64.Type),
+    WithTotal = Table.AddColumn(WithIndex, "RunningTotal",
+        each RunningTotals{[_idx]},
+        type number),
+    Result = Table.RemoveColumns(WithTotal, {"_idx"})
+in
+    Result
+```
+
+> **Note:** `List.FirstN` + `List.Sum` is O(n²) — it recalculates from the beginning for each row. Use the `List.Generate` approach above for large tables.
+
+### Running Count and Running Max
+
+The same pattern works for any accumulation:
+
+```powerquery
+let
+    Values = {3, 1, 4, 1, 5, 9, 2, 6},
+
+    // Running count of non-null values
+    RunningCount = List.Generate(
+        () => [i = 0, count = 0],
+        each [i] < List.Count(Values),
+        each [i = [i] + 1, count = [count] + (if Values{[i]} <> null then 1 else 0)],
+        each [count]
+    ),
+
+    // Running maximum
+    RunningMax = List.Generate(
+        () => [i = 0, mx = Values{0}],
+        each [i] < List.Count(Values),
+        each [i = [i] + 1, mx = List.Max({[mx], Values{[i]}})],
+        each [mx]
+    )
+in
+    {RunningCount, RunningMax}
+// RunningCount: {1, 2, 3, 4, 5, 6, 7, 8}
+// RunningMax:   {3, 3, 4, 4, 5, 9, 9, 9}
+```
+
+### Grouped Running Totals
+
+When you need a running total that resets per group (e.g., per customer), process each group separately and combine:
+
+```powerquery
+let
+    Source = Sales,
+    Sorted = Table.Sort(Source, {{"CustomerID", Order.Ascending}, {"OrderDate", Order.Ascending}}),
+
+    Grouped = Table.Group(Sorted, {"CustomerID"}, {
+        {"AllRows", each _, type table}
+    }),
+
+    WithRunning = Table.AddColumn(Grouped, "WithCumulative", each
+        let
+            t = [AllRows],
+            amounts = Table.Column(t, "Amount"),
+            totals = List.Generate(
+                () => [i = 0, total = 0.0],
+                each [i] < List.Count(amounts),
+                each [i = [i] + 1, total = [total] + amounts{[i]}],
+                each [total]
+            ),
+            indexed = Table.AddIndexColumn(t, "_i", 0, 1, Int64.Type),
+            result = Table.AddColumn(indexed, "RunningTotal", each totals{[_i]}, type number)
+        in
+            Table.RemoveColumns(result, {"_i"})
+    ),
+
+    Combined = Table.Combine(WithRunning[WithCumulative])
+in
+    Combined
+```
+
+### Performance Tip
+
+`List.Generate` with O(n) state carry is the right tool here — avoid `List.FirstN` + `List.Sum` inside a column transform, which recalculates from the start on every row (O(n²)). For millions of rows, consider whether the running total can be computed in the source system via query folding instead.
