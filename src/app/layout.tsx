@@ -11,6 +11,15 @@ export const metadata: Metadata = {
   },
   description:
     "Community-driven Power Query M language reference with visual table examples. Better than the official docs.",
+  metadataBase: new URL("https://pqm.guide"),
+  openGraph: {
+    siteName: "PQM.guide",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+  },
 };
 
 export default function RootLayout({
