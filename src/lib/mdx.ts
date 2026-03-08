@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { FunctionFrontmatter, FunctionIndexEntry, ConceptFrontmatter, ConceptIndexEntry } from "./types";
+import { FunctionFrontmatter, FunctionIndexEntry, ConceptFrontmatter, PatternFrontmatter } from "./types";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/functions");
 const CONCEPTS_DIR = path.join(process.cwd(), "src/content/concepts");
@@ -77,6 +77,35 @@ export function getAllConcepts(): (ConceptFrontmatter & { slug: string })[] {
   const slugs = getAllConceptSlugs();
   return slugs.map((slug) => {
     const { frontmatter } = getConceptBySlug(slug);
+    return { ...frontmatter, slug };
+  });
+}
+
+// Pattern utilities
+
+const PATTERNS_DIR = path.join(process.cwd(), "src/content/patterns");
+
+export function getPatternBySlug(slug: string) {
+  const filePath = path.join(PATTERNS_DIR, `${slug}.mdx`);
+  const raw = fs.readFileSync(filePath, "utf-8");
+  const { data, content } = matter(raw);
+  return {
+    frontmatter: data as PatternFrontmatter,
+    content,
+  };
+}
+
+export function getAllPatternSlugs(): string[] {
+  if (!fs.existsSync(PATTERNS_DIR)) return [];
+  return fs
+    .readdirSync(PATTERNS_DIR)
+    .filter((f) => f.endsWith(".mdx"))
+    .map((f) => f.replace(".mdx", ""));
+}
+
+export function getAllPatterns(): (PatternFrontmatter & { slug: string })[] {
+  return getAllPatternSlugs().map((slug) => {
+    const { frontmatter } = getPatternBySlug(slug);
     return { ...frontmatter, slug };
   });
 }

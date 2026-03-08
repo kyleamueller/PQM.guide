@@ -81,3 +81,21 @@ export interface ConceptIndexEntry {
   slug: string;
   description: string;
 }
+
+export type PatternDifficulty = "beginner" | "intermediate" | "advanced";
+
+export interface PatternFrontmatter {
+  title: string;
+  slug: string;
+  description: string;
+  difficulty: PatternDifficulty;
+  relatedFunctions: string[];
+  relatedConcepts: string[];
+}
+
+export interface PatternIndexEntry {
+  title: string;
+  slug: string;
+  description: string;
+  difficulty: PatternDifficulty;
+}

@@ -1,0 +1,91 @@
+---
+title: "Recursive List Flattening"
+slug: "recursive-list-flattening"
+description: "Flatten arbitrarily nested lists into a single flat list using recursion with the @ self-reference operator."
+difficulty: "advanced"
+relatedFunctions:
+  - "list-combine"
+  - "list-transform"
+  - "list-accumulate"
+relatedConcepts:
+  - "custom-functions"
+  - "identifiers-and-scoping"
+  - "m-paradigm"
+---
+
+### The Problem
+
+JSON APIs and nested data sources often return deeply nested structures. `{1, {2, 3}, {4, {5, 6}}}` needs to become `{1, 2, 3, 4, 5, 6}`. M has no built-in `List.Flatten`, so you build it with recursion.
+
+### The Recursive Flatten Function
+
+```powerquery
+let
+    Flatten = (lst as list) as list =>
+        List.Combine(
+            List.Transform(lst, each
+                if _ is list then @Flatten(_) else {_}
+            )
+        )
+in
+    Flatten({1, {2, 3}, {4, {5, 6}}})
+// Result: {1, 2, 3, 4, 5, 6}
+```
+
+The `@` prefix is M's self-reference operator — it lets a function call itself by name before that name is fully bound. Without `@`, the recursive call would fail with an error.
+
+### How It Works
+
+1. `List.Transform` maps over every item in the list
+2. If an item **is** a list, recursively call `@Flatten` on it
+3. If an item **is not** a list, wrap it in a single-item list `{_}`
+4. `List.Combine` merges all the resulting lists into one flat list
+
+### Flatten with a Depth Limit
+
+If you only want to flatten one or two levels deep:
+
+```powerquery
+let
+    FlattenN = (lst as list, depth as number) as list =>
+        if depth = 0 then lst
+        else List.Combine(
+            List.Transform(lst, each
+                if _ is list then @FlattenN(_, depth - 1) else {_}
+            )
+        )
+in
+    FlattenN({1, {2, {3, 4}}, 5}, 1)
+// Result: {1, 2, {3, 4}, 5}  — only one level flattened
+```
+
+### Flattening Nested Records into a Table
+
+The same recursive pattern works for nested records from JSON:
+
+```powerquery
+let
+    FlattenRecord = (rec as record, prefix as text) as list =>
+        List.Combine(
+            List.Transform(Record.FieldNames(rec), each
+                let value = Record.Field(rec, _)
+                in if value is record
+                   then @FlattenRecord(value, prefix & _ & ".")
+                   else {[Key = prefix & _, Value = value]}
+            )
+        ),
+
+    Source = Json.Document(Web.Contents("https://api.example.com/data")),
+    Flattened = FlattenRecord(Source, ""),
+    Result = Table.FromRecords(Flattened)
+in
+    Result
+```
+
+This turns a deeply nested JSON object into a two-column table of `Key` / `Value` pairs, where keys use dot notation like `"address.city"`.
+
+### Important Caveats
+
+- **Stack depth**: M does not optimize tail calls. Very deeply nested lists (hundreds of levels) can cause stack overflow errors. For known shallow nesting, prefer iterative approaches with `List.Accumulate`.
+- **Performance**: Recursive functions re-evaluate on each call. Buffer intermediate results if the function is called repeatedly on large lists.
+- **Type checking**: `_ is list` checks the runtime type. This works for lists of mixed types, including lists containing nulls — `null` is not a list and will be treated as a leaf value.

@@ -1,0 +1,124 @@
+---
+title: "Fuzzy Text Matching"
+slug: "fuzzy-text-matching"
+description: "Match records across tables when values aren't identical — handling typos, spacing, and case differences."
+difficulty: "intermediate"
+relatedFunctions:
+  - "text-lower"
+  - "text-trim"
+  - "text-replace"
+  - "table-nestedjoin"
+  - "list-select"
+relatedConcepts:
+  - "custom-functions"
+  - "m-paradigm"
+---
+
+### The Problem
+
+Real-world data is messy. Two tables might refer to the same entity as `"Microsoft Corp"` and `"microsoft corporation"`. Exact joins fail. You need a way to match records despite these inconsistencies.
+
+### Step 1: Normalize Before Matching
+
+The simplest fuzzy matching is aggressive normalization — strip punctuation, lowercase, trim whitespace — then do an exact join on the normalized form:
+
+```powerquery
+let
+    Normalize = (s as text) as text =>
+        let
+            Lower = Text.Lower(s),
+            Trimmed = Text.Trim(Lower),
+            NoPunct = Text.Remove(Trimmed, {".", ",", "-", "_", "(", ")", "&", "'"}),
+            SingleSpaced = Text.Replace(NoPunct, "  ", " ")
+        in
+            SingleSpaced,
+
+    Left = Table.AddColumn(Customers, "NormName", each Normalize([CompanyName])),
+    Right = Table.AddColumn(Accounts, "NormName", each Normalize([AccountName])),
+    Joined = Table.NestedJoin(Left, "NormName", Right, "NormName", "Match", JoinKind.LeftOuter),
+    Expanded = Table.ExpandTableColumn(Joined, "Match", {"AccountID", "Region"})
+in
+    Expanded
+```
+
+This handles case differences, extra spaces, and punctuation in one pass.
+
+### Step 2: Starts-With Matching
+
+When one value is a prefix or substring of another:
+
+```powerquery
+let
+    Source = Customers,
+    Lookup = Accounts,
+
+    MatchRow = (customerName as text) =>
+        let
+            Norm = Text.Lower(Text.Trim(customerName)),
+            Matches = Table.SelectRows(Lookup, each
+                Text.StartsWith(Text.Lower([AccountName]), Norm) or
+                Text.StartsWith(Norm, Text.Lower([AccountName]))
+            )
+        in
+            if Table.IsEmpty(Matches)
+            then null
+            else Matches{0}[AccountID],
+
+    Result = Table.AddColumn(Source, "AccountID", each MatchRow([CompanyName]))
+in
+    Result
+```
+
+### Step 3: Token-Based Matching
+
+Split names into words and find the record that shares the most tokens:
+
+```powerquery
+let
+    Tokenize = (s as text) as list =>
+        List.Select(
+            Text.Split(Text.Lower(Text.Trim(s)), " "),
+            each Text.Length(_) > 2
+        ),
+
+    Similarity = (a as text, b as text) as number =>
+        let
+            TokensA = Tokenize(a),
+            TokensB = Tokenize(b),
+            Shared = List.Select(TokensA, each List.Contains(TokensB, _)),
+            Total = List.Count(List.Distinct(List.Combine({TokensA, TokensB})))
+        in
+            if Total = 0 then 0 else List.Count(Shared) / Total,
+
+    BestMatch = (name as text) =>
+        let
+            Scored = Table.AddColumn(Accounts, "Score", each Similarity(name, [AccountName])),
+            Sorted = Table.Sort(Scored, {{"Score", Order.Descending}}),
+            Top = Sorted{0}
+        in
+            if Top[Score] > 0.5 then Top[AccountID] else null,
+
+    Result = Table.AddColumn(Customers, "AccountID", each BestMatch([CompanyName]))
+in
+    Result
+```
+
+The Jaccard-like similarity score between 0 and 1 measures token overlap. A threshold of `0.5` means at least half the unique tokens must match.
+
+### Choosing an Approach
+
+| Approach | Best for | Limitation |
+|---|---|---|
+| Normalization | Case/punctuation differences | Won't catch abbreviations |
+| Starts-with | Prefix matches | Direction-sensitive |
+| Token similarity | Multi-word name matching | Slow on large tables — add `Table.Buffer` to the lookup |
+
+### Performance Note
+
+When using row-by-row matching functions (the `BestMatch` pattern above), buffer the lookup table first to avoid repeated evaluation:
+
+```powerquery
+BufferedAccounts = Table.Buffer(Accounts)
+```
+
+Then reference `BufferedAccounts` instead of `Accounts` inside the matching function.

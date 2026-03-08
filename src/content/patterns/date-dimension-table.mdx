@@ -1,0 +1,120 @@
+---
+title: "Building a Date Dimension Table"
+slug: "date-dimension-table"
+description: "Generate a complete date table in M with year, month, quarter, week, and fiscal period columns — no external data source needed."
+difficulty: "intermediate"
+relatedFunctions:
+  - "list-generate"
+  - "list-transform"
+  - "table-fromlist"
+  - "date-adddays"
+  - "date-year"
+  - "date-month"
+  - "date-day"
+  - "date-dayofweek"
+relatedConcepts:
+  - "m-paradigm"
+  - "structured-data"
+---
+
+### Why Build a Date Table in M?
+
+A date dimension table is essential for time intelligence in Power BI and Excel. Building it in M — rather than importing from a spreadsheet or database — means it regenerates automatically, stays in sync with your data, and requires no external dependencies.
+
+### The Core Pattern
+
+Generate a list of dates, then transform each date into a record with all the columns you need:
+
+```powerquery
+let
+    StartDate = #date(2020, 1, 1),
+    EndDate = #date(2030, 12, 31),
+    DayCount = Duration.Days(EndDate - StartDate) + 1,
+
+    DateList = List.Transform(
+        List.Generate(() => 0, each _ < DayCount, each _ + 1),
+        each Date.AddDays(StartDate, _)
+    ),
+
+    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+    Typed = Table.TransformColumnTypes(DateTable, {{"Date", type date}}),
+
+    WithColumns = Table.AddColumn(Typed, "Year",          each Date.Year([Date]),   Int64.Type),
+    WithMonth   = Table.AddColumn(WithColumns, "Month",   each Date.Month([Date]),  Int64.Type),
+    WithMonthName = Table.AddColumn(WithMonth, "MonthName", each Date.MonthName([Date]), type text),
+    WithDay     = Table.AddColumn(WithMonthName, "Day",   each Date.Day([Date]),    Int64.Type),
+    WithQuarter = Table.AddColumn(WithDay, "Quarter",
+        each "Q" & Text.From(Number.RoundUp(Date.Month([Date]) / 3)), type text),
+    WithWeek    = Table.AddColumn(WithQuarter, "WeekOfYear",
+        each Date.WeekOfYear([Date]), Int64.Type),
+    WithDayOfWeek = Table.AddColumn(WithWeek, "DayOfWeek",
+        each Date.DayOfWeekName([Date]), type text),
+    WithIsWeekend = Table.AddColumn(WithDayOfWeek, "IsWeekend",
+        each Date.DayOfWeek([Date]) >= 5, type logical),
+    WithYearMonth = Table.AddColumn(WithIsWeekend, "YearMonth",
+        each Date.Year([Date]) * 100 + Date.Month([Date]), Int64.Type)
+in
+    WithYearMonth
+```
+
+### Making the Date Range Dynamic
+
+Drive the start and end dates from your actual data so the table always covers exactly what's needed:
+
+```powerquery
+let
+    // Reference your fact table
+    FactTable = Sales,
+    MinDate = List.Min(Table.Column(FactTable, "OrderDate")),
+    MaxDate = List.Max(Table.Column(FactTable, "OrderDate")),
+
+    // Add a buffer so future dates are included
+    StartDate = Date.StartOfYear(MinDate),
+    EndDate = Date.EndOfYear(Date.AddYears(MaxDate, 1)),
+
+    DayCount = Duration.Days(EndDate - StartDate) + 1,
+    DateList = List.Transform(
+        List.Generate(() => 0, each _ < DayCount, each _ + 1),
+        each Date.AddDays(StartDate, _)
+    )
+in
+    DateList
+```
+
+### Adding Fiscal Periods
+
+If your fiscal year starts in a month other than January (e.g., July = month 7):
+
+```powerquery
+let
+    FiscalYearStartMonth = 7,
+
+    WithFiscalYear = Table.AddColumn(DateTable, "FiscalYear",
+        each
+            if Date.Month([Date]) >= FiscalYearStartMonth
+            then Date.Year([Date]) + 1
+            else Date.Year([Date]),
+        Int64.Type),
+
+    WithFiscalMonth = Table.AddColumn(WithFiscalYear, "FiscalMonth",
+        each
+            let m = Date.Month([Date]) - FiscalYearStartMonth + 1
+            in if m <= 0 then m + 12 else m,
+        Int64.Type),
+
+    WithFiscalQuarter = Table.AddColumn(WithFiscalMonth, "FiscalQuarter",
+        each "Q" & Text.From(Number.RoundUp([FiscalMonth] / 3)),
+        type text)
+in
+    WithFiscalQuarter
+```
+
+### Performance Tip
+
+Mark the Date column as the primary key and set the table to **not summarize** in Power BI. Buffer the table if other queries reference it repeatedly:
+
+```powerquery
+Result = Table.Buffer(WithFiscalQuarter)
+```
+
+This prevents M from regenerating the full date list every time another query joins against it.

@@ -1,0 +1,95 @@
+---
+title: "Dynamic Column Selection"
+slug: "dynamic-column-selection"
+description: "Select table columns by name at runtime using a list variable instead of hardcoding column names."
+difficulty: "intermediate"
+relatedFunctions:
+  - "table-selectcolumns"
+  - "table-columnnames"
+  - "list-select"
+  - "list-contains"
+relatedConcepts:
+  - "custom-functions"
+  - "structured-data"
+---
+
+### The Problem
+
+Hardcoded column names break when upstream data changes. Instead of writing:
+
+```powerquery
+Table.SelectColumns(Source, {"Name", "Email", "City"})
+```
+
+you want to select columns dynamically based on a list that can change without touching the query logic.
+
+### Solution: Select Columns That Exist
+
+Build the column list at runtime by intersecting what you want with what actually exists:
+
+```powerquery
+let
+    Source = Customers,
+    WantedColumns = {"Name", "Email", "City", "PostalCode"},
+    AvailableColumns = Table.ColumnNames(Source),
+    SafeColumns = List.Select(WantedColumns, each List.Contains(AvailableColumns, _)),
+    Result = Table.SelectColumns(Source, SafeColumns)
+in
+    Result
+```
+
+`List.Select` filters `WantedColumns` to only those that appear in `AvailableColumns`. If `PostalCode` doesn't exist in the source, it's silently skipped rather than throwing an error.
+
+### Solution: Select Columns by Prefix or Pattern
+
+Select all columns whose names start with a given prefix:
+
+```powerquery
+let
+    Source = Sales,
+    TargetPrefix = "Order",
+    AllColumns = Table.ColumnNames(Source),
+    MatchingColumns = List.Select(AllColumns, each Text.StartsWith(_, TargetPrefix)),
+    Result = Table.SelectColumns(Source, MatchingColumns)
+in
+    Result
+```
+
+This selects `OrderID`, `OrderDate`, `OrderStatus` — whatever columns exist with that prefix.
+
+### Solution: Exclude Columns by Name
+
+Sometimes it's easier to specify what to drop rather than what to keep:
+
+```powerquery
+let
+    Source = Sales,
+    ColumnsToRemove = {"InternalNotes", "SystemID", "AuditLog"},
+    AllColumns = Table.ColumnNames(Source),
+    KeepColumns = List.Select(AllColumns, each not List.Contains(ColumnsToRemove, _)),
+    Result = Table.SelectColumns(Source, KeepColumns)
+in
+    Result
+```
+
+### Parameterizing the Column List
+
+Pass the column list as a parameter to make a reusable function:
+
+```powerquery
+let
+    SelectSafe = (tbl as table, wanted as list) as table =>
+        let
+            available = Table.ColumnNames(tbl),
+            safe = List.Select(wanted, each List.Contains(available, _))
+        in
+            Table.SelectColumns(tbl, safe)
+in
+    SelectSafe
+```
+
+Call it as `SelectSafe(Source, {"Name", "Email", "City"})` from any query.
+
+### Why This Matters
+
+Dynamic column selection makes queries resilient to schema changes. When the source adds or removes columns, your query adapts instead of failing. This pattern is especially useful for connecting to APIs or databases where the schema isn't fully under your control.

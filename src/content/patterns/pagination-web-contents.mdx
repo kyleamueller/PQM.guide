@@ -1,0 +1,118 @@
+---
+title: "Pagination with Web.Contents"
+slug: "pagination-web-contents"
+description: "Fetch all pages of a paginated REST API by looping with List.Generate until an empty response is returned."
+difficulty: "advanced"
+relatedFunctions:
+  - "web-contents"
+  - "list-generate"
+  - "list-combine"
+  - "json-document"
+relatedConcepts:
+  - "m-paradigm"
+  - "custom-functions"
+---
+
+### The Problem
+
+Most REST APIs return data in pages. A single `Web.Contents` call only fetches one page. To retrieve all records you need to keep fetching pages until the API signals there are no more.
+
+### Core Pattern: Page-Number Pagination
+
+For APIs that accept a `page` query parameter:
+
+```powerquery
+let
+    BaseUrl = "https://api.example.com/orders",
+    PageSize = 100,
+
+    FetchPage = (page as number) =>
+        let
+            Url = BaseUrl & "?page=" & Number.ToText(page) & "&per_page=" & Number.ToText(PageSize),
+            Raw = Web.Contents(Url),
+            Json = Json.Document(Raw),
+            Records = Json[data]
+        in
+            Records,
+
+    AllPages = List.Generate(
+        () => [page = 1, data = FetchPage(1)],
+        each List.Count([data]) > 0,
+        each [page = [page] + 1, data = FetchPage([page] + 1)],
+        each [data]
+    ),
+
+    Combined = List.Combine(AllPages),
+    Result = Table.FromList(Combined, Splitter.SplitByNothing(), null, null, ExtraValues.Error)
+in
+    Result
+```
+
+`List.Generate` keeps incrementing the page number and fetching until it gets back an empty list.
+
+### Pattern: Cursor / Next-URL Pagination
+
+For APIs that return the next page URL in the response body:
+
+```powerquery
+let
+    FirstUrl = "https://api.example.com/contacts?limit=100",
+
+    FetchPage = (url as text) =>
+        let
+            Raw = Web.Contents(url),
+            Json = Json.Document(Raw)
+        in
+            Json,
+
+    AllPages = List.Generate(
+        () => [url = FirstUrl, response = FetchPage(FirstUrl)],
+        each [url] <> null,
+        each
+            let nextUrl = try [response][next] otherwise null
+            in [url = nextUrl, response = if nextUrl <> null then FetchPage(nextUrl) else null],
+        each [response][results]
+    ),
+
+    Combined = List.Combine(AllPages),
+    Result = Table.FromList(Combined, Splitter.SplitByNothing())
+in
+    Result
+```
+
+### Handling Rate Limits
+
+If the API enforces rate limits, wrap each call in a `Function.InvokeAfter` to introduce a delay:
+
+```powerquery
+FetchPageWithDelay = (page as number) =>
+    Function.InvokeAfter(
+        () => FetchPage(page),
+        #duration(0, 0, 0, 1)    // 1 second delay
+    )
+```
+
+### Important: Privacy Levels
+
+`Web.Contents` with dynamic URLs can trigger formula firewall errors. Use the `RelativePath` and `Query` options to keep the base URL static:
+
+```powerquery
+Web.Contents(
+    "https://api.example.com",
+    [
+        RelativePath = "orders",
+        Query = [page = Number.ToText(page), per_page = "100"]
+    ]
+)
+```
+
+This keeps the base URL fixed, which satisfies Power Query's privacy level checks and enables query folding where supported.
+
+### Stopping Conditions
+
+Choose your stopping condition based on the API's contract:
+
+- **Empty list response**: `List.Count([data]) > 0`
+- **Null next URL**: `[url] <> null`
+- **Total count known**: `List.Count(List.Combine(AllPages)) < totalCount`
+- **Fixed page count**: `[page] <= maxPages`

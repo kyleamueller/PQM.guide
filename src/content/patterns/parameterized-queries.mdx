@@ -1,0 +1,120 @@
+---
+title: "Parameterized Queries"
+slug: "parameterized-queries"
+description: "Build queries that accept parameters — from simple Power BI parameters to dynamic function-based filtering — without hardcoding values."
+difficulty: "beginner"
+relatedFunctions:
+  - "table-selectrows"
+  - "expression-evaluate"
+relatedConcepts:
+  - "custom-functions"
+  - "sections-and-shared"
+---
+
+### Why Parameterize?
+
+Hardcoded values like dates, region names, and thresholds make queries brittle. When the value changes, you have to find and edit every query that uses it. Parameters centralize the value in one place.
+
+### Method 1: Power BI / Excel Parameters
+
+In the Power Query UI, create a parameter via **Manage Parameters → New Parameter**. Then reference it by name in any query:
+
+```powerquery
+let
+    Source = Sales,
+    Filtered = Table.SelectRows(Source, each [Region] = SelectedRegion)
+in
+    Filtered
+```
+
+`SelectedRegion` is a shared query (a parameter) whose value is set in the UI. Power BI lets end users update this value through a report parameter input. This is the simplest and most user-friendly approach.
+
+### Method 2: A Parameters Table
+
+Store parameters in a dedicated query as a record:
+
+```powerquery
+// Query named "Config"
+let
+    Params = [
+        StartDate = #date(2024, 1, 1),
+        EndDate   = #date(2024, 12, 31),
+        Region    = "North",
+        Threshold = 1000
+    ]
+in
+    Params
+```
+
+Then reference it from other queries:
+
+```powerquery
+let
+    Source = Sales,
+    Filtered = Table.SelectRows(Source, each
+        [OrderDate] >= Config[StartDate] and
+        [OrderDate] <= Config[EndDate] and
+        [Region] = Config[Region] and
+        [Amount] >= Config[Threshold]
+    )
+in
+    Filtered
+```
+
+Changing any value in `Config` updates every query that references it.
+
+### Method 3: Function Parameters
+
+Wrap your query logic in a function for maximum reusability:
+
+```powerquery
+let
+    FilterSales = (region as text, startDate as date, endDate as date) as table =>
+        let
+            Source = Sales,
+            Filtered = Table.SelectRows(Source, each
+                [Region] = region and
+                [OrderDate] >= startDate and
+                [OrderDate] <= endDate
+            )
+        in
+            Filtered
+in
+    FilterSales
+```
+
+Call it from other queries:
+
+```powerquery
+NorthSales2024 = FilterSales("North", #date(2024, 1, 1), #date(2024, 12, 31))
+EastSales2024  = FilterSales("East",  #date(2024, 1, 1), #date(2024, 12, 31))
+```
+
+### Method 4: Parameters from a Data Source
+
+Drive parameters from a cell in Excel or a table in SQL so non-technical users can update them without opening Power Query:
+
+```powerquery
+// Read a parameter value from a named Excel table
+let
+    ParamTable = Excel.CurrentWorkbook(){[Name="Parameters"]}[Content],
+    StartDate = ParamTable{[ParameterName="StartDate"]}[Value]
+in
+    StartDate
+```
+
+Then reference `StartDate` from your main query.
+
+### Combining Approaches
+
+A common production pattern:
+
+1. **Config query** holds all parameters as a record (Method 2)
+2. **Helper functions** accept parameters and do the data work (Method 3)
+3. **Final queries** call the helpers with values from Config
+
+This separates concerns cleanly: data logic lives in functions, values live in Config, and final queries are just one-liners.
+
+### Query Folding Consideration
+
+When using Power BI with DirectQuery or import mode against a database, parameterized filters using simple comparisons (`=`, `>=`, `<=`) will fold to the data source. Complex expressions using M functions may not fold. Keep filter logic simple when query folding matters for performance.

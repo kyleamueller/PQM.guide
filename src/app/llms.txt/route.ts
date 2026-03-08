@@ -1,10 +1,11 @@
-import { buildSearchIndex, getAllConcepts } from "@/lib/mdx";
+import { buildSearchIndex, getAllConcepts, getAllPatterns } from "@/lib/mdx";
 
 export const dynamic = "force-static";
 
 export function GET() {
   const functions = buildSearchIndex();
   const concepts = getAllConcepts();
+  const patterns = getAllPatterns();
 
   const lines: string[] = [
     "# PQM.guide — Power Query M Language Reference",
@@ -15,6 +16,7 @@ export function GET() {
     "",
     "- Browse functions by category at /categories",
     "- Read concept guides at /concepts",
+    "- Browse practical patterns and recipes at /patterns",
     "- Search all functions at / (Ctrl+K)",
     "- Sample data tables used in examples: /sample-tables",
     "- Community resources and links: /resources",
@@ -29,6 +31,12 @@ export function GET() {
     "",
     ...concepts.map(
       (c) => `- [${c.title}](https://pqm.guide/concepts/${c.slug}): ${c.description}`
+    ),
+    "",
+    "## Patterns",
+    "",
+    ...patterns.map(
+      (p) => `- [${p.title}](https://pqm.guide/patterns/${p.slug}): ${p.description}`
     ),
     "",
     "## Notes for LLMs",
