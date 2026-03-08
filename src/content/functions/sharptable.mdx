@@ -1,0 +1,72 @@
+---
+title: "#table"
+slug: "sharptable"
+category: "Table"
+description: "Creates a table literal from column names and a list of row value lists."
+syntax: "#table(columnSpecification as any, rows as list) as table"
+returnType: "table"
+returnDescription: "A table with the specified columns and rows."
+parameters:
+  - name: "columnSpecification"
+    type: "any"
+    required: true
+    description: "Either a list of column name strings, or a table type expression specifying column names and types."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of lists, where each inner list contains the values for one row in column order."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromcolumns"
+  - "table-fromrecords"
+  - "table-fromrows"
+---
+
+## Remarks
+
+`#table` is M's literal constructor for creating table values inline. It is most commonly used in query steps to define small reference tables, test fixtures, or lookup tables without relying on an external data source.
+
+The first argument can be either a plain list of column name strings (`{"A", "B"}`) or a table type that also specifies column types (`type table [A = text, B = number]`). Using a typed table type causes M to enforce or coerce the column types.
+
+Each inner list in `rows` must have the same number of elements as there are columns. If a row has too few elements, M will error at evaluation time.
+
+## Examples
+
+### Example 1: Create a simple two-column table
+
+```powerquery
+#table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 78}})
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Score","type":"number"}],"rows":[{"Name":"Alice","Score":95},{"Name":"Bob","Score":82},{"Name":"Carol","Score":78}]}
+-->
+
+### Example 2: Create a typed table with column types enforced
+
+```powerquery
+#table(
+    type table [Product = text, Price = number],
+    {{"Widget", 9.99}, {"Gadget", 24.99}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"text"},{"name":"Price","type":"number"}],"rows":[{"Product":"Widget","Price":9.99},{"Product":"Gadget","Price":24.99}]}
+-->
+
+### Example 3: Empty table with column names
+
+```powerquery
+#table({"ID", "Name"}, {})
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[]}
+-->

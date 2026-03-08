@@ -1,0 +1,89 @@
+---
+title: "Literal Constructors"
+slug: "literal-constructors"
+description: "M's #-prefixed literal constructors create typed values inline — #date, #datetime, #datetimezone, #time, #duration, #binary, and #table — without calling conversion functions."
+relatedConcepts:
+  - "datetime-types"
+  - "type-system"
+relatedFunctions:
+  - "sharpdate"
+  - "sharpdatetime"
+  - "sharpdatetimezone"
+  - "sharptime"
+  - "sharpduration"
+  - "sharptable"
+  - "sharpbinary"
+---
+
+M has a set of built-in literal constructors — keywords prefixed with `#` — that create typed values directly in source code. Unlike calling a conversion function such as `Date.From`, literal constructors declare both the type and value in one expression and evaluate to a precise, fully-typed M value.
+
+### Available Literal Constructors
+
+| Constructor | Type | Example |
+|---|---|---|
+| `#date(y, m, d)` | `date` | `#date(2024, 3, 15)` |
+| `#time(h, min, s)` | `time` | `#time(14, 30, 0)` |
+| `#datetime(y, m, d, h, min, s)` | `datetime` | `#datetime(2024, 3, 15, 14, 30, 0)` |
+| `#datetimezone(y, m, d, h, min, s, oh, om)` | `datetimezone` | `#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0)` |
+| `#duration(d, h, min, s)` | `duration` | `#duration(1, 2, 30, 0)` |
+| `#table(cols, rows)` | `table` | `#table({"A","B"}, {{1,2}})` |
+| `#binary(bytes)` | `binary` | `#binary({72, 101, 108})` |
+
+### Why Use Literal Constructors?
+
+**Precision and clarity.** `#date(2024, 3, 15)` is unambiguous — it is always March 15, 2024, regardless of locale, system settings, or column type coercion. `Date.From("2024-03-15")` works but parses a string; the result depends on how the parser interprets the input.
+
+**Type safety.** The value returned by `#datetime(...)` is always of type `datetime`. Conversion functions such as `DateTime.From` may return `null` or throw on unexpected input. Literal constructors enforce validity at the syntax level — invalid arguments (e.g. month 13) produce an error immediately.
+
+**No dependency on external context.** `#table` lets you embed a complete table inline without connecting to any data source, making it ideal for reference tables, test fixtures, and lookup structures.
+
+### Arithmetic with Temporal Literals
+
+The temporal literal constructors integrate naturally with M's arithmetic operators:
+
+```powerquery
+// Date arithmetic — produces a date
+#date(2024, 1, 1) + #duration(30, 0, 0, 0)
+// Result: #date(2024, 1, 31)
+
+// Subtracting two dates — produces a duration
+#date(2024, 12, 31) - #date(2024, 1, 1)
+// Result: #duration(365, 0, 0, 0)
+
+// Combining date and time — produces a datetime
+#date(2024, 3, 15) + #time(14, 30, 0)
+// Result: #datetime(2024, 3, 15, 14, 30, 0)
+```
+
+### `#table` for Inline Reference Tables
+
+`#table` is especially useful for embedding small lookup or parameter tables directly in a query, eliminating the need for an external data source:
+
+```powerquery
+let
+    StatusMap = #table(
+        {"Code", "Label"},
+        {{1, "Active"}, {2, "Inactive"}, {3, "Pending"}}
+    ),
+    Result = Table.SelectRows(StatusMap, each [Code] = 2)
+in
+    Result
+// Returns a one-row table: Code = 2, Label = "Inactive"
+```
+
+For columns with enforced types, pass a table type as the first argument instead of a list:
+
+```powerquery
+#table(
+    type table [Code = number, Label = text],
+    {{1, "Active"}, {2, "Inactive"}}
+)
+```
+
+### Common Pitfalls
+
+**Mixing date and datetime.** `#date(2024, 3, 15)` and `#datetime(2024, 3, 15, 0, 0, 0)` are not equal — M's type system treats them as different types and direct comparison will error.
+
+**Duration is not a number.** You cannot multiply `#duration(1, 0, 0, 0)` by a scalar. Use `Duration.TotalDays` to get a number, perform the multiplication, then use `Duration.From` to reconstruct.
+
+**`#datetimezone` offset is not converted.** The literal `#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0)` represents 14:30 at UTC-5. If you want UTC, use `DateTimeZone.ToUtc` rather than manually adjusting the hour argument.

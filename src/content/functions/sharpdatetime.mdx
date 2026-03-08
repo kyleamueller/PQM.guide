@@ -1,0 +1,97 @@
+---
+title: "#datetime"
+slug: "sharpdatetime"
+category: "DateTime"
+description: "Creates a datetime value from year, month, day, hour, minute, and second components."
+syntax: "#datetime(year as number, month as number, day as number, hour as number, minute as number, second as number) as datetime"
+returnType: "datetime"
+returnDescription: "A datetime value representing the specified date and time."
+parameters:
+  - name: "year"
+    type: "number"
+    required: true
+    description: "The year component (e.g. 2024)."
+  - name: "month"
+    type: "number"
+    required: true
+    description: "The month component (1–12)."
+  - name: "day"
+    type: "number"
+    required: true
+    description: "The day component (1–31, depending on month)."
+  - name: "hour"
+    type: "number"
+    required: true
+    description: "The hour component (0–23)."
+  - name: "minute"
+    type: "number"
+    required: true
+    description: "The minute component (0–59)."
+  - name: "second"
+    type: "number"
+    required: true
+    description: "The second component (0–59, can include fractional seconds)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-date"
+  - "datetime-time"
+  - "sharpdate"
+  - "sharptime"
+  - "sharpdatetimezone"
+---
+
+## Remarks
+
+`#datetime` is M's literal constructor for creating `datetime` values — a combined date and time with no timezone offset.
+
+The `second` argument may include fractional seconds (e.g. `30.5` for 30.5 seconds). Out-of-range component values produce an error.
+
+`#datetime` does not encode a timezone. If you need to represent a specific moment in time relative to UTC, use `#datetimezone` instead. To strip the time component from a datetime, use `DateTime.Date`. To extract the time component, use `DateTime.Time`.
+
+## Examples
+
+### Example 1: Create a datetime literal
+
+```powerquery
+#datetime(2024, 3, 15, 14, 30, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T14:30:00"}]}
+-->
+
+### Example 2: Extract date and time parts
+
+```powerquery
+let
+    dt   = #datetime(2024, 3, 15, 14, 30, 0),
+    d    = DateTime.Date(dt),
+    t    = DateTime.Time(dt)
+in
+    {d, t}
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{2024-03-15, 14:30:00}"}]}
+-->
+
+### Example 3: Subtract two datetimes to get a duration
+
+```powerquery
+let
+    start  = #datetime(2024, 3, 15, 9, 0, 0),
+    finish = #datetime(2024, 3, 15, 17, 30, 0),
+    elapsed = finish - start
+in
+    elapsed
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"PT8H30M"}]}
+-->
