@@ -148,6 +148,15 @@ export default function Sidebar({ functions, isOpen, onClose, onSearchOpen }: Si
             </Link>
           </div>
           <div className="sidebar-section">
+            <Link
+              href="/mcp"
+              className={`sidebar-home ${pathname?.startsWith("/mcp") ? "active" : ""}`}
+              onClick={onClose}
+            >
+              MCP Server
+            </Link>
+          </div>
+          <div className="sidebar-section">
             <div className="sidebar-section-title">Functions by Category</div>
             {functionsByCategory.map((cat) => {
               const IconComponent = categoryIcons[cat.slug] ?? Circle20Regular;
