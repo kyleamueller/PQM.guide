@@ -1,0 +1,76 @@
+---
+title: "List.Durations"
+slug: "list-durations"
+category: "List"
+description: "Generates a list of duration values starting from a given duration, with a specified count and step."
+syntax: "List.Durations(start as duration, count as number, step as duration) as list"
+returnType: "list"
+returnDescription: "A list of duration values of length count, beginning at start and incrementing by step."
+parameters:
+  - name: "start"
+    type: "duration"
+    required: true
+    description: "The starting duration value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of duration values to generate."
+  - name: "step"
+    type: "duration"
+    required: true
+    description: "The duration increment to add between each successive value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-dates"
+  - "list-datetimes"
+  - "list-times"
+  - "list-numbers"
+---
+
+## Remarks
+
+`List.Durations` generates a sequence of `duration` values. Duration values represent a span of time specified as days, hours, minutes, and seconds using the `#duration(days, hours, minutes, seconds)` literal.
+
+This function is useful for generating time intervals for scheduling analysis, elapsed time buckets, or SLA calculations.
+
+- `count` must be a non-negative integer; 0 returns an empty list.
+- The `start` and `step` values use the `#duration` literal syntax.
+- Duration arithmetic is exact — there are no calendar irregularities (unlike months).
+
+## Examples
+
+### Example 1: Generate hourly durations for 5 hours
+
+```powerquery
+List.Durations(#duration(0, 0, 0, 0), 5, #duration(0, 1, 0, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"0:00:00"},{"Result":"1:00:00"},{"Result":"2:00:00"},{"Result":"3:00:00"},{"Result":"4:00:00"}]}
+-->
+
+### Example 2: Generate durations in 30-minute steps
+
+```powerquery
+List.Durations(#duration(0, 8, 0, 0), 6, #duration(0, 0, 30, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"8:00:00"},{"Result":"8:30:00"},{"Result":"9:00:00"},{"Result":"9:30:00"},{"Result":"10:00:00"},{"Result":"10:30:00"}]}
+-->
+
+### Example 3: Daily increments starting from 1 day
+
+```powerquery
+List.Durations(#duration(1, 0, 0, 0), 5, #duration(1, 0, 0, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"1.00:00:00"},{"Result":"2.00:00:00"},{"Result":"3.00:00:00"},{"Result":"4.00:00:00"},{"Result":"5.00:00:00"}]}
+-->

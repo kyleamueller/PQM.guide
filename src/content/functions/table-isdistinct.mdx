@@ -1,0 +1,74 @@
+---
+title: "Table.IsDistinct"
+slug: "table-isdistinct"
+category: "Table"
+description: "Returns true if no two rows in the table are equal."
+syntax: "Table.IsDistinct(table as table, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if all rows are unique; false if any duplicates exist."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to check for row uniqueness."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to limit the uniqueness check to specific columns."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-distinct"
+  - "table-removeduplicates"
+  - "table-contains"
+---
+
+## Remarks
+
+`Table.IsDistinct` returns `true` if every row in the table is unique (no duplicate rows). When `equationCriteria` is specified, uniqueness is evaluated only across the specified column(s). This is equivalent to checking whether `Table.RowCount(table) = Table.RowCount(Table.Distinct(table))`, but may be more efficient.
+
+This function is useful for data quality checks — for example, verifying that a key column contains no duplicates before using it in a join.
+
+## Examples
+
+### Example 1: All rows are unique
+
+```powerquery
+Table.IsDistinct(
+    #table({"ID"}, {{1}, {2}, {3}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: Duplicate rows return false
+
+```powerquery
+Table.IsDistinct(
+    #table({"ID"}, {{1}, {2}, {1}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Check uniqueness on a single column
+
+```powerquery
+Table.IsDistinct(
+    #table({"ID", "Name"}, {{1, "Alice"}, {1, "Bob"}}),
+    "ID"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->

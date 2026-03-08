@@ -1,0 +1,77 @@
+---
+title: "ActiveDirectory.Domains"
+slug: "activedirectory-domains"
+category: "Accessing Data"
+description: "Returns a table of Active Directory domains accessible from the current machine or from a specified domain controller."
+syntax: "ActiveDirectory.Domains(optional domainController as nullable text) as table"
+returnType: "table"
+returnDescription: "A navigation table where each row represents an Active Directory domain, with columns for DNS Name, NetBIOS Name, DomainMode, and Data."
+parameters:
+  - name: "domainController"
+    type: "text"
+    required: false
+    description: "The hostname or IP address of a domain controller to query. If omitted, the function queries the domain controller for the current machine's domain."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions: []
+---
+
+## Remarks
+
+`ActiveDirectory.Domains` connects to Active Directory using LDAP and returns a table of domains in the forest. From the navigation table, you can drill into each domain to access its objects — such as users, groups, computers, and organizational units.
+
+**Authentication**: Uses the Windows credentials of the currently logged-in user (or the service account running the gateway). No explicit credential configuration is required.
+
+**Availability**: Only available in environments with network access to a domain controller. Not supported in Power BI Service (cloud) without an on-premises data gateway. Not available in Excel Online or dataflows.
+
+**Query folding**: Not supported. Active Directory queries are executed through LDAP, and filtering is performed in Power Query after the data is retrieved.
+
+**Navigation table columns**:
+- `DNS Name` (text) — the fully qualified domain name (e.g., `contoso.com`).
+- `NetBIOS Name` (text) — the short domain name (e.g., `CONTOSO`).
+- `DomainMode` (text) — the functional level of the domain.
+- `Data` (table) — a nested navigation table of Active Directory object categories (users, groups, computers, etc.) within the domain.
+
+**Use cases**:
+- Auditing user accounts, group memberships, or computer objects in Active Directory.
+- Cross-referencing HR data with AD user attributes (department, manager, email, etc.).
+- Inventorying machines joined to the domain.
+
+## Examples
+
+### Example 1: List all accessible Active Directory domains
+```powerquery
+ActiveDirectory.Domains()
+```
+
+### Example 2: Query a specific domain controller
+```powerquery
+ActiveDirectory.Domains("dc01.contoso.com")
+```
+
+### Example 3: Navigate to user accounts in a domain
+```powerquery
+let
+    Domains = ActiveDirectory.Domains(),
+    ContosoDomain = Domains{[#"DNS Name"="contoso.com"]}[Data],
+    Users = ContosoDomain{[Name="Users"]}[Data]
+in
+    Users
+```
+
+### Example 4: Get all enabled user accounts with email addresses
+```powerquery
+let
+    Domains = ActiveDirectory.Domains(),
+    Domain = Domains{0}[Data],
+    Users = Domain{[Name="Users"]}[Data],
+    Enabled = Table.SelectRows(Users, each [userAccountControl] <> "514"),
+    Selected = Table.SelectColumns(Users, {"displayName", "mail", "department", "manager"})
+in
+    Selected
+```

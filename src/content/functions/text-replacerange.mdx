@@ -1,0 +1,90 @@
+---
+title: "Text.ReplaceRange"
+slug: "text-replacerange"
+category: "Text"
+description: "Replaces a specified number of characters in a text value starting at the given offset with a new text value."
+syntax: "Text.ReplaceRange(text as nullable text, offset as number, count as number, newText as text) as nullable text"
+returnType: "text"
+returnDescription: "A new text value with the specified range replaced by newText."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The original text value."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based position at which to begin the replacement."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of characters to remove before inserting newText."
+  - name: "newText"
+    type: "text"
+    required: true
+    description: "The text value to insert in place of the removed characters."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-removerange"
+  - "text-insert"
+  - "text-replace"
+  - "text-range"
+---
+
+## Remarks
+
+`Text.ReplaceRange` removes `count` characters from `text` starting at the zero-based `offset` position, then inserts `newText` at that same position. The replacement text does not need to be the same length as the removed portion.
+
+If `text` is `null`, the function returns `null`. The length of `newText` may differ from `count`, allowing the result to be shorter or longer than the original.
+
+This is equivalent to: `Text.Start(text, offset) & newText & Text.End(text, Text.Length(text) - offset - count)`
+
+Use `Text.Replace` when you want to replace by value (all occurrences of a substring). Use `Text.ReplaceRange` when you want to replace by position.
+
+## Examples
+
+### Example 1: Replace a word at a known position
+
+```powerquery
+Text.ReplaceRange("Hello World", 6, 5, "There")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello There"}]}
+-->
+
+### Example 2: Replace a separator
+
+```powerquery
+Text.ReplaceRange("2024/03/15", 4, 1, "-")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024-03/15"}]}
+-->
+
+### Example 3: Replace a prefix code
+
+```powerquery
+Text.ReplaceRange("OLD-Report-2024", 0, 3, "NEW")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"NEW-Report-2024"}]}
+-->
+
+### Example 4: Replace with a longer string (expansion)
+
+```powerquery
+Text.ReplaceRange("AB12", 2, 2, "9999")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"AB9999"}]}
+-->

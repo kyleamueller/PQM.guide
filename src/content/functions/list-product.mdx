@@ -1,0 +1,77 @@
+---
+title: "List.Product"
+slug: "list-product"
+category: "List"
+description: "Returns the product of all numbers in a list."
+syntax: "List.Product(numberList as list, optional precision as nullable number) as nullable number"
+returnType: "nullable number"
+returnDescription: "The product of all numeric values in the list, or null if the list is empty."
+parameters:
+  - name: "numberList"
+    type: "list"
+    required: true
+    description: "The list of numbers to multiply together."
+  - name: "precision"
+    type: "nullable number"
+    required: false
+    description: "An optional precision value. Use Precision.Double for IEEE double-precision arithmetic."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-sum"
+  - "list-average"
+  - "list-accumulate"
+  - "list-numbers"
+---
+
+## Remarks
+
+`List.Product` multiplies all values in a numeric list together and returns the result. This is useful for compound growth calculations, factorial computations, and any scenario requiring sequential multiplication.
+
+- Returns `null` if the list is empty.
+- Null values in the list are skipped (treated as if they are not present).
+- Including `0` in the list will produce a result of `0`.
+- Use `Precision.Double` as the second argument to use IEEE 754 double-precision floating-point arithmetic, which may differ from the default decimal arithmetic for very large or very small numbers.
+
+## Examples
+
+### Example 1: Product of a simple list
+
+```powerquery
+List.Product({1, 2, 3, 4, 5})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":120}]}
+-->
+
+### Example 2: Compound growth calculation
+
+Calculate the cumulative growth factor over 4 years with annual growth rates.
+
+```powerquery
+let
+    GrowthRates = {1.05, 1.03, 1.08, 1.02},
+    CumulativeGrowth = List.Product(GrowthRates)
+in
+    CumulativeGrowth
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.1940588}]}
+-->
+
+### Example 3: Product with a zero
+
+```powerquery
+List.Product({5, 10, 0, 3})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->

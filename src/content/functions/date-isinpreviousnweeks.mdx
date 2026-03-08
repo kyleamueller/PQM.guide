@@ -1,0 +1,66 @@
+---
+title: "Date.IsInPreviousNWeeks"
+slug: "date-isinpreviousnweeks"
+category: "Date"
+description: "Returns true if the date falls within the previous N calendar weeks."
+syntax: "Date.IsInPreviousNWeeks(dateTime as any, weeks as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the N weeks before the current week, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "weeks"
+    type: "number"
+    required: true
+    description: "The number of weeks back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinpreviousweek"
+  - "date-isinnextnweeks"
+  - "date-isinpreviousndays"
+  - "date-isinpreviousnmonths"
+---
+
+## Remarks
+
+`Date.IsInPreviousNWeeks` returns `true` if the input date falls within the N complete Sunday–Saturday calendar weeks immediately preceding the current week. The current week is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter orders from the previous 2 weeks
+
+Keep only rows where OrderDate falls within the previous 2 calendar weeks.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousNWeeks([OrderDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":39,"OrderDate":"2026-02-23"},{"OrderID":40,"OrderDate":"2026-02-26"}]}
+-->
+
+### Example 2: Flag orders from the past 4 weeks
+
+Add a boolean column identifying orders from the previous 4 weeks.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "PreviousFourWeeks", each Date.IsInPreviousNWeeks([OrderDate], 4), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"PreviousFourWeeks","type":"logical"}],"rows":[{"OrderID":36,"OrderDate":"2026-02-05","PreviousFourWeeks":false},{"OrderID":39,"OrderDate":"2026-02-23","PreviousFourWeeks":true},{"OrderID":42,"OrderDate":"2026-03-08","PreviousFourWeeks":false}]}
+-->

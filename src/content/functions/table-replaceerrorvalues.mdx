@@ -1,0 +1,66 @@
+---
+title: "Table.ReplaceErrorValues"
+slug: "table-replaceerrorvalues"
+category: "Table"
+description: "Replaces error values in specified columns with replacement values."
+syntax: "Table.ReplaceErrorValues(table as table, errorReplacement as list) as table"
+returnType: "table"
+returnDescription: "The table with error values in specified columns replaced by the given values."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to clean."
+  - name: "errorReplacement"
+    type: "list"
+    required: true
+    description: "A list of {columnName, replacementValue} pairs specifying the column and value to substitute for errors."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removerowswitherrors"
+  - "table-selectrowswitherrors"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Table.ReplaceErrorValues` substitutes error values in specified columns with a provided replacement value. Each element of `errorReplacement` is a two-element list: `{columnName, replacementValue}`. Only columns explicitly listed are affected; errors in other columns remain.
+
+This is commonly used after `Table.TransformColumnTypes` when certain values could not be converted, to substitute a safe default like `0`, `null`, or `"N/A"` instead of leaving errors.
+
+## Examples
+
+### Example 1: Replace errors in one column with 0
+
+```powerquery
+let
+    Source = #table({"ID", "Amount"}, {{1, 100}, {2, error "parse error"}, {3, 300}})
+in
+    Table.ReplaceErrorValues(Source, {{"Amount", 0}})
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"ID":"1","Amount":"100"},{"ID":"2","Amount":"0"},{"ID":"3","Amount":"300"}]}
+-->
+
+### Example 2: Replace errors in multiple columns
+
+```powerquery
+let
+    Source = #table(
+        {"Name", "Score"},
+        {{"Alice", 95}, {error "bad name", 80}, {"Carol", error "N/A"}}
+    )
+in
+    Table.ReplaceErrorValues(Source, {{"Name", "Unknown"}, {"Score", 0}})
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Alice","Score":"95"},{"Name":"Unknown","Score":"80"},{"Name":"Carol","Score":"0"}]}
+-->

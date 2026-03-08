@@ -1,0 +1,75 @@
+---
+title: "Number.BitwiseAnd"
+slug: "number-bitwiseand"
+category: "Number"
+description: "Performs a bitwise AND operation on two integer values."
+syntax: "Number.BitwiseAnd(number1 as number, number2 as number) as number"
+returnType: "number"
+returnDescription: "An integer where each bit is 1 only if the corresponding bit is 1 in both inputs."
+parameters:
+  - name: "number1"
+    type: "number"
+    required: true
+    description: "The first integer operand."
+  - name: "number2"
+    type: "number"
+    required: true
+    description: "The second integer operand."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-bitwiseor"
+  - "number-bitwisexor"
+  - "number-bitwisenot"
+  - "number-bitwiseshiftleft"
+  - "number-bitwiseshiftright"
+---
+
+## Remarks
+
+`Number.BitwiseAnd` performs a bitwise AND between two integers. Each bit position in the result is set to `1` only when the corresponding bit is `1` in both operands. This operation is commonly used for:
+
+- **Masking**: extracting specific bits from a value by ANDing with a bitmask
+- **Flag testing**: checking whether specific flag bits are set
+- **Permission systems**: determining whether a user has a specific permission
+
+Both inputs are treated as integers. Floating-point values are truncated to their integer portion before the operation.
+
+## Examples
+
+### Example 1: Basic bitwise AND
+
+12 in binary is `1100`, 10 is `1010`. AND gives `1000` = 8.
+
+```powerquery
+Number.BitwiseAnd(12, 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":8}]}
+-->
+
+### Example 2: Test if a value has a specific bit set (bit 2 = value 4)
+
+```powerquery
+Number.BitwiseAnd(7, 4) > 0
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 3: Extract low nibble (lower 4 bits) using mask 0xF = 15
+
+```powerquery
+Number.BitwiseAnd(0b10110101, 15)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
+-->

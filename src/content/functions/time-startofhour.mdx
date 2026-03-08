@@ -1,0 +1,64 @@
+---
+title: "Time.StartOfHour"
+slug: "time-startofhour"
+category: "Time"
+description: "Returns the first moment of the hour for the given time or datetime value."
+syntax: "Time.StartOfHour(dateTime as any) as any"
+returnType: "any"
+returnDescription: "A time, datetime, or datetimezone value representing XX:00:00."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A time, datetime, or datetimezone value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-endofhour"
+  - "date-startofday"
+  - "time-hour"
+  - "time-from"
+---
+
+## Remarks
+
+`Time.StartOfHour` returns the first instant of the clock hour containing the input value: XX:00:00. When passed a plain `time`, it returns a `time` with minutes and seconds set to zero. When passed a `datetime` or `datetimezone`, it returns the same type with only the time component adjusted. This is useful for bucketing events into hourly groups or building hourly range filters.
+
+## Examples
+
+### Example 1: Truncate event times to the hour
+
+Round each event time down to the start of its hour.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
+    "HourStart", each Time.StartOfHour([EventTime]), type datetime
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HourStart","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","HourStart":"2024-03-15T08:00:00"},{"EventID":2,"EventTime":"2024-03-15T14:45:00","HourStart":"2024-03-15T14:00:00"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","HourStart":"2024-03-16T09:00:00"}]}
+-->
+
+### Example 2: Start of hour for a specific time
+
+Return the first instant of the 14:xx hour.
+
+```powerquery
+#table(
+    type table [Result = time],
+    {{Time.StartOfHour(#time(14, 30, 45))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"14:00:00"}]}
+-->

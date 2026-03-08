@@ -1,0 +1,72 @@
+---
+title: "Date.DayOfWeekName"
+slug: "date-dayofweekname"
+category: "Date"
+description: "Returns the name of the day of the week for the given date."
+syntax: "Date.DayOfWeekName(date as any, optional culture as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The localized name of the day of the week (e.g., \"Monday\")."
+parameters:
+  - name: "date"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code such as \"en-US\" or \"fr-FR\" that controls the language of the returned day name."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-dayofweek"
+  - "date-monthname"
+  - "date-totext"
+---
+
+## Remarks
+
+`Date.DayOfWeekName` returns the full, localized name of the day of the week for a given `date`, `datetime`, or `datetimezone` value. When no `culture` is provided, the function uses the current locale of the host environment.
+
+To get a short name (e.g., "Mon"), use `Date.ToText` with a custom format string such as `"ddd"`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Add day name column to Sales table
+
+Add a column showing the day-of-week name for each order date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "DayName", each Date.DayOfWeekName([OrderDate]), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DayName","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DayName":"Monday"},{"OrderID":2,"OrderDate":"2024-01-18","DayName":"Thursday"},{"OrderID":3,"OrderDate":"2024-02-01","DayName":"Thursday"},{"OrderID":4,"OrderDate":"2024-02-10","DayName":"Saturday"},{"OrderID":5,"OrderDate":"2024-03-05","DayName":"Tuesday"}]}
+-->
+
+### Example 2: Return a day name in French
+
+Use the culture parameter to return the day name in French.
+
+```powerquery
+#table(
+    type table [Date = date, DayNameFR = text],
+    {{#date(2024, 3, 15), Date.DayOfWeekName(#date(2024, 3, 15), "fr-FR")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"DayNameFR","type":"text"}],"rows":[{"Date":"2024-03-15","DayNameFR":"vendredi"}]}
+-->

@@ -1,0 +1,80 @@
+---
+title: "List.ReplaceMatchingItems"
+slug: "list-replacematchingitems"
+category: "List"
+description: "Replaces occurrences of specified values in a list with replacement values, given as a list of {old, new} pairs."
+syntax: "List.ReplaceMatchingItems(list as list, replacements as list, optional equationCriteria as any) as list"
+returnType: "list"
+returnDescription: "A new list with all specified values replaced."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list in which replacements are made."
+  - name: "replacements"
+    type: "list"
+    required: true
+    description: "A list of two-element lists, each of the form {oldValue, newValue}, specifying what to replace and with what."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined when matching values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-replacevalue"
+  - "list-replacerange"
+  - "list-removematchingitems"
+  - "list-transform"
+---
+
+## Remarks
+
+`List.ReplaceMatchingItems` performs multiple value replacements in a single pass through the list. The `replacements` parameter is a list of `{old, new}` pairs — for each item in the source list, if it matches an `old` value, it is replaced with the corresponding `new` value.
+
+- Multiple replacement pairs can be specified.
+- If an item matches more than one replacement pair, the **first** matching pair is applied.
+- Items that don't match any replacement pair are left unchanged.
+- All occurrences of each matching value are replaced.
+- Comparison is case-sensitive for text by default.
+
+## Examples
+
+### Example 1: Replace two values
+
+```powerquery
+List.ReplaceMatchingItems({1, 2, 3, 4, 5}, {{2, 20}, {4, 40}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 20, 3, 40, 5}"}]}
+-->
+
+### Example 2: Recode categorical values
+
+```powerquery
+let
+    Status = {"Active", "Inactive", "Pending", "Active", "Inactive"},
+    Recoded = List.ReplaceMatchingItems(Status, {{"Active", "A"}, {"Inactive", "I"}, {"Pending", "P"}})
+in
+    Recoded
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, I, P, A, I}"}]}
+-->
+
+### Example 3: Replace null values with a default
+
+```powerquery
+List.ReplaceMatchingItems({10, null, 30, null, 50}, {{null, 0}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{10, 0, 30, 0, 50}"}]}
+-->

@@ -1,0 +1,68 @@
+---
+title: "Date.IsInNextNYears"
+slug: "date-isinnextnyears"
+category: "Date"
+description: "Returns true if the date falls within the next N calendar years."
+syntax: "Date.IsInNextNYears(dateTime as any, years as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the next N years after the current year, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "years"
+    type: "number"
+    required: true
+    description: "The number of years ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinnextyear"
+  - "date-isinpreviousnyears"
+  - "date-isinnextnquarters"
+  - "date-isinnextnmonths"
+---
+
+## Remarks
+
+`Date.IsInNextNYears` returns `true` if the input date falls within the next N complete calendar years after the current year. The current year itself is not included; use `Date.IsInCurrentYear` to also match the current year. The function is re-evaluated on each query refresh.
+
+For example, if the current year is 2026 and `years = 3`, it matches any date in 2027, 2028, or 2029.
+
+## Examples
+
+### Example 1: Find contracts expiring in the next 2 years
+
+Keep only rows where ExpiryDate falls within the next 2 calendar years.
+
+```powerquery
+Table.SelectRows(
+    Contracts,
+    each Date.IsInNextNYears([ExpiryDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-06-30","Customer":"Contoso"},{"ContractID":"C002","ExpiryDate":"2027-12-31","Customer":"Fabrikam"}]}
+-->
+
+### Example 2: Flag long-term contracts
+
+Add a boolean column for contracts expiring in the next 5 years.
+
+```powerquery
+Table.AddColumn(
+    Contracts,
+    "ExpiresInNext5Years", each Date.IsInNextNYears([ExpiryDate], 5), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"ExpiresInNext5Years","type":"logical"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-06-30","ExpiresInNext5Years":true},{"ContractID":"C003","ExpiryDate":"2032-03-01","ExpiresInNext5Years":false}]}
+-->

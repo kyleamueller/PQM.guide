@@ -1,0 +1,76 @@
+---
+title: "List.FindText"
+slug: "list-findtext"
+category: "List"
+description: "Returns all items in the list that contain the given text string. Items must be text values; comparison is case-insensitive."
+syntax: "List.FindText(list as list, text as text) as list"
+returnType: "list"
+returnDescription: "A list of text items from the source list that contain the given text."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of text values to search."
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text string to search for within each list item."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-select"
+  - "list-contains"
+  - "list-containsany"
+  - "list-matchesany"
+---
+
+## Remarks
+
+`List.FindText` filters a list of text values, returning only those that contain the specified `text` as a substring. The search is **case-insensitive**.
+
+All items in the list must be text values; non-text values will cause an error. Use `List.Select` with `Text.Contains` for more control, such as case-sensitive matching or working with mixed-type lists.
+
+- Returns an empty list if no items match.
+- The search uses substring matching, not exact matching.
+- Equivalent to `List.Select(list, each Text.Contains(_, text, Comparer.OrdinalIgnoreCase))`.
+
+## Examples
+
+### Example 1: Find items containing "apple"
+
+```powerquery
+List.FindText({"Apple Juice", "Orange Soda", "Pineapple Tart", "Grape Jam"}, "apple")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Apple Juice, Pineapple Tart}"}]}
+-->
+
+### Example 2: Search product codes
+
+```powerquery
+let
+    Products = {"PROD-001", "ITEM-002", "PROD-003", "SVC-004", "PROD-005"},
+    ProdItems = List.FindText(Products, "PROD")
+in
+    ProdItems
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{PROD-001, PROD-003, PROD-005}"}]}
+-->
+
+### Example 3: Case-insensitive matching
+
+```powerquery
+List.FindText({"Alpha", "BETA", "gamma", "Delta"}, "a")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Alpha, gamma, Delta}"}]}
+-->

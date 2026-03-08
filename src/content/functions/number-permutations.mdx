@@ -1,0 +1,75 @@
+---
+title: "Number.Permutations"
+slug: "number-permutations"
+category: "Number"
+description: "Returns the number of permutations for choosing k items from a set of n items, where order matters (P(n,k))."
+syntax: "Number.Permutations(setSize as nullable number, permutationSize as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The number of ordered arrangements P(n,k) = n! / (n-k)!."
+parameters:
+  - name: "setSize"
+    type: "number"
+    required: true
+    description: "The total number of items in the set (n). Must be a non-negative integer."
+  - name: "permutationSize"
+    type: "number"
+    required: true
+    description: "The number of items to arrange (k). Must be a non-negative integer <= setSize."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-combinations"
+  - "number-factorial"
+---
+
+## Remarks
+
+`Number.Permutations` computes P(n, k) — the number of ordered arrangements of `permutationSize` items drawn from a set of `setSize` items. Unlike combinations, the order of selection matters here: choosing A then B is different from choosing B then A.
+
+The formula is: P(n, k) = n! / (n − k)!
+
+`Number.Permutations(n, k)` is always >= `Number.Combinations(n, k)` (by a factor of k!). When `permutationSize` equals `setSize`, the result is n! (all possible orderings of the full set).
+
+## Examples
+
+### Example 1: Ordered arrangements of 3 items chosen from 5
+
+```powerquery
+Number.Permutations(5, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":60}]}
+-->
+
+### Example 2: How many ways 3 runners can place in 1st, 2nd, 3rd from 8 competitors
+
+```powerquery
+Number.Permutations(8, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":336}]}
+-->
+
+### Example 3: Compare permutations vs combinations for same n and k
+
+```powerquery
+#table(
+    {"Measure", "Value"},
+    {
+        {"Combinations C(8,3)", Number.Combinations(8, 3)},
+        {"Permutations P(8,3)", Number.Permutations(8, 3)},
+        {"Ratio (k!)", Number.Factorial(3)}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Measure":"Combinations C(8,3)","Value":56},{"Measure":"Permutations P(8,3)","Value":336},{"Measure":"Ratio (k!)","Value":6}]}
+-->

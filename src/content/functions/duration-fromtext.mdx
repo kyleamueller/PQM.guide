@@ -1,0 +1,66 @@
+---
+title: "Duration.FromText"
+slug: "duration-fromtext"
+category: "Duration"
+description: "Converts a text representation to a duration value."
+syntax: "Duration.FromText(text as nullable text) as nullable duration"
+returnType: "duration"
+returnDescription: "A duration value parsed from the given text, or null if the input is null."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "A text string representing a duration in the format \"D.HH:MM:SS\" or \"HH:MM:SS\" (e.g., \"1.02:30:00\" for 1 day, 2 hours, 30 minutes)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-totext"
+  - "duration-from"
+  - "duration-days"
+  - "duration-hours"
+---
+
+## Remarks
+
+`Duration.FromText` parses a text value in the format `"D.HH:MM:SS"` (days, hours, minutes, seconds) or `"HH:MM:SS"` (when days are zero) into a `duration` value. This is the inverse of `Duration.ToText`. The day component is optional; if omitted, the value is treated as less than one day.
+
+If the text is `null`, the function returns `null`. If the text cannot be parsed, the function raises an error.
+
+## Examples
+
+### Example 1: Parse duration strings from a log table
+
+Convert text duration values in the Logs table into typed duration values.
+
+Input: `Logs`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Logs, 4), {"LogID", "DurationText"}),
+    {{"DurationText", each Duration.FromText(_), type duration}}
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationText","type":"duration"}],"rows":[{"LogID":"L001","DurationText":"0.02:30:00"},{"LogID":"L002","DurationText":"1.12:45:00"},{"LogID":"L003","DurationText":"0.00:15:30"},{"LogID":"L004","DurationText":"3.08:00:00"}]}
+-->
+
+### Example 2: Parse a specific duration text value
+
+Convert "1.02:30:00" (1 day, 2 hours, 30 minutes) to a duration.
+
+```powerquery
+#table(
+    type table [DurationText = text, Parsed = duration],
+    {{"1.02:30:00", Duration.FromText("1.02:30:00")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DurationText","type":"text"},{"name":"Parsed","type":"duration"}],"rows":[{"DurationText":"1.02:30:00","Parsed":"1.02:30:00"}]}
+-->

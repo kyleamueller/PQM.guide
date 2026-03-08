@@ -1,0 +1,74 @@
+---
+title: "Decimal.From"
+slug: "decimal-from"
+category: "Number"
+description: "Converts a value to a decimal (fixed-point) number with high precision for exact decimal arithmetic."
+syntax: "Decimal.From(value as any, optional culture as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "A decimal number with exact fixed-point representation."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "currency-from"
+  - "double-from"
+  - "number-from"
+---
+
+## Remarks
+
+`Decimal.From` converts a value to the decimal number type, which uses fixed-point arithmetic to avoid the binary floating-point rounding errors that can occur with `Double.From`. The decimal type in Power Query maps to the .NET `Decimal` type with 28–29 significant digits.
+
+This is especially important for financial and monetary values where exact decimal representation matters — for example, `0.1 + 0.2` in binary floating-point does not equal exactly `0.3`, but in decimal arithmetic it does.
+
+Text values are parsed using the specified culture. `true` converts to `1`, `false` to `0`, `null` to `null`.
+
+## Examples
+
+### Example 1: Exact decimal representation
+
+```powerquery
+Decimal.From(0.1) + Decimal.From(0.2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.3}]}
+-->
+
+### Example 2: Convert a text value
+
+```powerquery
+Decimal.From("1234.5678")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.5678}]}
+-->
+
+### Example 3: Apply to a price column for exact arithmetic
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumnTypes(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "UnitPrice"}),
+    {{"UnitPrice", Decimal.Type}}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25.99},{"OrderID":2,"UnitPrice":149.99},{"OrderID":3,"UnitPrice":74.50}]}
+-->

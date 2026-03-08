@@ -1,0 +1,67 @@
+---
+title: "Number.Tanh"
+slug: "number-tanh"
+category: "Number"
+description: "Returns the hyperbolic tangent of a number."
+syntax: "Number.Tanh(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The hyperbolic tangent of the number, in the range (-1, 1)."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number whose hyperbolic tangent is computed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-sinh"
+  - "number-cosh"
+  - "number-exp"
+---
+
+## Remarks
+
+`Number.Tanh` returns the hyperbolic tangent, defined as:
+
+tanh(x) = sinh(x) / cosh(x) = (e^x − e^(−x)) / (e^x + e^(−x))
+
+The result is always in the open interval (-1, 1), approaching -1 as x → -∞ and 1 as x → +∞. `Number.Tanh(0)` returns `0`.
+
+Hyperbolic tangent is widely used as an activation function in neural networks and for normalizing values to (-1, 1) without a hard cutoff.
+
+## Examples
+
+### Example 1: Hyperbolic tangent of 0
+
+```powerquery
+Number.Tanh(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 2: tanh approaches 1 for large values
+
+```powerquery
+Number.Tanh(10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.9999999958776927}]}
+-->
+
+### Example 3: tanh of 1
+
+```powerquery
+Number.Tanh(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.7615941559557649}]}
+-->

@@ -1,0 +1,94 @@
+---
+title: "Table.FuzzyJoin"
+slug: "table-fuzzyjoin"
+category: "Table"
+description: "Joins two tables using fuzzy (approximate) string matching on key columns."
+syntax: "Table.FuzzyJoin(table1 as table, key1 as any, table2 as table, key2 as any, optional joinKind as nullable number, optional joinOptions as nullable record) as table"
+returnType: "table"
+returnDescription: "A table resulting from joining the two tables using fuzzy key matching."
+parameters:
+  - name: "table1"
+    type: "table"
+    required: true
+    description: "The left table."
+  - name: "key1"
+    type: "any"
+    required: true
+    description: "The key column name or list of column names from table1."
+  - name: "table2"
+    type: "table"
+    required: true
+    description: "The right table."
+  - name: "key2"
+    type: "any"
+    required: true
+    description: "The key column name or list of column names from table2."
+  - name: "joinKind"
+    type: "number"
+    required: false
+    description: "Optional. The join type: JoinKind.Inner (0), JoinKind.LeftOuter (1), JoinKind.RightOuter (2), JoinKind.FullOuter (3), JoinKind.LeftAnti (4), JoinKind.RightAnti (5). Defaults to JoinKind.Inner."
+  - name: "joinOptions"
+    type: "record"
+    required: false
+    description: "Optional record supporting fields: Threshold (0.0–1.0 similarity), IgnoreCase, IgnoreSpace, NumberOfMatches, TransformationTable."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-join"
+  - "table-nestedjoin"
+  - "table-fuzzynestedjoin"
+  - "table-fuzzygroup"
+---
+
+## Remarks
+
+`Table.FuzzyJoin` performs a join between two tables using fuzzy string matching on key columns. Unlike `Table.Join`, which requires exact key equality, `Table.FuzzyJoin` tolerates typos, spacing differences, and spelling variations.
+
+The `joinOptions` record supports:
+- `Threshold`: similarity score from 0.0 (match everything) to 1.0 (exact match only). Default is 0.8.
+- `IgnoreCase`: boolean, default true.
+- `IgnoreSpace`: boolean, default true.
+- `NumberOfMatches`: maximum number of right-table matches per left-table row.
+- `TransformationTable`: a lookup table for custom value mappings before matching.
+
+This function does not fold to data sources.
+
+## Examples
+
+### Example 1: Fuzzy join with default settings
+
+```powerquery
+Table.FuzzyJoin(
+    #table({"CustomerName"}, {{"Micosoft"}, {"Gogle"}}),
+    "CustomerName",
+    #table({"CompanyName"}, {{"Microsoft"}, {"Google"}}),
+    "CompanyName",
+    JoinKind.LeftOuter
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"any"},{"name":"CompanyName","type":"any"}],"rows":[{"CustomerName":"Micosoft","CompanyName":"Microsoft"},{"CustomerName":"Gogle","CompanyName":"Google"}]}
+-->
+
+### Example 2: Fuzzy join with a custom threshold
+
+```powerquery
+Table.FuzzyJoin(
+    #table({"Name"}, {{"Jon"}}),
+    "Name",
+    #table({"CanonicalName"}, {{"John"}, {"Jane"}}),
+    "CanonicalName",
+    JoinKind.LeftOuter,
+    [Threshold = 0.6]
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"CanonicalName","type":"any"}],"rows":[{"Name":"Jon","CanonicalName":"John"}]}
+-->

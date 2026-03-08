@@ -1,0 +1,63 @@
+---
+title: "Table.RemoveLastN"
+slug: "table-removelastn"
+category: "Table"
+description: "Removes the last N rows of a table, or rows while a trailing condition is true."
+syntax: "Table.RemoveLastN(table as table, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "The table with the last N rows (or trailing conditional rows) removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to remove rows from."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many rows to remove from the end, or a condition function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removefirstn"
+  - "table-removerows"
+  - "table-lastn"
+---
+
+## Remarks
+
+`Table.RemoveLastN` removes rows from the bottom of the table. When passed a number, it removes that many rows from the end. When passed a function, it removes rows from the end of the table while the condition is true, working backwards from the last row.
+
+This is the counterpart to `Table.RemoveFirstN`.
+
+## Examples
+
+### Example 1: Remove the last 2 rows
+
+```powerquery
+Table.RemoveLastN(
+    #table({"ID"}, {{1}, {2}, {3}, {4}}),
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"2"}]}
+-->
+
+### Example 2: Remove trailing rows where value exceeds 2
+
+```powerquery
+Table.RemoveLastN(
+    #table({"ID"}, {{1}, {2}, {3}, {4}}),
+    each [ID] > 2
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"2"}]}
+-->

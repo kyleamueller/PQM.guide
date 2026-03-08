@@ -1,0 +1,83 @@
+---
+title: "Record.FromTable"
+slug: "record-fromtable"
+category: "Record"
+description: "Converts a two-column table (Name, Value) into a record, using the Name column as field names and Value as field values."
+syntax: "Record.FromTable(table as table) as record"
+returnType: "record"
+returnDescription: "A record constructed from the Name-Value pairs in the table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "A table with exactly two columns named \"Name\" (text) and \"Value\" (any). Each row becomes a field in the result record."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-totable"
+  - "record-fromlist"
+  - "record-fieldnames"
+  - "record-fieldvalues"
+---
+
+## Remarks
+
+`Record.FromTable` is the inverse of `Record.ToTable`. It converts a two-column table with `Name` and `Value` columns into a record, where each row provides one field name and its value.
+
+The table must have exactly a `Name` column (text type) and a `Value` column. Field names must be unique — duplicate names will raise an error.
+
+This function is useful when you have key-value data stored in tabular format and need to pivot it into a record for further processing.
+
+## Examples
+
+### Example 1: Convert a Name-Value table to a record
+
+```powerquery
+Record.FromTable(
+    #table({"Name", "Value"}, {{"CustomerID", 1}, {"Name", "Alice"}, {"City", "New York"}})
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerID","type":"number"},{"name":"Name","type":"text"},{"name":"City","type":"text"}],"rows":[{"CustomerID":1,"Name":"Alice","City":"New York"}]}
+-->
+
+### Example 2: Round-trip a record through ToTable and back
+
+```powerquery
+let
+    Original = [A = 1, B = "hello", C = true],
+    AsTable = Record.ToTable(Original),
+    BackToRecord = Record.FromTable(AsTable)
+in
+    BackToRecord
+```
+
+<!--output
+{"columns":[{"name":"A","type":"number"},{"name":"B","type":"text"},{"name":"C","type":"logical"}],"rows":[{"A":1,"B":"hello","C":true}]}
+-->
+
+### Example 3: Build a record from a filtered key-value table
+
+Input: `Sales`
+
+```powerquery
+let
+    Pairs = #table({"Name", "Value"}, {
+        {"Source", "Sales"},
+        {"RecordCount", Table.RowCount(Sales)},
+        {"FirstOrderID", Sales{0}[OrderID]}
+    }),
+    Summary = Record.FromTable(Pairs)
+in
+    Record.ToTable(Summary)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Source","Value":"Sales"},{"Name":"RecordCount","Value":100},{"Name":"FirstOrderID","Value":1}]}
+-->

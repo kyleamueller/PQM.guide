@@ -1,0 +1,84 @@
+---
+title: "Text.Middle"
+slug: "text-middle"
+category: "Text"
+description: "Returns a substring starting at the given position, optionally limited to a specified number of characters."
+syntax: "Text.Middle(text as nullable text, start as number, optional count as nullable number) as nullable text"
+returnType: "text"
+returnDescription: "The substring of text beginning at start for count characters, or to the end of the string if count is omitted."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "start"
+    type: "number"
+    required: true
+    description: "The zero-based index of the first character to return."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The number of characters to return. If omitted or null, returns all characters from start to the end of the text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-start"
+  - "text-end"
+  - "text-range"
+  - "text-at"
+---
+
+## Remarks
+
+`Text.Middle` returns a substring from `text` beginning at the zero-based `start` index. If `count` is provided, at most `count` characters are returned. If `count` is omitted or `null`, all characters from `start` to the end of the string are returned.
+
+If `text` is `null`, the function returns `null`. If `start` is beyond the end of the string, an empty string is returned. If `count` extends beyond the end of the string, all remaining characters are returned without error.
+
+`Text.Middle` and `Text.Range` are functionally equivalent. `Text.Middle` is often preferred in Power Query UI-generated queries.
+
+## Examples
+
+### Example 1: Extract characters from position 6 onward
+
+```powerquery
+Text.Middle("Hello World", 6)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"World"}]}
+-->
+
+### Example 2: Extract a fixed-length substring
+
+```powerquery
+Text.Middle("Hello World", 6, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Wor"}]}
+-->
+
+### Example 3: Extract part of a product code
+
+```powerquery
+Text.Middle("PRD-2024-001", 4, 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024"}]}
+-->
+
+### Example 4: Handle null input
+
+```powerquery
+Text.Middle(null, 2, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+-->

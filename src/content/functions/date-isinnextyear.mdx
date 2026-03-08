@@ -1,0 +1,62 @@
+---
+title: "Date.IsInNextYear"
+slug: "date-isinnextyear"
+category: "Date"
+description: "Returns true if the date falls in the next calendar year."
+syntax: "Date.IsInNextYear(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the calendar year immediately after the current year, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentyear"
+  - "date-isinpreviousyear"
+  - "date-isinnextnyears"
+  - "date-isinnextquarter"
+---
+
+## Remarks
+
+`Date.IsInNextYear` returns `true` if the input date falls anywhere within the calendar year immediately following the current year (as determined by `DateTime.LocalNow()`). For example, if today is in 2026, this function returns `true` for any date in 2027. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter contracts expiring next year
+
+Keep only rows where ExpiryDate is in the next calendar year.
+
+```powerquery
+Table.SelectRows(
+    Contracts,
+    each Date.IsInNextYear([ExpiryDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-03-31","Customer":"Contoso"},{"ContractID":"C002","ExpiryDate":"2027-09-30","Customer":"Fabrikam"}]}
+-->
+
+### Example 2: Flag next-year renewals
+
+Add a boolean column for items expiring next year.
+
+```powerquery
+Table.AddColumn(
+    Contracts,
+    "ExpiresNextYear", each Date.IsInNextYear([ExpiryDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"ExpiresNextYear","type":"logical"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-03-31","ExpiresNextYear":true},{"ContractID":"C002","ExpiryDate":"2026-06-30","ExpiresNextYear":false}]}
+-->

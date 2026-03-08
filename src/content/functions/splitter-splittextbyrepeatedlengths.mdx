@@ -1,0 +1,80 @@
+---
+title: "Splitter.SplitTextByRepeatedLengths"
+slug: "splitter-splittextbyrepeatedlengths"
+category: "Splitter"
+description: "Returns a splitter function that repeatedly splits off substrings of a fixed length from the text."
+syntax: "Splitter.SplitTextByRepeatedLengths(length as number, optional startAtEnd as nullable logical) as function"
+returnType: "function"
+returnDescription: "A function that splits text into consecutive fixed-length chunks."
+parameters:
+  - name: "length"
+    type: "number"
+    required: true
+    description: "The fixed number of characters for each chunk."
+  - name: "startAtEnd"
+    type: "logical"
+    required: false
+    description: "When true, chunks are taken from the end of the string first. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbylengths"
+  - "splitter-splittextbypositions"
+  - "splitter-splittextbyranges"
+  - "splitter-splitbynothing"
+---
+
+## Remarks
+
+`Splitter.SplitTextByRepeatedLengths` returns a splitter function that slices its input into consecutive chunks of the specified `length`. If the text length is not evenly divisible by `length`, the final chunk contains the remaining characters.
+
+When `startAtEnd` is `true`, chunks are taken from the right side of the string first, so the potentially shorter partial chunk appears at the beginning of the result list.
+
+This is useful for parsing packed binary-format text strings, segmenting hex data, chunking encoded strings, or splitting data into fixed-size page-width columns.
+
+## Examples
+
+### Example 1: Split into chunks of three characters
+
+```powerquery
+Splitter.SplitTextByRepeatedLengths(3)("ABCDEFGHI")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ABC","DEF","GHI"]}]}
+-->
+
+### Example 2: Remainder in the last chunk
+
+```powerquery
+Splitter.SplitTextByRepeatedLengths(4)("ABCDEFGHIJ")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ABCD","EFGH","IJ"]}]}
+-->
+
+### Example 3: Split from the end (remainder first)
+
+```powerquery
+Splitter.SplitTextByRepeatedLengths(4, true)("ABCDEFGHIJ")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["AB","CDEF","GHIJ"]}]}
+-->
+
+### Example 4: Split a hex string into bytes
+
+```powerquery
+Splitter.SplitTextByRepeatedLengths(2)("48656C6C6F")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["48","65","6C","6C","6F"]}]}
+-->

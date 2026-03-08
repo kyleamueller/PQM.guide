@@ -1,0 +1,82 @@
+---
+title: "Splitter.SplitTextByPositions"
+slug: "splitter-splittextbypositions"
+category: "Splitter"
+description: "Returns a splitter function that divides text at the specified zero-based character positions."
+syntax: "Splitter.SplitTextByPositions(positions as list, optional startAtEnd as nullable logical) as function"
+returnType: "function"
+returnDescription: "A function that splits text at each specified character position."
+parameters:
+  - name: "positions"
+    type: "list"
+    required: true
+    description: "A list of zero-based character positions at which to split the text. The first position is typically 0 to include the text from the start."
+  - name: "startAtEnd"
+    type: "logical"
+    required: false
+    description: "When true, positions are counted from the end of the string. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbylengths"
+  - "splitter-splittextbyranges"
+  - "splitter-splittextbydelimiter"
+  - "splitter-splitbynothing"
+---
+
+## Remarks
+
+`Splitter.SplitTextByPositions` returns a splitter function that, when applied to a text value, slices the text at each position in the `positions` list. Each position defines the start of the next segment.
+
+The `positions` list should be in ascending order. Typically the first element is 0 to start from the beginning of the string. Each subsequent position marks where the next segment begins. Text between consecutive positions forms one segment.
+
+This is useful for parsing fixed-width formats where you know the column start positions rather than the lengths.
+
+Note the difference from `Splitter.SplitTextByRanges`: positions defines cut points, while ranges specifies `{offset, length}` pairs.
+
+## Examples
+
+### Example 1: Split at positions 0, 2, and 5
+
+```powerquery
+Splitter.SplitTextByPositions({0, 2, 5})("ABCDEFGH")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["AB","CDE","FGH"]}]}
+-->
+
+### Example 2: Parse a fixed-width record with known column starts
+
+```powerquery
+let
+    record = "JohnDoe  30M",
+    splitter = Splitter.SplitTextByPositions({0, 8, 10}),
+    parts = splitter(record)
+in
+    parts
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["JohnDoe ","30","M"]}]}
+-->
+
+### Example 3: Use with Table.SplitColumn
+
+```powerquery
+Table.SplitColumn(
+    #table({"Record"}, {{"NY10001"}}),
+    "Record",
+    Splitter.SplitTextByPositions({0, 2}),
+    {"State", "ZipCode"}
+)
+```
+
+<!--output
+{"columns":[{"name":"State","type":"text"},{"name":"ZipCode","type":"text"}],"rows":[{"State":"NY","ZipCode":"10001"}]}
+-->

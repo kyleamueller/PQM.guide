@@ -1,0 +1,70 @@
+---
+title: "Date.AddWeeks"
+slug: "date-addweeks"
+category: "Date"
+description: "Adds a specified number of weeks to a date value."
+syntax: "Date.AddWeeks(dateTime as any, numberOfWeeks as number) as any"
+returnType: "any"
+returnDescription: "The date resulting from adding the specified number of weeks to the input value."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to add weeks to."
+  - name: "numberOfWeeks"
+    type: "number"
+    required: true
+    description: "The number of weeks to add. Use negative values to subtract weeks."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-adddays"
+  - "date-addmonths"
+  - "date-addquarters"
+---
+
+## Remarks
+
+`Date.AddWeeks` adds or subtracts a whole number of weeks (7-day periods) from a `date`, `datetime`, or `datetimezone` value. `Date.AddWeeks(d, n)` is equivalent to `Date.AddDays(d, n * 7)`. Passing a negative `numberOfWeeks` subtracts weeks. The return type matches the input type.
+
+## Examples
+
+### Example 1: Shift OrderDate forward by 2 weeks
+
+Add a 2-week lead time to each order date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "ShipByDate", each Date.AddWeeks([OrderDate], 2), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"ShipByDate","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","ShipByDate":"2024-01-29"},{"OrderID":2,"OrderDate":"2024-01-18","ShipByDate":"2024-02-01"},{"OrderID":3,"OrderDate":"2024-02-01","ShipByDate":"2024-02-15"},{"OrderID":4,"OrderDate":"2024-02-10","ShipByDate":"2024-02-24"},{"OrderID":5,"OrderDate":"2024-03-05","ShipByDate":"2024-03-19"}]}
+-->
+
+### Example 2: Subtract one week from a date
+
+Find the date one week before a reference date.
+
+```powerquery
+#table(
+    type table [Today = date, LastWeek = date],
+    {{#date(2024, 3, 15), Date.AddWeeks(#date(2024, 3, 15), -1)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Today","type":"date"},{"name":"LastWeek","type":"date"}],"rows":[{"Today":"2024-03-15","LastWeek":"2024-03-08"}]}
+-->

@@ -1,0 +1,80 @@
+---
+title: "Text.Reverse"
+slug: "text-reverse"
+category: "Text"
+description: "Returns a text value with the characters in reverse order."
+syntax: "Text.Reverse(text as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The text value with characters reversed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value to reverse."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-tolist"
+  - "text-combine"
+  - "text-start"
+  - "text-end"
+---
+
+## Remarks
+
+`Text.Reverse` returns a new text value containing all the characters of `text` in reverse order. If `text` is `null`, the function returns `null`. An empty string returns an empty string.
+
+This function operates on individual Unicode code units. For text containing surrogate pairs or combining characters, results may not be linguistically meaningful.
+
+Practical uses include palindrome detection, parsing right-to-left fixed-format strings, or reversing a portion of a text value when combined with `Text.Middle`.
+
+## Examples
+
+### Example 1: Reverse a simple string
+
+```powerquery
+Text.Reverse("Hello")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"olleH"}]}
+-->
+
+### Example 2: Palindrome check
+
+```powerquery
+let
+    word = "racecar",
+    ispalindrome = word = Text.Reverse(word)
+in
+    ispalindrome
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 3: Reverse a numeric string
+
+```powerquery
+Text.Reverse("12345")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"54321"}]}
+-->
+
+### Example 4: Handle null input
+
+```powerquery
+Text.Reverse(null)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+-->

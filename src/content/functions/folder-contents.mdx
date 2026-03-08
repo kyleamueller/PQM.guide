@@ -1,0 +1,88 @@
+---
+title: "Folder.Contents"
+slug: "folder-contents"
+category: "Accessing Data"
+description: "Returns a table of files and subfolders in the specified local or network folder path."
+syntax: "Folder.Contents(folderPath as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table with one row per file or subfolder, including columns for Name, Folder Path, Date accessed, Date modified, Date created, Extension, Attributes, and Content."
+parameters:
+  - name: "folderPath"
+    type: "text"
+    required: true
+    description: "The full path to the folder to read (e.g., \"C:\\Data\\Reports\" or a UNC path like \"\\\\server\\share\\folder\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options. Supports IncludeSubFolders (logical, defaults to false) to include items from subfolders recursively."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "folder-files"
+  - "file-contents"
+  - "csv-document"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`Folder.Contents` reads a folder and returns a table listing all files and immediate subfolders. Unlike `Folder.Files`, it does not recurse into subfolders by default — it returns only the direct children of the specified path.
+
+**Columns returned**:
+- `Name` (text) — the file or folder name including extension.
+- `Folder Path` (text) — the full folder path (without the file name).
+- `Date accessed` (datetime) — last access timestamp.
+- `Date modified` (datetime) — last modification timestamp.
+- `Date created` (datetime) — creation timestamp.
+- `Extension` (text) — the file extension including the leading dot (e.g., `.xlsx`), or empty for folders.
+- `Attributes` (record) — a record of file system attributes (Hidden, ReadOnly, System, Directory).
+- `Content` (binary) — the binary content of the file. `null` for folders.
+
+**Authentication**: Access is determined by the Windows credentials of the user or gateway running the query. No special authentication is configured in Power Query itself.
+
+**Query folding**: Not supported. All filtering of the resulting table occurs in Power Query.
+
+**Power BI Service**: This function is not available for direct cloud refresh. Use an on-premises data gateway to refresh queries based on local or network folder paths.
+
+**Combining files**: The typical pattern is to use `Folder.Contents` (or `Folder.Files`) to get a list of files, filter to the ones you want, then expand the `Content` column by passing each binary value to the appropriate parsing function (`Csv.Document`, `Excel.Workbook`, `Json.Document`, etc.).
+
+## Examples
+
+### Example 1: List all files and folders in a directory
+```powerquery
+Folder.Contents("C:\Data\Reports")
+```
+
+### Example 2: Filter to only CSV files
+```powerquery
+let
+    Source = Folder.Contents("C:\Data\Reports"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv")
+in
+    CsvFiles
+```
+
+### Example 3: Combine all CSV files in a folder into one table
+```powerquery
+let
+    Source = Folder.Contents("C:\Data\Reports"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv"),
+    AddedContent = Table.AddColumn(CsvFiles, "Parsed", each Csv.Document([Content])),
+    Combined = Table.Combine(AddedContent[Parsed])
+in
+    Combined
+```
+
+### Example 4: List files modified after a specific date
+```powerquery
+let
+    Source = Folder.Contents("C:\Data\Reports"),
+    Recent = Table.SelectRows(Source, each [Date modified] > #datetime(2024, 1, 1, 0, 0, 0))
+in
+    Recent
+```

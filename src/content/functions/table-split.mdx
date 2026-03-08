@@ -1,0 +1,63 @@
+---
+title: "Table.Split"
+slug: "table-split"
+category: "Table"
+description: "Splits a table into a list of tables, each containing at most pageSize rows."
+syntax: "Table.Split(table as table, pageSize as number) as list"
+returnType: "list"
+returnDescription: "A list of tables, each with at most pageSize rows."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to split into pages."
+  - name: "pageSize"
+    type: "number"
+    required: true
+    description: "The maximum number of rows per output table."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-splitat"
+  - "table-partition"
+  - "table-range"
+---
+
+## Remarks
+
+`Table.Split` divides a table into a list of evenly sized sub-tables (pages). The last page may have fewer rows than `pageSize` if the total row count is not evenly divisible. This is useful for implementing pagination or for processing large tables in smaller chunks.
+
+## Examples
+
+### Example 1: Split a 6-row table into pages of 2
+
+```powerquery
+Table.Split(
+    #table({"ID"}, {{1}, {2}, {3}, {4}, {5}, {6}}),
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Table], [Table], [Table]}"}]}
+-->
+
+### Example 2: Access the second page
+
+```powerquery
+let
+    Source = #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
+    Pages  = Table.Split(Source, 2),
+    Page2  = Pages{1}
+in
+    Page2
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"3"},{"ID":"4"}]}
+-->

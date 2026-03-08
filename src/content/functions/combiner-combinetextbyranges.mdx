@@ -1,0 +1,87 @@
+---
+title: "Combiner.CombineTextByRanges"
+slug: "combiner-combinetextbyranges"
+category: "Combiner"
+description: "Returns a combiner function that places text values into fixed-width ranges within an output string."
+syntax: "Combiner.CombineTextByRanges(ranges as list, optional template as nullable text) as function"
+returnType: "function"
+returnDescription: "A function that accepts a list of text values and fits each into the corresponding {offset, length} range in the output."
+parameters:
+  - name: "ranges"
+    type: "list"
+    required: true
+    description: "A list of two-element lists {offset, length} specifying where and how wide each field is in the output."
+  - name: "template"
+    type: "text"
+    required: false
+    description: "An optional template text used as the base output string. Defaults to a string of spaces."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "combiner-combinetextbypositions"
+  - "combiner-combinetextbydelimiter"
+  - "combiner-combinetextbylengths"
+  - "splitter-splittextbyranges"
+---
+
+## Remarks
+
+`Combiner.CombineTextByRanges` is the inverse of `Splitter.SplitTextByRanges`. It returns a combiner function that, when called with a list of text values, places each value into the corresponding `{offset, length}` range in the output string.
+
+Each `{offset, length}` pair specifies the starting character position and the width of the field. If a value is shorter than the field width, it is right-padded with spaces. If a value is longer than the field width, it is truncated to fit.
+
+The optional `template` parameter provides the base string; any positions not covered by a range retain the template characters. If no template is provided, the output is filled with spaces.
+
+This function is the structured counterpart of `Combiner.CombineTextByPositions` — use it when you need both positional and width control over each field.
+
+## Examples
+
+### Example 1: Place two values into fixed-width fields
+
+```powerquery
+Combiner.CombineTextByRanges({{0, 5}, {5, 5}})({"Hello", "World"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelloWorld"}]}
+-->
+
+### Example 2: Values padded to field width
+
+```powerquery
+Combiner.CombineTextByRanges({{0, 10}, {10, 10}})({"Alice", "Bob"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice     Bob       "}]}
+-->
+
+### Example 3: Values truncated when too long for the field
+
+```powerquery
+Combiner.CombineTextByRanges({{0, 3}, {3, 3}})({"Hello", "World"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelWor"}]}
+-->
+
+### Example 4: Use with Table.CombineColumns to produce fixed-width output
+
+```powerquery
+Table.CombineColumns(
+    #table({"Code", "Name"}, {{"US", "United States"}}),
+    {"Code", "Name"},
+    Combiner.CombineTextByRanges({{0, 2}, {2, 15}}),
+    "Record"
+)
+```
+
+<!--output
+{"columns":[{"name":"Record","type":"text"}],"rows":[{"Record":"USUnited States"}]}
+-->

@@ -1,0 +1,73 @@
+---
+title: "List.Buffer"
+slug: "list-buffer"
+category: "List"
+description: "Buffers a list in memory, forcing immediate evaluation and preventing repeated re-evaluation of the source."
+syntax: "List.Buffer(list as list) as list"
+returnType: "list"
+returnDescription: "An in-memory copy of the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to buffer into memory."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-transform"
+  - "list-select"
+  - "list-count"
+---
+
+## Remarks
+
+`List.Buffer` forces the immediate and complete evaluation of a list and stores the result in memory. The returned list is identical in content to the input, but is backed by an in-memory buffer rather than a lazy query pipeline.
+
+This is a performance optimization function. In Power Query, lists are often lazy — they are evaluated on demand, potentially multiple times. Buffering a list ensures it is evaluated exactly once, which is beneficial when:
+
+- The list is referenced multiple times in the same query (e.g., passed to multiple functions).
+- The source of the list is expensive (e.g., a database query, a web call, or a large file read).
+- You are iterating over a list and the source data could change between reads.
+
+`List.Buffer` is the list equivalent of `Table.Buffer`. Both are used to prevent redundant re-evaluation in complex query graphs.
+
+## Examples
+
+### Example 1: Buffer a list used in multiple operations
+
+Avoid evaluating the source list multiple times when using it for both count and sum.
+
+```powerquery
+let
+    Source = {1, 2, 3, 4, 5},
+    Buffered = List.Buffer(Source),
+    Count = List.Count(Buffered),
+    Total = List.Sum(Buffered)
+in
+    #table({"Count", "Total"}, {{Count, Total}})
+```
+
+<!--output
+{"columns":[{"name":"Count","type":"number"},{"name":"Total","type":"number"}],"rows":[{"Count":5,"Total":15}]}
+-->
+
+### Example 2: Buffer before a transformation loop
+
+Buffer a large list before referencing it inside List.Transform to prevent repeated evaluation.
+
+```powerquery
+let
+    RawValues = List.Buffer({10, 20, 30, 40, 50}),
+    Doubled = List.Transform(RawValues, each _ * 2)
+in
+    Doubled
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{20, 40, 60, 80, 100}"}]}
+-->

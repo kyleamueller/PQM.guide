@@ -1,0 +1,77 @@
+---
+title: "Table.AggregateTableColumn"
+slug: "table-aggregatetablecolumn"
+category: "Table"
+description: "Expands a column of nested tables by applying aggregation functions to each nested table."
+syntax: "Table.AggregateTableColumn(table as table, column as text, aggregations as list) as table"
+returnType: "table"
+returnDescription: "The original table with the nested table column replaced by aggregated result columns."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table containing a column of nested tables."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name of the column containing nested tables."
+  - name: "aggregations"
+    type: "list"
+    required: true
+    description: "A list of {newColumnName, aggregationFunction, newColumnType} triples defining how each nested table is aggregated."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-expandtablecolumn"
+  - "table-group"
+  - "table-nestedjoin"
+---
+
+## Remarks
+
+`Table.AggregateTableColumn` is an alternative to `Table.ExpandTableColumn` when you want to aggregate (rather than flatten) the nested tables in a column. Each aggregation is defined as a three-element list: `{newColumnName, aggregationFunction, newColumnType}`.
+
+The `aggregationFunction` receives the nested table as its argument and returns a scalar result. Common choices include `Table.RowCount`, `List.Sum`, `List.Max`, etc.
+
+This is particularly useful after a `Table.Group` or `Table.NestedJoin` step when you want summary statistics instead of expanded rows.
+
+## Examples
+
+### Example 1: Count rows in each nested table
+
+```powerquery
+let
+    Source = Table.Group(
+        #table({"Dept", "Salary"}, {{"HR", 50000}, {"IT", 80000}, {"HR", 60000}}),
+        "Dept",
+        {{"Employees", each _, type table}}
+    )
+in
+    Table.AggregateTableColumn(Source, "Employees", {{"Count", Table.RowCount, type number}})
+```
+
+<!--output
+{"columns":[{"name":"Dept","type":"any"},{"name":"Count","type":"number"}],"rows":[{"Dept":"HR","Count":"2"},{"Dept":"IT","Count":"1"}]}
+-->
+
+### Example 2: Sum a column in each nested table
+
+```powerquery
+let
+    Grouped = Table.Group(
+        #table({"Region", "Sales"}, {{"North", 100}, {"North", 200}, {"South", 150}}),
+        "Region",
+        {{"Data", each _, type table}}
+    )
+in
+    Table.AggregateTableColumn(Grouped, "Data", {{"TotalSales", each List.Sum([Sales]), type number}})
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"any"},{"name":"TotalSales","type":"number"}],"rows":[{"Region":"North","TotalSales":"300"},{"Region":"South","TotalSales":"150"}]}
+-->

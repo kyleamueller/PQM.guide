@@ -1,0 +1,57 @@
+---
+title: "Table.ColumnCount"
+slug: "table-columncount"
+category: "Table"
+description: "Returns the number of columns in the table."
+syntax: "Table.ColumnCount(table as table) as number"
+returnType: "number"
+returnDescription: "The total number of columns in the table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose column count is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-columnnames"
+  - "table-rowcount"
+  - "table-columntypes"
+---
+
+## Remarks
+
+`Table.ColumnCount` returns the number of columns in a table as a number. It is equivalent to `List.Count(Table.ColumnNames(table))` but more direct. Use it to validate structure, drive dynamic logic, or guard against schema changes.
+
+## Examples
+
+### Example 1: Count columns in a simple table
+
+```powerquery
+Table.ColumnCount(
+    #table({"A", "B", "C"}, {{1, 2, 3}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
+-->
+
+### Example 2: Use column count to build dynamic column references
+
+```powerquery
+let
+    Source  = #table({"Name", "Age", "City"}, {{"Alice", 30, "NYC"}}),
+    ColCount = Table.ColumnCount(Source)
+in
+    ColCount
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
+-->

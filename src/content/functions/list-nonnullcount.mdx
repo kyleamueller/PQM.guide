@@ -1,0 +1,74 @@
+---
+title: "List.NonNullCount"
+slug: "list-nonnullcount"
+category: "List"
+description: "Returns the count of non-null values in the list."
+syntax: "List.NonNullCount(list as list) as number"
+returnType: "number"
+returnDescription: "The number of items in the list that are not null."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to count non-null values in."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-count"
+  - "list-removenulls"
+  - "list-select"
+  - "list-isempty"
+---
+
+## Remarks
+
+`List.NonNullCount` returns the number of items in a list that are not null. This is equivalent to `List.Count(List.Select(list, each _ <> null))` but is more readable and concise.
+
+This function is useful for calculating fill rates, data quality metrics, or counting valid responses in survey data.
+
+- An empty list returns `0`.
+- Counts all non-null values regardless of their type (numbers, text, dates, etc.).
+- To get the null count, subtract from `List.Count(list)`.
+
+## Examples
+
+### Example 1: Count non-null values
+
+```powerquery
+List.NonNullCount({1, null, 3, null, 5})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 2: All values are non-null
+
+```powerquery
+List.NonNullCount({10, 20, 30})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 3: Calculate data completeness percentage
+
+```powerquery
+let
+    Values = {100, null, 250, null, null, 400, 150},
+    Total = List.Count(Values),
+    NonNull = List.NonNullCount(Values),
+    Completeness = NonNull / Total
+in
+    #table({"Total", "NonNull", "Completeness %"}, {{Total, NonNull, Completeness * 100}})
+```
+
+<!--output
+{"columns":[{"name":"Total","type":"number"},{"name":"NonNull","type":"number"},{"name":"Completeness %","type":"number"}],"rows":[{"Total":7,"NonNull":4,"Completeness %":57.142857142857142}]}
+-->

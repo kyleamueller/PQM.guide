@@ -1,0 +1,62 @@
+---
+title: "Date.IsInPreviousDay"
+slug: "date-isinpreviousday"
+category: "Date"
+description: "Returns true if the date was yesterday."
+syntax: "Date.IsInPreviousDay(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls on yesterday's date, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentday"
+  - "date-isinnextday"
+  - "date-isinpreviousndays"
+  - "date-isinpreviousweek"
+---
+
+## Remarks
+
+`Date.IsInPreviousDay` returns `true` if the input date falls on the calendar day immediately preceding today's date (`DateTime.LocalNow() - 1 day`). It does not include today itself. The function is re-evaluated on each query refresh, making it useful for identifying yesterday's transactions or events.
+
+## Examples
+
+### Example 1: Filter yesterday's orders
+
+Keep only rows from the Sales table where OrderDate was yesterday.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousDay([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-07"}]}
+-->
+
+### Example 2: Flag yesterday's rows
+
+Add a boolean column identifying rows from yesterday.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsYesterday", each Date.IsInPreviousDay([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsYesterday","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-06","IsYesterday":false},{"OrderID":41,"OrderDate":"2026-03-07","IsYesterday":true},{"OrderID":42,"OrderDate":"2026-03-08","IsYesterday":false}]}
+-->

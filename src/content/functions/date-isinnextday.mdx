@@ -1,0 +1,62 @@
+---
+title: "Date.IsInNextDay"
+slug: "date-isinnextday"
+category: "Date"
+description: "Returns true if the date is tomorrow relative to today."
+syntax: "Date.IsInNextDay(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls on tomorrow's date, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentday"
+  - "date-isinpreviousday"
+  - "date-isinnextndays"
+  - "date-isinnextweek"
+---
+
+## Remarks
+
+`Date.IsInNextDay` returns `true` if the input date falls on the calendar day immediately following today's date (`DateTime.LocalNow() + 1 day`). It does not include today itself. The function is re-evaluated on each query refresh, making it useful for highlighting upcoming deadlines or scheduled items.
+
+## Examples
+
+### Example 1: Filter tomorrow's scheduled tasks
+
+Keep only rows where DueDate is tomorrow.
+
+```powerquery
+Table.SelectRows(
+    Tasks,
+    each Date.IsInNextDay([DueDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":5,"DueDate":"2026-03-09","TaskName":"Submit report"}]}
+-->
+
+### Example 2: Flag tomorrow's rows
+
+Add a boolean column identifying rows due tomorrow.
+
+```powerquery
+Table.AddColumn(
+    Tasks,
+    "DueTomorrow", each Date.IsInNextDay([DueDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"DueTomorrow","type":"logical"}],"rows":[{"TaskID":4,"DueDate":"2026-03-08","DueTomorrow":false},{"TaskID":5,"DueDate":"2026-03-09","DueTomorrow":true},{"TaskID":6,"DueDate":"2026-03-15","DueTomorrow":false}]}
+-->

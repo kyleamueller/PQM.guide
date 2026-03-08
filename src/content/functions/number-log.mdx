@@ -1,0 +1,83 @@
+---
+title: "Number.Log"
+slug: "number-log"
+category: "Number"
+description: "Returns the logarithm of a number to the specified base. If no base is provided, returns the natural logarithm (base e)."
+syntax: "Number.Log(number as nullable number, optional base as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The logarithm of number to the specified base, or the natural log if base is omitted."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The positive number whose logarithm is computed."
+  - name: "base"
+    type: "number"
+    required: false
+    description: "The logarithm base. Defaults to e (natural logarithm) when omitted."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-ln"
+  - "number-log10"
+  - "number-exp"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Log` computes the logarithm of a number with respect to a specified base. When `base` is omitted, it behaves identically to `Number.Ln` (natural logarithm, base _e_). When `base` is `10`, it matches `Number.Log10`.
+
+The number must be positive for a real result. Passing `0` returns negative infinity; a negative number returns `NaN`. The base must be positive and not equal to `1`.
+
+## Examples
+
+### Example 1: Base-2 logarithm (how many doublings to reach 1024)
+
+```powerquery
+Number.Log(1024, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
+-->
+
+### Example 2: Natural log (base e) when base is omitted
+
+```powerquery
+Number.Log(Number.E)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 3: Base-10 log of 1000
+
+```powerquery
+Number.Log(1000, 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 4: Apply log base 2 transformation to a column
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Revenue"}),
+    "Log2Revenue", each Number.Log([Revenue], 2), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"Log2Revenue","type":"number"}],"rows":[{"OrderID":1,"Revenue":1024,"Log2Revenue":10},{"OrderID":2,"Revenue":512,"Log2Revenue":9},{"OrderID":3,"Revenue":2048,"Log2Revenue":11}]}
+-->

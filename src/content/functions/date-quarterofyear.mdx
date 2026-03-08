@@ -1,0 +1,72 @@
+---
+title: "Date.QuarterOfYear"
+slug: "date-quarterofyear"
+category: "Date"
+description: "Returns the quarter of the year (1–4) for the given date."
+syntax: "Date.QuarterOfYear(dateTime as any) as nullable number"
+returnType: "number"
+returnDescription: "An integer from 1 to 4 representing the calendar quarter."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-startofquarter"
+  - "date-endofquarter"
+  - "date-addquarters"
+  - "date-month"
+---
+
+## Remarks
+
+`Date.QuarterOfYear` returns 1 for January–March, 2 for April–June, 3 for July–September, and 4 for October–December. It is equivalent to `Number.RoundUp(Date.Month(d) / 3)`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Add quarter number to Sales table
+
+Add a column showing the fiscal quarter for each order date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "Quarter", each Date.QuarterOfYear([OrderDate]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Quarter","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Quarter":1},{"OrderID":2,"OrderDate":"2024-01-18","Quarter":1},{"OrderID":3,"OrderDate":"2024-02-01","Quarter":1},{"OrderID":4,"OrderDate":"2024-02-10","Quarter":1},{"OrderID":5,"OrderDate":"2024-03-05","Quarter":1}]}
+-->
+
+### Example 2: Quarter for each month boundary
+
+Show quarter assignment across all four quarters.
+
+```powerquery
+#table(
+    type table [Date = date, Quarter = number],
+    {
+        {#date(2024, 1, 1), Date.QuarterOfYear(#date(2024, 1, 1))},
+        {#date(2024, 4, 1), Date.QuarterOfYear(#date(2024, 4, 1))},
+        {#date(2024, 7, 1), Date.QuarterOfYear(#date(2024, 7, 1))},
+        {#date(2024, 10, 1), Date.QuarterOfYear(#date(2024, 10, 1))}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"Quarter","type":"number"}],"rows":[{"Date":"2024-01-01","Quarter":1},{"Date":"2024-04-01","Quarter":2},{"Date":"2024-07-01","Quarter":3},{"Date":"2024-10-01","Quarter":4}]}
+-->

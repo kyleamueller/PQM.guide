@@ -1,0 +1,85 @@
+---
+title: "List.IsDistinct"
+slug: "list-isdistinct"
+category: "List"
+description: "Returns true if the list contains no duplicate values."
+syntax: "List.IsDistinct(list as list, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "True if all values in the list are unique; false if any duplicates exist."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to check for uniqueness."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-distinct"
+  - "list-count"
+  - "list-isempty"
+---
+
+## Remarks
+
+`List.IsDistinct` checks whether every item in the list is unique. It returns `true` if all items are distinct, and `false` if any value appears more than once.
+
+This is a convenient shorthand for checking `List.Count(list) = List.Count(List.Distinct(list))`, but may be more efficient.
+
+- An empty list returns `true` (vacuous truth — no duplicates exist).
+- Null values are treated as equal to each other, so two nulls make the list non-distinct.
+- Pass `Comparer.OrdinalIgnoreCase` for case-insensitive text comparison.
+
+## Examples
+
+### Example 1: All values are distinct
+
+```powerquery
+List.IsDistinct({1, 2, 3, 4, 5})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: Duplicate values present
+
+```powerquery
+List.IsDistinct({1, 2, 3, 2, 5})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Case-insensitive check
+
+```powerquery
+List.IsDistinct({"Apple", "apple", "Banana"}, Comparer.OrdinalIgnoreCase)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 4: Validate a key column has no duplicates
+
+```powerquery
+let
+    Keys = {"ID-001", "ID-002", "ID-003", "ID-004"},
+    IsUnique = List.IsDistinct(Keys)
+in
+    IsUnique
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

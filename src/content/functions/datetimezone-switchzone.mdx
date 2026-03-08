@@ -1,0 +1,77 @@
+---
+title: "DateTimeZone.SwitchZone"
+slug: "datetimezone-switchzone"
+category: "DateTimeZone"
+description: "Adjusts a datetimezone value to a different UTC offset while preserving the instant in time."
+syntax: "DateTimeZone.SwitchZone(dateTimeZone as nullable datetimezone, timezoneHours as number, optional timezoneMinutes as nullable number) as nullable datetimezone"
+returnType: "datetimezone"
+returnDescription: "A datetimezone value representing the same instant in time expressed with the new UTC offset."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "The datetimezone value to convert to a new timezone."
+  - name: "timezoneHours"
+    type: "number"
+    required: true
+    description: "The hour component of the target UTC offset (e.g., -5 for EST, 1 for CET)."
+  - name: "timezoneMinutes"
+    type: "number"
+    required: false
+    description: "The minutes component of the target UTC offset. Defaults to 0. Use 30 for offsets like UTC+5:30."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-toutc"
+  - "datetimezone-tolocal"
+  - "datetimezone-removezone"
+  - "datetime-addzone"
+---
+
+## Remarks
+
+`DateTimeZone.SwitchZone` converts a `datetimezone` value to a new UTC offset while preserving the absolute point in time (the underlying UTC moment). The date and time components are adjusted accordingly. For example, switching `2024-03-15T14:30:00+05:00` to UTC+0 yields `2024-03-15T09:30:00+00:00`.
+
+This differs from `DateTime.AddZone`, which merely tags a datetime with a new offset without adjusting the time. Use `timezoneMinutes` for non-whole-hour offsets such as UTC+5:30 (India) or UTC+9:30 (Australia Central).
+
+## Examples
+
+### Example 1: Convert event timestamps to UTC
+
+Switch all event times with mixed timezone offsets to UTC (+00:00).
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
+    "EventUTC",
+    each DateTimeZone.SwitchZone([EventTimeZone], 0),
+    type datetimezone
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"EventUTC","type":"datetimezone"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","EventUTC":"2024-03-15T13:30:00+00:00"},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00+01:00","EventUTC":"2024-03-15T13:00:00+00:00"},{"EventID":3,"EventTimeZone":"2024-03-16T09:15:00+05:30","EventUTC":"2024-03-16T03:45:00+00:00"}]}
+-->
+
+### Example 2: Switch to a specific offset
+
+Convert a New York time (UTC-5) to Tokyo time (UTC+9).
+
+```powerquery
+#table(
+    type table [NewYork = datetimezone, Tokyo = datetimezone],
+    {{#datetimezone(2024, 3, 15, 9, 0, 0, -5, 0),
+      DateTimeZone.SwitchZone(#datetimezone(2024, 3, 15, 9, 0, 0, -5, 0), 9)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"NewYork","type":"datetimezone"},{"name":"Tokyo","type":"datetimezone"}],"rows":[{"NewYork":"2024-03-15T09:00:00-05:00","Tokyo":"2024-03-15T23:00:00+09:00"}]}
+-->

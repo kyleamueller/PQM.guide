@@ -1,0 +1,62 @@
+---
+title: "Date.IsInNextMonth"
+slug: "date-isinnextmonth"
+category: "Date"
+description: "Returns true if the date falls in the next calendar month."
+syntax: "Date.IsInNextMonth(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the month immediately after the current month, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentmonth"
+  - "date-isinpreviousmonth"
+  - "date-isinnextnmonths"
+  - "date-isinnextquarter"
+---
+
+## Remarks
+
+`Date.IsInNextMonth` returns `true` if the input date falls within the calendar month immediately after the current month (as determined by `DateTime.LocalNow()`). For example, if today is in March, this function returns `true` for any date in April. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter next month's renewals
+
+Keep only rows where RenewalDate falls in the next calendar month.
+
+```powerquery
+Table.SelectRows(
+    Subscriptions,
+    each Date.IsInNextMonth([RenewalDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"SubID":12,"RenewalDate":"2026-04-10","Customer":"Contoso"},{"SubID":15,"RenewalDate":"2026-04-25","Customer":"Fabrikam"}]}
+-->
+
+### Example 2: Flag next-month rows
+
+Add a boolean column identifying rows due next month.
+
+```powerquery
+Table.AddColumn(
+    Subscriptions,
+    "RenewsNextMonth", each Date.IsInNextMonth([RenewalDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"RenewsNextMonth","type":"logical"}],"rows":[{"SubID":10,"RenewalDate":"2026-03-15","RenewsNextMonth":false},{"SubID":12,"RenewalDate":"2026-04-10","RenewsNextMonth":true},{"SubID":14,"RenewalDate":"2026-05-20","RenewsNextMonth":false}]}
+-->

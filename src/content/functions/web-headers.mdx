@@ -1,0 +1,81 @@
+---
+title: "Web.Headers"
+slug: "web-headers"
+category: "Accessing Data"
+description: "Returns the HTTP response headers for the specified URL as a record."
+syntax: "Web.Headers(url as text, optional options as nullable record) as record"
+returnType: "record"
+returnDescription: "A record where each field name is an HTTP response header name and each field value is the corresponding header value as text."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL to send the HTTP HEAD request to."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with request options. Supports the same options as Web.Contents, including Headers (to set request headers), Timeout, and IsRetry."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+  - "web-page"
+  - "web-browsercontents"
+---
+
+## Remarks
+
+`Web.Headers` sends an HTTP HEAD request to the specified URL and returns the response headers as a record. This is useful for inspecting metadata about a resource — such as its content type, size, last modified date, or caching directives — without downloading the full response body.
+
+**Authentication**: The function respects the same credential settings as `Web.Contents`. If the URL requires authentication, configure it in the data source credentials dialog.
+
+**Query folding**: This function does not support query folding.
+
+**Common use cases**:
+- Checking the `Content-Type` header to determine the format of a resource before downloading it.
+- Reading the `Last-Modified` or `ETag` header to detect whether a resource has changed since a previous refresh.
+- Reading `Content-Length` to estimate download size before calling `Web.Contents`.
+
+**Key options** (same as `Web.Contents`):
+- `Headers` (record) — additional HTTP request headers to include in the HEAD request.
+- `Timeout` (duration) — maximum time to wait for a response.
+
+Header field names in the returned record follow standard HTTP capitalization (e.g., `Content-Type`, `Last-Modified`). Access them using record field access syntax.
+
+## Examples
+
+### Example 1: Get all response headers for a URL
+```powerquery
+Web.Headers("https://example.com/data.csv")
+```
+
+### Example 2: Read the Content-Type header
+```powerquery
+let
+    Headers = Web.Headers("https://example.com/data.csv"),
+    ContentType = Headers[Content-Type]
+in
+    ContentType
+```
+
+### Example 3: Check the Last-Modified date of a resource
+```powerquery
+let
+    Headers = Web.Headers("https://example.com/report.xlsx"),
+    LastModified = Headers[Last-Modified]
+in
+    LastModified
+```
+
+### Example 4: Send a request with a custom header
+```powerquery
+Web.Headers(
+    "https://api.example.com/resource",
+    [Headers = [Authorization = "Bearer mytoken123"]]
+)
+```

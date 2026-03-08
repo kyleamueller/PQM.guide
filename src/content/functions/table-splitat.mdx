@@ -1,0 +1,69 @@
+---
+title: "Table.SplitAt"
+slug: "table-splitat"
+category: "Table"
+description: "Splits a table into two parts at a given row count, returning both as fields of a record."
+syntax: "Table.SplitAt(table as table, count as number) as record"
+returnType: "record"
+returnDescription: "A record with two fields: First (the first count rows) and Remaining (all other rows)."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to split."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of rows in the first portion."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-split"
+  - "table-partition"
+  - "table-firstn"
+  - "table-skip"
+---
+
+## Remarks
+
+`Table.SplitAt` divides a table into two disjoint sub-tables at row `count`. The function returns a record with two fields:
+- `First`: the first `count` rows
+- `Remaining`: all rows after position `count`
+
+This is equivalent to calling `Table.FirstN(table, count)` and `Table.Skip(table, count)` separately but does so in a single pass.
+
+## Examples
+
+### Example 1: Split a table at row 2
+
+```powerquery
+Table.SplitAt(
+    #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[First = [Table], Remaining = [Table]]"}]}
+-->
+
+### Example 2: Access the First and Remaining portions
+
+```powerquery
+let
+    Source = #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
+    Split  = Table.SplitAt(Source, 2),
+    First  = Split[First],
+    Rest   = Split[Remaining]
+in
+    {Table.RowCount(First), Table.RowCount(Rest)}
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{2, 3}"}]}
+-->

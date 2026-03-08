@@ -1,0 +1,74 @@
+---
+title: "Table.CombineColumnsToRecord"
+slug: "table-combinecolumnstorecord"
+category: "Table"
+description: "Combines selected columns into a single record column."
+syntax: "Table.CombineColumnsToRecord(table as table, newColumnName as text, sourceColumns as list, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "The original table with the specified columns replaced by a single record column."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to process."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name of the new record column."
+  - name: "sourceColumns"
+    type: "list"
+    required: true
+    description: "A list of column names to combine into a record."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "Optional record. Supports DisplayNameColumn (text) to specify which field name to use as the display name for the record column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-expandrecordcolumn"
+  - "table-combinecolumns"
+  - "table-torecords"
+---
+
+## Remarks
+
+`Table.CombineColumnsToRecord` packages multiple columns into a single column where each cell is a record. The source columns are removed and replaced by the new record column. This is useful for passing structured sub-objects downstream or for reshaping data before expanding with `Table.ExpandRecordColumn`.
+
+The field names in the resulting records match the original column names.
+
+## Examples
+
+### Example 1: Combine address columns into a record
+
+```powerquery
+Table.CombineColumnsToRecord(
+    #table({"Name", "City", "Country"}, {{"Alice", "Paris", "France"}, {"Bob", "Tokyo", "Japan"}}),
+    "Address",
+    {"City", "Country"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Address","type":"record"}],"rows":[{"Name":"Alice","Address":"[City = \"Paris\", Country = \"France\"]"},{"Name":"Bob","Address":"[City = \"Tokyo\", Country = \"Japan\"]"}]}
+-->
+
+### Example 2: Round-trip with ExpandRecordColumn
+
+```powerquery
+let
+    Source   = #table({"ID", "X", "Y"}, {{1, 10, 20}, {2, 30, 40}}),
+    Combined = Table.CombineColumnsToRecord(Source, "Coords", {"X", "Y"}),
+    Expanded = Table.ExpandRecordColumn(Combined, "Coords", {"X", "Y"})
+in
+    Expanded
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"X","type":"any"},{"name":"Y","type":"any"}],"rows":[{"ID":"1","X":"10","Y":"20"},{"ID":"2","X":"30","Y":"40"}]}
+-->

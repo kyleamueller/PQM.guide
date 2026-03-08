@@ -1,0 +1,68 @@
+---
+title: "Date.IsInNextNQuarters"
+slug: "date-isinnextnquarters"
+category: "Date"
+description: "Returns true if the date falls within the next N calendar quarters."
+syntax: "Date.IsInNextNQuarters(dateTime as any, quarters as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the next N quarters after the current quarter, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "quarters"
+    type: "number"
+    required: true
+    description: "The number of quarters ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinnextquarter"
+  - "date-isinpreviousnquarters"
+  - "date-isinnextnmonths"
+  - "date-isinnextnyears"
+---
+
+## Remarks
+
+`Date.IsInNextNQuarters` returns `true` if the input date falls within the next N complete calendar quarters after the current quarter. The current quarter itself is not included; use `Date.IsInCurrentQuarter` to also match the current quarter. The function is re-evaluated on each query refresh.
+
+For example, if today is in Q1 and `quarters = 2`, it matches any date in Q2 or Q3.
+
+## Examples
+
+### Example 1: Find projects due in the next 2 quarters
+
+Keep only rows where ProjectEnd falls within the next 2 quarters.
+
+```powerquery
+Table.SelectRows(
+    Projects,
+    each Date.IsInNextNQuarters([ProjectEnd], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"ProjectID","type":"text"},{"name":"ProjectEnd","type":"date"},{"name":"ProjectName","type":"text"}],"rows":[{"ProjectID":"P001","ProjectEnd":"2026-04-30","ProjectName":"Alpha"},{"ProjectID":"P002","ProjectEnd":"2026-06-30","ProjectName":"Beta"}]}
+-->
+
+### Example 2: Flag projects ending in the next 4 quarters
+
+Add a boolean column for projects ending within the next year (4 quarters).
+
+```powerquery
+Table.AddColumn(
+    Projects,
+    "EndsNextYear", each Date.IsInNextNQuarters([ProjectEnd], 4), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"ProjectID","type":"text"},{"name":"ProjectEnd","type":"date"},{"name":"EndsNextYear","type":"logical"}],"rows":[{"ProjectID":"P001","ProjectEnd":"2026-04-30","EndsNextYear":true},{"ProjectID":"P003","ProjectEnd":"2027-02-28","EndsNextYear":false}]}
+-->

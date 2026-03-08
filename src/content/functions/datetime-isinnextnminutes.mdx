@@ -1,0 +1,66 @@
+---
+title: "DateTime.IsInNextNMinutes"
+slug: "datetime-isinnextnminutes"
+category: "DateTime"
+description: "Returns true if the datetime falls within the next N clock minutes."
+syntax: "DateTime.IsInNextNMinutes(dateTime as any, minutes as number) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the next N minutes after the current minute, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+  - name: "minutes"
+    type: "number"
+    required: true
+    description: "The number of minutes ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isinnextminute"
+  - "datetime-isinpreviousnminutes"
+  - "datetime-isinnextnhours"
+  - "datetime-isinnextnseconds"
+---
+
+## Remarks
+
+`DateTime.IsInNextNMinutes` returns `true` if the input `datetime` or `datetimezone` value falls within the next N complete clock minutes after the current minute. The current minute itself is not included; use `DateTime.IsInCurrentMinute` to also match the current minute. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events in the next 15 minutes
+
+Keep only rows where EventTime falls within the next 15 minutes.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInNextNMinutes([EventTime], 15)
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventName","type":"text"}],"rows":[{"EventID":62,"EventTime":"2026-03-08T10:40:00","EventName":"Check-in"},{"EventID":63,"EventTime":"2026-03-08T10:47:00","EventName":"Alert"}]}
+-->
+
+### Example 2: Flag events in the next 30 minutes
+
+Add a boolean column for events happening in the next 30 minutes.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "InNext30Min", each DateTime.IsInNextNMinutes([EventTime], 30), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InNext30Min","type":"logical"}],"rows":[{"EventID":61,"EventTime":"2026-03-08T10:32:00","InNext30Min":false},{"EventID":62,"EventTime":"2026-03-08T10:40:00","InNext30Min":true},{"EventID":64,"EventTime":"2026-03-08T11:05:00","InNext30Min":false}]}
+-->

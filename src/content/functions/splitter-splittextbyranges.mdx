@@ -1,0 +1,80 @@
+---
+title: "Splitter.SplitTextByRanges"
+slug: "splitter-splittextbyranges"
+category: "Splitter"
+description: "Returns a splitter function that extracts substrings from text at specified {offset, length} ranges."
+syntax: "Splitter.SplitTextByRanges(ranges as list, optional startAtEnd as nullable logical) as function"
+returnType: "function"
+returnDescription: "A function that extracts substrings from text according to the list of {offset, length} pairs."
+parameters:
+  - name: "ranges"
+    type: "list"
+    required: true
+    description: "A list of two-element lists {offset, length}, each specifying a zero-based start position and character count for a segment."
+  - name: "startAtEnd"
+    type: "logical"
+    required: false
+    description: "When true, offsets are measured from the end of the string. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbylengths"
+  - "splitter-splittextbypositions"
+  - "splitter-splittextbyrepeatedlengths"
+  - "combiner-combinetextbyranges"
+---
+
+## Remarks
+
+`Splitter.SplitTextByRanges` returns a splitter function that extracts non-contiguous or overlapping portions of a text value based on `{offset, length}` pairs. Each range specifies where to start (zero-based offset) and how many characters to take.
+
+Unlike `Splitter.SplitTextByPositions` (which splits at cut points) or `Splitter.SplitTextByLengths` (which takes consecutive segments), this function allows arbitrary, possibly non-adjacent ranges. Ranges may overlap or leave gaps between them.
+
+This is useful when dealing with fixed-width formats where only specific columns are needed, or when fields are interspersed with padding characters that should be skipped.
+
+## Examples
+
+### Example 1: Extract two non-adjacent ranges
+
+```powerquery
+Splitter.SplitTextByRanges({{0, 3}, {5, 4}})("ABCDE12345")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ABC","2345"]}]}
+-->
+
+### Example 2: Extract named fields from a fixed-width record
+
+```powerquery
+let
+    record = "SMITH     JOHN      1985",
+    splitter = Splitter.SplitTextByRanges({{0, 10}, {10, 10}, {20, 4}}),
+    parts = splitter(record)
+in
+    parts
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["SMITH     ","JOHN      ","1985"]}]}
+-->
+
+### Example 3: Use with Table.SplitColumn
+
+```powerquery
+Table.SplitColumn(
+    #table({"Data"}, {{"ABCXYZ"}}),
+    "Data",
+    Splitter.SplitTextByRanges({{0, 3}, {3, 3}}),
+    {"Part1", "Part2"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Part1","type":"text"},{"name":"Part2","type":"text"}],"rows":[{"Part1":"ABC","Part2":"XYZ"}]}
+-->

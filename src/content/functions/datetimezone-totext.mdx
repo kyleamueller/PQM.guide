@@ -1,0 +1,74 @@
+---
+title: "DateTimeZone.ToText"
+slug: "datetimezone-totext"
+category: "DateTimeZone"
+description: "Converts a datetimezone value to a text string."
+syntax: "DateTimeZone.ToText(dateTimeZone as nullable datetimezone, optional options as any) as nullable text"
+returnType: "text"
+returnDescription: "A text representation of the datetimezone, or null if the input is null."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "The datetimezone value to convert to text."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string, e.g., \"yyyy-MM-ddTHH:mm:sszzz\") and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-fromtext"
+  - "datetimezone-from"
+  - "datetime-totext"
+  - "date-totext"
+---
+
+## Remarks
+
+`DateTimeZone.ToText` formats a `datetimezone` value as a text string. Without options, it produces an ISO 8601 string including the UTC offset (e.g., `"2024-03-15T14:30:00+05:30"`). Use the `Format` field in the options record to apply a custom pattern; the format specifier `zzz` produces the offset in `±HH:mm` notation. Format strings follow .NET custom datetime format conventions.
+
+If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Format datetimezone values as ISO 8601 strings
+
+Convert datetimezone event timestamps to text for export or display.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
+    "EventText",
+    each DateTimeZone.ToText([EventTimeZone], [Format="yyyy-MM-ddTHH:mm:sszzz"]),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"EventText","type":"text"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","EventText":"2024-03-15T08:30:00-05:00"},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00+01:00","EventText":"2024-03-15T14:00:00+01:00"}]}
+-->
+
+### Example 2: Format a datetimezone with a custom pattern
+
+Format a literal datetimezone value with a human-readable pattern.
+
+```powerquery
+#table(
+    type table [DTZ = datetimezone, Formatted = text],
+    {{#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30),
+      DateTimeZone.ToText(#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30),
+        [Format="MMMM d, yyyy h:mm tt (zzz)"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"Formatted","type":"text"}],"rows":[{"DTZ":"2024-03-15T14:30:00+05:30","Formatted":"March 15, 2024 2:30 PM (+05:30)"}]}
+-->

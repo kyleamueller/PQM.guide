@@ -1,0 +1,70 @@
+---
+title: "DateTime.FromFileTime"
+slug: "datetime-fromfiletime"
+category: "DateTime"
+description: "Converts a Windows file time (100-nanosecond intervals since 1601-01-01) to a datetime value."
+syntax: "DateTime.FromFileTime(fileTime as nullable number) as nullable datetime"
+returnType: "datetime"
+returnDescription: "A datetime value corresponding to the given Windows file time, expressed in local time."
+parameters:
+  - name: "fileTime"
+    type: "number"
+    required: true
+    description: "A 64-bit integer representing the number of 100-nanosecond intervals since January 1, 1601 (UTC)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-from"
+  - "datetimezone-fromfiletime"
+  - "datetime-fromtext"
+---
+
+## Remarks
+
+`DateTime.FromFileTime` converts a Windows FILETIME value — the number of 100-nanosecond intervals since 00:00:00 UTC on January 1, 1601 — into a `datetime` value in local time. This format is commonly encountered in Windows registry entries, Active Directory attributes (such as `lastLogon`), and NTFS file system metadata.
+
+The result is adjusted to the local timezone of the host environment. To get the UTC datetimezone instead, use `DateTimeZone.FromFileTime`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert Windows file times from a data source
+
+Convert FILETIME values in the ActiveDirectory table to readable datetimes.
+
+Input: `ActiveDirectory`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(ActiveDirectory, 4),
+        {"UserID", "LastLogonFileTime"}
+    ),
+    "LastLogon",
+    each DateTime.FromFileTime([LastLogonFileTime]),
+    type datetime
+)
+```
+
+<!--output
+{"columns":[{"name":"UserID","type":"text"},{"name":"LastLogonFileTime","type":"number"},{"name":"LastLogon","type":"datetime"}],"rows":[{"UserID":"U001","LastLogonFileTime":133500000000000000,"LastLogon":"2024-01-15T08:20:00"},{"UserID":"U002","LastLogonFileTime":133550000000000000,"LastLogon":"2024-03-06T07:33:20"}]}
+-->
+
+### Example 2: Convert a known file time value
+
+Convert the FILETIME for a specific known datetime.
+
+```powerquery
+#table(
+    type table [FileTime = number, DateTime = datetime],
+    {{132000000000000000, DateTime.FromFileTime(132000000000000000)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"FileTime","type":"number"},{"name":"DateTime","type":"datetime"}],"rows":[{"FileTime":132000000000000000,"DateTime":"2019-10-26T01:46:40"}]}
+-->

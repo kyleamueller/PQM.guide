@@ -1,0 +1,81 @@
+---
+title: "Table.ContainsAll"
+slug: "table-containsall"
+category: "Table"
+description: "Returns true if the table contains all of the specified rows."
+syntax: "Table.ContainsAll(table as table, rows as list, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if every record in the rows list has a matching row in the table; false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of records, each representing a row that must exist in the table."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to control which fields are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-contains"
+  - "table-containsany"
+  - "table-isdistinct"
+---
+
+## Remarks
+
+`Table.ContainsAll` returns `true` only if every record in the `rows` list has at least one matching row in the table. It is the logical AND of multiple `Table.Contains` checks. If even one of the specified rows is absent from the table, the function returns `false`.
+
+Use this function to validate that a required set of keys or rows is fully present in a dataset.
+
+## Examples
+
+### Example 1: All rows present
+
+```powerquery
+Table.ContainsAll(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}, {3, "Carol"}}),
+    {[ID = 1, Name = "Alice"], [ID = 2, Name = "Bob"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: One row missing returns false
+
+```powerquery
+Table.ContainsAll(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    {[ID = 1, Name = "Alice"], [ID = 3, Name = "Carol"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Match on a single column
+
+```powerquery
+Table.ContainsAll(
+    #table({"Code"}, {{"A"}, {"B"}, {"C"}}),
+    {[Code = "A"], [Code = "C"]},
+    "Code"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

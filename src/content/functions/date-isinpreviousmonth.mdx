@@ -1,0 +1,62 @@
+---
+title: "Date.IsInPreviousMonth"
+slug: "date-isinpreviousmonth"
+category: "Date"
+description: "Returns true if the date falls in the previous calendar month."
+syntax: "Date.IsInPreviousMonth(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the month immediately before the current month, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentmonth"
+  - "date-isinnextmonth"
+  - "date-isinpreviousnmonths"
+  - "date-isinpreviousquarter"
+---
+
+## Remarks
+
+`Date.IsInPreviousMonth` returns `true` if the input date falls within the calendar month immediately before the current month (as determined by `DateTime.LocalNow()`). For example, if today is in March, this function returns `true` for any date in February. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter last month's orders
+
+Keep only rows from the Sales table where OrderDate was in the previous month.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousMonth([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-10"},{"OrderID":39,"OrderDate":"2026-02-25"}]}
+-->
+
+### Example 2: Flag last month's rows
+
+Add a boolean column identifying rows from the previous month.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsLastMonth", each Date.IsInPreviousMonth([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastMonth","type":"logical"}],"rows":[{"OrderID":37,"OrderDate":"2026-01-20","IsLastMonth":false},{"OrderID":38,"OrderDate":"2026-02-10","IsLastMonth":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastMonth":false}]}
+-->

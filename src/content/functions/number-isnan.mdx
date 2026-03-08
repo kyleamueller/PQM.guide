@@ -1,0 +1,72 @@
+---
+title: "Number.IsNaN"
+slug: "number-isnan"
+category: "Number"
+description: "Returns true if the number is NaN (Not a Number), such as the result of 0/0."
+syntax: "Number.IsNaN(number as number) as logical"
+returnType: "logical"
+returnDescription: "True if the value is NaN, false otherwise."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to test for NaN."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-from"
+  - "number-iseven"
+  - "number-isodd"
+---
+
+## Remarks
+
+`Number.IsNaN` returns `true` when the input is the special IEEE 754 "Not a Number" value. NaN arises from undefined arithmetic such as `0 / 0` or taking the square root of a negative number. NaN is not equal to itself — `NaN = NaN` evaluates to `false` in M — so `Number.IsNaN` is the correct way to detect it.
+
+Use this function to guard against NaN values before performing further calculations or writing results to a destination.
+
+Note: `Number.IsNaN` does not accept `null` — pass a non-null number. If your column may contain nulls, filter or coalesce first.
+
+## Examples
+
+### Example 1: Detect NaN from zero division
+
+```powerquery
+Number.IsNaN(0 / 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: A normal number is not NaN
+
+```powerquery
+Number.IsNaN(3.14)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 3: Replace NaN values in a column
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Ratio"}),
+    "SafeRatio",
+    each if Number.IsNaN([Ratio]) then null else [Ratio],
+    type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Ratio","type":"number"},{"name":"SafeRatio","type":"number"}],"rows":[{"OrderID":1,"Ratio":0.5,"SafeRatio":0.5},{"OrderID":2,"Ratio":null,"SafeRatio":null},{"OrderID":3,"Ratio":0.75,"SafeRatio":0.75},{"OrderID":4,"Ratio":null,"SafeRatio":null}]}
+-->

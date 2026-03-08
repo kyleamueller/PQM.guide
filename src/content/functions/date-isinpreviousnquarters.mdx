@@ -1,0 +1,68 @@
+---
+title: "Date.IsInPreviousNQuarters"
+slug: "date-isinpreviousnquarters"
+category: "Date"
+description: "Returns true if the date falls within the previous N calendar quarters."
+syntax: "Date.IsInPreviousNQuarters(dateTime as any, quarters as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the N quarters before the current quarter, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "quarters"
+    type: "number"
+    required: true
+    description: "The number of quarters back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinpreviousquarter"
+  - "date-isinnextnquarters"
+  - "date-isinpreviousnmonths"
+  - "date-isinpreviousnyears"
+---
+
+## Remarks
+
+`Date.IsInPreviousNQuarters` returns `true` if the input date falls within the N complete calendar quarters preceding the current quarter. The current quarter itself is not included; use `Date.IsInCurrentQuarter` to also match the current quarter. The function is re-evaluated on each query refresh.
+
+For example, if today is in Q1 2026 and `quarters = 2`, it matches any date in Q3 2025 or Q4 2025.
+
+## Examples
+
+### Example 1: Filter sales from the previous 2 quarters
+
+Keep only rows where OrderDate falls within the previous 2 quarters.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousNQuarters([OrderDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":32,"OrderDate":"2025-07-15"},{"OrderID":35,"OrderDate":"2025-10-20"}]}
+-->
+
+### Example 2: Flag orders from the prior 4 quarters
+
+Add a boolean column for orders from the previous 4 quarters (approximately one year).
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "PriorYear", each Date.IsInPreviousNQuarters([OrderDate], 4), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"PriorYear","type":"logical"}],"rows":[{"OrderID":28,"OrderDate":"2025-01-15","PriorYear":false},{"OrderID":32,"OrderDate":"2025-07-15","PriorYear":true},{"OrderID":42,"OrderDate":"2026-03-08","PriorYear":false}]}
+-->

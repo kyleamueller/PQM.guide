@@ -1,0 +1,80 @@
+---
+title: "List.PositionOfAny"
+slug: "list-positionofany"
+category: "List"
+description: "Returns the position of the first item in a list that matches any value from a second list."
+syntax: "List.PositionOfAny(list as list, values as list, optional occurrence as nullable number, optional equationCriteria as any) as any"
+returnType: "any"
+returnDescription: "The zero-based index of the first matching item, or -1 if no match is found."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to search."
+  - name: "values"
+    type: "list"
+    required: true
+    description: "The list of values to search for."
+  - name: "occurrence"
+    type: "nullable number"
+    required: false
+    description: "Controls which occurrence to find: Occurrence.First (default), Occurrence.Last, or Occurrence.All."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-positionof"
+  - "list-containsany"
+  - "list-positions"
+  - "list-findtext"
+---
+
+## Remarks
+
+`List.PositionOfAny` searches a list for the position of the first item that matches **any** of the values provided in the `values` list. It is a multi-target version of `List.PositionOf`.
+
+- Returns `-1` if none of the values in `values` are found in `list`.
+- Use `Occurrence.First` (default) to find the earliest match.
+- Use `Occurrence.Last` to find the last item from `list` that matches any value.
+- Use `Occurrence.All` to return a list of all positions where any of the target values appear.
+- Comparison is case-sensitive for text by default.
+
+## Examples
+
+### Example 1: Find position of first match from a set of values
+
+```powerquery
+List.PositionOfAny({"A", "B", "C", "D", "E"}, {"C", "E"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
+-->
+
+### Example 2: No match found
+
+```powerquery
+List.PositionOfAny({10, 20, 30}, {99, 100})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 3: Find all positions of any matching value
+
+```powerquery
+List.PositionOfAny({"A", "B", "C", "A", "D", "B"}, {"A", "B"}, Occurrence.All)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{0, 1, 3, 5}"}]}
+-->

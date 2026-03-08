@@ -1,0 +1,75 @@
+---
+title: "Int8.From"
+slug: "int8-from"
+category: "Number"
+description: "Converts a value to an 8-bit signed integer (-128 to 127)."
+syntax: "Int8.From(value as any, optional culture as nullable text, optional roundingMode as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "An 8-bit signed integer in the range -128 to 127."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+  - name: "roundingMode"
+    type: "number"
+    required: false
+    description: "An optional rounding mode constant used when truncating fractional values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "byte-from"
+  - "int16-from"
+  - "int32-from"
+  - "int64-from"
+  - "number-from"
+---
+
+## Remarks
+
+`Int8.From` converts a value to a signed 8-bit integer, allowing values from -128 to 127. Values outside this range raise an error. Fractional numbers are rounded using the specified rounding mode, defaulting to round-toward-even (banker's rounding).
+
+Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+
+Use this type when interfacing with systems or binary formats that use compact signed byte fields.
+
+## Examples
+
+### Example 1: Convert a positive number
+
+```powerquery
+Int8.From(100)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":100}]}
+-->
+
+### Example 2: Convert a negative number
+
+```powerquery
+Int8.From(-50)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-50}]}
+-->
+
+### Example 3: Convert a text value
+
+```powerquery
+Int8.From("-128")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-128}]}
+-->

@@ -1,0 +1,82 @@
+---
+title: "Table.Contains"
+slug: "table-contains"
+category: "Table"
+description: "Returns true if the table contains a row matching the given record."
+syntax: "Table.Contains(table as table, row as record, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if the table contains a matching row; false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "row"
+    type: "record"
+    required: true
+    description: "A record whose fields are matched against table rows."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. A column name, list of column names, or comparer function to control which fields are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-containsall"
+  - "table-containsany"
+  - "table-isdistinct"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.Contains` checks whether a table includes at least one row that matches the provided record. By default, all fields in the record are compared against corresponding columns in the table. The optional `equationCriteria` parameter can restrict comparison to specific columns or supply a custom comparer.
+
+This function is useful for membership tests — for example, verifying that a specific key exists in a lookup table before attempting a join.
+
+## Examples
+
+### Example 1: Check if a row exists
+
+```powerquery
+Table.Contains(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    [ID = 1, Name = "Alice"]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: Row not found returns false
+
+```powerquery
+Table.Contains(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    [ID = 3, Name = "Carol"]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Match on a single column
+
+```powerquery
+Table.Contains(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    [ID = 2],
+    "ID"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

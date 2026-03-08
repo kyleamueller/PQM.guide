@@ -1,0 +1,85 @@
+---
+title: "Number.RoundAwayFromZero"
+slug: "number-roundawayfromzero"
+category: "Number"
+description: "Rounds a number to the specified number of decimal places, always rounding away from zero on ties (the traditional \"round half up\" rule for positives)."
+syntax: "Number.RoundAwayFromZero(number as nullable number, optional digits as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The number rounded away from zero to the specified decimal places."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to round."
+  - name: "digits"
+    type: "number"
+    required: false
+    description: "The number of decimal places to round to. Defaults to 0 (nearest integer)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-round"
+  - "number-roundtowardzero"
+  - "number-rounddown"
+  - "number-roundup"
+---
+
+## Remarks
+
+`Number.RoundAwayFromZero` implements the "Round Half Away From Zero" rule: when a value falls exactly halfway between two representable values, it rounds to the value farther from zero. For positive numbers this is the familiar "round half up" behavior; for negative numbers it rounds down (further negative).
+
+This contrasts with `Number.Round`, which defaults to "Round Half to Even" (banker's rounding) to minimize statistical bias over large datasets.
+
+Use `Number.RoundAwayFromZero` when you need conventional rounding as taught in most school curricula, or when matching Excel's `ROUND` function behavior.
+
+## Examples
+
+### Example 1: Round a positive tie away from zero
+
+```powerquery
+Number.RoundAwayFromZero(2.5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 2: Round a negative tie away from zero
+
+```powerquery
+Number.RoundAwayFromZero(-2.5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-3}]}
+-->
+
+### Example 3: Round to 2 decimal places
+
+```powerquery
+Number.RoundAwayFromZero(1.555, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.56}]}
+-->
+
+### Example 4: Round sales amounts in a table
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "UnitPrice"}),
+    "Rounded", each Number.RoundAwayFromZero([UnitPrice], 0), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"},{"name":"Rounded","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25.5,"Rounded":26},{"OrderID":2,"UnitPrice":149.5,"Rounded":150},{"OrderID":3,"UnitPrice":74.5,"Rounded":75}]}
+-->

@@ -1,0 +1,68 @@
+---
+title: "Date.IsInPreviousNDays"
+slug: "date-isinpreviousndays"
+category: "Date"
+description: "Returns true if the date falls within the previous N days (not including today)."
+syntax: "Date.IsInPreviousNDays(dateTime as any, days as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the N days before today, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "days"
+    type: "number"
+    required: true
+    description: "The number of days back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinpreviousday"
+  - "date-isinnextndays"
+  - "date-isinpreviousnweeks"
+  - "date-isinpreviousnmonths"
+---
+
+## Remarks
+
+`Date.IsInPreviousNDays` returns `true` if the input date falls within the N days immediately preceding today. Today itself is not included; use `Date.IsInCurrentDay` to also match today. The function is re-evaluated on each query refresh.
+
+For example, with `days = 7`, it matches any date from 7 days ago through yesterday (a 7-day window ending yesterday).
+
+## Examples
+
+### Example 1: Filter orders from the past 30 days
+
+Keep only rows where OrderDate falls within the previous 30 days.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousNDays([OrderDate], 30)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":39,"OrderDate":"2026-02-10"},{"OrderID":40,"OrderDate":"2026-02-20"},{"OrderID":41,"OrderDate":"2026-03-07"}]}
+-->
+
+### Example 2: Flag rows from the past 7 days
+
+Add a boolean column identifying orders placed in the last week.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "LastWeek", each Date.IsInPreviousNDays([OrderDate], 7), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"LastWeek","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01","LastWeek":false},{"OrderID":41,"OrderDate":"2026-03-07","LastWeek":true},{"OrderID":42,"OrderDate":"2026-03-08","LastWeek":false}]}
+-->

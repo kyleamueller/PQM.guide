@@ -1,0 +1,74 @@
+---
+title: "Type.ReplaceTableKeys"
+slug: "type-replacetablekeys"
+category: "Type"
+description: "Returns a table type with all key definitions replaced by the provided list of key records."
+syntax: "Type.ReplaceTableKeys(type as type, keys as list) as type"
+returnType: "type"
+returnDescription: "A new table type with the specified key definitions."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The base table type whose keys are replaced."
+  - name: "keys"
+    type: "list"
+    required: true
+    description: "A list of key records, each with Columns (list of text) and Primary (logical) fields. Pass an empty list to remove all keys."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-tablekeys"
+  - "type-addtablekey"
+  - "type-tableschema"
+---
+
+## Remarks
+
+`Type.ReplaceTableKeys` replaces all existing key definitions on a table type with a new set of keys provided as a list. Each element of the list is a record with:
+
+- `Columns` — a list of column name text values
+- `Primary` — `true` for the primary key, `false` for alternate keys
+
+To remove all keys from a table type, pass an empty list (`{}`).
+
+This function is the bulk replacement counterpart to `Type.AddTableKey`. Use it to set a complete key configuration at once rather than adding keys one at a time.
+
+## Examples
+
+### Example 1: Replace keys with a new primary key
+
+```powerquery
+let
+    T = #table(type table [ID = number, Name = text], {}),
+    OldType = Value.Type(T),
+    NewType = Type.ReplaceTableKeys(OldType, {[Columns = {"ID"}, Primary = true]}),
+    Keys = Type.TableKeys(NewType)
+in
+    Keys{0}[Primary]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Clear all keys by passing an empty list
+
+```powerquery
+let
+    T = #table(type table [ID = number, Name = text], {}),
+    TypeWithKey = Type.AddTableKey(Value.Type(T), {"ID"}, true),
+    TypeNoKeys = Type.ReplaceTableKeys(TypeWithKey, {}),
+    Keys = Type.TableKeys(TypeNoKeys)
+in
+    List.Count(Keys)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->

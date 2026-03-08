@@ -1,0 +1,86 @@
+---
+title: "List.FirstN"
+slug: "list-firstn"
+category: "List"
+description: "Returns the first N items from a list, or items from the start of the list while a condition is true."
+syntax: "List.FirstN(list as list, countOrCondition as any) as any"
+returnType: "any"
+returnDescription: "A list of the first N items, or a list of items from the start while the condition holds true."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many items to return, or a function (condition) that returns true while items should be included."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-lastn"
+  - "list-first"
+  - "list-skip"
+  - "list-range"
+  - "list-select"
+---
+
+## Remarks
+
+`List.FirstN` is the flexible counterpart to `List.First`. It returns a **list** (not a scalar) of either:
+
+- The first `N` items when passed a number.
+- Items from the start of the list as long as a condition function returns `true`, stopping at the first item that fails the condition.
+
+When passed a number:
+- If `N` is greater than the list length, the entire list is returned.
+- If `N` is 0, an empty list is returned.
+
+When passed a condition function:
+- The function is applied to each item in order, starting from the first.
+- Items are collected while the function returns `true`.
+- Collection stops as soon as the function returns `false` — remaining items (even if they'd pass the condition) are not included.
+
+## Examples
+
+### Example 1: Return the first 3 items
+
+```powerquery
+List.FirstN({10, 20, 30, 40, 50}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{10, 20, 30}"}]}
+-->
+
+### Example 2: Return items while value is less than 40
+
+```powerquery
+List.FirstN({10, 20, 30, 40, 50}, each _ < 40)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{10, 20, 30}"}]}
+-->
+
+### Example 3: Take top N sorted values
+
+Return the 3 highest-priced products.
+
+```powerquery
+let
+    Prices = {75, 120, 25, 200, 50},
+    Sorted = List.Sort(Prices, Order.Descending),
+    TopThree = List.FirstN(Sorted, 3)
+in
+    TopThree
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{200, 120, 75}"}]}
+-->

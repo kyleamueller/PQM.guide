@@ -1,0 +1,79 @@
+---
+title: "List.Times"
+slug: "list-times"
+category: "List"
+description: "Generates a list of time values starting from a given time, with a specified count and step duration."
+syntax: "List.Times(start as time, count as number, step as duration) as list"
+returnType: "list"
+returnDescription: "A list of time values of length count, beginning at start and incrementing by step."
+parameters:
+  - name: "start"
+    type: "time"
+    required: true
+    description: "The starting time value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of time values to generate."
+  - name: "step"
+    type: "duration"
+    required: true
+    description: "The duration to add between each successive time value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-dates"
+  - "list-datetimes"
+  - "list-durations"
+  - "list-numbers"
+---
+
+## Remarks
+
+`List.Times` generates a sequence of `time` values. Time values represent a time of day (hours, minutes, seconds) without a date component.
+
+- The `step` parameter uses `#duration(days, hours, minutes, seconds)` syntax.
+- If the generated time exceeds 23:59:59, it wraps around (times are cyclic within a 24-hour day).
+- `count` must be a non-negative integer; `0` returns an empty list.
+- Use `List.DateTimes` when a date component is also needed.
+
+## Examples
+
+### Example 1: Generate hourly time slots starting at midnight
+
+```powerquery
+List.Times(#time(0, 0, 0), 8, #duration(0, 1, 0, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"0:00:00"},{"Result":"1:00:00"},{"Result":"2:00:00"},{"Result":"3:00:00"},{"Result":"4:00:00"},{"Result":"5:00:00"},{"Result":"6:00:00"},{"Result":"7:00:00"}]}
+-->
+
+### Example 2: Generate 30-minute appointment slots
+
+```powerquery
+List.Times(#time(9, 0, 0), 8, #duration(0, 0, 30, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"9:00:00"},{"Result":"9:30:00"},{"Result":"10:00:00"},{"Result":"10:30:00"},{"Result":"11:00:00"},{"Result":"11:30:00"},{"Result":"12:00:00"},{"Result":"12:30:00"}]}
+-->
+
+### Example 3: Create a time-of-day dimension table
+
+```powerquery
+let
+    Times = List.Times(#time(0, 0, 0), 24, #duration(0, 1, 0, 0)),
+    TimeTable = Table.FromList(Times, Splitter.SplitByNothing(), {"Hour"})
+in
+    TimeTable
+```
+
+<!--output
+{"columns":[{"name":"Hour","type":"time"}],"rows":[{"Hour":"0:00:00"},{"Hour":"1:00:00"},{"Hour":"2:00:00"},{"Hour":"..."}]}
+-->

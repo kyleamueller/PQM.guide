@@ -1,0 +1,62 @@
+---
+title: "Date.IsInPreviousQuarter"
+slug: "date-isinpreviousquarter"
+category: "Date"
+description: "Returns true if the date falls in the previous calendar quarter."
+syntax: "Date.IsInPreviousQuarter(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the quarter immediately before the current quarter, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentquarter"
+  - "date-isinnextquarter"
+  - "date-isinpreviousnquarters"
+  - "date-isinpreviousmonth"
+---
+
+## Remarks
+
+`Date.IsInPreviousQuarter` returns `true` if the input date falls within the calendar quarter immediately preceding the current quarter (as determined by `DateTime.LocalNow()`). For example, if today is in Q1, this function returns `true` for any date in Q4 of the prior year. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter last quarter's sales
+
+Keep only rows where OrderDate falls in the previous quarter.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousQuarter([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":35,"OrderDate":"2025-10-10"},{"OrderID":36,"OrderDate":"2025-11-20"},{"OrderID":37,"OrderDate":"2025-12-31"}]}
+-->
+
+### Example 2: Flag last-quarter rows
+
+Add a boolean column identifying rows from the previous quarter.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsLastQuarter", each Date.IsInPreviousQuarter([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastQuarter","type":"logical"}],"rows":[{"OrderID":34,"OrderDate":"2025-09-15","IsLastQuarter":false},{"OrderID":35,"OrderDate":"2025-10-10","IsLastQuarter":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastQuarter":false}]}
+-->

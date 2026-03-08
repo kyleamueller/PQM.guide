@@ -1,0 +1,70 @@
+---
+title: "Duration.TotalMinutes"
+slug: "duration-totalminutes"
+category: "Duration"
+description: "Returns the total duration expressed as a fractional number of minutes."
+syntax: "Duration.TotalMinutes(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The total number of minutes (including fractional parts) represented by the duration."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "A duration value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-totaldays"
+  - "duration-totalhours"
+  - "duration-totalseconds"
+  - "duration-minutes"
+  - "duration-from"
+---
+
+## Remarks
+
+`Duration.TotalMinutes` returns the entire duration as a decimal number of minutes. For example, 2 hours and 30 minutes returns `150.0`. This differs from `Duration.Minutes`, which returns only the minutes component of the duration. Use `Duration.TotalMinutes` when you need elapsed time as a single numeric value for SLA analysis, billing calculations, or reporting. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Calculate response time in minutes from log data
+
+Compute the total minutes elapsed between log start and end times.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(OrderLog, each [DurationMinutes] <> null),
+        {"LogID", "DurationMinutes"}
+    ),
+    "TotalMinutes",
+    each Duration.TotalMinutes(#duration(0, 0, [DurationMinutes], 0)),
+    type number
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"TotalMinutes","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"TotalMinutes":1725},{"LogID":"L004","DurationMinutes":2745,"TotalMinutes":2745},{"LogID":"L006","DurationMinutes":1065,"TotalMinutes":1065}]}
+-->
+
+### Example 2: Total minutes for a mixed duration
+
+Return the total minutes for a duration of 2 hours and 30 minutes.
+
+```powerquery
+#table(
+    type table [Duration = duration, TotalMinutes = number],
+    {{#duration(0, 2, 30, 0), Duration.TotalMinutes(#duration(0, 2, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"TotalMinutes","type":"number"}],"rows":[{"Duration":"0.02:30:00","TotalMinutes":150}]}
+-->

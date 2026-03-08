@@ -1,0 +1,82 @@
+---
+title: "Number.BitwiseOr"
+slug: "number-bitwiseor"
+category: "Number"
+description: "Performs a bitwise OR operation on two integer values."
+syntax: "Number.BitwiseOr(number1 as number, number2 as number) as number"
+returnType: "number"
+returnDescription: "An integer where each bit is 1 if the corresponding bit is 1 in either input."
+parameters:
+  - name: "number1"
+    type: "number"
+    required: true
+    description: "The first integer operand."
+  - name: "number2"
+    type: "number"
+    required: true
+    description: "The second integer operand."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-bitwiseand"
+  - "number-bitwisexor"
+  - "number-bitwisenot"
+  - "number-bitwiseshiftleft"
+  - "number-bitwiseshiftright"
+---
+
+## Remarks
+
+`Number.BitwiseOr` performs a bitwise OR between two integers. Each bit position in the result is set to `1` when the corresponding bit is `1` in at least one of the operands. Common uses include:
+
+- **Setting flags**: combining multiple flag bits into a single value
+- **Merging bitmasks**: combining permission sets
+- **Constructing values**: building a result from individual bit contributions
+
+Both inputs are treated as integers. Floating-point values are truncated before the operation.
+
+## Examples
+
+### Example 1: Basic bitwise OR
+
+12 in binary is `1100`, 10 is `1010`. OR gives `1110` = 14.
+
+```powerquery
+Number.BitwiseOr(12, 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":14}]}
+-->
+
+### Example 2: Set a specific bit (bit 0) in a value
+
+```powerquery
+Number.BitwiseOr(12, 1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":13}]}
+-->
+
+### Example 3: Merge two permission bitmasks
+
+Read=1, Write=2, Execute=4. Grant Read and Write:
+
+```powerquery
+let
+    Read = 1,
+    Write = 2,
+    Permissions = Number.BitwiseOr(Read, Write)
+in
+    Permissions
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->

@@ -1,0 +1,75 @@
+---
+title: "DateTime.ToText"
+slug: "datetime-totext"
+category: "DateTime"
+description: "Converts a datetime value to a text string."
+syntax: "DateTime.ToText(dateTime as nullable datetime, optional options as any) as nullable text"
+returnType: "text"
+returnDescription: "A text representation of the datetime, or null if the input is null."
+parameters:
+  - name: "dateTime"
+    type: "datetime"
+    required: true
+    description: "The datetime value to convert to text."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string, e.g., \"yyyy-MM-dd HH:mm:ss\") and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-fromtext"
+  - "datetime-from"
+  - "date-totext"
+  - "datetimezone-totext"
+---
+
+## Remarks
+
+`DateTime.ToText` formats a `datetime` value as a text string. Without options, it produces an ISO 8601-style string (e.g., `"2024-03-15T14:30:00"`). Use the `Format` field in the options record to apply custom patterns such as `"dd/MM/yyyy HH:mm"` or `"MMMM d, yyyy h:mm tt"`. The `Culture` field controls locale-specific formatting such as localized month or day names. Format strings follow .NET custom datetime format conventions.
+
+If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Format datetime values for a report label
+
+Convert EventTime to a human-readable string for display.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Events, 4),
+        {"EventID", "EventTime"}
+    ),
+    "DisplayTime",
+    each DateTime.ToText([EventTime], [Format="MMMM d, yyyy h:mm tt"]),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"DisplayTime","type":"text"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","DisplayTime":"March 15, 2024 8:30 AM"},{"EventID":2,"EventTime":"2024-03-15T14:00:00","DisplayTime":"March 15, 2024 2:00 PM"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","DisplayTime":"March 16, 2024 9:15 AM"},{"EventID":4,"EventTime":"2024-03-16T17:45:00","DisplayTime":"March 16, 2024 5:45 PM"}]}
+-->
+
+### Example 2: Format in 24-hour ISO style
+
+Convert a specific datetime to a sortable ISO-format string.
+
+```powerquery
+#table(
+    type table [DateTime = datetime, ISO = text],
+    {{#datetime(2024, 3, 15, 14, 30, 0), DateTime.ToText(#datetime(2024, 3, 15, 14, 30, 0), [Format="yyyy-MM-dd HH:mm:ss"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DateTime","type":"datetime"},{"name":"ISO","type":"text"}],"rows":[{"DateTime":"2024-03-15T14:30:00","ISO":"2024-03-15 14:30:00"}]}
+-->

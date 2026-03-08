@@ -1,0 +1,74 @@
+---
+title: "Currency.From"
+slug: "currency-from"
+category: "Number"
+description: "Converts a value to a currency number — a fixed-decimal type with exactly 4 decimal places."
+syntax: "Currency.From(value as any, optional culture as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "A fixed-decimal number with 4 decimal places (currency type)."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "decimal-from"
+  - "double-from"
+  - "number-from"
+---
+
+## Remarks
+
+`Currency.From` converts a value to the currency data type, which is a fixed-decimal number with exactly 4 decimal places. The underlying representation is a scaled 64-bit integer (value × 10,000), giving exact arithmetic for monetary amounts up to ±922,337,203,685,477.5807.
+
+The currency type prevents floating-point rounding errors that plague financial calculations when using double-precision arithmetic. It maps to the `Currency` type in Power BI Desktop and `Fixed Decimal Number` in the UI.
+
+Text values are parsed using the specified culture. `true` converts to `1.0000`, `false` to `0.0000`, `null` to `null`.
+
+## Examples
+
+### Example 1: Convert a number to currency
+
+```powerquery
+Currency.From(19.99)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":19.99}]}
+-->
+
+### Example 2: Convert text to currency
+
+```powerquery
+Currency.From("1234.5678")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.5678}]}
+-->
+
+### Example 3: Apply currency type to a revenue column
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumnTypes(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Revenue"}),
+    {{"Revenue", Currency.Type}}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"}],"rows":[{"OrderID":1,"Revenue":1250.0000},{"OrderID":2,"Revenue":8750.0000},{"OrderID":3,"Revenue":3400.0000}]}
+-->

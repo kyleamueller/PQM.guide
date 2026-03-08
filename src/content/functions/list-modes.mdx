@@ -1,0 +1,77 @@
+---
+title: "List.Modes"
+slug: "list-modes"
+category: "List"
+description: "Returns all values that appear with the highest frequency in the list (all modes when there is a tie)."
+syntax: "List.Modes(list as list, optional equationCriteria as any) as list"
+returnType: "list"
+returnDescription: "A list of all values tied for the highest frequency."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to find all modes of."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-mode"
+  - "list-median"
+  - "list-distinct"
+  - "list-count"
+---
+
+## Remarks
+
+`List.Modes` returns a **list** of all values that share the maximum frequency. When there is only one mode, it returns a single-element list. When multiple values are tied for the highest frequency, all tied values are returned.
+
+This is the multi-value counterpart of `List.Mode`. Use `List.Modes` when you need to detect or handle ties in frequency analysis.
+
+- Returns a list, even when there is only one mode.
+- The order of modes in the result follows their first appearance in the source list.
+- Null values count as occurrences and can be included in the result.
+- An empty list causes an error.
+
+## Examples
+
+### Example 1: Single mode
+
+```powerquery
+List.Modes({1, 2, 2, 3, 3, 3, 4})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{3}"}]}
+-->
+
+### Example 2: Multiple tied modes
+
+```powerquery
+List.Modes({1, 2, 2, 3, 3, 4})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{2, 3}"}]}
+-->
+
+### Example 3: Detect tied categories
+
+```powerquery
+let
+    Categories = {"A", "B", "A", "B", "C"},
+    AllModes = List.Modes(Categories)
+in
+    AllModes
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, B}"}]}
+-->

@@ -1,0 +1,65 @@
+---
+title: "Number.Tan"
+slug: "number-tan"
+category: "Number"
+description: "Returns the tangent of an angle specified in radians."
+syntax: "Number.Tan(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The tangent of the angle in radians."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The angle in radians."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-sin"
+  - "number-cos"
+  - "number-atan"
+---
+
+## Remarks
+
+`Number.Tan` returns the trigonometric tangent of an angle measured in radians. Tangent is defined as sine divided by cosine: tan(x) = sin(x) / cos(x).
+
+The function is undefined at odd multiples of π/2 (90°, 270°, etc.), where cosine equals zero. At these points the result approaches positive or negative infinity. Floating-point representation may return a very large finite number rather than true infinity.
+
+To convert degrees to radians, multiply by `Number.PI / 180`.
+
+## Examples
+
+### Example 1: Tangent of 0 radians
+
+```powerquery
+Number.Tan(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 2: Tangent of 45 degrees (π/4 radians)
+
+```powerquery
+Number.Tan(Number.PI / 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.9999999999999999}]}
+-->
+
+### Example 3: Tangent of 30 degrees
+
+```powerquery
+Number.Tan(30 * Number.PI / 180)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.5773502691896257}]}
+-->

@@ -1,0 +1,93 @@
+---
+title: "AzureStorage.Blobs"
+slug: "azurestorage-blobs"
+category: "Accessing Data"
+description: "Returns a navigation table of containers and blobs from an Azure Blob Storage account."
+syntax: "AzureStorage.Blobs(account as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of containers in the Azure Blob Storage account. Drilling into a container reveals its blobs with Name, Folder Path, Date accessed, Date modified, Date created, Extension, Attributes, and Content columns."
+parameters:
+  - name: "account"
+    type: "text"
+    required: true
+    description: "The Azure Blob Storage account name (e.g., \"mystorageaccount\") or the full account URL (e.g., \"https://mystorageaccount.blob.core.windows.net\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with additional connection options."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "azurestorage-tables"
+  - "folder-files"
+  - "csv-document"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`AzureStorage.Blobs` connects to an Azure Blob Storage account and returns a navigation table of storage containers. Each container can be drilled into to retrieve a flat list of blobs (files) with their binary content accessible via the `Content` column.
+
+**Authentication**: Supports Account Key authentication (storage account name + access key), Shared Access Signature (SAS), and anonymous access (for public containers). Configure the key in the Power Query credentials dialog. Azure Active Directory (Entra ID) authentication is also supported in recent versions of Power BI Desktop.
+
+**Query folding**: Not supported. Blob enumeration and filtering occur entirely in Power Query after the blob list is fetched.
+
+**Account parameter**: You can pass either just the account name (e.g., `"mystorageaccount"`) and Power Query constructs the full URL, or the full blob service endpoint URL.
+
+**Blob content**: The `Content` column for each blob contains the binary data. Pass it to the appropriate parsing function based on the file type:
+- `Csv.Document([Content])` for CSV files
+- `Excel.Workbook([Content])` for Excel files
+- `Json.Document([Content])` for JSON files
+
+**Combine-files pattern**: The typical workflow mirrors `Folder.Files`: enumerate blobs, filter to the desired type/container, then expand `Content` using a parsing function.
+
+**Hierarchical blob paths**: Azure Blob Storage uses a flat namespace with `/`-delimited blob names that simulate a folder hierarchy. The `Folder Path` column reflects the virtual path structure.
+
+## Examples
+
+### Example 1: Connect to an Azure Blob Storage account
+```powerquery
+AzureStorage.Blobs("mystorageaccount")
+```
+
+### Example 2: Connect using the full service URL
+```powerquery
+AzureStorage.Blobs("https://mystorageaccount.blob.core.windows.net")
+```
+
+### Example 3: Navigate to a specific container and list blobs
+```powerquery
+let
+    Account = AzureStorage.Blobs("mystorageaccount"),
+    Container = Account{[Name="reports"]}[Data]
+in
+    Container
+```
+
+### Example 4: Combine all CSV blobs in a container
+```powerquery
+let
+    Account = AzureStorage.Blobs("mystorageaccount"),
+    Container = Account{[Name="exports"]}[Data],
+    CsvBlobs = Table.SelectRows(Container, each [Extension] = ".csv"),
+    Parsed = Table.AddColumn(CsvBlobs, "Data", each Csv.Document([Content])),
+    Combined = Table.Combine(Parsed[Data])
+in
+    Combined
+```
+
+### Example 5: Read a single known blob
+```powerquery
+let
+    Account = AzureStorage.Blobs("mystorageaccount"),
+    Container = Account{[Name="data"]}[Data],
+    FileContent = Container{[Name="data/sales2024.csv"]}[Content],
+    Parsed = Csv.Document(FileContent, [Delimiter=",", Encoding=65001])
+in
+    Parsed
+```

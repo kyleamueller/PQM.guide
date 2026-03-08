@@ -1,0 +1,81 @@
+---
+title: "Table.ContainsAny"
+slug: "table-containsany"
+category: "Table"
+description: "Returns true if the table contains any of the specified rows."
+syntax: "Table.ContainsAny(table as table, rows as list, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if at least one record in the rows list has a matching row in the table; false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of records, at least one of which must exist in the table."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to control which fields are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-contains"
+  - "table-containsall"
+  - "table-isdistinct"
+---
+
+## Remarks
+
+`Table.ContainsAny` returns `true` if at least one record from the `rows` list matches a row in the table. It is the logical OR of multiple `Table.Contains` checks. As soon as a match is found, evaluation stops.
+
+Use this function to check whether any member of a set of candidate rows exists in the data.
+
+## Examples
+
+### Example 1: At least one row present
+
+```powerquery
+Table.ContainsAny(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    {[ID = 2, Name = "Bob"], [ID = 5, Name = "Eve"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: No matching rows returns false
+
+```powerquery
+Table.ContainsAny(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    {[ID = 3, Name = "Carol"], [ID = 4, Name = "Dave"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Match on a single column
+
+```powerquery
+Table.ContainsAny(
+    #table({"Region"}, {{"North"}, {"South"}}),
+    {[Region = "East"], [Region = "South"]},
+    "Region"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

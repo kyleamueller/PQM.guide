@@ -1,0 +1,62 @@
+---
+title: "DateTime.IsInPreviousHour"
+slug: "datetime-isinprevioushour"
+category: "DateTime"
+description: "Returns true if the datetime falls in the previous clock hour."
+syntax: "DateTime.IsInPreviousHour(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the clock hour immediately before the current hour, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isincurrenthour"
+  - "datetime-isinnexthour"
+  - "datetime-isinpreviousnhours"
+  - "datetime-isinpreviousminute"
+---
+
+## Remarks
+
+`DateTime.IsInPreviousHour` returns `true` if the input `datetime` or `datetimezone` value falls within the clock hour immediately preceding the current hour (as determined by `DateTime.LocalNow()`). For example, if it is currently 10:xx, this function returns `true` for any datetime between 09:00:00 and 09:59:59.9999999. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events from the previous hour
+
+Keep only rows where EventTime falls in the previous clock hour.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInPreviousHour([EventTime])
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":40,"EventTime":"2026-03-08T09:10:00"},{"EventID":41,"EventTime":"2026-03-08T09:55:00"}]}
+-->
+
+### Example 2: Flag previous-hour events
+
+Add a boolean column identifying events from the previous hour.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "IsPreviousHour", each DateTime.IsInPreviousHour([EventTime]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsPreviousHour","type":"logical"}],"rows":[{"EventID":39,"EventTime":"2026-03-08T08:55:00","IsPreviousHour":false},{"EventID":40,"EventTime":"2026-03-08T09:10:00","IsPreviousHour":true},{"EventID":42,"EventTime":"2026-03-08T10:05:00","IsPreviousHour":false}]}
+-->

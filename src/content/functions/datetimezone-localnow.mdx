@@ -1,0 +1,62 @@
+---
+title: "DateTimeZone.LocalNow"
+slug: "datetimezone-localnow"
+category: "DateTimeZone"
+description: "Returns the current local date and time with UTC offset as a datetimezone value."
+syntax: "DateTimeZone.LocalNow() as datetimezone"
+returnType: "datetimezone"
+returnDescription: "The current local date, time, and UTC offset."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-utcnow"
+  - "datetimezone-fixedlocalnow"
+  - "datetimezone-fixedutcnow"
+  - "datetime-localnow"
+---
+
+## Remarks
+
+`DateTimeZone.LocalNow` returns the current local date and time including the UTC offset as a `datetimezone` value. Unlike `DateTimeZone.FixedLocalNow()`, this function may return different values if called multiple times during a long-running query evaluation. For a consistent snapshot, use `DateTimeZone.FixedLocalNow()` instead.
+
+In Power BI Service scheduled refreshes, the "local" time is the time zone of the gateway (for on-premises data) or the cloud region's system time (for cloud connectors).
+
+## Examples
+
+### Example 1: Show current local time with timezone offset
+
+Return the current local datetimezone for auditing or display.
+
+```powerquery
+#table(
+    type table [LocalNow = datetimezone],
+    {{DateTimeZone.LocalNow()}}
+)
+```
+
+<!--output
+{"columns":[{"name":"LocalNow","type":"datetimezone"}],"rows":[{"LocalNow":"2026-03-08T10:00:00-06:00"}]}
+-->
+
+### Example 2: Add a refresh timestamp column
+
+Stamp each row with the current local time and timezone offset.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
+    "RefreshedAt", each DateTimeZone.LocalNow(), type datetimezone
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAt","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":2,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":3,"RefreshedAt":"2026-03-08T10:00:01-06:00"}]}
+-->

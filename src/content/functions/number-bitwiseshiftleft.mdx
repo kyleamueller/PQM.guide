@@ -1,0 +1,67 @@
+---
+title: "Number.BitwiseShiftLeft"
+slug: "number-bitwiseshiftleft"
+category: "Number"
+description: "Shifts the bits of an integer left by a specified number of positions."
+syntax: "Number.BitwiseShiftLeft(number as number, shift as number) as number"
+returnType: "number"
+returnDescription: "The integer with bits shifted left by the specified number of positions."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The integer whose bits are shifted."
+  - name: "shift"
+    type: "number"
+    required: true
+    description: "The number of bit positions to shift left. Must be a non-negative integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-bitwiseshiftright"
+  - "number-bitwiseand"
+  - "number-bitwiseor"
+---
+
+## Remarks
+
+`Number.BitwiseShiftLeft` shifts the binary representation of `number` to the left by `shift` positions, filling the vacated low-order bits with zeros. Shifting left by `n` is equivalent to multiplying by 2^n (for values that do not overflow).
+
+This is commonly used in low-level data encoding, packing multiple values into a single integer field, or constructing bitmasks.
+
+## Examples
+
+### Example 1: Shift 1 left by 3 (multiply by 8)
+
+```powerquery
+Number.BitwiseShiftLeft(1, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":8}]}
+-->
+
+### Example 2: Shift left by 4 (equivalent to × 16)
+
+```powerquery
+Number.BitwiseShiftLeft(3, 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":48}]}
+-->
+
+### Example 3: Build a bitmask for bit position 5
+
+```powerquery
+Number.BitwiseShiftLeft(1, 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":32}]}
+-->

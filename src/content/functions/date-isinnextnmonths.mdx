@@ -1,0 +1,68 @@
+---
+title: "Date.IsInNextNMonths"
+slug: "date-isinnextnmonths"
+category: "Date"
+description: "Returns true if the date falls within the next N calendar months."
+syntax: "Date.IsInNextNMonths(dateTime as any, months as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the next N months after the current month, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "months"
+    type: "number"
+    required: true
+    description: "The number of months ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinnextmonth"
+  - "date-isinpreviousnmonths"
+  - "date-isinnextnquarters"
+  - "date-isinnextnweeks"
+---
+
+## Remarks
+
+`Date.IsInNextNMonths` returns `true` if the input date falls within the next N complete calendar months after the current month. The current month itself is not included; use `Date.IsInCurrentMonth` to also match the current month. The function is re-evaluated on each query refresh.
+
+For example, if today is in March and `months = 3`, it matches any date in April, May, or June.
+
+## Examples
+
+### Example 1: Find renewals due in the next 3 months
+
+Keep only rows where RenewalDate falls within the next 3 calendar months.
+
+```powerquery
+Table.SelectRows(
+    Subscriptions,
+    each Date.IsInNextNMonths([RenewalDate], 3)
+)
+```
+
+<!--output
+{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"SubID":12,"RenewalDate":"2026-04-10","Customer":"Contoso"},{"SubID":13,"RenewalDate":"2026-05-18","Customer":"Northwind"},{"SubID":15,"RenewalDate":"2026-06-25","Customer":"Fabrikam"}]}
+-->
+
+### Example 2: Flag renewals in the next 6 months
+
+Add a boolean column for subscriptions renewing within the next 6 months.
+
+```powerquery
+Table.AddColumn(
+    Subscriptions,
+    "RenewsInNext6Months", each Date.IsInNextNMonths([RenewalDate], 6), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"RenewsInNext6Months","type":"logical"}],"rows":[{"SubID":12,"RenewalDate":"2026-04-10","RenewsInNext6Months":true},{"SubID":16,"RenewalDate":"2026-09-01","RenewsInNext6Months":false}]}
+-->

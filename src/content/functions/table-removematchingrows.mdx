@@ -1,0 +1,68 @@
+---
+title: "Table.RemoveMatchingRows"
+slug: "table-removematchingrows"
+category: "Table"
+description: "Removes all rows from a table that match any row in the given list of records."
+syntax: "Table.RemoveMatchingRows(table as table, rows as list, optional equationCriteria as any) as table"
+returnType: "table"
+returnDescription: "The table with all rows matching any record in the rows list removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to remove rows from."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of records representing the rows to remove."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to limit which fields are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removerows"
+  - "table-removefirstn"
+  - "table-selectrows"
+  - "table-contains"
+---
+
+## Remarks
+
+`Table.RemoveMatchingRows` removes every row from the table that matches any record in the `rows` list. Matching is based on record field equality. The optional `equationCriteria` parameter lets you restrict comparison to specific columns.
+
+This is the inverse of filtering to keep only matching rows — use it to exclude a known set of unwanted rows.
+
+## Examples
+
+### Example 1: Remove specific rows by record match
+
+```powerquery
+Table.RemoveMatchingRows(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}, {3, "Carol"}}),
+    {[ID = 2, Name = "Bob"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"3","Name":"Carol"}]}
+-->
+
+### Example 2: Remove multiple matching rows
+
+```powerquery
+Table.RemoveMatchingRows(
+    #table({"Code"}, {{"A"}, {"B"}, {"C"}, {"D"}}),
+    {[Code = "B"], [Code = "D"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Code","type":"any"}],"rows":[{"Code":"A"},{"Code":"C"}]}
+-->

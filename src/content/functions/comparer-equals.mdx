@@ -1,0 +1,93 @@
+---
+title: "Comparer.Equals"
+slug: "comparer-equals"
+category: "Comparer"
+description: "Returns a comparer function that tests equality using the given base comparer."
+syntax: "Comparer.Equals(comparer as function) as function"
+returnType: "function"
+returnDescription: "A function that accepts two values and returns true if they are considered equal by the given comparer, false otherwise."
+parameters:
+  - name: "comparer"
+    type: "function"
+    required: true
+    description: "A comparer function (such as Comparer.Ordinal or Comparer.OrdinalIgnoreCase) that defines the equality rules."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "comparer-ordinal"
+  - "comparer-ordinalignorecase"
+  - "comparer-fromculture"
+  - "text-positionof"
+  - "text-contains"
+---
+
+## Remarks
+
+`Comparer.Equals` wraps a base comparer function and returns a new binary function `(x, y) => logical`. The returned function returns `true` when the comparer considers `x` and `y` equal (i.e., the comparer returns 0), and `false` otherwise.
+
+A comparer function in M is a function of the form `(x, y) => number` that returns:
+- A negative number when `x < y`
+- Zero when `x = y`
+- A positive number when `x > y`
+
+`Comparer.Equals` converts this ordering relation into a simple equality test, which is useful in contexts that require a predicate rather than a full ordering relation.
+
+Common use cases include passing to `List.Contains`, `List.Distinct`, or building custom equality predicates for case-insensitive or culture-aware comparisons.
+
+## Examples
+
+### Example 1: Case-insensitive equality check
+
+```powerquery
+let
+    equalIgnoreCase = Comparer.Equals(Comparer.OrdinalIgnoreCase)
+in
+    equalIgnoreCase("hello", "HELLO")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Case-sensitive equality check
+
+```powerquery
+let
+    equalOrdinal = Comparer.Equals(Comparer.Ordinal)
+in
+    equalOrdinal("hello", "HELLO")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 3: Use in List.Contains for case-insensitive membership test
+
+```powerquery
+List.Contains({"Apple", "Banana", "Cherry"}, "apple", Comparer.OrdinalIgnoreCase)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 4: Build a reusable equality predicate
+
+```powerquery
+let
+    isEqual = Comparer.Equals(Comparer.OrdinalIgnoreCase),
+    values = {"Alpha", "BETA", "gamma"},
+    filtered = List.Select(values, each isEqual(_, "beta"))
+in
+    filtered
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["BETA"]}]}
+-->

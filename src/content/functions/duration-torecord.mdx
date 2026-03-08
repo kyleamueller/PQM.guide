@@ -1,0 +1,71 @@
+---
+title: "Duration.ToRecord"
+slug: "duration-torecord"
+category: "Duration"
+description: "Returns a record with Days, Hours, Minutes, and Seconds fields from a duration value."
+syntax: "Duration.ToRecord(duration as duration) as record"
+returnType: "record"
+returnDescription: "A record with fields Days, Hours, Minutes, and Seconds as numbers."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "A duration value to decompose into its components."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-days"
+  - "duration-hours"
+  - "duration-minutes"
+  - "duration-seconds"
+  - "duration-from"
+  - "date-torecord"
+---
+
+## Remarks
+
+`Duration.ToRecord` decomposes a `duration` value into a record with four numeric fields: `Days`, `Hours`, `Minutes`, and `Seconds`. Each field represents the corresponding component of the duration (not cumulative totals). For example, a duration of 1 day and 2.5 hours returns `[Days=1, Hours=2, Minutes=30, Seconds=0]`. Use `Table.ExpandRecordColumn` to expand the record into separate table columns.
+
+## Examples
+
+### Example 1: Expand duration components into separate columns
+
+Decompose duration values in the Logs table into Days, Hours, Minutes, Seconds columns.
+
+Input: `Logs`
+
+```powerquery
+Table.ExpandRecordColumn(
+    Table.AddColumn(
+        Table.SelectColumns(
+            Table.SelectRows(Logs, each [DurationMinutes] <> null),
+            {"LogID", "DurationMinutes"}
+        ),
+        "Parts",
+        each Duration.ToRecord(#duration(0, 0, [DurationMinutes], 0))
+    ),
+    "Parts",
+    {"Days", "Hours", "Minutes", "Seconds"}
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Days","type":"number"},{"name":"Hours","type":"number"},{"name":"Minutes","type":"number"},{"name":"Seconds","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Days":1,"Hours":4,"Minutes":45,"Seconds":0},{"LogID":"L004","DurationMinutes":2745,"Days":1,"Hours":21,"Minutes":45,"Seconds":0}]}
+-->
+
+### Example 2: Decompose a specific duration
+
+Return the component record for a literal duration of 3 days, 5 hours, 30 minutes.
+
+```powerquery
+Duration.ToRecord(#duration(3, 5, 30, 0))
+```
+
+<!--output
+{"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Days","Value":3},{"Field":"Hours","Value":5},{"Field":"Minutes","Value":30},{"Field":"Seconds","Value":0}]}
+-->

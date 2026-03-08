@@ -1,0 +1,62 @@
+---
+title: "Date.IsInPreviousWeek"
+slug: "date-isinpreviousweek"
+category: "Date"
+description: "Returns true if the date falls in the previous calendar week."
+syntax: "Date.IsInPreviousWeek(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the Sunday–Saturday week immediately before the current week, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentweek"
+  - "date-isinnextweek"
+  - "date-isinpreviousnweeks"
+  - "date-isinpreviousday"
+---
+
+## Remarks
+
+`Date.IsInPreviousWeek` returns `true` if the input date falls within the Sunday–Saturday calendar week immediately preceding the current week. The current week is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter last week's orders
+
+Keep only rows from the Sales table where OrderDate was in the previous calendar week.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousWeek([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-02"},{"OrderID":41,"OrderDate":"2026-03-04"}]}
+-->
+
+### Example 2: Flag last week's rows
+
+Add a boolean column identifying orders from the previous week.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsLastWeek", each Date.IsInPreviousWeek([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastWeek","type":"logical"}],"rows":[{"OrderID":39,"OrderDate":"2026-02-25","IsLastWeek":false},{"OrderID":40,"OrderDate":"2026-03-02","IsLastWeek":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastWeek":false}]}
+-->

@@ -1,0 +1,56 @@
+---
+title: "Value.Expression"
+slug: "value-expression"
+category: "Value"
+description: "Returns an abstract syntax tree (AST) representation of the expression that produces the given value."
+syntax: "Value.Expression(value as any) as any"
+returnType: "any"
+returnDescription: "An AST record representing the expression that would produce the value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose expression representation is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+---
+
+## Remarks
+
+`Value.Expression` returns a structured representation (an abstract syntax tree, or AST) of the M expression that would produce the given value. The result is a record with fields describing the expression kind and its children, following the M AST schema used by the Power Query formula engine.
+
+This function is primarily used for **metaprogramming** — building query generators, expression analyzers, or code transformation tools that operate on M expressions as data. It is used internally by the Power Query editor and by custom connector development tools.
+
+For most data transformation tasks, `Value.Expression` is not needed. It is an advanced introspection tool.
+
+The returned AST can be passed to `Expression.Evaluate` or `Text.FromBinary(Expression.Document(ast))` in appropriate contexts.
+
+## Examples
+
+### Example 1: Get the expression for a literal number
+
+```powerquery
+Value.Expression(42)
+```
+
+<!--output
+{"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
+-->
+
+### Example 2: Get the expression for a list literal
+
+```powerquery
+Value.Expression({1, 2, 3})
+```
+
+<!--output
+{"columns":[{"name":"Kind","type":"text"},{"name":"Items","type":"any"}],"rows":[{"Kind":"List","Items":[{"Kind":"Constant","Value":1},{"Kind":"Constant","Value":2},{"Kind":"Constant","Value":3}]}]}
+-->

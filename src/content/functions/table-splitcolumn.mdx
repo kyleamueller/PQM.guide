@@ -1,0 +1,83 @@
+---
+title: "Table.SplitColumn"
+slug: "table-splitcolumn"
+category: "Table"
+description: "Splits a text column into multiple columns using a splitter function."
+syntax: "Table.SplitColumn(table as table, sourceColumn as text, splitter as function, optional columnNamesOrNumber as any, optional default as nullable any, optional extraColumns as nullable any) as table"
+returnType: "table"
+returnDescription: "A new table where the specified column has been split into multiple columns."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table containing the column to split."
+  - name: "sourceColumn"
+    type: "text"
+    required: true
+    description: "The name of the column to split."
+  - name: "splitter"
+    type: "function"
+    required: true
+    description: "A splitter function such as Splitter.SplitTextByDelimiter or Splitter.SplitTextByLengths."
+  - name: "columnNamesOrNumber"
+    type: "any"
+    required: false
+    description: "Optional. A list of new column names, or a number indicating how many columns to produce."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Optional. The value to use when a split produces fewer parts than expected columns."
+  - name: "extraColumns"
+    type: "any"
+    required: false
+    description: "Optional. Controls how extra split parts beyond the expected column count are handled."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-combinecolumns"
+  - "table-addcolumn"
+  - "table-transformcolumns"
+---
+
+## Remarks
+
+`Table.SplitColumn` uses a splitter function to divide the values in a text column into multiple output columns. The splitter functions in the `Splitter.*` namespace — such as `Splitter.SplitTextByDelimiter`, `Splitter.SplitTextByLengths`, and `Splitter.SplitTextByPositions` — are the standard choices for the `splitter` parameter.
+
+If `columnNamesOrNumber` is a list, those become the new column names. If it is a number, columns are named `sourceColumn.1`, `sourceColumn.2`, etc.
+
+## Examples
+
+### Example 1: Split a column by delimiter
+
+```powerquery
+Table.SplitColumn(
+    #table({"FullName"}, {{"Alice Smith"}, {"Bob Jones"}}),
+    "FullName",
+    Splitter.SplitTextByDelimiter(" "),
+    {"FirstName", "LastName"}
+)
+```
+
+<!--output
+{"columns":[{"name":"FirstName","type":"any"},{"name":"LastName","type":"any"}],"rows":[{"FirstName":"Alice","LastName":"Smith"},{"FirstName":"Bob","LastName":"Jones"}]}
+-->
+
+### Example 2: Split a fixed-width column
+
+```powerquery
+Table.SplitColumn(
+    #table({"Code"}, {{"AB123"}, {"CD456"}}),
+    "Code",
+    Splitter.SplitTextByLengths({2, 3}),
+    {"Prefix", "Number"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Prefix","type":"any"},{"name":"Number","type":"any"}],"rows":[{"Prefix":"AB","Number":"123"},{"Prefix":"CD","Number":"456"}]}
+-->

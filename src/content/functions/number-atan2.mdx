@@ -1,0 +1,76 @@
+---
+title: "Number.Atan2"
+slug: "number-atan2"
+category: "Number"
+description: "Returns the angle in radians between the positive x-axis and the point (x, y), correctly handling all four quadrants."
+syntax: "Number.Atan2(y as nullable number, x as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The angle in radians in the range (-π, π]."
+parameters:
+  - name: "y"
+    type: "number"
+    required: true
+    description: "The y-coordinate (vertical component)."
+  - name: "x"
+    type: "number"
+    required: true
+    description: "The x-coordinate (horizontal component)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-atan"
+  - "number-sin"
+  - "number-cos"
+---
+
+## Remarks
+
+`Number.Atan2(y, x)` computes the angle θ such that the point (x, y) lies on the ray from the origin at angle θ from the positive x-axis. The result is in the range (-π, π].
+
+Note that the parameter order is **(y, x)** — y first, then x. This matches the mathematical convention and matches Excel's `ATAN2` argument order (Excel also takes y first as the numerator).
+
+Unlike `Number.Atan(y/x)`, which loses quadrant information when both y and x are negative, `Number.Atan2` correctly distinguishes all four quadrants and handles the case where x = 0.
+
+## Examples
+
+### Example 1: Angle to the point (1, 1) — 45 degrees
+
+```powerquery
+Number.Atan2(1, 1) * 180 / Number.PI
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":45}]}
+-->
+
+### Example 2: Angle to the point (-1, 0) — 180 degrees
+
+```powerquery
+Number.Atan2(0, -1) * 180 / Number.PI
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":180}]}
+-->
+
+### Example 3: Bearing angle from origin to a map coordinate
+
+Compute the compass bearing in degrees to a point at (x=3, y=4):
+
+```powerquery
+let
+    X = 3,
+    Y = 4,
+    AngleDegrees = Number.Atan2(Y, X) * 180 / Number.PI
+in
+    AngleDegrees
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":53.13010235415598}]}
+-->

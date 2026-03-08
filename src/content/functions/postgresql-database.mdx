@@ -1,0 +1,90 @@
+---
+title: "PostgreSQL.Database"
+slug: "postgresql-database"
+category: "Accessing Data"
+description: "Returns a navigation table of tables and views from a PostgreSQL database."
+syntax: "PostgreSQL.Database(server as text, database as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of tables and views from the specified PostgreSQL database."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The PostgreSQL server hostname or IP address, optionally including a port number (e.g., \"myserver.com\" or \"myserver.com:5433\")."
+  - name: "database"
+    type: "text"
+    required: true
+    description: "The name of the PostgreSQL database to connect to."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with connection options such as CommandTimeout, CreateNavigationProperties, HierarchicalNavigation, and Query."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "mysql-database"
+  - "odbc-datasource"
+---
+
+## Remarks
+
+`PostgreSQL.Database` connects to a PostgreSQL server and returns a navigation table of tables, views, and other objects from the specified database. The connector uses Npgsql (the .NET PostgreSQL driver) which is bundled with Power BI Desktop.
+
+**Authentication**: Supports database authentication (username and password). Configure credentials in the Power Query credentials dialog.
+
+**Query folding**: PostgreSQL supports query folding. Filters, projections, sorts, and aggregations are translated into SQL and pushed to the PostgreSQL server.
+
+**Custom port**: The default PostgreSQL port is 5432. To connect on a non-default port, append it to the server string: `"myserver.com:5433"`.
+
+**Schemas**: PostgreSQL organizes tables into schemas (similar to SQL Server schemas). The navigation table is organized by schema, and you reference tables using `{[Schema="schema_name", Item="table_name"]}`.
+
+**Key options**:
+- `CommandTimeout` (duration) — maximum time for a query to execute before timing out.
+- `CreateNavigationProperties` (logical) — generate navigation properties based on foreign key constraints.
+- `HierarchicalNavigation` (logical) — group the navigation table by schema.
+- `Query` (text) — execute a native PostgreSQL SQL query instead of navigating to a table.
+
+**SSL/TLS**: PostgreSQL connections typically use SSL. The Npgsql driver negotiates SSL automatically if the server requires it.
+
+**Amazon RDS / Aurora / Azure Database for PostgreSQL**: These managed PostgreSQL services are fully supported. Use the cloud instance endpoint as the server address.
+
+## Examples
+
+### Example 1: Connect to a PostgreSQL database
+```powerquery
+PostgreSQL.Database("myserver.com", "sales")
+```
+
+### Example 2: Connect to PostgreSQL on a custom port
+```powerquery
+PostgreSQL.Database("myserver.com:5433", "analytics")
+```
+
+### Example 3: Navigate to a table in a specific schema
+```powerquery
+let
+    Source = PostgreSQL.Database("myserver.com", "sales"),
+    Orders = Source{[Schema="public", Item="orders"]}[Data]
+in
+    Orders
+```
+
+### Example 4: Run a native SQL query
+```powerquery
+PostgreSQL.Database(
+    "myserver.com",
+    "analytics",
+    [Query = "SELECT date_trunc('month', created_at) AS month, SUM(revenue) AS total FROM orders GROUP BY 1 ORDER BY 1"]
+)
+```
+
+### Example 5: Connect to Amazon RDS PostgreSQL
+```powerquery
+PostgreSQL.Database("myinstance.rds.amazonaws.com", "production")
+```

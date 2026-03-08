@@ -1,0 +1,95 @@
+---
+title: "OData.Feed"
+slug: "odata-feed"
+category: "Accessing Data"
+description: "Returns a navigation table from an OData service at the specified URI."
+syntax: "OData.Feed(serviceUri as text, optional headers as nullable record, optional options as any) as any"
+returnType: "any"
+returnDescription: "A navigation table of entity sets from the OData service, or a table of records if a specific entity set URI is provided."
+parameters:
+  - name: "serviceUri"
+    type: "text"
+    required: true
+    description: "The URI of the OData service root (e.g., \"https://services.odata.org/V4/Northwind/Northwind.svc/\") or a specific entity set (e.g., \"https://api.example.com/odata/Orders\")."
+  - name: "headers"
+    type: "record"
+    required: false
+    description: "An optional record of HTTP headers to include with each request (e.g., [Authorization = \"Bearer token\"])."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "An optional record with additional options such as Query (record of query string parameters), ExcludedFromCacheKey, ODataVersion, Implementation, IncludeAnnotations, Timeout, and MaxUriLength."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+  - "json-document"
+  - "sharepoint-tables"
+---
+
+## Remarks
+
+`OData.Feed` connects to an OData v3 or v4 service and returns a navigation table of entity sets, or directly returns the data from a specific entity set endpoint. OData is a standardized REST-based protocol widely used in Microsoft services (Dynamics, SharePoint REST API, Azure DevOps, etc.).
+
+**Authentication**: Supports Anonymous, Basic, Windows, OAuth, and API key authentication. Configure credentials in the Power Query credentials dialog based on the service requirements.
+
+**Query folding**: OData.Feed has strong query folding support. Filter, sort, select, top, and skip operations are translated into OData query options (`$filter`, `$orderby`, `$select`, `$top`, `$skip`) and sent to the server. This greatly reduces data transfer for large entity sets.
+
+**OData versions**: The function auto-detects the OData version from the service metadata. You can override this with `[ODataVersion = 4]` in the options record.
+
+**Key options**:
+- `Query` (record) — additional OData query parameters appended to the URI (e.g., `[Query = [$filter = "Region eq 'West'"]]`).
+- `ODataVersion` (number) — force a specific OData protocol version (3 or 4).
+- `Implementation` (text) — set to `"2.0"` to use the newer OData implementation.
+- `IncludeAnnotations` (text) — include OData annotations in the result.
+- `Timeout` (duration) — request timeout.
+
+**Pagination**: OData services that use server-side paging (`@odata.nextLink`) are handled automatically by Power Query.
+
+## Examples
+
+### Example 1: Connect to a public OData service
+```powerquery
+OData.Feed("https://services.odata.org/V4/Northwind/Northwind.svc/")
+```
+
+### Example 2: Access a specific entity set directly
+```powerquery
+OData.Feed("https://services.odata.org/V4/Northwind/Northwind.svc/Orders")
+```
+
+### Example 3: Connect to the Dynamics 365 OData endpoint
+```powerquery
+OData.Feed("https://myorg.crm.dynamics.com/api/data/v9.2/")
+```
+
+### Example 4: Pass custom headers for authentication
+```powerquery
+OData.Feed(
+    "https://api.example.com/odata/",
+    [Authorization = "Bearer eyJhbGciOiJSUzI1NiJ9..."]
+)
+```
+
+### Example 5: Filter using OData query parameters
+```powerquery
+OData.Feed(
+    "https://services.odata.org/V4/Northwind/Northwind.svc/Orders",
+    null,
+    [Query = [#"$filter" = "ShipCountry eq 'Germany'", #"$select" = "OrderID,CustomerID,OrderDate"]]
+)
+```
+
+### Example 6: Connect to Azure DevOps Analytics OData
+```powerquery
+let
+    Source = OData.Feed("https://analytics.dev.azure.com/{organization}/{project}/_odata/v3.0-preview/"),
+    WorkItems = Source{[Name="WorkItems"]}[Data]
+in
+    WorkItems
+```

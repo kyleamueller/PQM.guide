@@ -1,0 +1,62 @@
+---
+title: "Date.IsInNextWeek"
+slug: "date-isinnextweek"
+category: "Date"
+description: "Returns true if the date falls in the next calendar week."
+syntax: "Date.IsInNextWeek(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the Sunday–Saturday week immediately after the current week, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentweek"
+  - "date-isinpreviousweek"
+  - "date-isinnextnweeks"
+  - "date-isinnextday"
+---
+
+## Remarks
+
+`Date.IsInNextWeek` returns `true` if the input date falls within the Sunday–Saturday calendar week immediately following the current week. The current week is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter next week's scheduled tasks
+
+Keep only rows where TaskDate falls in the next calendar week.
+
+```powerquery
+Table.SelectRows(
+    Tasks,
+    each Date.IsInNextWeek([TaskDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"TaskID","type":"number"},{"name":"TaskDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":8,"TaskDate":"2026-03-16","TaskName":"Team sync"},{"TaskID":9,"TaskDate":"2026-03-18","TaskName":"Code review"}]}
+-->
+
+### Example 2: Flag next-week items
+
+Add a boolean column for tasks scheduled next week.
+
+```powerquery
+Table.AddColumn(
+    Tasks,
+    "NextWeek", each Date.IsInNextWeek([TaskDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"TaskID","type":"number"},{"name":"TaskDate","type":"date"},{"name":"NextWeek","type":"logical"}],"rows":[{"TaskID":6,"TaskDate":"2026-03-10","NextWeek":false},{"TaskID":8,"TaskDate":"2026-03-16","NextWeek":true},{"TaskID":10,"TaskDate":"2026-03-23","NextWeek":false}]}
+-->

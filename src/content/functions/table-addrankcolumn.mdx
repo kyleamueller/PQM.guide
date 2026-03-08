@@ -1,0 +1,78 @@
+---
+title: "Table.AddRankColumn"
+slug: "table-addrankcolumn"
+category: "Table"
+description: "Adds a rank column to the table based on the specified comparison criteria."
+syntax: "Table.AddRankColumn(table as table, newColumnName as text, comparisonCriteria as any, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "The original table with a new column containing rank numbers."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to rank."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name of the new rank column to add."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: true
+    description: "A column name, list of column names with optional sort order, or comparer function."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "Optional record. Supports RankKind (e.g., RankKind.Dense, RankKind.Competition, RankKind.Ordinal) to control tie-breaking behavior."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-sort"
+  - "table-addindexcolumn"
+  - "table-maxn"
+  - "table-minn"
+---
+
+## Remarks
+
+`Table.AddRankColumn` adds a new column to the table containing a rank number for each row based on the specified comparison criteria. The default sort order is descending (highest value = rank 1).
+
+The `options` record supports a `RankKind` field to control tie behavior:
+- `RankKind.Competition` (default): tied rows share the same rank, and the next rank skips (1, 1, 3).
+- `RankKind.Dense`: tied rows share the same rank without skipping (1, 1, 2).
+- `RankKind.Ordinal`: each row receives a unique rank, with ties broken by row order.
+
+## Examples
+
+### Example 1: Add a rank column by score (descending)
+
+```powerquery
+Table.AddRankColumn(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 95}, {"Dave", 70}}),
+    "Rank",
+    {"Score", Order.Descending}
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"3"},{"Name":"Carol","Score":"95","Rank":"1"},{"Name":"Dave","Score":"70","Rank":"4"}]}
+-->
+
+### Example 2: Dense ranking
+
+```powerquery
+Table.AddRankColumn(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 95}}),
+    "Rank",
+    {"Score", Order.Descending},
+    [RankKind = RankKind.Dense]
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"2"},{"Name":"Carol","Score":"95","Rank":"1"}]}
+-->

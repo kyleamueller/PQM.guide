@@ -1,0 +1,76 @@
+---
+title: "Record.HasFields"
+slug: "record-hasfields"
+category: "Record"
+description: "Returns true if a record contains all of the specified field names."
+syntax: "Record.HasFields(record as record, fields as any) as logical"
+returnType: "logical"
+returnDescription: "True if all specified fields exist in the record, false otherwise."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to check."
+  - name: "fields"
+    type: "any"
+    required: true
+    description: "A single field name as text, or a list of field name text values to check."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fieldnames"
+  - "record-fieldcount"
+  - "record-fieldordefault"
+---
+
+## Remarks
+
+`Record.HasFields` checks whether a record contains one or more specified field names. Pass a single text value to check for one field, or a list of text values to check that all of them are present.
+
+This is useful for defensive data processing — before accessing a field that may or may not exist depending on the data source — and for conditional branching based on record shape.
+
+To check for the presence of any field (not all), use `List.AnyTrue` combined with `List.Transform` and individual checks.
+
+## Examples
+
+### Example 1: Check for a single field
+
+```powerquery
+Record.HasFields([Name = "Alice", Age = 30], "Name")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Check for multiple fields — all must be present
+
+```powerquery
+Record.HasFields([Name = "Alice", Age = 30], {"Name", "Email"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 3: Safely access a field in a row that may vary by source
+
+Input: `Customers`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Customers, 3), {"CustomerID", "Name"}),
+    "HasEmail",
+    each Record.HasFields(_, "Email"),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"CustomerID","type":"number"},{"name":"Name","type":"text"},{"name":"HasEmail","type":"logical"}],"rows":[{"CustomerID":1,"Name":"Alice","HasEmail":false},{"CustomerID":2,"Name":"Bob","HasEmail":false},{"CustomerID":3,"Name":"Charlie","HasEmail":false}]}
+-->

@@ -1,0 +1,74 @@
+---
+title: "Table.SingleRow"
+slug: "table-singlerow"
+category: "Table"
+description: "Returns the single row of a table as a record. Throws an error if the table does not have exactly one row."
+syntax: "Table.SingleRow(table as table) as record"
+returnType: "record"
+returnDescription: "The single row of the table as a record."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "A table that must contain exactly one row."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-first"
+  - "table-last"
+  - "table-firstvalue"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.SingleRow` asserts that a table contains exactly one row and returns that row as a record. If the table has zero rows or more than one row, an error is raised. This makes it useful as a deliberate assertion — a "fail loud" approach when you expect exactly one match, such as when looking up a configuration record or a unique key.
+
+Use `Table.First` instead if you only want the first row without enforcing that exactly one row exists.
+
+## Examples
+
+### Example 1: Return a single row as a record
+
+```powerquery
+Table.SingleRow(
+    #table({"Key", "Value"}, {{"Environment", "Production"}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Key = \"Environment\", Value = \"Production\"]"}]}
+-->
+
+### Example 2: Access a field from the single row
+
+```powerquery
+let
+    Config = #table({"Setting", "Value"}, {{"MaxRows", "1000"}}),
+    Row = Table.SingleRow(Config)
+in
+    Row[Value]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"1000"}]}
+-->
+
+### Example 3: Filter then assert single result
+
+```powerquery
+let
+    Source  = #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    Filtered = Table.SelectRows(Source, each [ID] = 1)
+in
+    Table.SingleRow(Filtered)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[ID = 1, Name = \"Alice\"]"}]}
+-->

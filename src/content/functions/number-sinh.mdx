@@ -1,0 +1,72 @@
+---
+title: "Number.Sinh"
+slug: "number-sinh"
+category: "Number"
+description: "Returns the hyperbolic sine of a number."
+syntax: "Number.Sinh(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The hyperbolic sine of the number."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number whose hyperbolic sine is computed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-cosh"
+  - "number-tanh"
+  - "number-exp"
+---
+
+## Remarks
+
+`Number.Sinh` returns the hyperbolic sine, defined as:
+
+sinh(x) = (e^x − e^(−x)) / 2
+
+Unlike the circular sine, hyperbolic sine is unbounded — it increases without limit as x grows. `Number.Sinh(0)` returns `0`. The function is an odd function: `sinh(−x) = −sinh(x)`.
+
+Hyperbolic functions appear in physics (catenary curves, special relativity), engineering, and certain statistical distributions.
+
+## Examples
+
+### Example 1: Hyperbolic sine of 0
+
+```powerquery
+Number.Sinh(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 2: Hyperbolic sine of 1
+
+```powerquery
+Number.Sinh(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.1752011936438014}]}
+-->
+
+### Example 3: Verify odd symmetry
+
+```powerquery
+#table(
+    {"x", "sinh(x)", "sinh(-x)", "Equal"},
+    {
+        {2, Number.Sinh(2), Number.Sinh(-2), Number.Sinh(2) = -Number.Sinh(-2)}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"x","type":"number"},{"name":"sinh(x)","type":"number"},{"name":"sinh(-x)","type":"number"},{"name":"Equal","type":"logical"}],"rows":[{"x":2,"sinh(x)":3.6268604078470186,"sinh(-x)":-3.6268604078470186,"Equal":true}]}
+-->

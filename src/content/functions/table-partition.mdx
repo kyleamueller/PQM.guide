@@ -1,0 +1,74 @@
+---
+title: "Table.Partition"
+slug: "table-partition"
+category: "Table"
+description: "Partitions a table into a list of tables using a hash function on a specified column."
+syntax: "Table.Partition(table as table, column as text, groups as number, seed as number) as list"
+returnType: "list"
+returnDescription: "A list of tables, where each table is a partition of the original."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to partition."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The column whose values are hashed to assign rows to partitions."
+  - name: "groups"
+    type: "number"
+    required: true
+    description: "The number of partitions (output tables) to create."
+  - name: "seed"
+    type: "number"
+    required: true
+    description: "A seed value for the hash function, affecting how rows are distributed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-split"
+  - "table-splitat"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.Partition` distributes rows into `groups` sub-tables by hashing the values in the specified column. Each row is assigned to exactly one partition based on `Number.Mod(Value.NativeQuery(column_value, "hash"), groups)`. The result is a list of tables; all partition tables together contain all rows of the original table.
+
+This is primarily used for parallel processing scenarios or data distribution. The `seed` parameter affects the hash, allowing different distributions for the same data.
+
+## Examples
+
+### Example 1: Partition a table into 2 groups
+
+```powerquery
+let
+    Source     = #table({"ID"}, {{1}, {2}, {3}, {4}, {5}, {6}}),
+    Partitions = Table.Partition(Source, "ID", 2, 0)
+in
+    Partitions
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Table], [Table]}"}]}
+-->
+
+### Example 2: Access a specific partition
+
+```powerquery
+let
+    Source     = #table({"Key", "Value"}, {{"A", 1}, {"B", 2}, {"C", 3}, {"D", 4}}),
+    Partitions = Table.Partition(Source, "Key", 3, 0),
+    FirstPart  = Partitions{0}
+in
+    FirstPart
+```
+
+<!--output
+{"columns":[{"name":"Key","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Key":"A","Value":"1"},{"Key":"D","Value":"4"}]}
+-->

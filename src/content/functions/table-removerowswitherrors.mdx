@@ -1,0 +1,63 @@
+---
+title: "Table.RemoveRowsWithErrors"
+slug: "table-removerowswitherrors"
+category: "Table"
+description: "Removes rows that contain error values, optionally limited to specified columns."
+syntax: "Table.RemoveRowsWithErrors(table as table, optional columns as nullable list) as table"
+returnType: "table"
+returnDescription: "The table with error-containing rows removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to clean."
+  - name: "columns"
+    type: "list"
+    required: false
+    description: "Optional list of column names. Only rows with errors in those columns are removed. If omitted, all columns are checked."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-selectrowswitherrors"
+  - "table-replaceerrorvalues"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.RemoveRowsWithErrors` discards any row that contains an error value in at least one cell. When `columns` is specified, only errors in those columns trigger row removal — errors in other columns are ignored.
+
+This is useful for cleaning data after a type conversion step (e.g., `Table.TransformColumnTypes`) that may have introduced errors for unparseable values.
+
+## Examples
+
+### Example 1: Remove all rows containing errors
+
+```powerquery
+let
+    Source = #table({"ID", "Value"}, {{1, 10}, {2, error "bad"}, {3, 30}})
+in
+    Table.RemoveRowsWithErrors(Source)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"10"},{"ID":"3","Value":"30"}]}
+-->
+
+### Example 2: Only remove rows with errors in a specific column
+
+```powerquery
+let
+    Source = #table({"ID", "Value"}, {{1, error "bad"}, {2, 20}, {3, error "bad"}})
+in
+    Table.RemoveRowsWithErrors(Source, {"Value"})
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"2","Value":"20"}]}
+-->

@@ -1,0 +1,84 @@
+---
+title: "Text.Range"
+slug: "text-range"
+category: "Text"
+description: "Returns a substring from a text value starting at a given offset, optionally limited to a specified number of characters."
+syntax: "Text.Range(text as nullable text, offset as number, optional count as nullable number) as nullable text"
+returnType: "text"
+returnDescription: "The substring of text starting at offset for count characters, or to the end of the string if count is omitted."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based starting position."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The number of characters to return. If omitted or null, returns all characters from offset to end."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-start"
+  - "text-end"
+  - "text-middle"
+  - "text-at"
+---
+
+## Remarks
+
+`Text.Range` returns a substring from `text` starting at the zero-based `offset` index. If `count` is provided, at most `count` characters are returned. If `count` is omitted or `null`, all characters from `offset` to the end of the string are returned.
+
+If `text` is `null`, the function returns `null`. If `offset` is beyond the end of the string, an empty string is returned. If `count` extends beyond the available characters, all remaining characters are returned without error.
+
+`Text.Range` and `Text.Middle` are functionally equivalent — both accept an offset and optional count. Use whichever is clearer in context.
+
+## Examples
+
+### Example 1: Extract from offset to end
+
+```powerquery
+Text.Range("Hello World", 6)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"World"}]}
+-->
+
+### Example 2: Extract a fixed-length portion
+
+```powerquery
+Text.Range("Hello World", 0, 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+-->
+
+### Example 3: Extract year from a date string
+
+```powerquery
+Text.Range("2024-03-15", 0, 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024"}]}
+-->
+
+### Example 4: Extract month portion
+
+```powerquery
+Text.Range("2024-03-15", 5, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"03"}]}
+-->

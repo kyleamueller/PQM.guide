@@ -1,0 +1,71 @@
+---
+title: "DateTimeZone.FromText"
+slug: "datetimezone-fromtext"
+category: "DateTimeZone"
+description: "Converts a text representation to a datetimezone value."
+syntax: "DateTimeZone.FromText(text as nullable text, optional options as any) as nullable datetimezone"
+returnType: "datetimezone"
+returnDescription: "A datetimezone value parsed from the given text, or null if the input is null."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "A text string representing a datetimezone, such as \"2024-03-15T14:30:00+05:30\" or \"2024-03-15 14:30:00Z\"."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string) and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-totext"
+  - "datetimezone-from"
+  - "datetime-fromtext"
+  - "date-fromtext"
+---
+
+## Remarks
+
+`DateTimeZone.FromText` parses a text value into a `datetimezone`. Without options, it attempts ISO 8601 formats with timezone offsets (e.g., `"2024-03-15T14:30:00+00:00"` or `"2024-03-15T14:30:00Z"`). Use the `options` record to supply a custom `Format` pattern or `Culture`. Format strings follow .NET custom datetime format conventions.
+
+If the text is `null`, the function returns `null`. If parsing fails, the function raises an error.
+
+## Examples
+
+### Example 1: Parse ISO 8601 datetimezone strings
+
+Convert timezone-aware text timestamps in a log table to datetimezone values.
+
+Input: `Logs`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Logs, 4), {"LogID", "TimestampText"}),
+    {{"TimestampText", each DateTimeZone.FromText(_), type datetimezone}}
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"TimestampText","type":"datetimezone"}],"rows":[{"LogID":"L001","TimestampText":"2024-01-15T08:30:00+00:00"},{"LogID":"L002","TimestampText":"2024-01-15T09:45:00-05:00"},{"LogID":"L003","TimestampText":"2024-01-16T14:00:00+05:30"},{"LogID":"L004","TimestampText":"2024-01-16T17:30:00Z"}]}
+-->
+
+### Example 2: Parse a specific datetimezone format
+
+Parse a text value with a custom format and culture.
+
+```powerquery
+#table(
+    type table [TextValue = text, Parsed = datetimezone],
+    {{"2024-03-15 14:30:00 +0530",
+      DateTimeZone.FromText("2024-03-15 14:30:00 +0530", [Format="yyyy-MM-dd HH:mm:ss zzz"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"TextValue","type":"text"},{"name":"Parsed","type":"datetimezone"}],"rows":[{"TextValue":"2024-03-15 14:30:00 +0530","Parsed":"2024-03-15T14:30:00+05:30"}]}
+-->

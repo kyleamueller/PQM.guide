@@ -1,0 +1,79 @@
+---
+title: "Int64.From"
+slug: "int64-from"
+category: "Number"
+description: "Converts a value to a 64-bit signed integer (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)."
+syntax: "Int64.From(value as any, optional culture as nullable text, optional roundingMode as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "A 64-bit signed integer (long integer)."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+  - name: "roundingMode"
+    type: "number"
+    required: false
+    description: "An optional rounding mode constant used when truncating fractional values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "int32-from"
+  - "int16-from"
+  - "number-from"
+  - "double-from"
+---
+
+## Remarks
+
+`Int64.From` converts a value to a signed 64-bit integer (long integer). This is the largest fixed-size integer type in Power Query M, covering approximately ±9.2 × 10^18. Fractional values are rounded using the optional rounding mode (default: round-toward-even).
+
+Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+
+In Power BI and Analysis Services, this type is called `Whole Number`. It maps to `bigint` in SQL Server. Use this for IDs, row counts, timestamps in epoch format, or any integer that may exceed the 32-bit range.
+
+## Examples
+
+### Example 1: Convert a large number
+
+```powerquery
+Int64.From(9007199254740992)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":9007199254740992}]}
+-->
+
+### Example 2: Convert from text
+
+```powerquery
+Int64.From("1234567890123")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234567890123}]}
+-->
+
+### Example 3: Use in a column type conversion
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumnTypes(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
+    {{"OrderID", Int64.Type}}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"}],"rows":[{"OrderID":1},{"OrderID":2},{"OrderID":3}]}
+-->

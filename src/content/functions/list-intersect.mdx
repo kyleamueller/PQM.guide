@@ -1,0 +1,79 @@
+---
+title: "List.Intersect"
+slug: "list-intersect"
+category: "List"
+description: "Returns the intersection of a list of lists, containing only items that appear in every list."
+syntax: "List.Intersect(lists as list, optional equationCriteria as any) as list"
+returnType: "list"
+returnDescription: "A list of distinct items that appear in all of the provided lists."
+parameters:
+  - name: "lists"
+    type: "list"
+    required: true
+    description: "A list of lists to intersect."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria value to control how values are compared for equality."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-union"
+  - "list-difference"
+  - "list-distinct"
+  - "list-containsall"
+---
+
+## Remarks
+
+`List.Intersect` takes a **list of lists** as its first argument (not two separate lists) and returns a new list containing only items that are present in **every** provided list. The result contains distinct values only.
+
+This function is useful for finding common values across multiple datasets — for example, customers who appear in all regions, or products available in every store.
+
+- The argument is a list of lists: `{list1, list2, list3}`.
+- The result is deduplicated (distinct values only).
+- Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` for case-insensitive matching.
+- If any list in the input is empty, the result is an empty list.
+
+## Examples
+
+### Example 1: Intersect two lists
+
+```powerquery
+List.Intersect({{1, 2, 3, 4}, {2, 4, 6}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{2, 4}"}]}
+-->
+
+### Example 2: Intersect three lists
+
+```powerquery
+List.Intersect({{"A", "B", "C"}, {"B", "C", "D"}, {"C", "D", "E"}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{C}"}]}
+-->
+
+### Example 3: Find common customers across regions
+
+```powerquery
+let
+    RegionA = {"Cust-01", "Cust-02", "Cust-03"},
+    RegionB = {"Cust-02", "Cust-03", "Cust-04"},
+    RegionC = {"Cust-02", "Cust-05", "Cust-03"},
+    CommonCustomers = List.Intersect({RegionA, RegionB, RegionC})
+in
+    CommonCustomers
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Cust-02, Cust-03}"}]}
+-->

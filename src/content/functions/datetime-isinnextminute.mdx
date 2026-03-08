@@ -1,0 +1,62 @@
+---
+title: "DateTime.IsInNextMinute"
+slug: "datetime-isinnextminute"
+category: "DateTime"
+description: "Returns true if the datetime falls in the next clock minute."
+syntax: "DateTime.IsInNextMinute(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the clock minute immediately after the current minute, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isincurrentminute"
+  - "datetime-isinpreviousminute"
+  - "datetime-isinnextnminutes"
+  - "datetime-isinnexthour"
+---
+
+## Remarks
+
+`DateTime.IsInNextMinute` returns `true` if the input `datetime` or `datetimezone` value falls within the clock minute immediately following the current minute (as determined by `DateTime.LocalNow()`). For example, if it is currently 10:32, this function returns `true` for any datetime between 10:33:00 and 10:33:59.9999999. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events in the next minute
+
+Keep only rows where EventTime falls in the next clock minute.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInNextMinute([EventTime])
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":60,"EventTime":"2026-03-08T10:33:05"},{"EventID":61,"EventTime":"2026-03-08T10:33:45"}]}
+-->
+
+### Example 2: Flag next-minute events
+
+Add a boolean column for events in the next minute.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "IsNextMinute", each DateTime.IsInNextMinute([EventTime]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsNextMinute","type":"logical"}],"rows":[{"EventID":59,"EventTime":"2026-03-08T10:32:50","IsNextMinute":false},{"EventID":60,"EventTime":"2026-03-08T10:33:05","IsNextMinute":true},{"EventID":62,"EventTime":"2026-03-08T10:34:00","IsNextMinute":false}]}
+-->

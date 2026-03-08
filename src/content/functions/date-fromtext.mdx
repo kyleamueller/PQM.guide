@@ -1,0 +1,69 @@
+---
+title: "Date.FromText"
+slug: "date-fromtext"
+category: "Date"
+description: "Converts a text representation of a date to a date value."
+syntax: "Date.FromText(text as nullable text, optional options as any) as nullable date"
+returnType: "date"
+returnDescription: "A date value parsed from the given text, or null if the input is null."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "A text string representing a date, such as \"2024-03-15\" or \"March 15, 2024\"."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string, e.g., \"yyyy-MM-dd\") and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-totext"
+  - "date-from"
+  - "datetime-fromtext"
+---
+
+## Remarks
+
+`Date.FromText` parses a text value into a `date`. Without options, it attempts to parse common ISO 8601 formats (e.g., `"2024-03-15"`). Use the `options` parameter to provide a `Format` pattern or a `Culture` for locale-specific date strings. The format strings follow .NET custom date format conventions (e.g., `"dd/MM/yyyy"` for UK-style dates).
+
+If the text is `null`, the function returns `null`. If the text cannot be parsed, the function raises an error.
+
+## Examples
+
+### Example 1: Parse ISO date strings from a text column
+
+Convert string dates in the TextDates table to proper date values.
+
+Input: `TextDates`
+
+```powerquery
+Table.TransformColumns(
+    TextDates,
+    {{"DateText", each Date.FromText(_), type date}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DateText","type":"date"}],"rows":[{"DateText":"2024-01-15"},{"DateText":"2024-02-10"},{"DateText":"2024-03-05"}]}
+-->
+
+### Example 2: Parse a locale-specific date format
+
+Parse a date string in UK format using a custom format and culture.
+
+```powerquery
+#table(
+    type table [TextDate = text, ParsedDate = date],
+    {{"15/03/2024", Date.FromText("15/03/2024", [Format="dd/MM/yyyy", Culture="en-GB"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"TextDate","type":"text"},{"name":"ParsedDate","type":"date"}],"rows":[{"TextDate":"15/03/2024","ParsedDate":"2024-03-15"}]}
+-->

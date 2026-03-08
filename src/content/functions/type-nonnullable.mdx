@@ -1,0 +1,65 @@
+---
+title: "Type.NonNullable"
+slug: "type-nonnullable"
+category: "Type"
+description: "Returns the non-nullable version of a type, stripping the nullable wrapper if present."
+syntax: "Type.NonNullable(type as type) as type"
+returnType: "type"
+returnDescription: "The non-nullable form of the given type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The type to unwrap. If it is already non-nullable, it is returned as-is."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-isnullable"
+  - "value-type"
+  - "value-is"
+---
+
+## Remarks
+
+`Type.NonNullable` returns the non-nullable form of a type. If the input type is `nullable X`, the result is `X`. If the input is already non-nullable, it is returned unchanged.
+
+This is useful when you need to compare or work with type values in a normalized form, stripping any nullable wrapper before inspection.
+
+The inverse operation — making a type nullable — is performed with `type nullable X` syntax rather than a dedicated function.
+
+## Examples
+
+### Example 1: Strip nullable from nullable number
+
+```powerquery
+Type.NonNullable(type nullable number)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
+-->
+
+### Example 2: Non-nullable type is returned unchanged
+
+```powerquery
+Type.NonNullable(type text)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+-->
+
+### Example 3: Verify round-trip: NonNullable of nullable equals original
+
+```powerquery
+Type.NonNullable(type nullable number) = type number
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->

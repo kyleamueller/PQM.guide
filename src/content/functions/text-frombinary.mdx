@@ -1,0 +1,75 @@
+---
+title: "Text.FromBinary"
+slug: "text-frombinary"
+category: "Text"
+description: "Decodes a binary value into text using the specified encoding."
+syntax: "Text.FromBinary(binary as binary, optional encoding as nullable number) as text"
+returnType: "text"
+returnDescription: "A text value decoded from the binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to decode."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "A TextEncoding value specifying the character encoding. Defaults to TextEncoding.Utf8 (65001). Common values: TextEncoding.Ascii (20127), TextEncoding.Unicode (1200), TextEncoding.Utf16 (1200), TextEncoding.Utf8 (65001)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-tobinary"
+  - "lines-tobinary"
+  - "lines-totext"
+---
+
+## Remarks
+
+`Text.FromBinary` decodes a binary value into a text string using the specified character encoding. This is the inverse of `Text.ToBinary`.
+
+The `encoding` parameter accepts values from the `TextEncoding` enum:
+- `TextEncoding.Utf8` (65001) — default
+- `TextEncoding.Ascii` (20127)
+- `TextEncoding.Unicode` / `TextEncoding.Utf16` (1200)
+- `TextEncoding.Utf16BE` (1201)
+- `TextEncoding.Utf32` (12000)
+- `TextEncoding.Windows` (1252)
+
+Common uses include decoding base64-decoded binary payloads (e.g., from web APIs), reading binary file content as text, or processing encoded data returned by connectors.
+
+## Examples
+
+### Example 1: Decode UTF-8 binary to text
+
+```powerquery
+Text.FromBinary(Text.ToBinary("Hello World", TextEncoding.Utf8), TextEncoding.Utf8)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
+-->
+
+### Example 2: Decode a binary value using the default encoding
+
+```powerquery
+Text.FromBinary(Binary.FromText("SGVsbG8gV29ybGQ=", BinaryEncoding.Base64))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
+-->
+
+### Example 3: Decode ASCII-encoded binary
+
+```powerquery
+Text.FromBinary(Text.ToBinary("Power Query", TextEncoding.Ascii), TextEncoding.Ascii)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Power Query"}]}
+-->

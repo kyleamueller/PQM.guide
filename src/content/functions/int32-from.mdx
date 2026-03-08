@@ -1,0 +1,74 @@
+---
+title: "Int32.From"
+slug: "int32-from"
+category: "Number"
+description: "Converts a value to a 32-bit signed integer (-2,147,483,648 to 2,147,483,647)."
+syntax: "Int32.From(value as any, optional culture as nullable text, optional roundingMode as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "A 32-bit signed integer in the range -2,147,483,648 to 2,147,483,647."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+  - name: "roundingMode"
+    type: "number"
+    required: false
+    description: "An optional rounding mode constant used when truncating fractional values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "int64-from"
+  - "int16-from"
+  - "int8-from"
+  - "number-from"
+---
+
+## Remarks
+
+`Int32.From` converts a value to a signed 32-bit integer, the most common integer size in databases and programming. It covers the range -2,147,483,648 to 2,147,483,647. Values outside this range raise an error. Fractional numbers are rounded (default: round-toward-even).
+
+Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+
+This maps to `int` in SQL Server, `INTEGER` in SQLite, and similar types across many systems. Use `Int64.From` for larger integers.
+
+## Examples
+
+### Example 1: Convert a number to Int32
+
+```powerquery
+Int32.From(2147483647)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2147483647}]}
+-->
+
+### Example 2: Convert text
+
+```powerquery
+Int32.From("-100000")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-100000}]}
+-->
+
+### Example 3: Round and convert a decimal
+
+```powerquery
+Int32.From(99.5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":100}]}
+-->

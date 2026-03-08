@@ -1,0 +1,74 @@
+---
+title: "Table.AddFuzzyClusterColumn"
+slug: "table-addfuzzyclustercolumn"
+category: "Table"
+description: "Adds a column containing representative cluster values based on fuzzy matching of an existing column."
+syntax: "Table.AddFuzzyClusterColumn(table as table, columnName as text, newColumnName as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "The original table with a new column containing the canonical cluster representative for each row."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to process."
+  - name: "columnName"
+    type: "text"
+    required: true
+    description: "The name of the column to cluster."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name for the new column containing cluster representative values."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "Optional record with fuzzy options: Threshold, IgnoreCase, IgnoreSpace, NumberOfMatches, TransformationTable."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fuzzygroup"
+  - "table-fuzzyjoin"
+  - "table-addcolumn"
+---
+
+## Remarks
+
+`Table.AddFuzzyClusterColumn` assigns each row to a cluster based on approximate string similarity of the specified column, then adds a new column containing the representative (canonical) value for that cluster. All variants that fuzzy-match each other receive the same representative value.
+
+Unlike `Table.FuzzyGroup`, this function preserves all original rows and simply annotates them with a cluster label — it does not aggregate. This makes it useful for previewing cluster assignments before deciding how to proceed.
+
+## Examples
+
+### Example 1: Add a cluster column for company names
+
+```powerquery
+Table.AddFuzzyClusterColumn(
+    #table({"Company"}, {{"Microsoft"}, {"Micosoft"}, {"MICROSOFT"}, {"Google"}, {"Gogle"}}),
+    "Company",
+    "ClusterCompany"
+)
+```
+
+<!--output
+{"columns":[{"name":"Company","type":"any"},{"name":"ClusterCompany","type":"any"}],"rows":[{"Company":"Microsoft","ClusterCompany":"Microsoft"},{"Company":"Micosoft","ClusterCompany":"Microsoft"},{"Company":"MICROSOFT","ClusterCompany":"Microsoft"},{"Company":"Google","ClusterCompany":"Google"},{"Company":"Gogle","ClusterCompany":"Google"}]}
+-->
+
+### Example 2: Apply a lower threshold for more aggressive clustering
+
+```powerquery
+Table.AddFuzzyClusterColumn(
+    #table({"City"}, {{"New York"}, {"New-York"}, {"Newyork"}, {"NY"}}),
+    "City",
+    "CanonicalCity",
+    [Threshold = 0.6]
+)
+```
+
+<!--output
+{"columns":[{"name":"City","type":"any"},{"name":"CanonicalCity","type":"any"}],"rows":[{"City":"New York","CanonicalCity":"New York"},{"City":"New-York","CanonicalCity":"New York"},{"City":"Newyork","CanonicalCity":"New York"},{"City":"NY","CanonicalCity":"New York"}]}
+-->

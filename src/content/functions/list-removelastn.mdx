@@ -1,0 +1,74 @@
+---
+title: "List.RemoveLastN"
+slug: "list-removelastn"
+category: "List"
+description: "Removes the last N items from a list, or items from the end while a condition is true."
+syntax: "List.RemoveLastN(list as list, countOrCondition as any) as list"
+returnType: "list"
+returnDescription: "A new list with the last N items removed."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many items to remove from the end, or a condition function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-removefirstn"
+  - "list-lastn"
+  - "list-removerange"
+  - "list-skip"
+---
+
+## Remarks
+
+`List.RemoveLastN` removes the last `N` items from a list and returns the remaining items. It accepts either a count or a condition function.
+
+- **Number**: Removes the last `N` items. If `N` is larger than the list, an empty list is returned.
+- **Condition function**: Removes items from the **end** of the list while the condition returns `true`, scanning backward.
+- The original list is not modified; a new list is returned.
+
+## Examples
+
+### Example 1: Remove the last 2 items
+
+```powerquery
+List.RemoveLastN({1, 2, 3, 4, 5}, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 2, 3}"}]}
+-->
+
+### Example 2: Remove trailing items while value exceeds 30
+
+```powerquery
+List.RemoveLastN({10, 20, 30, 40, 50}, each _ > 30)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{10, 20, 30}"}]}
+-->
+
+### Example 3: Remove footer rows from a list
+
+```powerquery
+let
+    Rows = {"Data1", "Data2", "Data3", "---", "Footer", "Total"},
+    DataOnly = List.RemoveLastN(Rows, 3)
+in
+    DataOnly
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
+-->

@@ -1,0 +1,75 @@
+---
+title: "Int16.From"
+slug: "int16-from"
+category: "Number"
+description: "Converts a value to a 16-bit signed integer (-32,768 to 32,767)."
+syntax: "Int16.From(value as any, optional culture as nullable text, optional roundingMode as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "A 16-bit signed integer in the range -32,768 to 32,767."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+  - name: "roundingMode"
+    type: "number"
+    required: false
+    description: "An optional rounding mode constant used when truncating fractional values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "byte-from"
+  - "int8-from"
+  - "int32-from"
+  - "int64-from"
+  - "number-from"
+---
+
+## Remarks
+
+`Int16.From` converts a value to a signed 16-bit integer (short integer), covering the range -32,768 to 32,767. Values outside this range raise an error. Fractional numbers are rounded using the specified rounding mode (default: round-toward-even).
+
+Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+
+This type maps to the `smallint` type in many databases and is useful for compact integer storage where values are known to fit within 16 bits.
+
+## Examples
+
+### Example 1: Convert a number to Int16
+
+```powerquery
+Int16.From(1000)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1000}]}
+-->
+
+### Example 2: Convert a text value
+
+```powerquery
+Int16.From("32767")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":32767}]}
+-->
+
+### Example 3: Convert a decimal (rounded)
+
+```powerquery
+Int16.From(255.7)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":256}]}
+-->

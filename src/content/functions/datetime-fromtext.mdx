@@ -1,0 +1,70 @@
+---
+title: "DateTime.FromText"
+slug: "datetime-fromtext"
+category: "DateTime"
+description: "Converts a text representation of a datetime to a datetime value."
+syntax: "DateTime.FromText(text as nullable text, optional options as any) as nullable datetime"
+returnType: "datetime"
+returnDescription: "A datetime value parsed from the given text, or null if the input is null."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "A text string representing a datetime, such as \"2024-03-15 14:30:00\" or \"March 15, 2024 2:30 PM\"."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string) and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-totext"
+  - "datetime-from"
+  - "date-fromtext"
+  - "datetimezone-fromtext"
+---
+
+## Remarks
+
+`DateTime.FromText` parses a text value into a `datetime`. Without options, it attempts common ISO 8601 datetime formats (e.g., `"2024-03-15T14:30:00"`). Use the `options` record to supply a `Format` pattern or a `Culture` for locale-specific strings. Format strings follow .NET custom datetime format conventions.
+
+If the text is `null`, the function returns `null`. If parsing fails, the function raises an error.
+
+## Examples
+
+### Example 1: Parse ISO datetime text strings
+
+Convert text datetime values in a log table into typed datetime values.
+
+Input: `Logs`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Logs, 4), {"LogID", "TimestampText"}),
+    {{"TimestampText", each DateTime.FromText(_), type datetime}}
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"TimestampText","type":"datetime"}],"rows":[{"LogID":"L001","TimestampText":"2024-01-15T08:30:00"},{"LogID":"L002","TimestampText":"2024-01-15T09:45:00"},{"LogID":"L003","TimestampText":"2024-01-16T14:00:00"},{"LogID":"L004","TimestampText":"2024-01-16T17:30:00"}]}
+-->
+
+### Example 2: Parse a locale-specific datetime string
+
+Parse a US-format datetime string with a custom format.
+
+```powerquery
+#table(
+    type table [TextValue = text, Parsed = datetime],
+    {{"03/15/2024 02:30:00 PM", DateTime.FromText("03/15/2024 02:30:00 PM", [Format="MM/dd/yyyy hh:mm:ss tt", Culture="en-US"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"TextValue","type":"text"},{"name":"Parsed","type":"datetime"}],"rows":[{"TextValue":"03/15/2024 02:30:00 PM","Parsed":"2024-03-15T14:30:00"}]}
+-->

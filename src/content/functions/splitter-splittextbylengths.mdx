@@ -1,0 +1,93 @@
+---
+title: "Splitter.SplitTextByLengths"
+slug: "splitter-splittextbylengths"
+category: "Splitter"
+description: "Returns a splitter function that divides text into substrings of specified lengths."
+syntax: "Splitter.SplitTextByLengths(lengths as list, optional startAtEnd as nullable logical) as function"
+returnType: "function"
+returnDescription: "A function that splits text into substrings according to the specified list of lengths."
+parameters:
+  - name: "lengths"
+    type: "list"
+    required: true
+    description: "A list of numbers specifying the character length of each resulting segment."
+  - name: "startAtEnd"
+    type: "logical"
+    required: false
+    description: "When true, splits from the end of the string rather than the start. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbypositions"
+  - "splitter-splittextbyranges"
+  - "splitter-splittextbyrepeatedlengths"
+  - "splitter-splittextbydelimiter"
+  - "splitter-splitbynothing"
+---
+
+## Remarks
+
+`Splitter.SplitTextByLengths` returns a splitter function that, when applied to a text value, extracts consecutive substrings of the lengths specified by the `lengths` list. Each element of `lengths` defines how many characters to take for that segment.
+
+If the total of all lengths is less than the full string length, any remaining text is returned as an additional final element. If a length extends beyond the remaining characters, only the available characters are returned for that segment.
+
+When `startAtEnd` is `true`, lengths are applied from right to left.
+
+This is useful for parsing fixed-width file formats where each field has a predetermined character count.
+
+## Examples
+
+### Example 1: Split into segments of 3, 4, and 3 characters
+
+```powerquery
+Splitter.SplitTextByLengths({3, 4, 3})("PowerQuery")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Pow","erQu","ery"]}]}
+-->
+
+### Example 2: Parse a fixed-width record
+
+```powerquery
+let
+    record = "ALICE030F",
+    splitter = Splitter.SplitTextByLengths({5, 2, 1}),
+    parts = splitter(record)
+in
+    parts
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ALICE","03","0F"]}]}
+-->
+
+### Example 3: Split from the end
+
+```powerquery
+Splitter.SplitTextByLengths({3, 3}, true)("ABCDEF")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ABC","DEF"]}]}
+-->
+
+### Example 4: Use with Table.SplitColumn
+
+```powerquery
+Table.SplitColumn(
+    #table({"Code"}, {{"US1234"}}),
+    "Code",
+    Splitter.SplitTextByLengths({2, 4}),
+    {"Country", "Number"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Country","type":"text"},{"name":"Number","type":"text"}],"rows":[{"Country":"US","Number":"1234"}]}
+-->

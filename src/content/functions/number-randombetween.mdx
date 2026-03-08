@@ -1,0 +1,72 @@
+---
+title: "Number.RandomBetween"
+slug: "number-randombetween"
+category: "Number"
+description: "Returns a random number between bottom and top (inclusive)."
+syntax: "Number.RandomBetween(bottom as number, top as number) as number"
+returnType: "number"
+returnDescription: "A pseudo-random number in the range [bottom, top]."
+parameters:
+  - name: "bottom"
+    type: "number"
+    required: true
+    description: "The minimum value of the random range (inclusive)."
+  - name: "top"
+    type: "number"
+    required: true
+    description: "The maximum value of the random range (inclusive)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-random"
+---
+
+## Remarks
+
+`Number.RandomBetween` returns a pseudo-random floating-point number uniformly distributed between `bottom` and `top`, both endpoints inclusive. It is equivalent to `bottom + Number.Random() * (top - bottom)`.
+
+Like `Number.Random`, the value regenerates on each refresh. When used inside `Table.AddColumn`, the engine typically evaluates the expression once per row, producing different values per row. However, caching behavior may vary — if consistent per-row randomness is critical, test in your specific environment.
+
+`bottom` must not exceed `top`. Both parameters accept decimal values.
+
+## Examples
+
+### Example 1: Random integer-range value between 1 and 100
+
+```powerquery
+Number.RandomBetween(1, 100)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":73.41829}]}
+-->
+
+### Example 2: Simulate a random price adjustment between -5% and +5%
+
+```powerquery
+Number.RandomBetween(-0.05, 0.05)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.0238}]}
+-->
+
+### Example 3: Add a random discount column
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "UnitPrice"}),
+    "Discount", each Number.Round(Number.RandomBetween(0, 0.3), 2), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"},{"name":"Discount","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25,"Discount":0.12},{"OrderID":2,"UnitPrice":150,"Discount":0.27},{"OrderID":3,"UnitPrice":75,"Discount":0.05},{"OrderID":4,"UnitPrice":200,"Discount":0.19}]}
+-->

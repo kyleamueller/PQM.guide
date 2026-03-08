@@ -1,0 +1,86 @@
+---
+title: "Text.PadEnd"
+slug: "text-padend"
+category: "Text"
+description: "Pads the end of a text value with a character to reach at least the specified total length."
+syntax: "Text.PadEnd(text as nullable text, count as number, optional character as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The text value right-padded to at least count total characters."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The minimum total length of the resulting text."
+  - name: "character"
+    type: "text"
+    required: false
+    description: "The single character to use for padding. Defaults to a space character if omitted or null."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-padstart"
+  - "text-trim"
+  - "text-trimend"
+  - "text-repeat"
+---
+
+## Remarks
+
+`Text.PadEnd` adds `character` characters to the right (end) of `text` until the total length is at least `count`. If `text` is already `count` characters or longer, it is returned unchanged.
+
+If `character` is omitted or `null`, a space (`" "`) is used. The `character` argument must be exactly one character long; providing a multi-character string raises an error.
+
+If `text` is `null`, the function returns `null`.
+
+Right-padding is commonly used for fixed-width text file output, aligning columns in reports, or filling codes to a standard length.
+
+## Examples
+
+### Example 1: Pad a label to ten characters with spaces
+
+```powerquery
+Text.PadEnd("Hello", 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello     "}]}
+-->
+
+### Example 2: Pad with a custom character
+
+```powerquery
+Text.PadEnd("abc", 6, "-")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"abc---"}]}
+-->
+
+### Example 3: Text already meets minimum length — no padding added
+
+```powerquery
+Text.PadEnd("Hello World", 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
+-->
+
+### Example 4: Pad a product code to eight characters
+
+```powerquery
+Text.PadEnd("A12", 8, "0")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"A1200000"}]}
+-->

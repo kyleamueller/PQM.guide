@@ -1,0 +1,71 @@
+---
+title: "DateTimeZone.FromFileTime"
+slug: "datetimezone-fromfiletime"
+category: "DateTimeZone"
+description: "Converts a Windows file time to a datetimezone value in UTC."
+syntax: "DateTimeZone.FromFileTime(fileTime as nullable number) as nullable datetimezone"
+returnType: "datetimezone"
+returnDescription: "A datetimezone value in UTC (+00:00) corresponding to the given Windows file time."
+parameters:
+  - name: "fileTime"
+    type: "number"
+    required: true
+    description: "A 64-bit integer representing the number of 100-nanosecond intervals since January 1, 1601 (UTC)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-fromfiletime"
+  - "datetimezone-from"
+  - "datetimezone-toutc"
+  - "datetimezone-tolocal"
+---
+
+## Remarks
+
+`DateTimeZone.FromFileTime` converts a Windows FILETIME value — the number of 100-nanosecond intervals since 00:00:00 UTC on January 1, 1601 — into a `datetimezone` value with a `+00:00` (UTC) offset. This differs from `DateTime.FromFileTime`, which converts to local time without timezone information. Use this function when you need to preserve the UTC context of timestamps from Windows APIs, Active Directory, or NTFS metadata.
+
+If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Convert Active Directory lastLogon to UTC datetimezone
+
+Convert FILETIME values from Active Directory to timezone-aware UTC datetimezone values.
+
+Input: `ActiveDirectory`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(ActiveDirectory, 4),
+        {"UserID", "LastLogonFileTime"}
+    ),
+    "LastLogonUTC",
+    each DateTimeZone.FromFileTime([LastLogonFileTime]),
+    type datetimezone
+)
+```
+
+<!--output
+{"columns":[{"name":"UserID","type":"text"},{"name":"LastLogonFileTime","type":"number"},{"name":"LastLogonUTC","type":"datetimezone"}],"rows":[{"UserID":"U001","LastLogonFileTime":133500000000000000,"LastLogonUTC":"2024-01-15T14:20:00+00:00"},{"UserID":"U002","LastLogonFileTime":133550000000000000,"LastLogonUTC":"2024-03-06T13:33:20+00:00"}]}
+-->
+
+### Example 2: Convert a known file time to UTC datetimezone
+
+Convert a literal FILETIME value to a UTC datetimezone.
+
+```powerquery
+#table(
+    type table [FileTime = number, UTCDateTime = datetimezone],
+    {{132000000000000000, DateTimeZone.FromFileTime(132000000000000000)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"FileTime","type":"number"},{"name":"UTCDateTime","type":"datetimezone"}],"rows":[{"FileTime":132000000000000000,"UTCDateTime":"2019-10-26T07:46:40+00:00"}]}
+-->

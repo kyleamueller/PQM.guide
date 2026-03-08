@@ -1,0 +1,66 @@
+---
+title: "Number.Random"
+slug: "number-random"
+category: "Number"
+description: "Returns a random number between 0 (inclusive) and 1 (exclusive). The value changes on each call."
+syntax: "Number.Random() as number"
+returnType: "number"
+returnDescription: "A pseudo-random number in the range [0, 1)."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-randombetween"
+---
+
+## Remarks
+
+`Number.Random` returns a pseudo-random floating-point number uniformly distributed in the interval [0, 1). Each invocation returns an independent value.
+
+In Power Query, results may be cached by the engine: if the engine evaluates the expression only once (for example, during a fold or step caching), all rows may receive the same value. To reliably generate a unique random number per row, use `Number.RandomBetween` inside a `Table.AddColumn` call, as the row-by-row evaluation context forces per-row recalculation.
+
+Random values regenerate on each refresh, making this unsuitable for reproducible results without seeding mechanisms. There is no built-in seed parameter in Power Query M.
+
+## Examples
+
+### Example 1: Generate a single random number
+
+```powerquery
+Number.Random()
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.6472834521098765}]}
+-->
+
+### Example 2: Scale to a custom range using arithmetic
+
+Generate a random number in [0, 100):
+
+```powerquery
+Number.Random() * 100
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42.381927463819}]}
+-->
+
+### Example 3: Add a random score column to a table
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID"}),
+    "RandomScore", each Number.Random(), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"RandomScore","type":"number"}],"rows":[{"OrderID":1,"RandomScore":0.234},{"OrderID":2,"RandomScore":0.891},{"OrderID":3,"RandomScore":0.512},{"OrderID":4,"RandomScore":0.047}]}
+-->

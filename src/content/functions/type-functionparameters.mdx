@@ -1,0 +1,61 @@
+---
+title: "Type.FunctionParameters"
+slug: "type-functionparameters"
+category: "Type"
+description: "Returns a record of parameter types for a given function type."
+syntax: "Type.FunctionParameters(type as type) as record"
+returnType: "record"
+returnDescription: "A record where each field name is a parameter name and each value is the parameter's type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A function type whose parameter types are returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-functionrequiredparameters"
+  - "type-functionreturn"
+  - "value-type"
+---
+
+## Remarks
+
+`Type.FunctionParameters` extracts parameter type information from a function type. The result is a record where each field corresponds to a parameter — the field name is the parameter name and the value is the parameter's declared type.
+
+This function operates on the **type** of a function, not the function itself. To get the type of a function value, use `Value.Type(myFunction)` first.
+
+Use this for metaprogramming, documentation generation, or validation of function signatures.
+
+## Examples
+
+### Example 1: Get parameter types of a simple function type
+
+```powerquery
+let
+    FType = type function (x as number, y as text) as logical
+in
+    Record.ToTable(Type.FunctionParameters(FType))
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"x","Value":"type number"},{"Name":"y","Value":"type text"}]}
+-->
+
+### Example 2: Inspect parameter types of a built-in function
+
+```powerquery
+let
+    FType = Value.Type(Number.Round)
+in
+    Record.ToTable(Type.FunctionParameters(FType))
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"number","Value":"type nullable number"},{"Name":"digits","Value":"type nullable number"},{"Name":"roundingMode","Value":"type nullable number"}]}
+-->

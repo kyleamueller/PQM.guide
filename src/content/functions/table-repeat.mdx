@@ -1,0 +1,60 @@
+---
+title: "Table.Repeat"
+slug: "table-repeat"
+category: "Table"
+description: "Returns a table that repeats the original table's rows a specified number of times."
+syntax: "Table.Repeat(table as table, count as number) as table"
+returnType: "table"
+returnDescription: "A table containing the original rows repeated count times."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose rows are repeated."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of times to repeat the table's rows."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-combine"
+  - "table-fromrows"
+---
+
+## Remarks
+
+`Table.Repeat` concatenates the table's rows with itself `count` times. The result has `Table.RowCount(table) * count` rows. This is useful for generating test data, creating repeating calendar patterns, or building cross-join-style datasets.
+
+## Examples
+
+### Example 1: Repeat a table twice
+
+```powerquery
+Table.Repeat(
+    #table({"Name"}, {{"Alice"}, {"Bob"}}),
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"}],"rows":[{"Name":"Alice"},{"Name":"Bob"},{"Name":"Alice"},{"Name":"Bob"}]}
+-->
+
+### Example 2: Repeat to generate test data
+
+```powerquery
+Table.Repeat(
+    #table({"Status"}, {{"Pending"}, {"Active"}, {"Closed"}}),
+    3
+)
+```
+
+<!--output
+{"columns":[{"name":"Status","type":"any"}],"rows":[{"Status":"Pending"},{"Status":"Active"},{"Status":"Closed"},{"Status":"Pending"},{"Status":"Active"},{"Status":"Closed"},{"Status":"Pending"},{"Status":"Active"},{"Status":"Closed"}]}
+-->

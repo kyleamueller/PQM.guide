@@ -1,0 +1,71 @@
+---
+title: "Table.AddKey"
+slug: "table-addkey"
+category: "Table"
+description: "Marks specified columns as a key (primary or non-primary) in the table's type metadata."
+syntax: "Table.AddKey(table as table, columns as list, isPrimary as logical) as table"
+returnType: "table"
+returnDescription: "A table with key metadata added for the specified columns."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to annotate with a key."
+  - name: "columns"
+    type: "list"
+    required: true
+    description: "A list of column names that form the key."
+  - name: "isPrimary"
+    type: "logical"
+    required: true
+    description: "true to mark the key as a primary key; false for a non-primary key."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-keys"
+  - "table-schema"
+  - "table-distinct"
+---
+
+## Remarks
+
+`Table.AddKey` annotates a table's type metadata to declare that one or more columns form a key. This metadata is used by the Power Query engine to optimize operations such as joins and duplicate removal. It does not enforce uniqueness or validate the data; it is purely a hint to the engine.
+
+A primary key (`isPrimary = true`) declares that the combination of columns is unique across all rows. A non-primary key is a candidate key that may be used for optimization purposes.
+
+Use `Table.Keys` to inspect existing key definitions on a table.
+
+## Examples
+
+### Example 1: Add a primary key on a single column
+
+```powerquery
+let
+    Source = #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    WithKey = Table.AddKey(Source, {"ID"}, true)
+in
+    WithKey
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"2","Name":"Bob"}]}
+-->
+
+### Example 2: Add a composite non-primary key
+
+```powerquery
+let
+    Source  = #table({"Year", "Region", "Sales"}, {{2024, "North", 100}, {2024, "South", 200}}),
+    WithKey = Table.AddKey(Source, {"Year", "Region"}, false)
+in
+    WithKey
+```
+
+<!--output
+{"columns":[{"name":"Year","type":"any"},{"name":"Region","type":"any"},{"name":"Sales","type":"any"}],"rows":[{"Year":"2024","Region":"North","Sales":"100"},{"Year":"2024","Region":"South","Sales":"200"}]}
+-->

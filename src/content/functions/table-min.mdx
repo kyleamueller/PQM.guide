@@ -1,0 +1,80 @@
+---
+title: "Table.Min"
+slug: "table-min"
+category: "Table"
+description: "Returns the row with the minimum value according to the given comparison criteria."
+syntax: "Table.Min(table as table, comparisonCriteria as any, optional default as nullable any) as any"
+returnType: "any"
+returnDescription: "The row with the lowest value as a record, or the default if the table is empty."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: true
+    description: "A column name (text), a list of column names, or a comparer function to determine ordering."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Optional value to return if the table is empty. Defaults to null."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-minn"
+  - "table-max"
+  - "table-sort"
+  - "table-first"
+---
+
+## Remarks
+
+`Table.Min` returns the entire row (as a record) that contains the minimum value for the given comparison criteria. Field values can be accessed using record field access: `Table.Min(t, "Date")[Date]`. If the table is empty, it returns the `default` value (or `null` if no default is provided).
+
+## Examples
+
+### Example 1: Get the row with the lowest score
+
+```powerquery
+Table.Min(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
+    "Score"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"Bob\", Score = 82]"}]}
+-->
+
+### Example 2: Get the earliest date
+
+```powerquery
+Table.Min(
+    #table({"Event", "Date"}, {{"Launch", #date(2024,3,15)}, {"Review", #date(2024,1,10)}}),
+    "Date"
+)[Date]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-10"}]}
+-->
+
+### Example 3: Return a default for an empty table
+
+```powerquery
+Table.Min(
+    #table({"Name", "Score"}, {}),
+    "Score",
+    [Name = "N/A", Score = 0]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"N/A\", Score = 0]"}]}
+-->

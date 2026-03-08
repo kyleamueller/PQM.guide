@@ -1,0 +1,71 @@
+---
+title: "Type.FunctionReturn"
+slug: "type-functionreturn"
+category: "Type"
+description: "Returns the return type declared for a given function type."
+syntax: "Type.FunctionReturn(type as type) as type"
+returnType: "type"
+returnDescription: "The declared return type of the function type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A function type whose return type is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-functionparameters"
+  - "type-functionrequiredparameters"
+  - "value-type"
+---
+
+## Remarks
+
+`Type.FunctionReturn` extracts the declared return type from a function type. If the function type does not declare a return type, the result is `type any`.
+
+Use `Value.Type(fn)` to obtain the function type from a function value before passing it to this function.
+
+This is useful for introspecting function signatures in metaprogramming, custom documentation generation, or building generic pipelines that need to know the output type of a function.
+
+## Examples
+
+### Example 1: Return type of a typed function
+
+```powerquery
+let
+    FType = type function (x as number) as text
+in
+    Type.FunctionReturn(FType)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+-->
+
+### Example 2: Return type of Number.Abs
+
+```powerquery
+Type.FunctionReturn(Value.Type(Number.Abs))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type nullable number"}]}
+-->
+
+### Example 3: A function without declared return type returns any
+
+```powerquery
+let
+    FType = type function (x as number) as any
+in
+    Type.FunctionReturn(FType)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type any"}]}
+-->

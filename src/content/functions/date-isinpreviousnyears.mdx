@@ -1,0 +1,68 @@
+---
+title: "Date.IsInPreviousNYears"
+slug: "date-isinpreviousnyears"
+category: "Date"
+description: "Returns true if the date falls within the previous N calendar years."
+syntax: "Date.IsInPreviousNYears(dateTime as any, years as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the N years before the current year, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "years"
+    type: "number"
+    required: true
+    description: "The number of years back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinpreviousyear"
+  - "date-isinnextnyears"
+  - "date-isinpreviousnquarters"
+  - "date-isinpreviousnmonths"
+---
+
+## Remarks
+
+`Date.IsInPreviousNYears` returns `true` if the input date falls within the N complete calendar years preceding the current year. The current year itself is not included; use `Date.IsInCurrentYear` to also match the current year. The function is re-evaluated on each query refresh.
+
+For example, if the current year is 2026 and `years = 3`, it matches any date in 2023, 2024, or 2025.
+
+## Examples
+
+### Example 1: Filter orders from the previous 3 years
+
+Keep only rows where OrderDate falls within the previous 3 calendar years.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousNYears([OrderDate], 3)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":10,"OrderDate":"2023-05-15"},{"OrderID":20,"OrderDate":"2024-08-22"},{"OrderID":30,"OrderDate":"2025-11-03"}]}
+-->
+
+### Example 2: Flag records from the past 5 years
+
+Add a boolean column for records within the previous 5 years.
+
+```powerquery
+Table.AddColumn(
+    HistoricalData,
+    "IsRecentHistory", each Date.IsInPreviousNYears([RecordDate], 5), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"RecordID","type":"number"},{"name":"RecordDate","type":"date"},{"name":"IsRecentHistory","type":"logical"}],"rows":[{"RecordID":1,"RecordDate":"2020-01-15","IsRecentHistory":false},{"RecordID":5,"RecordDate":"2022-06-30","IsRecentHistory":true},{"RecordID":10,"RecordDate":"2025-12-01","IsRecentHistory":true}]}
+-->

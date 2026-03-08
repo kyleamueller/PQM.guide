@@ -1,0 +1,97 @@
+---
+title: "SharePoint.Files"
+slug: "sharepoint-files"
+category: "Accessing Data"
+description: "Returns a table of all files from a SharePoint site or document library, including their binary content."
+syntax: "SharePoint.Files(url as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table where each row represents a file in the SharePoint site or library, including columns for Name, Folder Path, Date accessed, Date modified, Date created, Extension, Attributes, and Content."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the SharePoint site root (e.g., \"https://contoso.sharepoint.com/sites/Finance\"). The connector enumerates all files across document libraries under this URL."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options. Supports ApiVersion to specify the SharePoint REST API version."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sharepoint-contents"
+  - "sharepoint-tables"
+  - "folder-files"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`SharePoint.Files` connects to a SharePoint Online or SharePoint on-premises site and returns a flat table of all files found across all document libraries under the specified URL. The `Content` column contains the binary data of each file, which can be passed to parsing functions like `Excel.Workbook`, `Csv.Document`, `Json.Document`, or `Pdf.Tables`.
+
+This function is the SharePoint equivalent of `Folder.Files` for local file systems.
+
+**Authentication**: Microsoft Account (OAuth) for SharePoint Online, or Windows/Basic credentials for SharePoint on-premises. Use the site root URL as the credential scope.
+
+**Query folding**: Not supported for most operations. Filtering the file list (by name, extension, or date) is performed in Power Query after the full file list is retrieved.
+
+**Columns returned**:
+- `Name` (text) — the file name including extension.
+- `Folder Path` (text) — the SharePoint URL path of the folder containing the file.
+- `Date accessed` (datetime) — last access timestamp.
+- `Date modified` (datetime) — last modification timestamp.
+- `Date created` (datetime) — creation timestamp.
+- `Extension` (text) — the file extension including the leading dot.
+- `Attributes` (record) — file metadata attributes.
+- `Content` (binary) — the binary content of the file.
+
+**Performance**: `Content` is loaded lazily. Filter by extension or folder before expanding `Content` to avoid downloading unnecessary files.
+
+**Typical use**: Combine files of the same type (e.g., all `.xlsx` files in a SharePoint library) into a single unified table.
+
+## Examples
+
+### Example 1: List all files on a SharePoint site
+```powerquery
+SharePoint.Files("https://contoso.sharepoint.com/sites/Finance")
+```
+
+### Example 2: Combine all Excel files from a SharePoint library
+```powerquery
+let
+    Source = SharePoint.Files("https://contoso.sharepoint.com/sites/Finance"),
+    ExcelFiles = Table.SelectRows(Source, each [Extension] = ".xlsx"),
+    AddWorkbook = Table.AddColumn(ExcelFiles, "Workbook", each Excel.Workbook([Content])),
+    Expanded = Table.ExpandTableColumn(AddWorkbook, "Workbook", {"Name", "Data"}),
+    Sheet1 = Table.SelectRows(Expanded, each [Name] = "Sheet1"),
+    Combined = Table.Combine(Sheet1[Data])
+in
+    Combined
+```
+
+### Example 3: Filter files from a specific library folder
+```powerquery
+let
+    Source = SharePoint.Files("https://contoso.sharepoint.com/sites/Finance"),
+    Filtered = Table.SelectRows(
+        Source,
+        each Text.Contains([Folder Path], "/Shared Documents/Reports/")
+    )
+in
+    Filtered
+```
+
+### Example 4: Read a single known file from SharePoint
+```powerquery
+let
+    Source = SharePoint.Files("https://contoso.sharepoint.com/sites/Finance"),
+    File = Source{[Name="Budget2024.xlsx"]}[Content],
+    Workbook = Excel.Workbook(File),
+    Sheet = Workbook{[Name="Summary"]}[Data]
+in
+    Sheet
+```

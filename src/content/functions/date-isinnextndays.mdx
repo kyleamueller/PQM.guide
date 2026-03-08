@@ -1,0 +1,68 @@
+---
+title: "Date.IsInNextNDays"
+slug: "date-isinnextndays"
+category: "Date"
+description: "Returns true if the date falls within the next N days (not including today)."
+syntax: "Date.IsInNextNDays(dateTime as any, days as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the next N days after today, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "days"
+    type: "number"
+    required: true
+    description: "The number of days ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinnextday"
+  - "date-isinpreviousndays"
+  - "date-isinnextnweeks"
+  - "date-isinnextnmonths"
+---
+
+## Remarks
+
+`Date.IsInNextNDays` returns `true` if the input date falls between tomorrow and N days from today (inclusive). Today itself is not included; use `Date.IsInCurrentDay` if you also need to match today. The function is re-evaluated on each query refresh.
+
+For example, with `days = 7`, it matches any date from tomorrow through 7 days from now (a 7-day window starting tomorrow).
+
+## Examples
+
+### Example 1: Find tasks due in the next 14 days
+
+Keep only rows where DueDate falls within the next 14 days.
+
+```powerquery
+Table.SelectRows(
+    Tasks,
+    each Date.IsInNextNDays([DueDate], 14)
+)
+```
+
+<!--output
+{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":5,"DueDate":"2026-03-09","TaskName":"Submit report"},{"TaskID":6,"DueDate":"2026-03-15","TaskName":"Client call"},{"TaskID":7,"DueDate":"2026-03-20","TaskName":"Review budget"}]}
+-->
+
+### Example 2: Flag rows expiring in the next 30 days
+
+Add a boolean column for items expiring within 30 days.
+
+```powerquery
+Table.AddColumn(
+    Licenses,
+    "ExpiringSoon", each Date.IsInNextNDays([ExpiryDate], 30), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"LicenseID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"ExpiringSoon","type":"logical"}],"rows":[{"LicenseID":"L001","ExpiryDate":"2026-03-20","ExpiringSoon":true},{"LicenseID":"L002","ExpiryDate":"2026-04-05","ExpiringSoon":true},{"LicenseID":"L003","ExpiryDate":"2026-06-01","ExpiringSoon":false}]}
+-->

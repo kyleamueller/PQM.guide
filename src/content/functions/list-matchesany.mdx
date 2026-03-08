@@ -1,0 +1,78 @@
+---
+title: "List.MatchesAny"
+slug: "list-matchesany"
+category: "List"
+description: "Returns true if the condition function returns true for at least one item in the list."
+syntax: "List.MatchesAny(list as list, condition as function) as logical"
+returnType: "logical"
+returnDescription: "True if the condition returns true for at least one item; false if no items satisfy the condition."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to test."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "A function that takes a list item and returns a logical value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-matchesall"
+  - "list-anytrue"
+  - "list-alltrue"
+  - "list-select"
+  - "list-contains"
+---
+
+## Remarks
+
+`List.MatchesAny` applies a condition function to each item in the list and returns `true` as soon as any item satisfies the condition. It is the list equivalent of the "there exists" quantifier.
+
+Unlike `List.AnyTrue`, which expects a pre-computed list of logical values, `List.MatchesAny` accepts any list and a predicate function.
+
+- An empty list returns `false`.
+- The function short-circuits: evaluation stops as soon as a passing item is found.
+- Equivalent to `List.AnyTrue(List.Transform(list, condition))`, but may short-circuit earlier.
+- Use `List.Contains` for simple equality checks; `List.MatchesAny` is better for complex conditions.
+
+## Examples
+
+### Example 1: Check if any number exceeds a threshold
+
+```powerquery
+List.MatchesAny({10, 25, 5, 8}, each _ > 20)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: No items match
+
+```powerquery
+List.MatchesAny({1, 2, 3}, each _ > 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Check if any product is out of stock
+
+```powerquery
+let
+    StockLevels = {100, 0, 45, 230, 0},
+    HasOutOfStock = List.MatchesAny(StockLevels, each _ = 0)
+in
+    HasOutOfStock
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

@@ -1,0 +1,84 @@
+---
+title: "Lines.ToBinary"
+slug: "lines-tobinary"
+category: "Lines"
+description: "Converts a list of text lines to a binary value using the specified encoding and line separator options."
+syntax: "Lines.ToBinary(lines as list, optional quoteStyle as nullable number, optional includeByteOrderMark as nullable logical, optional encoding as nullable number) as binary"
+returnType: "binary"
+returnDescription: "A binary value containing the lines joined with line separators and encoded using the specified encoding."
+parameters:
+  - name: "lines"
+    type: "list"
+    required: true
+    description: "A list of text values, each representing one line."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "Controls how line endings within quoted fields are handled. Use QuoteStyle.None (default) or QuoteStyle.Csv."
+  - name: "includeByteOrderMark"
+    type: "logical"
+    required: false
+    description: "When true, prepends a byte order mark (BOM) to the output. Defaults to false."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "A TextEncoding value specifying the character encoding. Defaults to TextEncoding.Utf8 (65001)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "lines-totext"
+  - "text-tobinary"
+  - "text-frombinary"
+  - "text-combine"
+---
+
+## Remarks
+
+`Lines.ToBinary` is the inverse of splitting binary text content into lines. It takes a list of text lines and produces a binary value by joining the lines with the platform line separator (`#(lf)` or `#(cr,lf)`) and encoding the result.
+
+This function is primarily used when writing text-based file content (such as CSV or log files) to binary, for example when using `Binary.Buffer` or passing to a web service.
+
+The `encoding` parameter accepts `TextEncoding` values. The most common choice is `TextEncoding.Utf8` (the default). Set `includeByteOrderMark` to `true` when the consuming system requires a UTF-8 BOM (e.g., Excel CSV imports).
+
+## Examples
+
+### Example 1: Convert a list of lines to binary
+
+```powerquery
+Lines.ToBinary({"Line one", "Line two", "Line three"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"TGluZSBvbmUKTGluZSB0d28KTGluZSB0aHJlZQ=="}]}
+-->
+
+### Example 2: Include a UTF-8 byte order mark
+
+```powerquery
+Lines.ToBinary({"Header", "Data row"}, null, true, TextEncoding.Utf8)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"77u/SGVhZGVyCkRhdGEgcm93"}]}
+-->
+
+### Example 3: Round-trip lines through binary
+
+```powerquery
+let
+    original = {"apple", "banana", "cherry"},
+    asBinary = Lines.ToBinary(original),
+    asText = Text.FromBinary(asBinary),
+    backToLines = Lines.FromText(asText)
+in
+    backToLines
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["apple","banana","cherry"]}]}
+-->

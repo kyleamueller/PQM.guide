@@ -1,0 +1,64 @@
+---
+title: "DateTime.FixedLocalNow"
+slug: "datetime-fixedlocalnow"
+category: "DateTime"
+description: "Returns the current local date and time, fixed for the entire query evaluation."
+syntax: "DateTime.FixedLocalNow() as datetime"
+returnType: "datetime"
+returnDescription: "The local date and time at which query evaluation began."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-localnow"
+  - "datetimezone-fixedlocalnow"
+  - "datetimezone-fixedutcnow"
+---
+
+## Remarks
+
+`DateTime.FixedLocalNow` returns the current local date and time, but unlike `DateTime.LocalNow()`, it returns a consistent value for the entire duration of query evaluation. Multiple calls to `DateTime.FixedLocalNow` within a single query will always return the same timestamp, making it suitable for calculations that require a stable reference point such as age calculations or elapsed-time computations across multiple columns.
+
+`DateTime.LocalNow()` may return different values if called at different points during a long-running query, whereas `DateTime.FixedLocalNow()` is guaranteed to be consistent.
+
+## Examples
+
+### Example 1: Calculate consistent elapsed time across multiple columns
+
+Use a fixed reference to compute both days-elapsed and hours-elapsed without risk of the clock advancing between calls.
+
+```powerquery
+let
+    Now = DateTime.FixedLocalNow(),
+    Source = Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
+    WithAge = Table.AddColumn(Source, "DaysOld",
+        each Duration.TotalDays(Now - [EventTime]), type number),
+    WithHours = Table.AddColumn(WithAge, "HoursOld",
+        each Duration.TotalHours(Now - [EventTime]), type number)
+in
+    WithHours
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"DaysOld","type":"number"},{"name":"HoursOld","type":"number"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00","DaysOld":783.5,"HoursOld":18803.9},{"EventID":2,"EventTime":"2024-03-01T14:00:00","DaysOld":737.2,"HoursOld":17692.4}]}
+-->
+
+### Example 2: Compare FixedLocalNow vs LocalNow behavior
+
+Both return the current time, but FixedLocalNow is stable across calls.
+
+```powerquery
+#table(
+    type table [FixedNow = datetime, Note = text],
+    {{DateTime.FixedLocalNow(), "Consistent across all calls in this query"}}
+)
+```
+
+<!--output
+{"columns":[{"name":"FixedNow","type":"datetime"},{"name":"Note","type":"text"}],"rows":[{"FixedNow":"2026-03-08T10:00:00","Note":"Consistent across all calls in this query"}]}
+-->

@@ -1,0 +1,71 @@
+---
+title: "Number.Log10"
+slug: "number-log10"
+category: "Number"
+description: "Returns the base-10 logarithm of a number."
+syntax: "Number.Log10(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The base-10 logarithm of the number."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The positive number whose base-10 logarithm is computed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-ln"
+  - "number-log"
+  - "number-exp"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Log10` returns the common (base-10) logarithm of a number. It is equivalent to `Number.Log(number, 10)`. The result represents the power to which 10 must be raised to produce the given number — for example, `Number.Log10(1000)` returns `3` because 10³ = 1000.
+
+The input must be a positive number. Passing `0` returns negative infinity; a negative number returns `NaN`.
+
+Base-10 logarithms are commonly used for decibel calculations, pH measurements, order-of-magnitude analysis, and log-scale chart axes.
+
+## Examples
+
+### Example 1: Log base 10 of 1000
+
+```powerquery
+Number.Log10(1000)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 2: Log base 10 of 1
+
+```powerquery
+Number.Log10(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 3: Determine order of magnitude for revenue values
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Revenue"}),
+    "OrderOfMagnitude", each Number.RoundDown(Number.Log10([Revenue])), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"OrderOfMagnitude","type":"number"}],"rows":[{"OrderID":1,"Revenue":250,"OrderOfMagnitude":2},{"OrderID":2,"Revenue":5000,"OrderOfMagnitude":3},{"OrderID":3,"Revenue":75000,"OrderOfMagnitude":4},{"OrderID":4,"Revenue":1200000,"OrderOfMagnitude":6}]}
+-->

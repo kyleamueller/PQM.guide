@@ -1,0 +1,75 @@
+---
+title: "Byte.From"
+slug: "byte-from"
+category: "Number"
+description: "Converts a value to an 8-bit unsigned integer (0 to 255)."
+syntax: "Byte.From(value as any, optional culture as nullable text, optional roundingMode as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "An 8-bit unsigned integer in the range 0–255."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values (e.g., \"en-US\")."
+  - name: "roundingMode"
+    type: "number"
+    required: false
+    description: "An optional rounding mode constant (e.g., RoundingMode.AwayFromZero) used when truncating fractional values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "int8-from"
+  - "int16-from"
+  - "int32-from"
+  - "int64-from"
+  - "number-from"
+---
+
+## Remarks
+
+`Byte.From` converts a value to a byte — an 8-bit unsigned integer in the range 0 to 255. Values outside this range raise an error. Fractional numbers are rounded according to the optional `roundingMode` parameter (defaulting to round-toward-even).
+
+Text values are parsed as numbers before conversion. A logical `true` converts to `1`, `false` to `0`. `null` returns `null`.
+
+This type is useful when working with binary data, raw byte buffers, or systems that require small fixed-range integer fields.
+
+## Examples
+
+### Example 1: Convert a number to a byte
+
+```powerquery
+Byte.From(200)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":200}]}
+-->
+
+### Example 2: Convert a text value
+
+```powerquery
+Byte.From("128")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":128}]}
+-->
+
+### Example 3: Convert a decimal with default rounding
+
+```powerquery
+Byte.From(10.6)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":11}]}
+-->

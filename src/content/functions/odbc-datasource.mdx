@@ -1,0 +1,89 @@
+---
+title: "Odbc.DataSource"
+slug: "odbc-datasource"
+category: "Accessing Data"
+description: "Returns a navigation table of tables from an ODBC data source using the given connection string."
+syntax: "Odbc.DataSource(connectionString as any, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of schemas and tables available through the ODBC data source."
+parameters:
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "An ODBC connection string as text (e.g., \"Driver={SQL Server};Server=myserver;Database=mydb;\") or a record of connection string key-value pairs."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options such as CreateNavigationProperties, HierarchicalNavigation, HideNativeQuery, SqlCompatibleWindowsAuth, CommandTimeout, ConnectionTimeout, and TolerateConcatOverflow."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "odbc-query"
+  - "sql-database"
+  - "mysql-database"
+  - "postgresql-database"
+---
+
+## Remarks
+
+`Odbc.DataSource` connects to any data source that has an ODBC driver installed on the machine and returns a navigation table of the available schemas and tables. It is a general-purpose connector that works with any ODBC-compliant database, including databases that do not have a dedicated Power Query connector.
+
+**Connection string**: The `connectionString` parameter accepts:
+- A text value in standard ODBC DSN or driver format: `"DSN=MyDSN;"` or `"Driver={MyDriver};Server=host;..."`.
+- A record where field names are connection string keys: `[Driver="SQL Server", Server="myserver", Database="mydb"]`.
+
+**Authentication**: ODBC credentials (username and password for database auth) are typically included in the connection string or prompted via the Power Query credentials dialog. Configure the `UID` and `PWD` parameters in the connection string, or use Windows auth where supported.
+
+**Query folding**: Query folding capability depends on the ODBC driver. Drivers that support the full ODBC SQL grammar and report their capabilities correctly will enable folding. Use `Odbc.Query` for guaranteed direct SQL execution.
+
+**Driver requirement**: The appropriate ODBC driver for the target data source must be installed on the machine running Power Query. 32-bit and 64-bit driver compatibility matters — Power BI Desktop is 64-bit.
+
+**Key options**:
+- `CreateNavigationProperties` (logical) — generate navigation properties from foreign keys if the driver supports it.
+- `HierarchicalNavigation` (logical) — group navigation by schema.
+- `HideNativeQuery` (logical) — prevent native SQL queries from being passed through (security).
+- `CommandTimeout` (duration) — query execution timeout.
+- `ConnectionTimeout` (duration) — connection establishment timeout.
+
+**Use cases**: Connecting to legacy databases (IBM DB2, Teradata, Sybase, Informix, etc.), third-party SaaS platforms with ODBC drivers, or any data source not covered by a built-in Power Query connector.
+
+## Examples
+
+### Example 1: Connect using a DSN
+```powerquery
+Odbc.DataSource("DSN=MyDataSource;")
+```
+
+### Example 2: Connect using a full driver connection string
+```powerquery
+Odbc.DataSource("Driver={PostgreSQL Unicode};Server=myserver;Port=5432;Database=analytics;UID=myuser;PWD=mypassword;")
+```
+
+### Example 3: Connect using a record (key-value pairs)
+```powerquery
+Odbc.DataSource([
+    Driver  = "SQL Server",
+    Server  = "myserver",
+    Database = "Northwind"
+])
+```
+
+### Example 4: Connect to IBM DB2 via ODBC
+```powerquery
+Odbc.DataSource("Driver={IBM DB2 ODBC DRIVER};Database=SAMPLE;Hostname=db2server;Port=50000;Protocol=TCPIP;UID=db2user;PWD=db2pass;")
+```
+
+### Example 5: Navigate to a specific table
+```powerquery
+let
+    Source = Odbc.DataSource("DSN=MyDB;"),
+    Schema = Source{[Name="dbo"]}[Data],
+    OrdersTable = Schema{[Name="Orders"]}[Data]
+in
+    OrdersTable
+```

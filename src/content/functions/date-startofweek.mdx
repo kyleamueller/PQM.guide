@@ -1,0 +1,71 @@
+---
+title: "Date.StartOfWeek"
+slug: "date-startofweek"
+category: "Date"
+description: "Returns the first day of the week containing the given date."
+syntax: "Date.StartOfWeek(dateTime as any, optional firstDayOfWeek as nullable number) as any"
+returnType: "any"
+returnDescription: "A date, datetime, or datetimezone value representing the first day of the week."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value."
+  - name: "firstDayOfWeek"
+    type: "number"
+    required: false
+    description: "A Day.* constant specifying the first day of the week. Defaults to Day.Sunday (0). Use Day.Monday (1) for ISO weeks."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-endofweek"
+  - "date-weekofyear"
+  - "date-weekofmonth"
+  - "date-startofmonth"
+---
+
+## Remarks
+
+`Date.StartOfWeek` returns the first day of the calendar week containing the input value. By default, weeks start on Sunday (Day.Sunday = 0). Pass `Day.Monday` (1) for ISO 8601-style Monday-to-Sunday weeks. The return type matches the input type.
+
+## Examples
+
+### Example 1: Find the start of the week for each order date (Sunday start)
+
+Add a column with the start of the week (Sunday) for each order.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "WeekStart", each Date.StartOfWeek([OrderDate]), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"WeekStart","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","WeekStart":"2024-01-14"},{"OrderID":2,"OrderDate":"2024-01-18","WeekStart":"2024-01-14"},{"OrderID":3,"OrderDate":"2024-02-01","WeekStart":"2024-01-28"},{"OrderID":4,"OrderDate":"2024-02-10","WeekStart":"2024-02-04"},{"OrderID":5,"OrderDate":"2024-03-05","WeekStart":"2024-03-03"}]}
+-->
+
+### Example 2: Start of ISO week (Monday start)
+
+Return the Monday of the ISO week containing March 13, 2024.
+
+```powerquery
+#table(
+    type table [Date = date, ISOWeekStart = date],
+    {{#date(2024, 3, 13), Date.StartOfWeek(#date(2024, 3, 13), Day.Monday)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"ISOWeekStart","type":"date"}],"rows":[{"Date":"2024-03-13","ISOWeekStart":"2024-03-11"}]}
+-->

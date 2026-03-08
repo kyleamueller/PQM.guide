@@ -1,0 +1,65 @@
+---
+title: "Date.IsInYearToDate"
+slug: "date-isinyeartodate"
+category: "Date"
+description: "Returns true if the date falls between January 1 of the current year and today (inclusive)."
+syntax: "Date.IsInYearToDate(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls from January 1 of the current year through today, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentyear"
+  - "date-isincurrentmonth"
+  - "date-isincurrentquarter"
+  - "date-isinpreviousyear"
+---
+
+## Remarks
+
+`Date.IsInYearToDate` returns `true` if the input date falls between January 1 of the current year and today's date (inclusive), as determined by `DateTime.LocalNow()`. This differs from `Date.IsInCurrentYear`, which includes the entire year including future dates. Use this function for YTD metrics where you only want to compare the portion of the year that has elapsed. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter year-to-date sales
+
+Keep only rows where OrderDate falls within the current year up to today.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInYearToDate([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10"},{"OrderID":40,"OrderDate":"2026-02-20"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+-->
+
+### Example 2: Compare YTD vs. current year rows
+
+Show the difference between YTD and full current-year flags.
+
+```powerquery
+Table.AddColumn(
+    Table.AddColumn(
+        Sales,
+        "IsCurrentYear", each Date.IsInCurrentYear([OrderDate]), type logical
+    ),
+    "IsYTD", each Date.IsInYearToDate([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentYear","type":"logical"},{"name":"IsYTD","type":"logical"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentYear":true,"IsYTD":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentYear":true,"IsYTD":true},{"OrderID":45,"OrderDate":"2026-06-15","IsCurrentYear":true,"IsYTD":false}]}
+-->

@@ -1,0 +1,65 @@
+---
+title: "Table.Transpose"
+slug: "table-transpose"
+category: "Table"
+description: "Transposes the table so that rows become columns and columns become rows."
+syntax: "Table.Transpose(table as table, optional columns as any) as table"
+returnType: "table"
+returnDescription: "A new table where each original column becomes a row and each original row becomes a column."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to transpose."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "Optional. Column names for the transposed result. Can be a list of names or a table type."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-pivot"
+  - "table-unpivot"
+  - "table-demoteheaders"
+  - "table-promoteheaders"
+---
+
+## Remarks
+
+`Table.Transpose` rotates the table 90 degrees: each column in the original becomes a row in the result, and each row becomes a column. The column headers of the original table become the values in the first column of the transposed result, unless the optional `columns` parameter is supplied.
+
+After transposing, you typically use `Table.PromoteHeaders` to elevate the first row as the new column names. This function does not fold to data sources.
+
+## Examples
+
+### Example 1: Basic transpose
+
+```powerquery
+Table.Transpose(
+    #table({"A", "B"}, {{1, 2}, {3, 4}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"},{"name":"Column3","type":"any"}],"rows":[{"Column1":"A","Column2":"1","Column3":"3"},{"Column1":"B","Column2":"2","Column3":"4"}]}
+-->
+
+### Example 2: Transpose and promote headers
+
+```powerquery
+let
+    Source = #table({"Metric", "Jan", "Feb"}, {{"Sales", 100, 200}, {"Cost", 50, 80}}),
+    Transposed = Table.Transpose(Source),
+    Promoted = Table.PromoteHeaders(Transposed)
+in
+    Promoted
+```
+
+<!--output
+{"columns":[{"name":"Metric","type":"any"},{"name":"Sales","type":"any"},{"name":"Cost","type":"any"}],"rows":[{"Metric":"Jan","Sales":"100","Cost":"50"},{"Metric":"Feb","Sales":"200","Cost":"80"}]}
+-->

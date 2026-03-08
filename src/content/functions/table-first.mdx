@@ -1,0 +1,75 @@
+---
+title: "Table.First"
+slug: "table-first"
+category: "Table"
+description: "Returns the first row of the table as a record, or a default value if the table is empty."
+syntax: "Table.First(table as table, optional default as nullable any) as any"
+returnType: "any"
+returnDescription: "The first row as a record, or the default value if the table is empty."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to retrieve the first row from."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Optional value to return if the table is empty. Defaults to null if omitted."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-last"
+  - "table-firstn"
+  - "table-firstvalue"
+  - "table-singlerow"
+---
+
+## Remarks
+
+`Table.First` returns the first row of a table as a record. This allows you to access individual field values using record field access syntax (`[FieldName]`). If the table is empty and no `default` is provided, the function returns `null`.
+
+Providing a default value prevents null-related errors in downstream steps when the table may occasionally be empty.
+
+## Examples
+
+### Example 1: Get the first row as a record
+
+```powerquery
+Table.First(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"Alice\", Score = 95]"}]}
+-->
+
+### Example 2: Access a field from the first row
+
+```powerquery
+Table.First(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}})
+)[Name]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice"}]}
+-->
+
+### Example 3: Return a default when table is empty
+
+```powerquery
+Table.First(
+    #table({"Name", "Score"}, {}),
+    [Name = "N/A", Score = 0]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"N/A\", Score = 0]"}]}
+-->

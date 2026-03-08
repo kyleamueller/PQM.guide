@@ -1,0 +1,72 @@
+---
+title: "List.IsEmpty"
+slug: "list-isempty"
+category: "List"
+description: "Returns true if the list contains no elements."
+syntax: "List.IsEmpty(list as list) as logical"
+returnType: "logical"
+returnDescription: "True if the list has zero elements; false otherwise."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to check."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-count"
+  - "list-isdistinct"
+  - "list-first"
+  - "list-select"
+---
+
+## Remarks
+
+`List.IsEmpty` returns `true` if the list has no items — i.e., when `List.Count(list) = 0`. It is a concise alternative to checking the count manually.
+
+This function is useful for null-safe branching logic, such as checking whether a filter returned any results before accessing the first item.
+
+- A list containing only null values is **not** empty — it has elements.
+- Equivalent to `List.Count(list) = 0`.
+
+## Examples
+
+### Example 1: Empty list
+
+```powerquery
+List.IsEmpty({})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: Non-empty list
+
+```powerquery
+List.IsEmpty({1, 2, 3})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Check if a filter returned results before accessing
+
+```powerquery
+let
+    Values = {10, 20, 30},
+    Filtered = List.Select(Values, each _ > 50),
+    Result = if List.IsEmpty(Filtered) then null else List.First(Filtered)
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"null"}]}
+-->

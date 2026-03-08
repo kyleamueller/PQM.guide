@@ -1,0 +1,76 @@
+---
+title: "Table.MatchesAnyRows"
+slug: "table-matchesanyrows"
+category: "Table"
+description: "Returns true if at least one row in the table satisfies the given condition function."
+syntax: "Table.MatchesAnyRows(table as table, condition as function) as logical"
+returnType: "logical"
+returnDescription: "true if the condition function returns true for at least one row; false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose rows are tested."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "A function that accepts a row as a record and returns a logical value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-matchesallrows"
+  - "table-selectrows"
+  - "table-containsany"
+---
+
+## Remarks
+
+`Table.MatchesAnyRows` applies a predicate function to each row and returns `true` as soon as any row passes the condition. If no row matches, it returns `false`. An empty table returns `false`.
+
+Use this function to quickly check whether a dataset contains at least one row satisfying a criterion, without returning the matching rows themselves.
+
+## Examples
+
+### Example 1: At least one row has a large amount
+
+```powerquery
+Table.MatchesAnyRows(
+    #table({"Amount"}, {{10}, {500}, {7}}),
+    each [Amount] > 100
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: No row meets the condition
+
+```powerquery
+Table.MatchesAnyRows(
+    #table({"Amount"}, {{10}, {25}, {7}}),
+    each [Amount] > 100
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Check for a specific status value
+
+```powerquery
+Table.MatchesAnyRows(
+    #table({"Status"}, {{"Pending"}, {"Approved"}, {"Rejected"}}),
+    each [Status] = "Approved"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

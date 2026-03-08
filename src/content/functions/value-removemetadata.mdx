@@ -1,0 +1,64 @@
+---
+title: "Value.RemoveMetadata"
+slug: "value-removemetadata"
+category: "Value"
+description: "Returns a copy of a value with all metadata removed, or with specified metadata fields removed."
+syntax: "Value.RemoveMetadata(value as any, optional metadataRecord as nullable record) as any"
+returnType: "any"
+returnDescription: "The value with metadata removed."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose metadata is removed."
+  - name: "metadataRecord"
+    type: "record"
+    required: false
+    description: "An optional record specifying which metadata fields to remove. If omitted, all metadata is removed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-metadata"
+  - "value-replacemetadata"
+---
+
+## Remarks
+
+`Value.RemoveMetadata` strips metadata from a value. When called without the optional parameter, it removes all metadata. When a `metadataRecord` is provided, only the fields whose names appear in that record are removed from the metadata.
+
+This is useful for cleaning up values before passing them to systems that should not receive internal metadata annotations, or for stripping specific internal bookkeeping fields while retaining others.
+
+## Examples
+
+### Example 1: Remove all metadata from a value
+
+```powerquery
+let
+    Annotated = 42 meta [Source = "Raw", Verified = false],
+    Clean = Value.RemoveMetadata(Annotated)
+in
+    Value.Metadata(Clean)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[]}
+-->
+
+### Example 2: The underlying value is preserved after removing metadata
+
+```powerquery
+let
+    Annotated = 42 meta [Source = "Raw"],
+    Clean = Value.RemoveMetadata(Annotated)
+in
+    Clean
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+-->

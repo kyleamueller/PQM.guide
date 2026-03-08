@@ -1,0 +1,81 @@
+---
+title: "Splitter.SplitTextByWhitespace"
+slug: "splitter-splittextbywhitespace"
+category: "Splitter"
+description: "Returns a splitter function that splits text on whitespace characters, with optional CSV quoting behavior."
+syntax: "Splitter.SplitTextByWhitespace(optional quoteStyle as nullable number) as function"
+returnType: "function"
+returnDescription: "A function that splits text at whitespace boundaries."
+parameters:
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "Controls how quoted strings containing whitespace are handled. Use QuoteStyle.None (default) or QuoteStyle.Csv to preserve whitespace within double-quoted segments."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbydelimiter"
+  - "splitter-splittextbyanydelimiter"
+  - "splitter-splittextbylengths"
+  - "splitter-splitbynothing"
+  - "text-trim"
+---
+
+## Remarks
+
+`Splitter.SplitTextByWhitespace` returns a splitter function that divides text at sequences of whitespace characters (spaces, tabs, and other Unicode whitespace). Multiple consecutive whitespace characters are treated as a single separator, and leading/trailing whitespace does not produce empty strings at the start or end.
+
+The optional `quoteStyle` parameter controls whether content within double quotes is preserved as a single token even if it contains whitespace. Passing `QuoteStyle.Csv` enables CSV-style quoting, where `"Hello World"` is treated as a single token.
+
+This splitter is commonly used with `Table.SplitColumn` to tokenize space-separated values or normalize inconsistently spaced data.
+
+## Examples
+
+### Example 1: Split on whitespace
+
+```powerquery
+Splitter.SplitTextByWhitespace()("Hello   World  Power Query")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Hello","World","Power","Query"]}]}
+-->
+
+### Example 2: Leading and trailing whitespace produces no empty elements
+
+```powerquery
+Splitter.SplitTextByWhitespace()("  apple  banana  ")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["apple","banana"]}]}
+-->
+
+### Example 3: Preserve quoted tokens with CSV quote style
+
+```powerquery
+Splitter.SplitTextByWhitespace(QuoteStyle.Csv)("one ""two words"" three")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["one","two words","three"]}]}
+-->
+
+### Example 4: Use with Table.SplitColumn
+
+```powerquery
+Table.SplitColumn(
+    #table({"Tags"}, {{"alpha beta gamma"}}),
+    "Tags",
+    Splitter.SplitTextByWhitespace()
+)
+```
+
+<!--output
+{"columns":[{"name":"Tags.1","type":"text"},{"name":"Tags.2","type":"text"},{"name":"Tags.3","type":"text"}],"rows":[{"Tags.1":"alpha","Tags.2":"beta","Tags.3":"gamma"}]}
+-->

@@ -1,0 +1,76 @@
+---
+title: "Table.MatchesAllRows"
+slug: "table-matchesallrows"
+category: "Table"
+description: "Returns true if every row in the table satisfies the given condition function."
+syntax: "Table.MatchesAllRows(table as table, condition as function) as logical"
+returnType: "logical"
+returnDescription: "true if the condition function returns true for every row; false otherwise."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose rows are tested."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "A function that accepts a row as a record and returns a logical value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-matchesanyrows"
+  - "table-selectrows"
+  - "table-isdistinct"
+---
+
+## Remarks
+
+`Table.MatchesAllRows` applies a predicate function to each row (supplied as a record) and returns `true` only if every row passes. The function short-circuits and returns `false` as soon as any row fails the condition. An empty table returns `true` (vacuous truth).
+
+This is useful for data quality assertions — for example, ensuring that all values in a column meet a minimum threshold, or that no row contains a null key.
+
+## Examples
+
+### Example 1: All rows have positive amounts
+
+```powerquery
+Table.MatchesAllRows(
+    #table({"Amount"}, {{10}, {25}, {7}}),
+    each [Amount] > 0
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: Condition fails on one row
+
+```powerquery
+Table.MatchesAllRows(
+    #table({"Amount"}, {{10}, {-5}, {7}}),
+    each [Amount] > 0
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Validate no null keys
+
+```powerquery
+Table.MatchesAllRows(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    each [ID] <> null
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

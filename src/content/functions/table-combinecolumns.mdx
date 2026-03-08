@@ -1,0 +1,75 @@
+---
+title: "Table.CombineColumns"
+slug: "table-combinecolumns"
+category: "Table"
+description: "Combines multiple columns into a single column using a combiner function."
+syntax: "Table.CombineColumns(table as table, sourceColumns as list, combiner as function, column as text) as table"
+returnType: "table"
+returnDescription: "A new table where the specified source columns have been merged into one column."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table containing the columns to combine."
+  - name: "sourceColumns"
+    type: "list"
+    required: true
+    description: "A list of column names to combine."
+  - name: "combiner"
+    type: "function"
+    required: true
+    description: "A combiner function such as Combiner.CombineTextByDelimiter or Combiner.CombineTextByLengths."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name for the new combined column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-splitcolumn"
+  - "table-addcolumn"
+  - "table-transformcolumns"
+---
+
+## Remarks
+
+`Table.CombineColumns` merges values from multiple columns into a single new column using a combiner function. The source columns are removed and replaced by the new column. Combiner functions from the `Combiner.*` namespace — such as `Combiner.CombineTextByDelimiter` and `Combiner.CombineTextByLengths` — determine how the values are joined.
+
+The new combined column is placed where the first source column was.
+
+## Examples
+
+### Example 1: Combine first and last name with a space
+
+```powerquery
+Table.CombineColumns(
+    #table({"First", "Last"}, {{"Alice", "Smith"}, {"Bob", "Jones"}}),
+    {"First", "Last"},
+    Combiner.CombineTextByDelimiter(" "),
+    "FullName"
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"any"}],"rows":[{"FullName":"Alice Smith"},{"FullName":"Bob Jones"}]}
+-->
+
+### Example 2: Combine city and country with a comma
+
+```powerquery
+Table.CombineColumns(
+    #table({"City", "Country"}, {{"Paris", "France"}, {"Tokyo", "Japan"}}),
+    {"City", "Country"},
+    Combiner.CombineTextByDelimiter(", "),
+    "Location"
+)
+```
+
+<!--output
+{"columns":[{"name":"Location","type":"any"}],"rows":[{"Location":"Paris, France"},{"Location":"Tokyo, Japan"}]}
+-->

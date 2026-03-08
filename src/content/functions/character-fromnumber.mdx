@@ -1,0 +1,80 @@
+---
+title: "Character.FromNumber"
+slug: "character-fromnumber"
+category: "Text"
+description: "Returns the Unicode character corresponding to the given numeric code point."
+syntax: "Character.FromNumber(number as number) as text"
+returnType: "text"
+returnDescription: "A single-character text value corresponding to the Unicode code point."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "A Unicode code point number (e.g., 65 for \"A\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "character-tonumber"
+  - "text-tolist"
+  - "text-at"
+---
+
+## Remarks
+
+`Character.FromNumber` converts a Unicode code point (a non-negative integer) into the corresponding single-character text value. This is the inverse of `Character.ToNumber`.
+
+Common code point ranges include:
+- 0–31: Control characters (tab = 9, newline = 10, carriage return = 13)
+- 32: Space
+- 48–57: Digits `0`–`9`
+- 65–90: Uppercase letters `A`–`Z`
+- 97–122: Lowercase letters `a`–`z`
+
+This function is useful for generating special characters programmatically, building character sequences with `List.Transform`, or inserting control characters such as line feeds or tabs into text values.
+
+## Examples
+
+### Example 1: Convert code point 65 to a character
+
+```powerquery
+Character.FromNumber(65)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"A"}]}
+-->
+
+### Example 2: Generate the tab character
+
+```powerquery
+Character.FromNumber(9)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"\t"}]}
+-->
+
+### Example 3: Build the alphabet as a list
+
+```powerquery
+List.Transform({65..90}, Character.FromNumber)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]}]}
+-->
+
+### Example 4: Round-trip with Character.ToNumber
+
+```powerquery
+Character.FromNumber(Character.ToNumber("M"))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"M"}]}
+-->
