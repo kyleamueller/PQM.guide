@@ -139,6 +139,15 @@ export default function Sidebar({ functions, isOpen, onClose, onSearchOpen }: Si
             </Link>
           </div>
           <div className="sidebar-section">
+            <Link
+              href="/patterns"
+              className={`sidebar-home ${pathname?.startsWith("/patterns") ? "active" : ""}`}
+              onClick={onClose}
+            >
+              Patterns
+            </Link>
+          </div>
+          <div className="sidebar-section">
             <div className="sidebar-section-title">Functions by Category</div>
             {functionsByCategory.map((cat) => {
               const IconComponent = categoryIcons[cat.slug] ?? Circle20Regular;
