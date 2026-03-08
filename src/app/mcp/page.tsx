@@ -22,7 +22,7 @@ const TOOLS = [
   {
     name: "search_functions",
     args: `{ "query": "merge tables", "limit": 5 }`,
-    description: "Fuzzy-search all 161 functions by keyword.",
+    description: "Fuzzy-search all functions by keyword.",
   },
   {
     name: "list_categories",
@@ -40,6 +40,11 @@ const TOOLS = [
     description: "All concept guides with slugs and descriptions.",
   },
   {
+    name: "search_concepts",
+    args: `{ "query": "null handling" }`,
+    description: "Fuzzy-search concept guides by keyword.",
+  },
+  {
     name: "get_pattern",
     args: `{ "slug": "dynamic-column-selection" }`,
     description: "Full content of a practical M pattern/recipe.",
@@ -48,6 +53,11 @@ const TOOLS = [
     name: "list_patterns",
     args: `{}`,
     description: "All patterns grouped by difficulty.",
+  },
+  {
+    name: "search_patterns",
+    args: `{ "query": "running total" }`,
+    description: "Fuzzy-search patterns by keyword.",
   },
   {
     name: "get_sample_table",

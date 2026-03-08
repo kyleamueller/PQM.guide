@@ -9,6 +9,7 @@ import {
 } from "@/lib/mdx";
 import { categories } from "@/data/categories";
 import { sampleTables } from "@/data/sample-tables";
+import Fuse from "fuse.js";
 import { createSearchIndex } from "@/lib/search";
 import { PQTableData } from "@/lib/types";
 
@@ -97,6 +98,38 @@ const TOOLS = [
     description:
       "List all available Power Query M patterns and recipes, grouped by difficulty.",
     inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "search_concepts",
+    description:
+      "Fuzzy-search Power Query M concept guides by keyword. Returns matching concepts with their slugs and descriptions. Use this when you know what topic you're looking for but not the exact slug.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Search query (e.g. 'lazy evaluation', 'null', 'folding')" },
+        limit: {
+          type: "number",
+          description: "Maximum number of results to return (default 5)",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "search_patterns",
+    description:
+      "Fuzzy-search Power Query M patterns and recipes by keyword. Returns matching patterns with their slugs, difficulty, and descriptions.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Search query (e.g. 'pagination', 'running total', 'lookup')" },
+        limit: {
+          type: "number",
+          description: "Maximum number of results to return (default 5)",
+        },
+      },
+      required: ["query"],
+    },
   },
   {
     name: "get_sample_table",
@@ -285,6 +318,45 @@ async function callTool(
             (p) =>
               `- **${p.title}** (${p.difficulty}, \`${p.slug}\`): ${p.description}\n  → /patterns/${p.slug}`
           )
+          .join("\n");
+      }
+
+      case "search_concepts": {
+        const query = String(args.query ?? "");
+        const limit = Math.min(Number(args.limit ?? 5), 10);
+        const concepts = getAllConcepts();
+        const index = new Fuse(concepts, {
+          keys: [
+            { name: "title", weight: 2 },
+            { name: "description", weight: 1 },
+          ],
+          threshold: 0.4,
+          includeScore: true,
+        });
+        const results = index.search(query, { limit });
+        if (results.length === 0) return `No concepts found matching "${query}". Use list_concepts to see all available concepts.`;
+        return results
+          .map((r) => `- **${r.item.title}** (\`${r.item.slug}\`): ${r.item.description}\n  → /concepts/${r.item.slug}`)
+          .join("\n");
+      }
+
+      case "search_patterns": {
+        const query = String(args.query ?? "");
+        const limit = Math.min(Number(args.limit ?? 5), 10);
+        const patterns = getAllPatterns();
+        const index = new Fuse(patterns, {
+          keys: [
+            { name: "title", weight: 2 },
+            { name: "description", weight: 1 },
+            { name: "difficulty", weight: 0.3 },
+          ],
+          threshold: 0.4,
+          includeScore: true,
+        });
+        const results = index.search(query, { limit });
+        if (results.length === 0) return `No patterns found matching "${query}". Use list_patterns to see all available patterns.`;
+        return results
+          .map((r) => `- **${r.item.title}** (${r.item.difficulty}, \`${r.item.slug}\`): ${r.item.description}\n  → /patterns/${r.item.slug}`)
           .join("\n");
       }
 
