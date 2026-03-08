@@ -1,0 +1,164 @@
+---
+title: "API Authentication with Web.Contents"
+slug: "api-authentication"
+description: "Pass API keys, Bearer tokens, and query parameters to authenticated REST APIs using the Web.Contents options record — including how to handle token refresh and avoid hardcoding secrets."
+difficulty: "advanced"
+relatedFunctions:
+  - "table-addcolumn"
+relatedConcepts:
+  - "custom-functions"
+  - "m-paradigm"
+---
+
+### The Web.Contents Options Record
+
+All authentication in `Web.Contents` flows through its second argument — an options record. The key fields:
+
+| Field | Type | Purpose |
+|---|---|---|
+| `Headers` | record | HTTP request headers (API keys, Bearer tokens, Content-Type) |
+| `Query` | record | Query string parameters (appended to the URL) |
+| `Content` | binary | POST body |
+| `ManualCredentials` | logical | Set `true` to bypass Power Query's credential prompt |
+
+### API Key in a Header
+
+Most REST APIs expect a key in a request header:
+
+```powerquery
+let
+    ApiKey = "your-api-key-here",
+
+    Response = Web.Contents("https://api.example.com/data", [
+        Headers = [
+            #"X-API-Key" = ApiKey,
+            #"Accept" = "application/json"
+        ],
+        ManualCredentials = true
+    ]),
+
+    Json = Json.Document(Response)
+in
+    Json
+```
+
+`ManualCredentials = true` tells Power Query not to pop up its own credential dialog — you're handling authentication yourself via the headers.
+
+### Bearer Token (OAuth 2.0)
+
+APIs using OAuth return a short-lived access token you include as a Bearer header:
+
+```powerquery
+let
+    // Step 1: Request a token
+    TokenResponse = Json.Document(
+        Web.Contents("https://auth.example.com/oauth/token", [
+            Headers = [#"Content-Type" = "application/x-www-form-urlencoded"],
+            Content = Text.ToBinary(
+                "grant_type=client_credentials"
+                & "&client_id=YOUR_CLIENT_ID"
+                & "&client_secret=YOUR_CLIENT_SECRET"
+            ),
+            ManualCredentials = true
+        ])
+    ),
+    AccessToken = TokenResponse[access_token],
+
+    // Step 2: Use the token in the data request
+    Data = Json.Document(
+        Web.Contents("https://api.example.com/v1/records", [
+            Headers = [
+                Authorization = "Bearer " & AccessToken,
+                #"Content-Type" = "application/json"
+            ],
+            ManualCredentials = true
+        ])
+    )
+in
+    Data
+```
+
+### Query String Parameters
+
+Pass parameters in the `Query` field rather than concatenating them into the URL string — this handles URL encoding automatically:
+
+```powerquery
+// Good — automatic URL encoding, readable
+Web.Contents("https://api.example.com/search", [
+    Query = [
+        q      = "power query",
+        limit  = "50",
+        page   = "1",
+        format = "json"
+    ],
+    ManualCredentials = true
+])
+
+// Avoid — manual concatenation, fragile, no encoding
+Web.Contents("https://api.example.com/search?q=power+query&limit=50")
+```
+
+The `Query` record values must be text — convert numbers with `Text.From(...)`.
+
+### Paginating Through Results
+
+Combine authentication with pagination using a recursive or `List.Generate` approach:
+
+```powerquery
+let
+    ApiKey = "your-api-key",
+    PageSize = 100,
+
+    FetchPage = (page as number) =>
+        Json.Document(
+            Web.Contents("https://api.example.com/orders", [
+                Query = [
+                    page     = Text.From(page),
+                    per_page = Text.From(PageSize)
+                ],
+                Headers = [#"X-API-Key" = ApiKey],
+                ManualCredentials = true
+            ])
+        ),
+
+    // Fetch pages until an empty result comes back
+    AllPages = List.Generate(
+        () => [page = 1, data = FetchPage(1)],
+        each List.Count([data][items]) > 0,
+        each [page = [page] + 1, data = FetchPage([page] + 1)],
+        each [data][items]
+    ),
+
+    AllItems = List.Combine(AllPages),
+    Result   = Table.FromList(AllItems, Splitter.SplitByNothing()),
+    Expanded = Table.ExpandRecordColumn(Result, "Column1",
+        Record.FieldNames(Result[Column1]{0}))
+in
+    Expanded
+```
+
+### Avoiding Hardcoded Secrets
+
+Never commit API keys or client secrets directly in a query. Instead:
+
+1. **Power BI parameters** — Store the key as a Power BI parameter. Users can update it in the service without touching M code.
+2. **Azure Key Vault** — Use `Web.Contents` to fetch the secret from Key Vault at query time (requires managed identity or a service principal).
+3. **Environment variables via a config table** — Keep secrets in a separate, permission-restricted query that other queries reference.
+
+```powerquery
+// Read the key from a dedicated Config query (not committed to source control)
+let
+    ApiKey   = Config[ApiKey],
+    Response = Web.Contents("https://api.example.com/data", [
+        Headers = [#"X-API-Key" = ApiKey],
+        ManualCredentials = true
+    ])
+in
+    Json.Document(Response)
+```
+
+### Refresh Behavior in Power BI Service
+
+- `ManualCredentials = true` bypasses the credential store, so the key must be embedded or read from a parameter/config query that is itself accessible during refresh.
+- OAuth tokens are often short-lived. If the token expires between the token request and the data request (rare for scheduled refresh, possible for very large pulls), structure the query so the token fetch and data fetch happen in the same M evaluation.
+- Power BI Service enforces privacy level rules — if your API and your config query have different privacy levels, M may refuse to combine them. Set both to the same privacy level, or set the dataset to `Ignore Privacy Levels` (only for trusted, internal data).

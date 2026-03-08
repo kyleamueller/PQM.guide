@@ -1,0 +1,148 @@
+---
+title: "Cross-Query Lookup (VLOOKUP in M)"
+slug: "cross-query-lookup"
+description: "Look up values from one table in another — the M equivalent of VLOOKUP — using Table.NestedJoin or direct list lookup patterns."
+difficulty: "intermediate"
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-expandtablecolumn"
+  - "list-select"
+  - "list-first"
+  - "table-addcolumn"
+relatedConcepts:
+  - "structured-data"
+  - "query-folding"
+---
+
+### The Problem
+
+You have a fact table and a lookup table (a dimension). You want to bring a value from the lookup table into the fact table based on a matching key — the same operation as VLOOKUP in Excel or JOIN in SQL.
+
+### Method 1: Table.NestedJoin (Recommended)
+
+This is the idiomatic M approach. It folds to SQL when the sources support query folding:
+
+```powerquery
+let
+    // Fact table: Sales with [ProductID]
+    // Lookup table: Products with [ProductID] and [ProductName]
+
+    Joined = Table.NestedJoin(
+        Sales,    {"ProductID"},     // left table and join key
+        Products, {"ProductID"},     // right table and join key
+        "ProductLookup",             // name for the nested table column
+        JoinKind.LeftOuter           // keep all rows from Sales
+    ),
+
+    // Expand only the column(s) you need
+    Result = Table.ExpandTableColumn(Joined, "ProductLookup",
+        {"ProductName", "Category"},
+        {"ProductName", "Category"}   // output column names
+    )
+in
+    Result
+```
+
+Use `JoinKind.LeftOuter` to keep all rows from the fact table even when no match is found (unmatched rows get `null`). Use `JoinKind.Inner` to drop rows with no match.
+
+### Handling Duplicate Keys in the Lookup Table
+
+If the lookup table has duplicate keys (not a true dimension), `Table.NestedJoin` will produce multiple rows per fact row. Deduplicate the lookup table first:
+
+```powerquery
+let
+    UniqueLookup = Table.Distinct(Products, {"ProductID"}),
+
+    Joined = Table.NestedJoin(Sales, {"ProductID"}, UniqueLookup, {"ProductID"},
+        "Lookup", JoinKind.LeftOuter),
+    Result = Table.ExpandTableColumn(Joined, "Lookup", {"ProductName"})
+in
+    Result
+```
+
+### Method 2: Direct List Lookup
+
+For simple single-column lookups, a direct list search avoids the nested table overhead and is readable for beginners:
+
+```powerquery
+let
+    // Build lookup record from the dimension table
+    LookupTable = Products,
+    Keys   = Table.Column(LookupTable, "ProductID"),
+    Values = Table.Column(LookupTable, "ProductName"),
+
+    // Function: given an ID, return the matching name
+    LookupName = (id as text) as nullable text =>
+        let
+            idx = List.PositionOf(Keys, id)
+        in
+            if idx = -1 then null else Values{idx},
+
+    Result = Table.AddColumn(Sales, "ProductName",
+        each LookupName([ProductID]),
+        type nullable text)
+in
+    Result
+```
+
+> **Performance note:** `List.PositionOf` scans the list linearly for each row. On large fact tables this is O(n × m). Prefer `Table.NestedJoin` for large datasets — it's optimized and can fold.
+
+### Method 3: Record Lookup (Fastest for Small Dimensions)
+
+Convert the lookup table into a record keyed by the lookup value. Record field access is O(1):
+
+```powerquery
+let
+    // Build a record: [ProductID → ProductName]
+    LookupRecord = Record.FromList(
+        Table.Column(Products, "ProductName"),
+        Table.Column(Products, "ProductID")
+    ),
+
+    Result = Table.AddColumn(Sales, "ProductName",
+        each Record.FieldOrDefault(LookupRecord, [ProductID], null),
+        type nullable text)
+in
+    Result
+```
+
+`Record.FieldOrDefault` returns the fallback value (null here) when the key doesn't exist, avoiding errors for unmatched rows.
+
+### Multi-Column Lookup Keys
+
+When you need to match on two or more columns (composite key), `Table.NestedJoin` handles this natively:
+
+```powerquery
+Table.NestedJoin(
+    Sales,   {"Year", "Month", "RegionID"},
+    Targets, {"Year", "Month", "RegionID"},
+    "TargetLookup",
+    JoinKind.LeftOuter
+)
+```
+
+For the record-based approach, combine the key columns into a single text key:
+
+```powerquery
+let
+    MakeKey = (year as number, month as number, region as text) =>
+        Text.From(year) & "|" & Text.From(month) & "|" & region,
+
+    LookupRecord = Record.FromList(
+        Table.Column(Targets, "TargetAmount"),
+        List.Transform(
+            Table.ToRows(Table.SelectColumns(Targets, {"Year", "Month", "RegionID"})),
+            each MakeKey(_{0}, _{1}, _{2})
+        )
+    ),
+
+    Result = Table.AddColumn(Sales, "Target",
+        each Record.FieldOrDefault(LookupRecord, MakeKey([Year], [Month], [RegionID]), null),
+        type nullable number)
+in
+    Result
+```
+
+### Query Folding
+
+`Table.NestedJoin` folds to a SQL JOIN when both tables come from the same relational source. The direct list and record lookup methods do **not** fold — they execute in the M engine. If performance matters and both tables are in the same database, use `Table.NestedJoin`.

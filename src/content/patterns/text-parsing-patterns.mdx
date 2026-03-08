@@ -1,0 +1,158 @@
+---
+title: "Text Parsing Patterns"
+slug: "text-parsing-patterns"
+description: "Extract, split, and transform text in M using Text.* functions — parsing delimited strings, extracting substrings, and cleaning messy data without regular expressions."
+difficulty: "intermediate"
+relatedFunctions:
+  - "text-split"
+  - "text-combine"
+  - "text-contains"
+  - "text-replace"
+  - "text-trim"
+  - "text-from"
+relatedConcepts:
+  - "each-keyword"
+  - "structured-data"
+---
+
+### Splitting on a Delimiter
+
+`Text.Split` returns a list of parts. Access specific positions with `{index}`:
+
+```powerquery
+let
+    Source = Customers,
+
+    // Split "Smith, John" into last and first name
+    WithLast  = Table.AddColumn(Source, "LastName",
+        each Text.Trim(Text.Split([FullName], ","){0}), type text),
+    WithFirst = Table.AddColumn(WithLast, "FirstName",
+        each Text.Trim(Text.Split([FullName], ","){1}), type text)
+in
+    WithFirst
+```
+
+When the number of parts is variable, guard against index-out-of-bounds with `try ... otherwise null`:
+
+```powerquery
+Table.AddColumn(Source, "Extension",
+    each try Text.Split([Phone], "x"){1} otherwise null,
+    type nullable text)
+```
+
+### Extracting Between Delimiters
+
+`Text.BetweenDelimiters` extracts text between a start and end marker without index arithmetic:
+
+```powerquery
+// Input: "Order [#12345] - Pending"
+// Extract: "12345"
+Table.AddColumn(Source, "OrderID",
+    each Text.BetweenDelimiters([Description], "[#", "]"),
+    type text)
+```
+
+For repeated delimiters, use the optional count arguments to select which occurrence:
+
+```powerquery
+// Text: "2024/03/15"
+// Extract the month (second segment, 0-indexed)
+Text.BetweenDelimiters("2024/03/15", "/", "/", 0, 0)
+// Result: "03"
+```
+
+### Extracting from the Start or End
+
+```powerquery
+let
+    Code = "AB-12345-XZ",
+
+    Prefix = Text.Start(Code, 2),                     // "AB"
+    Suffix = Text.End(Code, 2),                       // "XZ"
+    Middle = Text.Range(Code, 3, 5)                   // "12345"  (start at index 3, take 5 chars)
+in
+    {Prefix, Suffix, Middle}
+```
+
+### Finding a Position and Slicing
+
+When the delimiter position varies, `Text.PositionOf` gives you the index to slice at:
+
+```powerquery
+// Extract domain from email: "user@example.com" → "example.com"
+Table.AddColumn(Source, "Domain",
+    each
+        let pos = Text.PositionOf([Email], "@")
+        in if pos = -1 then null
+           else Text.Range([Email], pos + 1),
+    type nullable text)
+```
+
+`Text.PositionOf` returns `-1` when the character isn't found — always guard against it.
+
+### Cleaning and Normalizing Text
+
+```powerquery
+let
+    Source = Customers,
+
+    // Remove leading/trailing whitespace, then collapse internal spaces
+    Normalized = Table.TransformColumns(Source, {
+        {"Name",    each Text.Trim(_),                type text},
+        {"Email",   each Text.Lower(Text.Trim(_)),    type text},
+        {"Phone",   each Text.Remove(_, {" ", "-", "(", ")"}), type text},
+        {"Country", each Text.Proper(Text.Trim(_)),   type text}
+    })
+in
+    Normalized
+```
+
+`Text.Remove` strips every character in the list. `Text.Select` keeps only characters in the list — useful for extracting digits:
+
+```powerquery
+// Extract only digits from a messy phone number "(206) 555-1234"
+Text.Select("(206) 555-1234", {"0".."9"})
+// Result: "2065551234"
+```
+
+### Replacing Multiple Values
+
+For more than one substitution, chain `Text.Replace` or use `List.Accumulate`:
+
+```powerquery
+let
+    Replacements = {
+        {"&amp;", "&"},
+        {"&lt;",  "<"},
+        {"&gt;",  ">"},
+        {"&nbsp;", " "}
+    },
+
+    // Apply all replacements to a single value
+    DecodeHtml = (s as text) as text =>
+        List.Accumulate(Replacements, s, (state, pair) =>
+            Text.Replace(state, pair{0}, pair{1})
+        ),
+
+    Decoded = Table.TransformColumns(Source, {{"HtmlContent", each DecodeHtml(_), type text}})
+in
+    Decoded
+```
+
+### Splitting into Rows (Text → Table)
+
+When one cell contains a newline-delimited list, expand it into multiple rows:
+
+```powerquery
+let
+    Source = Orders,  // Each row has [OrderID] and [Tags] = "red\nurgent\nexport"
+
+    Expanded = Table.TransformColumns(Source, {
+        {"Tags", each Text.Split(_, "#(lf)"), type {type text}}
+    }),
+    Result = Table.ExpandListColumn(Expanded, "Tags")
+in
+    Result
+```
+
+`"#(lf)"` is M's escape sequence for a line feed character.
