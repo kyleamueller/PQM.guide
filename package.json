@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-push": "npm run typecheck && npm run test"
   },
   "dependencies": {
     "@fluentui/react-icons": "^2.0.320",
@@ -25,9 +32,13 @@
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18"
   }
 }

@@ -1,0 +1,62 @@
+---
+title: "Table.ExpandListColumn"
+slug: "table-expandlistcolumn"
+category: "Table"
+description: "Expands a column containing lists into multiple rows, one row per list element."
+syntax: "Table.ExpandListColumn(table as table, column as text) as table"
+returnType: "table"
+returnDescription: "A table where each list element in the named column becomes its own row, with all other column values duplicated."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table containing a list column to expand."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name of the column containing list values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-expandrecordcolumn"
+  - "table-fromlist"
+---
+
+## Remarks
+
+`Table.ExpandListColumn` unnests a column of lists, creating one row per element. All other columns in the row are repeated for each expanded value. If a list cell is empty, the row is removed from the result.
+
+This is the standard way to flatten a column of lists created by operations like `Table.Group` with aggregated lists or JSON array expansion.
+
+## Examples
+
+### Example 1: Expand a list column into rows
+
+```powerquery
+let
+    Source = #table({"Name", "Tags"}, {{"Alice", {"A", "B"}}, {"Bob", {"C"}}}),
+    Expanded = Table.ExpandListColumn(Source, "Tags")
+in
+    Expanded
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Tags","type":"any"}],"rows":[{"Name":"Alice","Tags":"A"},{"Name":"Alice","Tags":"B"},{"Name":"Bob","Tags":"C"}]}
+-->
+
+### Example 2: Flatten grouped results
+
+After grouping and collecting values into a list, expand back to individual rows.
+
+```powerquery
+let
+    Grouped  = Table.Group(Sales, {"Region"}, {{"Orders", each [OrderID], type list}}),
+    Expanded = Table.ExpandListColumn(Grouped, "Orders")
+in
+    Expanded
+```

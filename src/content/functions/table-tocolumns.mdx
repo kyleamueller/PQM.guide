@@ -1,0 +1,61 @@
+---
+title: "Table.ToColumns"
+slug: "table-tocolumns"
+category: "Table"
+description: "Returns a list of lists, where each inner list contains the values of one column."
+syntax: "Table.ToColumns(table as table) as list"
+returnType: "list"
+returnDescription: "A list of lists, one inner list per column, in column order."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to convert."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromcolumns"
+  - "table-torecords"
+---
+
+## Remarks
+
+`Table.ToColumns` is the inverse of `Table.FromColumns`. It returns a list of lists — one per column — where each inner list contains all values in that column in row order.
+
+This is useful for transposing data, passing column data to list functions, or zipping columns together.
+
+## Examples
+
+### Example 1: Extract all column values as lists
+
+```powerquery
+let
+    Source  = #table({"A", "B"}, {{1, 4}, {2, 5}, {3, 6}}),
+    Columns = Table.ToColumns(Source)
+in
+    Columns
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1,2,3},{4,5,6}}"}]}
+-->
+
+### Example 2: Transpose a table using ToColumns and FromColumns
+
+```powerquery
+let
+    Source     = #table({"A","B","C"},{{1,2,3},{4,5,6}}),
+    Cols       = Table.ToColumns(Source),
+    Transposed = Table.FromColumns(Cols)
+in
+    Transposed
+```
+
+<!--output
+{"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"}],"rows":[{"Column1":1,"Column2":4},{"Column1":2,"Column2":5},{"Column1":3,"Column2":6}]}
+-->

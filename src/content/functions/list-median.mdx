@@ -1,0 +1,59 @@
+---
+title: "List.Median"
+slug: "list-median"
+category: "List"
+description: "Returns the median value of a list."
+syntax: "List.Median(list as list, optional comparisonCriteria as any) as any"
+returnType: "any"
+returnDescription: "The median value of the list. For even-length lists of numbers, returns the arithmetic mean of the two middle values."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of values to evaluate."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: false
+    description: "A comparer or key selector for custom ordering."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-average"
+  - "list-min"
+  - "list-max"
+---
+
+## Remarks
+
+`List.Median` returns the middle value of a sorted list. For numeric lists with an even number of elements, it returns the average of the two middle values. For non-numeric lists, it returns the lower middle value.
+
+Null values are ignored. If the list is empty or contains only nulls, `null` is returned.
+
+## Examples
+
+### Example 1: Median of an odd-length list
+
+```powerquery
+List.Median({3, 1, 4, 1, 5})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 2: Median of an even-length list
+
+For even-length numeric lists, the two middle values are averaged.
+
+```powerquery
+List.Median({1, 2, 3, 4})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2.5}]}
+-->

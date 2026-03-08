@@ -1,0 +1,59 @@
+import { describe, it, expect } from "vitest";
+import { createSearchIndex } from "@/lib/search";
+import type { FunctionIndexEntry } from "@/lib/types";
+
+const DATA: FunctionIndexEntry[] = [
+  { title: "List.Accumulate", slug: "list-accumulate", category: "List", description: "Fold over a list with a seed value." },
+  { title: "Table.AddColumn", slug: "table-addcolumn", category: "Table", description: "Add a computed column to a table." },
+  { title: "List.Sum", slug: "list-sum", category: "List", description: "Sum all numeric values in a list." },
+  { title: "Number.Round", slug: "number-round", category: "Number", description: "Round a number to a given precision." },
+  { title: "Text.Length", slug: "text-length", category: "Text", description: "Returns the number of characters in a text value." },
+];
+
+describe("createSearchIndex", () => {
+  it("returns a Fuse instance with a .search method", () => {
+    const index = createSearchIndex(DATA);
+    expect(typeof index.search).toBe("function");
+  });
+
+  it("exact title match returns the correct result first", () => {
+    const results = createSearchIndex(DATA).search("List.Accumulate");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].item.slug).toBe("list-accumulate");
+  });
+
+  it("partial title match works (fuzzy search)", () => {
+    const results = createSearchIndex(DATA).search("Accumulate");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].item.slug).toBe("list-accumulate");
+  });
+
+  it("returns empty array for a query with no possible match", () => {
+    const results = createSearchIndex(DATA).search("xyznonexistentquery");
+    expect(results).toEqual([]);
+  });
+
+  it("results include a score (includeScore: true is configured)", () => {
+    const results = createSearchIndex(DATA).search("AddColumn");
+    expect(results.length).toBeGreaterThan(0);
+    expect(typeof results[0].score).toBe("number");
+  });
+
+  it("respects the limit option", () => {
+    const large: FunctionIndexEntry[] = Array.from({ length: 50 }, (_, i) => ({
+      title: `List.Function${i}`,
+      slug: `list-function-${i}`,
+      category: "List",
+      description: `Does thing number ${i}.`,
+    }));
+    const results = createSearchIndex(large).search("List", { limit: 10 });
+    expect(results.length).toBeLessThanOrEqual(10);
+  });
+
+  it("category search returns multiple matches", () => {
+    const results = createSearchIndex(DATA).search("List");
+    const slugs = results.map((r) => r.item.slug);
+    expect(slugs).toContain("list-accumulate");
+    expect(slugs).toContain("list-sum");
+  });
+});
