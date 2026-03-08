@@ -26,6 +26,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: frontmatter.title,
       description: frontmatter.description,
+      openGraph: {
+        title: frontmatter.title,
+        description: frontmatter.description,
+        url: `/functions/${slug}`,
+        type: "article",
+      },
     };
   } catch {
     return { title: "Not Found" };
