@@ -1,0 +1,68 @@
+---
+title: "List.Average"
+slug: "list-average"
+category: "List"
+description: "Returns the average of the values in a list."
+syntax: "List.Average(list as list, optional precision as nullable number) as any"
+returnType: "number"
+returnDescription: "The arithmetic mean of the numeric values in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of numeric values to average."
+  - name: "precision"
+    type: "number"
+    required: false
+    description: "Precision mode. Use Precision.Double (0) or Precision.Decimal (1)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-sum"
+  - "list-min"
+  - "list-max"
+  - "list-median"
+---
+
+## Remarks
+
+`List.Average` returns the arithmetic mean of a list of numbers. Null values are ignored in the calculation. If the list is empty or contains only nulls, the function returns `null`.
+
+The optional `precision` parameter controls numeric precision: `Precision.Double` (default) uses floating-point arithmetic; `Precision.Decimal` uses exact decimal arithmetic and is slower but avoids floating-point rounding errors.
+
+## Examples
+
+### Example 1: Average of a simple list
+
+Calculate the mean of a set of sales quantities.
+
+```powerquery
+List.Average({10, 20, 30, 40, 50})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+-->
+
+### Example 2: Average a table column
+
+Calculate the average order amount from the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Amounts = Table.Column(Sales, "Amount"),
+    Avg     = List.Average(Amounts)
+in
+    #table({"AvgAmount"}, {{Avg}})
+```
+
+<!--output
+{"columns":[{"name":"AvgAmount","type":"number"}],"rows":[{"AvgAmount":339.6}]}
+-->

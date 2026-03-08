@@ -1,0 +1,57 @@
+---
+title: "Text.Select"
+slug: "text-select"
+category: "Text"
+description: "Returns a text value containing only the characters from the input that match the specified selector."
+syntax: "Text.Select(text as nullable text, selectChars as any) as nullable text"
+returnType: "text"
+returnDescription: "A text value containing only the characters that satisfy the selector."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text to filter."
+  - name: "selectChars"
+    type: "any"
+    required: true
+    description: "A character, list of characters, or a character class specification (such as a range) identifying which characters to keep."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-remove"
+  - "text-clean"
+  - "text-trim"
+---
+
+## Remarks
+
+`Text.Select` is the complement of `Text.Remove` — it keeps only the characters you specify and discards everything else. The selector can be a single character, a list of characters, or a character class range such as `{"0".."9"}` to keep only digits.
+
+This is useful for extracting numeric digits from mixed text, keeping only alphabetic characters, or filtering to a known safe character set.
+
+## Examples
+
+### Example 1: Extract digits from a mixed string
+
+```powerquery
+Text.Select("Phone: 555-1234", {"0".."9"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"5551234"}]}
+-->
+
+### Example 2: Keep only alphabetic characters
+
+```powerquery
+Text.Select("Hello, World! 123", {"A".."Z", "a".."z"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelloWorld"}]}
+-->

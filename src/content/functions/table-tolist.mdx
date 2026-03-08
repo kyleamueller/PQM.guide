@@ -1,0 +1,64 @@
+---
+title: "Table.ToList"
+slug: "table-tolist"
+category: "Table"
+description: "Converts a table to a list by applying a combiner function to each row."
+syntax: "Table.ToList(table as table, optional combiner as nullable function) as list"
+returnType: "list"
+returnDescription: "A list with one element per row, produced by applying the combiner to each row's values."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to convert."
+  - name: "combiner"
+    type: "function"
+    required: false
+    description: "A function that takes a list of row values and returns a single value. Defaults to Combiner.CombineTextByDelimiter(\",\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromlist"
+  - "table-torecords"
+---
+
+## Remarks
+
+`Table.ToList` converts each row of a table into a single value using the supplied combiner function. The default combiner joins row values into a comma-separated text string.
+
+Supply a custom combiner to produce any desired output type — for example, to collect row records or concatenate with a different separator.
+
+## Examples
+
+### Example 1: Convert a single-column table to a list
+
+```powerquery
+let
+    Source = #table({"Value"}, {{1}, {2}, {3}}),
+    Result = Table.ToList(Source, each _{0})
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":1},{"Result":2},{"Result":3}]}
+-->
+
+### Example 2: Join row values into delimited text
+
+```powerquery
+let
+    Source = #table({"A","B"}, {{"x","y"},{"p","q"}}),
+    Result = Table.ToList(Source, Combiner.CombineTextByDelimiter("|"))
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"x|y"},{"Result":"p|q"}]}
+-->

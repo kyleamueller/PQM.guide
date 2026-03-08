@@ -6,11 +6,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "PQM.guide — Power Query M Function Reference",
   description:
-    "Community-driven Power Query M language reference with visual table examples. 161 functions across 23 categories, concept guides, and practical patterns.",
+    "Community-driven Power Query M language reference with visual table examples, concept guides, and practical patterns.",
   openGraph: {
     title: "PQM.guide — Power Query M Function Reference",
     description:
-      "Community-driven Power Query M language reference with visual table examples. 161 functions across 23 categories, concept guides, and practical patterns.",
+      "Community-driven Power Query M language reference with visual table examples, concept guides, and practical patterns.",
     url: "/",
     type: "website",
   },
@@ -65,7 +65,7 @@ export default function Home() {
             padding: "20px 24px",
           }}
         >
-          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Search 161 functions</div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Search {allFunctions.length} functions</div>
           <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
             Press <kbd style={{ fontSize: 11 }}>Ctrl+K</kbd> to search by name or description.
           </div>

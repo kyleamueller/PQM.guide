@@ -1016,6 +1016,44 @@ code {
   border-color: var(--accent);
 }
 
+.sample-code-pre-wrapper {
+  position: relative;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms, color 150ms, border-color 150ms;
+}
+
+.sample-code-pre-wrapper:hover .code-copy-btn,
+.code-copy-btn.copied {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.code-copy-btn.copied {
+  color: var(--pq-logical-true);
+  border-color: var(--pq-logical-true);
+}
+
 .sample-code-block pre {
   padding: 14px 18px;
   margin: 0;
@@ -1057,13 +1095,17 @@ code {
   margin-bottom: 16px;
 }
 
-.usage-example-block pre {
+.usage-example-block {
   background: var(--code-bg);
   border: 1px solid var(--border-color);
   border-radius: 6px;
+}
+
+.usage-example-block pre {
   padding: 14px 18px;
   font-size: 14px;
   overflow-x: auto;
+  margin: 0;
 }
 
 .usage-example-block pre code {

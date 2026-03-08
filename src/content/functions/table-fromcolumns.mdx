@@ -1,0 +1,63 @@
+---
+title: "Table.FromColumns"
+slug: "table-fromcolumns"
+category: "Table"
+description: "Constructs a table from a list of column lists, with optional column names and type information."
+syntax: "Table.FromColumns(lists as list, optional columns as any) as table"
+returnType: "table"
+returnDescription: "A table whose columns are the supplied lists."
+parameters:
+  - name: "lists"
+    type: "list"
+    required: true
+    description: "A list of lists, one inner list per column."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "A table type, a list of column names, or a list of {name, type} pairs."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromrecords"
+  - "table-fromlist"
+  - "table-tocolumns"
+---
+
+## Remarks
+
+`Table.FromColumns` is the column-oriented counterpart to `Table.FromRecords`. Supply one list per column; all lists must be the same length. Column names can be provided as a second argument — pass a list of strings, a list of `{name, type}` pairs, or a table type.
+
+If `columns` is omitted, columns are named `Column1`, `Column2`, etc.
+
+## Examples
+
+### Example 1: Build a table from column lists
+
+Construct a two-column table from two separate lists.
+
+```powerquery
+Table.FromColumns(
+    {{1, 2, 3}, {"Alice", "Bob", "Carol"}},
+    {"ID", "Name"}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[{"ID":1,"Name":"Alice"},{"ID":2,"Name":"Bob"},{"ID":3,"Name":"Carol"}]}
+-->
+
+### Example 2: Transpose a table using FromColumns and ToColumns
+
+```powerquery
+let
+    Source   = #table({"A","B","C"},{{1,2,3},{4,5,6}}),
+    Columns  = Table.ToColumns(Source),
+    Transposed = Table.FromColumns(Columns)
+in
+    Transposed
+```

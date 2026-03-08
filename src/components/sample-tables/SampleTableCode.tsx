@@ -116,31 +116,57 @@ export default function SampleTableCode({ table }: { table: SampleTable }) {
           <div className="sample-code-block">
             <div className="sample-code-header">
               <h4>Option 1: Paste into Advanced Editor</h4>
+            </div>
+            <div className="sample-code-pre-wrapper">
+              <pre>
+                <code>{fromRecordsCode}</code>
+              </pre>
               <button
-                className="copy-btn"
+                className={`code-copy-btn${copied === "records" ? " copied" : ""}`}
                 onClick={() => handleCopy(fromRecordsCode, "records")}
+                aria-label={copied === "records" ? "Copied!" : "Copy code"}
+                title={copied === "records" ? "Copied!" : "Copy code"}
               >
-                {copied === "records" ? "Copied!" : "Copy"}
+                {copied === "records" ? (
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <path d="M2 7.5L6 11.5L13 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                    <path d="M10 5V3.5A1.5 1.5 0 008.5 2h-6A1.5 1.5 0 001 3.5v6A1.5 1.5 0 002.5 11H4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                )}
               </button>
             </div>
-            <pre>
-              <code>{fromRecordsCode}</code>
-            </pre>
           </div>
 
           <div className="sample-code-block">
             <div className="sample-code-header">
               <h4>Option 2: Load from URL</h4>
+            </div>
+            <div className="sample-code-pre-wrapper">
+              <pre>
+                <code>{webContentsCode}</code>
+              </pre>
               <button
-                className="copy-btn"
+                className={`code-copy-btn${copied === "web" ? " copied" : ""}`}
                 onClick={() => handleCopy(webContentsCode, "web")}
+                aria-label={copied === "web" ? "Copied!" : "Copy code"}
+                title={copied === "web" ? "Copied!" : "Copy code"}
               >
-                {copied === "web" ? "Copied!" : "Copy"}
+                {copied === "web" ? (
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <path d="M2 7.5L6 11.5L13 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                    <path d="M10 5V3.5A1.5 1.5 0 008.5 2h-6A1.5 1.5 0 001 3.5v6A1.5 1.5 0 002.5 11H4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                )}
               </button>
             </div>
-            <pre>
-              <code>{webContentsCode}</code>
-            </pre>
             <p className="sample-code-note">
               Requires web access from Power Query. URL will be available once the site is live.
             </p>

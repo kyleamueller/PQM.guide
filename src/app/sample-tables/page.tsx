@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { sampleTables } from "@/data/sample-tables";
 import PQTable from "@/components/pq-table/PQTable";
 import SampleTableCode from "@/components/sample-tables/SampleTableCode";
+import CopyCodeBlock from "@/components/sample-tables/CopyCodeBlock";
 
 export const metadata: Metadata = {
   title: "Sample Tables - PQM.guide",
@@ -64,11 +65,7 @@ export default function SampleTablesPage() {
           rather than deciphering a <code>Table.FromRecords</code> wall of
           text.
         </p>
-        <div className="usage-example-block">
-          <pre>
-            <code>Table.SelectRows(Sales, each [Region] = &quot;East&quot;)</code>
-          </pre>
-        </div>
+        <CopyCodeBlock code={`Table.SelectRows(Sales, each [Region] = "East")`} />
       </section>
     </div>
   );

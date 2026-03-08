@@ -1,0 +1,71 @@
+---
+title: "List.Min"
+slug: "list-min"
+category: "List"
+description: "Returns the minimum value from a list."
+syntax: "List.Min(list as list, optional default as nullable any, optional comparisonCriteria as any, optional includeNulls as nullable logical) as any"
+returnType: "any"
+returnDescription: "The smallest value in the list, or the default value if the list is empty."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to search."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Value returned when the list is empty. Defaults to null."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: false
+    description: "A comparer or key selector for custom ordering."
+  - name: "includeNulls"
+    type: "logical"
+    required: false
+    description: "Whether to include null values in the comparison. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-max"
+  - "list-average"
+  - "list-sum"
+---
+
+## Remarks
+
+`List.Min` returns the smallest value in a list. Null values are excluded from comparison by default. If the list is empty, `null` is returned unless a `default` value is provided.
+
+The optional `comparisonCriteria` parameter accepts a comparer function or a key selector (for example, `each Text.Length(_)` to find the shortest text).
+
+Use `List.Min` on a table column by first extracting it with `Table.Column`.
+
+## Examples
+
+### Example 1: Find the minimum of a list of numbers
+
+```powerquery
+List.Min({5, 3, 8, 1, 9})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 2: Find the earliest date in a column
+
+```powerquery
+let
+    Dates  = Table.Column(Sales, "OrderDate"),
+    Oldest = List.Min(Dates)
+in
+    #table({"EarliestOrder"}, {{Oldest}})
+```
+
+<!--output
+{"columns":[{"name":"EarliestOrder","type":"date"}],"rows":[{"EarliestOrder":"2024-01-15"}]}
+-->

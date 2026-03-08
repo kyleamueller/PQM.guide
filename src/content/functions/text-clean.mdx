@@ -1,0 +1,55 @@
+---
+title: "Text.Clean"
+slug: "text-clean"
+category: "Text"
+description: "Removes all control characters from a text value."
+syntax: "Text.Clean(text as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The input text with all control characters (characters with Unicode values 0–31 and 127) removed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to clean."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-trim"
+  - "text-remove"
+  - "text-select"
+---
+
+## Remarks
+
+`Text.Clean` removes non-printable control characters — the same characters Excel's CLEAN function removes. This includes carriage returns (`#(cr)`), line feeds (`#(lf)`), tabs (`#(tab)`), and other characters with Unicode code points 0–31 and 127.
+
+Use `Text.Clean` to sanitize text imported from legacy systems, CSV files, or copy-pasted content that may contain invisible formatting characters. For stripping specific characters beyond control codes, use `Text.Remove` instead.
+
+`Text.Trim` removes leading/trailing whitespace; `Text.Clean` removes embedded control characters anywhere in the string. Both are often applied together.
+
+## Examples
+
+### Example 1: Remove embedded line feeds and tabs from imported text
+
+```powerquery
+let
+    Messy  = "Hello" & "#(lf)" & "World" & "#(tab)",
+    Cleaned = Text.Clean(Messy)
+in
+    Cleaned
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelloWorld"}]}
+-->
+
+### Example 2: Clean a column of messy imported values
+
+```powerquery
+Table.TransformColumns(Source, {{"Notes", Text.Clean, type text}})
+```

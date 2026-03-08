@@ -15,7 +15,7 @@ export function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
-function parseExamples(content: string) {
+export function parseExamples(content: string) {
   const examples: Array<{
     title: string;
     description: string;
@@ -32,7 +32,7 @@ function parseExamples(content: string) {
     const title = match[1].trim();
     const body = match[2];
 
-    const descMatch = body.match(/^(.+?)(?:\n|\r\n)/);
+    const descMatch = body.match(/^\n*(.+?)(?:\n|\r\n)/);
     const description = descMatch ? descMatch[1].trim() : "";
 
     const codeMatch = body.match(/```powerquery\n([\s\S]*?)```/);
@@ -59,7 +59,7 @@ function parseExamples(content: string) {
   return examples;
 }
 
-function parseRemarks(content: string): string | null {
+export function parseRemarks(content: string): string | null {
   const match = content.match(/## Remarks\n([\s\S]*?)(?=## Examples|## Related|$)/);
   return match ? match[1].trim() : null;
 }

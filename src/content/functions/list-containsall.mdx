@@ -1,0 +1,72 @@
+---
+title: "List.ContainsAll"
+slug: "list-containsall"
+category: "List"
+description: "Returns true if a list contains all of the values in another list."
+syntax: "List.ContainsAll(list as list, values as list, optional equationCriteria as any) as logical"
+returnType: "logical"
+returnDescription: "true if every value from the second list is found in the first list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to search."
+  - name: "values"
+    type: "list"
+    required: true
+    description: "The list of values that must all be present."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "A comparer function for custom equality testing."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-contains"
+  - "list-containsany"
+---
+
+## Remarks
+
+`List.ContainsAll` returns `true` only if every value in the second list appears in the first list. A single missing value causes it to return `false`. For a looser check that requires just one match, use `List.ContainsAny`.
+
+The optional `equationCriteria` parameter accepts a comparer (such as `Comparer.OrdinalIgnoreCase`) for case-insensitive or culture-sensitive comparisons.
+
+## Examples
+
+### Example 1: Verify all required columns are present
+Check whether a table has all of the columns needed for a downstream transformation.
+
+```powerquery
+let
+    RequiredColumns = {"OrderID", "CustomerID", "Amount", "Region"},
+    ActualColumns   = Table.ColumnNames(Sales),
+    AllPresent      = List.ContainsAll(ActualColumns, RequiredColumns)
+in
+    #table({"AllColumnsPresent"}, {{AllPresent}})
+```
+
+<!--output
+{"columns":[{"name":"AllColumnsPresent","type":"logical"}],"rows":[{"AllColumnsPresent":true}]}
+-->
+
+### Example 2: Check for missing values
+When not all values are present, the function returns false.
+
+```powerquery
+let
+    Source    = {"a", "b", "c"},
+    CheckList = {"a", "b", "d"},
+    Result    = List.ContainsAll(Source, CheckList)
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->

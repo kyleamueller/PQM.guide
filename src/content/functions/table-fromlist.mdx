@@ -1,0 +1,75 @@
+---
+title: "Table.FromList"
+slug: "table-fromlist"
+category: "Table"
+description: "Converts a list to a table by applying a splitter function to each element."
+syntax: "Table.FromList(list as list, optional splitter as nullable function, optional columns as any, optional default as nullable any, optional extraValues as nullable number) as table"
+returnType: "table"
+returnDescription: "A table derived from the supplied list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to convert."
+  - name: "splitter"
+    type: "function"
+    required: false
+    description: "A function that splits each list item into column values. Defaults to Splitter.SplitByNothing()."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "Column names, a table type, or a list of {name, type} pairs."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Default value for missing columns when a row has fewer values than expected."
+  - name: "extraValues"
+    type: "number"
+    required: false
+    description: "Specifies how extra values beyond the expected column count are handled."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromrecords"
+  - "table-fromcolumns"
+  - "table-expandlistcolumn"
+---
+
+## Remarks
+
+`Table.FromList` is the standard way to convert a list of values into a table. The `splitter` parameter determines how each list element maps to columns:
+
+- `Splitter.SplitByNothing()` (default) — each element becomes the single value in `Column1`. Use `Table.ExpandRecordColumn` afterwards if elements are records.
+- `Splitter.SplitByComma()` — splits text by comma into multiple columns.
+- `Splitter.SplitTextByDelimiter(...)` — splits by any delimiter.
+
+## Examples
+
+### Example 1: Convert a list of numbers to a single-column table
+
+```powerquery
+Table.FromList({1, 2, 3, 4, 5}, Splitter.SplitByNothing(), {"Number"})
+```
+
+<!--output
+{"columns":[{"name":"Number","type":"any"}],"rows":[{"Number":1},{"Number":2},{"Number":3},{"Number":4},{"Number":5}]}
+-->
+
+### Example 2: Split comma-delimited strings into columns
+
+```powerquery
+Table.FromList(
+    {"Alice,30,Engineer", "Bob,25,Designer"},
+    Splitter.SplitByComma(),
+    {"Name", "Age", "Role"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"text"},{"name":"Role","type":"text"}],"rows":[{"Name":"Alice","Age":"30","Role":"Engineer"},{"Name":"Bob","Age":"25","Role":"Designer"}]}
+-->

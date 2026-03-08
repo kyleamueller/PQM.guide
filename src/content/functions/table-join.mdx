@@ -1,0 +1,75 @@
+---
+title: "Table.Join"
+slug: "table-join"
+category: "Table"
+description: "Joins two tables on key columns, returning a flat combined table."
+syntax: "Table.Join(table1 as table, key1 as any, table2 as table, key2 as any, optional joinKind as nullable number, optional joinAlgorithm as nullable number, optional keyEqualityComparers as nullable list) as table"
+returnType: "table"
+returnDescription: "A table containing columns from both inputs joined on the specified keys."
+parameters:
+  - name: "table1"
+    type: "table"
+    required: true
+    description: "The left table."
+  - name: "key1"
+    type: "any"
+    required: true
+    description: "The join key column name (text) or list of column names for table1."
+  - name: "table2"
+    type: "table"
+    required: true
+    description: "The right table."
+  - name: "key2"
+    type: "any"
+    required: true
+    description: "The join key column name (text) or list of column names for table2."
+  - name: "joinKind"
+    type: "number"
+    required: false
+    description: "Join type: JoinKind.Inner (0, default), LeftOuter (1), RightOuter (2), FullOuter (3), LeftAnti (4), RightAnti (5)."
+  - name: "joinAlgorithm"
+    type: "number"
+    required: false
+    description: "Algorithm hint for performance tuning."
+  - name: "keyEqualityComparers"
+    type: "list"
+    required: false
+    description: "Custom comparers for key matching (e.g., case-insensitive)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.Join` is a flat join — it returns a single table with all columns from both inputs side by side, similar to a SQL `JOIN`. If both tables share a column name (other than the key), the duplicate is renamed with a suffix.
+
+For most Power Query workflows, `Table.NestedJoin` followed by `Table.ExpandTableColumn` is preferred because it gives finer control over which columns to expand and avoids automatic column renaming. Use `Table.Join` when you want a flat result immediately.
+
+## Examples
+
+### Example 1: Inner join on a shared key
+
+Join Sales to a Products lookup table.
+
+Input: `Sales`
+
+```powerquery
+let
+    Products = #table(
+        {"Category", "CategoryLabel"},
+        {{"Electronics", "Consumer Electronics"},
+         {"Clothing", "Apparel & Fashion"},
+         {"Books", "Books & Media"}}
+    ),
+    Joined = Table.Join(Sales, "Category", Products, "Category", JoinKind.LeftOuter)
+in
+    Joined
+```

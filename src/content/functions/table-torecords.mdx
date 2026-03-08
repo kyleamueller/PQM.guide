@@ -1,0 +1,63 @@
+---
+title: "Table.ToRecords"
+slug: "table-torecords"
+category: "Table"
+description: "Converts a table to a list of records, one record per row."
+syntax: "Table.ToRecords(table as table) as list"
+returnType: "list"
+returnDescription: "A list of records where each record corresponds to a row in the table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to convert."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromrecords"
+  - "table-tolist"
+  - "table-tocolumns"
+---
+
+## Remarks
+
+`Table.ToRecords` is the inverse of `Table.FromRecords`. Each row becomes a record with field names matching the column names. This is useful when you need to iterate over rows as records or pass table data to a function expecting a list of records.
+
+## Examples
+
+### Example 1: Convert a table to a list of records
+
+Convert the Sales table to a list of records.
+
+Input: `Sales`
+
+```powerquery
+let
+    Records = Table.ToRecords(Sales),
+    First   = Records{0}
+in
+    First
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Region","type":"text"},{"name":"OrderDate","type":"date"},{"name":"Category","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"OrderID":1001,"CustomerID":"C001","Amount":250.0,"Region":"East","OrderDate":"2024-01-15","Category":"Electronics","Quantity":5}]}
+-->
+
+### Example 2: Round-trip via records
+
+Convert a table to records and back, preserving structure.
+
+Input: `Sales`
+
+```powerquery
+let
+    Records   = Table.ToRecords(Sales),
+    BackToTable = Table.FromRecords(Records)
+in
+    BackToTable
+```

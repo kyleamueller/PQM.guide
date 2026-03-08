@@ -1,0 +1,57 @@
+---
+title: "Table.DemoteHeaders"
+slug: "table-demoteheaders"
+category: "Table"
+description: "Moves the column headers down into the first row of data, replacing them with default column names."
+syntax: "Table.DemoteHeaders(table as table) as table"
+returnType: "table"
+returnDescription: "The table with previous column names as the first data row and default column names (Column1, Column2, …) as the new headers."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose headers should be demoted."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-promoteheaders"
+  - "table-renamecolumns"
+---
+
+## Remarks
+
+`Table.DemoteHeaders` is the inverse of `Table.PromoteHeaders`. It is useful when you need to prepend the current column names as a data row — for example, before combining tables with different headers into a single flat list, or before pivoting/reshaping data where the headers themselves are values.
+
+After demotion, columns are named `Column1`, `Column2`, etc.
+
+## Examples
+
+### Example 1: Demote headers to prepare for header-as-data reshaping
+
+```powerquery
+let
+    Source = #table({"Name", "Q1", "Q2"}, {{"Alice", 100, 200}, {"Bob", 150, 250}}),
+    Demoted = Table.DemoteHeaders(Source)
+in
+    Demoted
+```
+
+<!--output
+{"columns":[{"name":"Column1","type":"text"},{"name":"Column2","type":"text"},{"name":"Column3","type":"text"}],"rows":[{"Column1":"Name","Column2":"Q1","Column3":"Q2"},{"Column1":"Alice","Column2":"100","Column3":"200"},{"Column1":"Bob","Column2":"150","Column3":"250"}]}
+-->
+
+### Example 2: Round-trip — demote then re-promote
+
+```powerquery
+let
+    Source   = #table({"City","Sales"},  {{"New York", 500}, {"Chicago", 300}}),
+    Demoted  = Table.DemoteHeaders(Source),
+    Promoted = Table.PromoteHeaders(Demoted)
+in
+    Promoted
+```
