@@ -166,25 +166,7 @@ export default function ResourcesPage() {
         <div className="resource-card">
           <h3>
             <a
-              href="https://www.youtube.com/@SolutionsAbroad"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Solutions Abroad — Wyn Hopkins
-            </a>
-          </h3>
-          <p>
-            Practical Power Query and Power BI tutorials with a focus on
-            real-world data transformation scenarios. Wyn&apos;s channel is
-            particularly strong on M code techniques, advanced Power Query
-            patterns, and explaining how things work under the hood.
-          </p>
-        </div>
-
-        <div className="resource-card">
-          <h3>
-            <a
-              href="https://www.youtube.com/@Goodly"
+              href="https://www.youtube.com/@GoodlyChandeep"
               target="_blank"
               rel="noopener noreferrer"
             >
