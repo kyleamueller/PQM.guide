@@ -1016,6 +1016,44 @@ code {
   border-color: var(--accent);
 }
 
+.sample-code-pre-wrapper {
+  position: relative;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms, color 150ms, border-color 150ms;
+}
+
+.sample-code-pre-wrapper:hover .code-copy-btn,
+.code-copy-btn.copied {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.code-copy-btn.copied {
+  color: var(--pq-logical-true);
+  border-color: var(--pq-logical-true);
+}
+
 .sample-code-block pre {
   padding: 14px 18px;
   margin: 0;
@@ -1061,11 +1099,6 @@ code {
   background: var(--code-bg);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  overflow: hidden;
-}
-
-.usage-example-block .sample-code-header {
-  background: var(--bg-secondary);
 }
 
 .usage-example-block pre {
