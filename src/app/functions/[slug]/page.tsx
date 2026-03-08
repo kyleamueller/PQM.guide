@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import Link from "next/link";
 import { getFunctionBySlug, getAllFunctionSlugs, buildSearchIndex } from "@/lib/mdx";
 import { PQTableData } from "@/lib/types";
 import FunctionHeader from "@/components/function-page/FunctionHeader";
@@ -101,8 +102,17 @@ export default async function FunctionPage({ params }: PageProps) {
   const remarks = parseRemarks(content);
   const allFunctions = buildSearchIndex();
 
+  const categorySlug = frontmatter.category.toLowerCase().replace(/\s+/g, "-");
+
   return (
     <article>
+      <nav style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 20, display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+        <Link href="/categories" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Functions</Link>
+        <span>›</span>
+        <Link href={`/categories/${categorySlug}`} style={{ color: "var(--text-muted)", textDecoration: "none" }}>{frontmatter.category}</Link>
+        <span>›</span>
+        <span style={{ color: "var(--text-secondary)" }}>{frontmatter.title}</span>
+      </nav>
       <FunctionHeader
         title={frontmatter.title}
         category={frontmatter.category}

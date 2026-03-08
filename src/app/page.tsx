@@ -1,6 +1,20 @@
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import { getAllFunctions } from "@/lib/mdx";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "PQM.guide — Power Query M Function Reference",
+  description:
+    "Community-driven Power Query M language reference with visual table examples. 161 functions across 23 categories, concept guides, and practical patterns.",
+  openGraph: {
+    title: "PQM.guide — Power Query M Function Reference",
+    description:
+      "Community-driven Power Query M language reference with visual table examples. 161 functions across 23 categories, concept guides, and practical patterns.",
+    url: "/",
+    type: "website",
+  },
+};
 
 export default function Home() {
   const allFunctions = getAllFunctions();
@@ -22,6 +36,40 @@ export default function Home() {
           Community-driven Power Query M language reference with visual table
           examples. No more <code>Table.FromRecords</code>.
         </p>
+      </div>
+
+      <div style={{ display: "flex", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
+        <Link
+          href="/learn"
+          style={{
+            flex: "1 1 200px",
+            display: "block",
+            background: "var(--accent)",
+            color: "#fff",
+            borderRadius: 8,
+            padding: "20px 24px",
+            textDecoration: "none",
+          }}
+        >
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>New to M? Start Here →</div>
+          <div style={{ fontSize: 13, opacity: 0.88, lineHeight: 1.5 }}>
+            An 8-step learning path from the M paradigm to query folding.
+          </div>
+        </Link>
+        <div
+          style={{
+            flex: "1 1 200px",
+            background: "var(--bg-secondary)",
+            border: "1px solid var(--border-color)",
+            borderRadius: 8,
+            padding: "20px 24px",
+          }}
+        >
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Search 161 functions</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+            Press <kbd style={{ fontSize: 11 }}>Ctrl+K</kbd> to search by name or description.
+          </div>
+        </div>
       </div>
 
       <div className="category-grid">
