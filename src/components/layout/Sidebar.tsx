@@ -113,6 +113,15 @@ export default function Sidebar({ functions, isOpen, onClose, onSearchOpen }: Si
           </div>
           <div className="sidebar-section">
             <Link
+              href="/learn"
+              className={`sidebar-home ${pathname?.startsWith("/learn") ? "active" : ""}`}
+              onClick={onClose}
+            >
+              Start Here
+            </Link>
+          </div>
+          <div className="sidebar-section">
+            <Link
               href="/sample-tables"
               className={`sidebar-home ${pathname === "/sample-tables" ? "active" : ""}`}
               onClick={onClose}

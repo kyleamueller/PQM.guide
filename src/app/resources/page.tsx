@@ -143,6 +143,86 @@ export default function ResourcesPage() {
       </section>
 
       <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontSize: 20, marginBottom: 16 }}>YouTube Channels</h2>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://www.youtube.com/@GuyInACube"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Guy in a Cube — Adam Saxton &amp; Patrick LeBlanc
+            </a>
+          </h3>
+          <p>
+            Weekly Power BI videos covering everything from Power Query
+            transformations and M code to DAX, report design, and the Power BI
+            service. One of the longest-running and most-watched Power BI
+            channels on YouTube, with deep dives and live Q&amp;A sessions.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://www.youtube.com/@SolutionsAbroad"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Solutions Abroad — Wyn Hopkins
+            </a>
+          </h3>
+          <p>
+            Practical Power Query and Power BI tutorials with a focus on
+            real-world data transformation scenarios. Wyn&apos;s channel is
+            particularly strong on M code techniques, advanced Power Query
+            patterns, and explaining how things work under the hood.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://www.youtube.com/@Goodly"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Goodly — Chandeep Chhabra
+            </a>
+          </h3>
+          <p>
+            Clear, practical Power BI and Power Query tutorials aimed at
+            analysts who want to level up quickly. Covers M code, data
+            modeling, and DAX with an emphasis on real business use cases.
+          </p>
+        </div>
+      </section>
+
+      <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontSize: 20, marginBottom: 16 }}>Blogs</h2>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://gorilla.bi"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Gorilla.bi — Rick de Groot
+            </a>
+          </h3>
+          <p>
+            A well-organized Power BI and Power Query blog with searchable
+            function references, technique breakdowns, and practical tutorials.
+            Rick&apos;s articles are detailed and consistently well-explained,
+            making it a reliable reference whether you&apos;re debugging a
+            formula or learning a new pattern.
+          </p>
+        </div>
+      </section>
+
+      <section style={{ marginBottom: 40 }}>
         <h2 style={{ fontSize: 20, marginBottom: 16 }}>Community</h2>
 
         <div className="resource-card">
@@ -178,6 +258,24 @@ export default function ResourcesPage() {
             their workarounds. An invaluable reference for understanding edge
             cases and quirks in the standard M library that can trip up even
             experienced developers.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://community.fabric.microsoft.com/t5/Power-Query/bd-p/power_query_en"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Microsoft Fabric Community — Power Query Forum
+            </a>
+          </h3>
+          <p>
+            The official community forum for Power Query questions, hosted on
+            the Microsoft Fabric Community site. Millions of threads covering
+            every imaginable M scenario, with answers from Microsoft MVPs and
+            the community at large.
           </p>
         </div>
 
