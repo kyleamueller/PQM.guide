@@ -1,0 +1,148 @@
+---
+title: "Date, Time, and Duration Types"
+slug: "datetime-types"
+description: "The five temporal types in M — date, time, datetime, datetimezone, and duration — how they differ, how to convert between them, and common pitfalls."
+relatedConcepts:
+  - "type-system"
+  - "null-handling"
+relatedFunctions:
+  - "date-from"
+  - "date-year"
+  - "date-month"
+  - "date-day"
+  - "date-adddays"
+  - "date-addmonths"
+  - "datetime-from"
+  - "datetime-localnow"
+---
+
+M has five distinct temporal types. Mixing them up is one of the most common sources of type errors and unexpected behavior in Power Query.
+
+### The Five Temporal Types
+
+| Type | What it represents | Example literal |
+|---|---|---|
+| `date` | Calendar date only — no time | `#date(2024, 3, 15)` |
+| `time` | Time of day only — no date | `#time(14, 30, 0)` |
+| `datetime` | Date + time, no timezone | `#datetime(2024, 3, 15, 14, 30, 0)` |
+| `datetimezone` | Date + time + UTC offset | `#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0)` |
+| `duration` | A span of time — days, hours, minutes, seconds | `#duration(1, 2, 30, 0)` |
+
+### Conversions Between Types
+
+**From datetime to its parts:**
+
+```powerquery
+let
+    dt = #datetime(2024, 3, 15, 14, 30, 0),
+    d  = DateTime.Date(dt),       // #date(2024, 3, 15)
+    t  = DateTime.Time(dt)        // #time(14, 30, 0)
+in
+    {d, t}
+```
+
+**Combining date and time into a datetime:**
+
+```powerquery
+let
+    d = #date(2024, 3, 15),
+    t = #time(14, 30, 0),
+    dt = d + t    // date + time = datetime
+in
+    dt
+// Result: #datetime(2024, 3, 15, 14, 30, 0)
+```
+
+**Adding a timezone offset:**
+
+```powerquery
+DateTimeZone.From(#datetime(2024, 3, 15, 14, 30, 0))
+// Uses the local machine's timezone offset
+
+DateTimeZone.SwitchZone(#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0), 0, 0)
+// Converts to UTC (#datetimezone(2024, 3, 15, 19, 30, 0, 0, 0))
+```
+
+**Stripping the timezone (for storage or joining):**
+
+```powerquery
+DateTimeZone.RemoveZone(#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0))
+// Result: #datetime(2024, 3, 15, 14, 30, 0) — offset discarded
+```
+
+### Duration Arithmetic
+
+Durations are the result of subtracting two dates or datetimes of the same type:
+
+```powerquery
+#date(2024, 3, 15) - #date(2024, 1, 1)
+// Result: #duration(74, 0, 0, 0)  — 74 days
+
+#datetime(2024, 3, 15, 14, 30, 0) - #datetime(2024, 3, 15, 12, 0, 0)
+// Result: #duration(0, 2, 30, 0)  — 2 hours, 30 minutes
+```
+
+Extract the components of a duration:
+
+```powerquery
+let
+    d = #duration(3, 14, 30, 45),
+    days    = Duration.Days(d),       // 3
+    hours   = Duration.Hours(d),      // 14
+    minutes = Duration.Minutes(d),    // 30
+    seconds = Duration.Seconds(d),    // 45
+    total   = Duration.TotalHours(d)  // 86.5125
+in
+    {days, hours, minutes, seconds, total}
+```
+
+You can add a duration to a date or datetime to shift it forward:
+
+```powerquery
+#date(2024, 1, 1) + #duration(30, 0, 0, 0)
+// Result: #date(2024, 1, 31)
+```
+
+### Common Pitfalls
+
+**Comparing date to datetime fails silently.** M is strict about type compatibility:
+
+```powerquery
+// This will error:
+#date(2024, 3, 15) = #datetime(2024, 3, 15, 0, 0, 0)
+
+// Do this instead:
+DateTime.Date(#datetime(2024, 3, 15, 0, 0, 0)) = #date(2024, 3, 15)
+// Result: true
+```
+
+**`DateTime.LocalNow()` vs `DateTimeZone.LocalNow()`.** `DateTime.LocalNow()` returns the machine's local time as a datetime (no offset). `DateTimeZone.LocalNow()` includes the UTC offset. In scheduled refreshes (Power BI Service, Dataflows), "local" is the server's timezone — often UTC — not your local machine.
+
+**Column type vs value type.** Setting a column's type to `type date` via `Table.TransformColumnTypes` does not strip the time component from underlying values that arrived as datetimes — it converts them. If conversion fails (malformed strings, mixed types), cells become errors. Always inspect source data before applying a strict temporal type.
+
+**Duration is not a number.** You cannot multiply a duration by a scalar directly:
+
+```powerquery
+// This errors:
+#duration(1, 0, 0, 0) * 7
+
+// Use Duration.TotalDays to get a number first, or add repeatedly:
+Duration.From(Duration.TotalDays(#duration(1, 0, 0, 0)) * 7)
+// Result: #duration(7, 0, 0, 0)
+```
+
+### Quick Reference: Key Conversion Functions
+
+| Function | From → To |
+|---|---|
+| `DateTime.Date(dt)` | datetime → date |
+| `DateTime.Time(dt)` | datetime → time |
+| `DateTime.From(d)` | date → datetime (time = 00:00:00) |
+| `DateTimeZone.From(dt)` | datetime → datetimezone (local offset) |
+| `DateTimeZone.RemoveZone(dtz)` | datetimezone → datetime |
+| `DateTimeZone.ToLocal(dtz)` | datetimezone → local datetimezone |
+| `DateTimeZone.ToUtc(dtz)` | datetimezone → UTC datetimezone |
+| `Duration.TotalDays(dur)` | duration → number (days) |
+| `Duration.TotalHours(dur)` | duration → number (hours) |
+| `Duration.TotalMinutes(dur)` | duration → number (minutes) |
+| `Duration.TotalSeconds(dur)` | duration → number (seconds) |
