@@ -1,0 +1,89 @@
+---
+title: "Table.FuzzyNestedJoin"
+slug: "table-fuzzynestedjoin"
+category: "Table"
+description: "Joins two tables using fuzzy string matching and produces a nested table column of matches."
+syntax: "Table.FuzzyNestedJoin(table1 as table, key1 as any, table2 as table, key2 as any, newColumnName as text, optional joinKind as nullable number, optional joinOptions as nullable record) as table"
+returnType: "table"
+returnDescription: "The left table with a new column containing nested tables of fuzzy-matched rows from the right table."
+parameters:
+  - name: "table1"
+    type: "table"
+    required: true
+    description: "The left table."
+  - name: "key1"
+    type: "any"
+    required: true
+    description: "The key column name or list of column names from table1."
+  - name: "table2"
+    type: "table"
+    required: true
+    description: "The right table."
+  - name: "key2"
+    type: "any"
+    required: true
+    description: "The key column name or list of column names from table2."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name for the new nested table column added to table1."
+  - name: "joinKind"
+    type: "number"
+    required: false
+    description: "Optional. The join type (JoinKind.Inner, JoinKind.LeftOuter, etc.). Defaults to JoinKind.LeftOuter."
+  - name: "joinOptions"
+    type: "record"
+    required: false
+    description: "Optional record with fuzzy matching options: Threshold, IgnoreCase, IgnoreSpace, NumberOfMatches, TransformationTable."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-fuzzyjoin"
+  - "table-fuzzygroup"
+  - "table-expandtablecolumn"
+---
+
+## Remarks
+
+`Table.FuzzyNestedJoin` is the fuzzy-matching counterpart of `Table.NestedJoin`. Instead of requiring exact key equality, it matches keys using approximate string similarity. The result adds a new column to `table1` where each cell contains a nested table of matching rows from `table2`.
+
+Use `Table.ExpandTableColumn` to flatten the nested results after the join. The `joinOptions` record accepts the same options as `Table.FuzzyJoin`.
+
+## Examples
+
+### Example 1: Fuzzy nested join
+
+```powerquery
+let
+    Left  = #table({"Customer"}, {{"Micosoft"}, {"Gogle"}}),
+    Right = #table({"Company", "Revenue"}, {{"Microsoft", 100}, {"Google", 200}}),
+    Joined = Table.FuzzyNestedJoin(Left, "Customer", Right, "Company", "Matches", JoinKind.LeftOuter)
+in
+    Joined
+```
+
+<!--output
+{"columns":[{"name":"Customer","type":"any"},{"name":"Matches","type":"table"}],"rows":[{"Customer":"Micosoft","Matches":"[Table]"},{"Customer":"Gogle","Matches":"[Table]"}]}
+-->
+
+### Example 2: Expand the nested column after fuzzy join
+
+```powerquery
+let
+    Left    = #table({"Customer"}, {{"Micosoft"}}),
+    Right   = #table({"Company", "Revenue"}, {{"Microsoft", 100}}),
+    Joined  = Table.FuzzyNestedJoin(Left, "Customer", Right, "Company", "Matches"),
+    Expanded = Table.ExpandTableColumn(Joined, "Matches", {"Company", "Revenue"})
+in
+    Expanded
+```
+
+<!--output
+{"columns":[{"name":"Customer","type":"any"},{"name":"Company","type":"any"},{"name":"Revenue","type":"any"}],"rows":[{"Customer":"Micosoft","Company":"Microsoft","Revenue":"100"}]}
+-->

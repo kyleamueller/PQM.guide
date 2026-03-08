@@ -1,0 +1,80 @@
+---
+title: "Lines.ToText"
+slug: "lines-totext"
+category: "Lines"
+description: "Converts a list of text lines into a single text value by joining the lines with line separators."
+syntax: "Lines.ToText(lines as list, optional quoteStyle as nullable number, optional includeByteOrderMark as nullable logical) as text"
+returnType: "text"
+returnDescription: "A single text value with each element from lines joined by line feed characters."
+parameters:
+  - name: "lines"
+    type: "list"
+    required: true
+    description: "A list of text values, each representing one line."
+  - name: "quoteStyle"
+    type: "number"
+    required: false
+    description: "Controls how line endings within quoted fields are treated. Use QuoteStyle.None (default) or QuoteStyle.Csv."
+  - name: "includeByteOrderMark"
+    type: "logical"
+    required: false
+    description: "When true, prepends a byte order mark to the output. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "lines-tobinary"
+  - "text-combine"
+  - "text-split"
+  - "text-frombinary"
+---
+
+## Remarks
+
+`Lines.ToText` joins a list of text values into a single multi-line string, inserting a line feed character (`#(lf)`) between each element. This is the inverse of `Lines.FromText`.
+
+The function is commonly used to reconstruct text content from a list of lines — for example, after filtering, transforming, or reordering lines that were split from a source file.
+
+Unlike `Text.Combine`, which requires you to explicitly specify a delimiter, `Lines.ToText` automatically uses the standard line separator. Use `Text.Combine` when you need a custom separator.
+
+## Examples
+
+### Example 1: Join a list of lines into a single string
+
+```powerquery
+Lines.ToText({"First line", "Second line", "Third line"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"First line\nSecond line\nThird line"}]}
+-->
+
+### Example 2: Round-trip with Lines.FromText
+
+```powerquery
+let
+    source = "apple#(lf)banana#(lf)cherry",
+    lines = Lines.FromText(source),
+    filtered = List.Select(lines, each Text.StartsWith(_, "b")),
+    result = Lines.ToText(filtered)
+in
+    result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"banana"}]}
+-->
+
+### Example 3: Build a CSV-like text from rows
+
+```powerquery
+Lines.ToText({"Name,Age", "Alice,30", "Bob,25"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Name,Age\nAlice,30\nBob,25"}]}
+-->

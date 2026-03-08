@@ -1,0 +1,76 @@
+---
+title: "List.Skip"
+slug: "list-skip"
+category: "List"
+description: "Skips the first N items of a list (or items while a condition is true) and returns the remaining items."
+syntax: "List.Skip(list as list, countOrCondition as any) as list"
+returnType: "list"
+returnDescription: "A new list with the first N items (or leading items matching the condition) removed."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many items to skip, or a condition function that skips items while it returns true."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-removefirstn"
+  - "list-firstn"
+  - "list-range"
+  - "list-select"
+---
+
+## Remarks
+
+`List.Skip` is functionally equivalent to `List.RemoveFirstN`. It skips the first `N` items of a list and returns all remaining items.
+
+- **Number**: Skips the first `N` items. If `N` is greater than the list length, an empty list is returned.
+- **Condition function**: Skips items from the start while the condition returns `true`. Collection of remaining items begins at the first item that fails the condition.
+- Skipped items at the start that match the condition stop at the first non-matching item — subsequent matching items are not skipped.
+
+## Examples
+
+### Example 1: Skip the first 3 items
+
+```powerquery
+List.Skip({1, 2, 3, 4, 5}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{4, 5}"}]}
+-->
+
+### Example 2: Skip items while they are less than 30
+
+```powerquery
+List.Skip({10, 20, 30, 40, 50}, each _ < 30)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{30, 40, 50}"}]}
+-->
+
+### Example 3: Paginate through a list (page 2 of 3)
+
+```powerquery
+let
+    AllItems = List.Numbers(1, 15),
+    PageSize = 5,
+    Page = 2,
+    PageItems = List.FirstN(List.Skip(AllItems, PageSize * (Page - 1)), PageSize)
+in
+    PageItems
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{6, 7, 8, 9, 10}"}]}
+-->

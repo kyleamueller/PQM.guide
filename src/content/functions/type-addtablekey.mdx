@@ -1,0 +1,73 @@
+---
+title: "Type.AddTableKey"
+slug: "type-addtablekey"
+category: "Type"
+description: "Returns a new table type with an additional key definition added."
+syntax: "Type.AddTableKey(type as type, columns as list, isPrimary as logical) as type"
+returnType: "type"
+returnDescription: "A new table type with the specified key added."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The base table type to add a key to."
+  - name: "columns"
+    type: "list"
+    required: true
+    description: "A list of column name text values that form the key."
+  - name: "isPrimary"
+    type: "logical"
+    required: true
+    description: "True if this is the primary key; false for an alternate key."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-tablekeys"
+  - "type-replacetablekeys"
+  - "type-tableschema"
+---
+
+## Remarks
+
+`Type.AddTableKey` adds a key definition to a table type. Keys identify columns whose values uniquely identify rows, analogous to primary and unique keys in relational databases.
+
+In Power BI, declaring keys enables relationship management and can improve query performance. The function returns a new type — it does not modify the input type. To apply the new type to a table, use `Value.ReplaceType(table, newType)`.
+
+A table type can have at most one primary key but multiple alternate keys.
+
+## Examples
+
+### Example 1: Add a primary key on a single column
+
+```powerquery
+let
+    T = #table(type table [ID = number, Name = text], {{1, "Alice"}, {2, "Bob"}}),
+    NewType = Type.AddTableKey(Value.Type(T), {"ID"}, true),
+    Keys = Type.TableKeys(NewType)
+in
+    Keys{0}[Primary]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Add a composite key
+
+```powerquery
+let
+    T = #table(type table [Year = number, Month = number, Value = number], {}),
+    NewType = Type.AddTableKey(Value.Type(T), {"Year", "Month"}, true),
+    Keys = Type.TableKeys(NewType)
+in
+    Keys{0}[Columns]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Year","Month"]}]}
+-->

@@ -1,0 +1,77 @@
+---
+title: "Record.ToTable"
+slug: "record-totable"
+category: "Record"
+description: "Converts a record into a two-column table with columns Name and Value."
+syntax: "Record.ToTable(record as record) as table"
+returnType: "table"
+returnDescription: "A table with two columns — Name (text) and Value (any) — one row per field."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to convert to a table."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-fromtable"
+  - "record-fieldnames"
+  - "record-fieldvalues"
+  - "record-tolist"
+---
+
+## Remarks
+
+`Record.ToTable` converts a record into a two-column table with columns `Name` and `Value`. Each field in the record becomes one row: `Name` holds the field name as text, and `Value` holds the field's value.
+
+This is the inverse of `Record.FromTable`. It is commonly used for:
+
+- Pivoting a record into a row-based structure for display or export
+- Inspecting record contents in a tabular format
+- Applying list or table operations across all fields
+
+The order of rows in the result matches the field order in the record.
+
+## Examples
+
+### Example 1: Convert a simple record to a table
+
+```powerquery
+Record.ToTable([Name = "Alice", Age = 30, City = "New York"])
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":"Alice"},{"Name":"Age","Value":30},{"Name":"City","Value":"New York"}]}
+-->
+
+### Example 2: Inspect all fields of a Sales row
+
+Input: `Sales`
+
+```powerquery
+Record.ToTable(Sales{0})
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"Quantity","Value":2},{"Name":"UnitPrice","Value":25}]}
+-->
+
+### Example 3: Find which fields contain null values
+
+```powerquery
+let
+    Row = [OrderID = 1, CustomerID = null, Product = "Widget A", Notes = null],
+    AsTable = Record.ToTable(Row),
+    NullFields = Table.SelectRows(AsTable, each [Value] = null)
+in
+    NullFields
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"CustomerID","Value":null},{"Name":"Notes","Value":null}]}
+-->

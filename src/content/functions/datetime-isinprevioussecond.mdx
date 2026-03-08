@@ -1,0 +1,62 @@
+---
+title: "DateTime.IsInPreviousSecond"
+slug: "datetime-isinprevioussecond"
+category: "DateTime"
+description: "Returns true if the datetime falls in the previous clock second."
+syntax: "DateTime.IsInPreviousSecond(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the clock second immediately before the current second, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isincurrentsecond"
+  - "datetime-isinnextsecond"
+  - "datetime-isinpreviousnseconds"
+  - "datetime-isinpreviousminute"
+---
+
+## Remarks
+
+`DateTime.IsInPreviousSecond` returns `true` if the input `datetime` or `datetimezone` value falls within the clock second immediately preceding the current second (as determined by `DateTime.LocalNow()`). The current second is not included. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events from the previous second
+
+Keep only rows where EventTime falls in the previous clock second.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInPreviousSecond([EventTime])
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":73,"EventTime":"2026-03-08T10:32:44.100"},{"EventID":74,"EventTime":"2026-03-08T10:32:44.800"}]}
+-->
+
+### Example 2: Flag previous-second events
+
+Add a boolean column for events in the previous second.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "IsPreviousSecond", each DateTime.IsInPreviousSecond([EventTime]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsPreviousSecond","type":"logical"}],"rows":[{"EventID":72,"EventTime":"2026-03-08T10:32:43.500","IsPreviousSecond":false},{"EventID":73,"EventTime":"2026-03-08T10:32:44.100","IsPreviousSecond":true},{"EventID":75,"EventTime":"2026-03-08T10:32:45.000","IsPreviousSecond":false}]}
+-->

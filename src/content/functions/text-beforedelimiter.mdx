@@ -1,0 +1,88 @@
+---
+title: "Text.BeforeDelimiter"
+slug: "text-beforedelimiter"
+category: "Text"
+description: "Returns the portion of a text value before a specified delimiter, optionally specifying which occurrence to use."
+syntax: "Text.BeforeDelimiter(text as nullable text, delimiter as text, optional index as any) as nullable text"
+returnType: "text"
+returnDescription: "The text before the specified occurrence of delimiter."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "delimiter"
+    type: "text"
+    required: true
+    description: "The delimiter string to search for."
+  - name: "index"
+    type: "any"
+    required: false
+    description: "A zero-based occurrence index (number) or a two-item list {index, RelativePosition.FromEnd} to count from the end. Defaults to 0 (first occurrence)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-afterdelimiter"
+  - "text-betweendelimiters"
+  - "text-split"
+  - "text-positionof"
+---
+
+## Remarks
+
+`Text.BeforeDelimiter` returns all text that precedes the specified `delimiter` occurrence. By default it uses the first occurrence (index 0).
+
+The `index` parameter can be:
+- A non-negative integer: the zero-based occurrence to use (0 = first, 1 = second, etc.)
+- A list `{n, RelativePosition.FromEnd}`: count occurrences from the end of the string
+
+If the delimiter is not found, the entire text is returned. If `text` is `null`, the function returns `null`.
+
+This function is commonly used in the Power Query UI when splitting or extracting columns by delimiter.
+
+## Examples
+
+### Example 1: Text before the first hyphen
+
+```powerquery
+Text.BeforeDelimiter("US-WA-Seattle", "-")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US"}]}
+-->
+
+### Example 2: Text before the second hyphen
+
+```powerquery
+Text.BeforeDelimiter("US-WA-Seattle", "-", 1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US-WA"}]}
+-->
+
+### Example 3: Text before the last hyphen (from end)
+
+```powerquery
+Text.BeforeDelimiter("US-WA-Seattle", "-", {0, RelativePosition.FromEnd})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US-WA"}]}
+-->
+
+### Example 4: Extract username from email address
+
+```powerquery
+Text.BeforeDelimiter("user@example.com", "@")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"user"}]}
+-->

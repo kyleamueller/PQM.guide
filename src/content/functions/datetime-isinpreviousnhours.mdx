@@ -1,0 +1,66 @@
+---
+title: "DateTime.IsInPreviousNHours"
+slug: "datetime-isinpreviousnhours"
+category: "DateTime"
+description: "Returns true if the datetime falls within the previous N clock hours."
+syntax: "DateTime.IsInPreviousNHours(dateTime as any, hours as number) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the N hours before the current hour, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+  - name: "hours"
+    type: "number"
+    required: true
+    description: "The number of hours back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isinprevioushour"
+  - "datetime-isinnextnhours"
+  - "datetime-isinpreviousnminutes"
+  - "datetime-isinpreviousnseconds"
+---
+
+## Remarks
+
+`DateTime.IsInPreviousNHours` returns `true` if the input `datetime` or `datetimezone` value falls within the N complete clock hours preceding the current hour. The current hour itself is not included; use `DateTime.IsInCurrentHour` to also match the current hour. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events from the previous 4 hours
+
+Keep only rows where EventTime falls within the previous 4 clock hours.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInPreviousNHours([EventTime], 4)
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":30,"EventTime":"2026-03-08T06:15:00"},{"EventID":35,"EventTime":"2026-03-08T08:45:00"},{"EventID":40,"EventTime":"2026-03-08T09:30:00"}]}
+-->
+
+### Example 2: Flag events from the past 8 hours
+
+Add a boolean column for events in the previous 8 hours.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "InPrevious8Hours", each DateTime.IsInPreviousNHours([EventTime], 8), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InPrevious8Hours","type":"logical"}],"rows":[{"EventID":25,"EventTime":"2026-03-08T01:00:00","InPrevious8Hours":false},{"EventID":30,"EventTime":"2026-03-08T06:15:00","InPrevious8Hours":true},{"EventID":42,"EventTime":"2026-03-08T10:05:00","InPrevious8Hours":false}]}
+-->

@@ -1,0 +1,63 @@
+---
+title: "Date.IsInCurrentWeek"
+slug: "date-isincurrentweek"
+category: "Date"
+description: "Returns true if the date falls within the current calendar week."
+syntax: "Date.IsInCurrentWeek(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date is in the current week, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentday"
+  - "date-isincurrentmonth"
+  - "date-isinpreviousweek"
+  - "date-isinnextweek"
+  - "date-startofweek"
+---
+
+## Remarks
+
+`Date.IsInCurrentWeek` returns `true` if the input date falls within the same Sunday-to-Saturday week as today (`DateTime.LocalNow()`). The week boundary is determined using Sunday as the first day of the week (consistent with the default behavior of `Date.StartOfWeek`). The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter this week's orders
+
+Keep only rows where OrderDate falls in the current week.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentWeek([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-05"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+-->
+
+### Example 2: Flag current-week rows
+
+Add a boolean column identifying rows from the current week.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsCurrentWeek", each Date.IsInCurrentWeek([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentWeek","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01","IsCurrentWeek":false},{"OrderID":41,"OrderDate":"2026-03-05","IsCurrentWeek":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentWeek":true}]}
+-->

@@ -1,0 +1,86 @@
+---
+title: "List.Numbers"
+slug: "list-numbers"
+category: "List"
+description: "Generates a list of numbers starting from a given value, with a specified count and optional increment."
+syntax: "List.Numbers(start as number, count as number, optional increment as nullable number) as list"
+returnType: "list"
+returnDescription: "A list of numbers of length count, beginning at start and incrementing by the specified amount."
+parameters:
+  - name: "start"
+    type: "number"
+    required: true
+    description: "The starting number."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of values to generate."
+  - name: "increment"
+    type: "nullable number"
+    required: false
+    description: "The amount to add between each successive number. Defaults to 1 if not specified."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-dates"
+  - "list-positions"
+  - "list-range"
+  - "list-repeat"
+---
+
+## Remarks
+
+`List.Numbers` generates an arithmetic sequence of numeric values. It is the numeric equivalent of `List.Dates` and related sequence generators.
+
+- Default increment is `1` if omitted or null.
+- Use negative increment values to generate decreasing sequences.
+- Use decimal increments for fractional steps (e.g., `0.5` for half-unit increments).
+- `count` must be a non-negative integer; `0` returns an empty list.
+- For simple integer ranges, the `{0..N}` literal syntax may be more concise.
+
+## Examples
+
+### Example 1: Generate integers from 1 to 5
+
+```powerquery
+List.Numbers(1, 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 2, 3, 4, 5}"}]}
+-->
+
+### Example 2: Generate even numbers
+
+```powerquery
+List.Numbers(0, 6, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{0, 2, 4, 6, 8, 10}"}]}
+-->
+
+### Example 3: Countdown from 10
+
+```powerquery
+List.Numbers(10, 5, -1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{10, 9, 8, 7, 6}"}]}
+-->
+
+### Example 4: Decimal step (percentage increments)
+
+```powerquery
+List.Numbers(0, 5, 0.25)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{0, 0.25, 0.5, 0.75, 1}"}]}
+-->

@@ -1,0 +1,76 @@
+---
+title: "SharePoint.Contents"
+slug: "sharepoint-contents"
+category: "Accessing Data"
+description: "Returns a navigation table of sites, lists, and document libraries from a SharePoint site."
+syntax: "SharePoint.Contents(url as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table where each row represents a list, library, or subsite available at the SharePoint site URL."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the SharePoint site (e.g., \"https://contoso.sharepoint.com/sites/Finance\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options. Supports ApiVersion to specify the SharePoint REST API version."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sharepoint-files"
+  - "sharepoint-tables"
+  - "odata-feed"
+---
+
+## Remarks
+
+`SharePoint.Contents` connects to a SharePoint Online or SharePoint on-premises site and returns a navigation table of all lists, document libraries, and subsites available at that URL. It is a general-purpose SharePoint connector that exposes the full site structure.
+
+**Authentication**: Microsoft Account (OAuth) for SharePoint Online, or Windows/Basic credentials for SharePoint on-premises. Configure credentials in the Power Query credentials dialog using the SharePoint site root URL as the credential scope.
+
+**Query folding**: Limited. Some filters may fold to SharePoint REST API queries, but complex transformations are performed in Power Query.
+
+**Navigating the result**: The returned table has a hierarchical structure. Each row may have a `Data` column containing a nested navigation table of that list's contents or a document library's files. This is useful for browsing interactively, but for production queries, prefer `SharePoint.Files` (for files) or `SharePoint.Tables` (for list data).
+
+**On-premises SharePoint**: Supported with Windows authentication and an on-premises data gateway for Power BI Service refresh.
+
+**Key option**:
+- `ApiVersion` (number) — the SharePoint REST API version to use. Defaults to 15 (SharePoint 2013+). Set to 14 for SharePoint 2010.
+
+Use the site root URL (e.g., `https://contoso.sharepoint.com/sites/Finance`) rather than a subsite or library URL for the broadest navigation table.
+
+## Examples
+
+### Example 1: Connect to a SharePoint site
+```powerquery
+SharePoint.Contents("https://contoso.sharepoint.com/sites/Finance")
+```
+
+### Example 2: Navigate to a specific document library
+```powerquery
+let
+    Site = SharePoint.Contents("https://contoso.sharepoint.com/sites/Finance"),
+    Documents = Site{[Name="Documents"]}[Data]
+in
+    Documents
+```
+
+### Example 3: List all available lists and libraries on a site
+```powerquery
+let
+    Source = SharePoint.Contents("https://contoso.sharepoint.com/sites/Finance"),
+    Names = Source[Name]
+in
+    Names
+```
+
+### Example 4: Connect to SharePoint on-premises
+```powerquery
+SharePoint.Contents("https://sharepoint.contoso.local/sites/HR", [ApiVersion = 15])
+```

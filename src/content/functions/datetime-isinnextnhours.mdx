@@ -1,0 +1,66 @@
+---
+title: "DateTime.IsInNextNHours"
+slug: "datetime-isinnextnhours"
+category: "DateTime"
+description: "Returns true if the datetime falls within the next N clock hours."
+syntax: "DateTime.IsInNextNHours(dateTime as any, hours as number) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the next N hours after the current hour, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+  - name: "hours"
+    type: "number"
+    required: true
+    description: "The number of hours ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isinnexthour"
+  - "datetime-isinpreviousnhours"
+  - "datetime-isinnextnminutes"
+  - "datetime-isinnextnseconds"
+---
+
+## Remarks
+
+`DateTime.IsInNextNHours` returns `true` if the input `datetime` or `datetimezone` value falls within the next N complete clock hours after the current hour. The current hour itself is not included; use `DateTime.IsInCurrentHour` to also match the current hour. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events in the next 4 hours
+
+Keep only rows where EventTime falls within the next 4 clock hours.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInNextNHours([EventTime], 4)
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventName","type":"text"}],"rows":[{"EventID":55,"EventTime":"2026-03-08T11:15:00","EventName":"Standup"},{"EventID":56,"EventTime":"2026-03-08T13:30:00","EventName":"Review"}]}
+-->
+
+### Example 2: Flag events in the next 8 hours
+
+Add a boolean column identifying events within the next 8 hours.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "InNext8Hours", each DateTime.IsInNextNHours([EventTime], 8), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InNext8Hours","type":"logical"}],"rows":[{"EventID":54,"EventTime":"2026-03-08T10:30:00","InNext8Hours":false},{"EventID":55,"EventTime":"2026-03-08T11:15:00","InNext8Hours":true},{"EventID":60,"EventTime":"2026-03-08T20:00:00","InNext8Hours":false}]}
+-->

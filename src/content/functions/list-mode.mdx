@@ -1,0 +1,78 @@
+---
+title: "List.Mode"
+slug: "list-mode"
+category: "List"
+description: "Returns the most frequently occurring value in the list. If there is a tie, returns the first mode encountered."
+syntax: "List.Mode(list as list, optional equationCriteria as any) as any"
+returnType: "any"
+returnDescription: "The most frequently occurring value in the list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to find the mode of."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined when finding duplicate values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-modes"
+  - "list-median"
+  - "list-average"
+  - "list-distinct"
+  - "list-count"
+---
+
+## Remarks
+
+`List.Mode` returns the single value that appears most frequently in the list. If multiple values are tied for the highest frequency (multiple modes), it returns the first one encountered in the original list order.
+
+To retrieve **all** modes in a tie situation, use `List.Modes` instead.
+
+- Null values are counted as occurrences and can be returned as the mode.
+- Comparison is case-sensitive for text by default.
+- Returns a single scalar value, not a list.
+- An empty list causes an error.
+
+## Examples
+
+### Example 1: Single clear mode
+
+```powerquery
+List.Mode({1, 2, 2, 3, 3, 3, 4})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 2: Mode of text values
+
+```powerquery
+List.Mode({"A", "B", "A", "C", "B", "A"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"A"}]}
+-->
+
+### Example 3: Most common category in a dataset
+
+```powerquery
+let
+    Categories = {"Electronics", "Clothing", "Electronics", "Books", "Clothing", "Electronics"},
+    MostCommon = List.Mode(Categories)
+in
+    MostCommon
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Electronics"}]}
+-->

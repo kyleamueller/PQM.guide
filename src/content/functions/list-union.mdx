@@ -1,0 +1,77 @@
+---
+title: "List.Union"
+slug: "list-union"
+category: "List"
+description: "Returns the union of a list of lists, containing all distinct items from all lists combined."
+syntax: "List.Union(lists as list, optional equationCriteria as any) as list"
+returnType: "list"
+returnDescription: "A list of all distinct items that appear in any of the provided lists."
+parameters:
+  - name: "lists"
+    type: "list"
+    required: true
+    description: "A list of lists to compute the union of."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined when deduplicating."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-intersect"
+  - "list-difference"
+  - "list-distinct"
+  - "list-combine"
+---
+
+## Remarks
+
+`List.Union` takes a **list of lists** as its argument and returns a single list containing all distinct values from all the input lists combined. It is equivalent to combining all lists with `List.Combine` and then deduplicating with `List.Distinct`.
+
+- The argument is a list of lists: `{list1, list2, list3}`.
+- The result contains only distinct values — duplicates across or within input lists are removed.
+- Order of items in the result follows first appearance across the input lists in order.
+- Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` for case-insensitive deduplication.
+
+## Examples
+
+### Example 1: Union of two lists
+
+```powerquery
+List.Union({{1, 2, 3}, {2, 3, 4, 5}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 2, 3, 4, 5}"}]}
+-->
+
+### Example 2: Union of three lists
+
+```powerquery
+List.Union({{"A", "B"}, {"B", "C"}, {"C", "D", "E"}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, B, C, D, E}"}]}
+-->
+
+### Example 3: Combine customer lists from multiple regions
+
+```powerquery
+let
+    RegionA = {"Cust-01", "Cust-02", "Cust-03"},
+    RegionB = {"Cust-02", "Cust-04"},
+    RegionC = {"Cust-03", "Cust-05"},
+    AllCustomers = List.Union({RegionA, RegionB, RegionC})
+in
+    AllCustomers
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Cust-01, Cust-02, Cust-03, Cust-04, Cust-05}"}]}
+-->

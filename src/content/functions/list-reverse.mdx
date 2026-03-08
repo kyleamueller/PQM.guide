@@ -1,0 +1,69 @@
+---
+title: "List.Reverse"
+slug: "list-reverse"
+category: "List"
+description: "Returns a new list with the elements in reverse order."
+syntax: "List.Reverse(list as list) as list"
+returnType: "list"
+returnDescription: "A new list with elements in reverse order."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to reverse."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-sort"
+  - "list-transform"
+  - "list-firstn"
+  - "list-lastn"
+---
+
+## Remarks
+
+`List.Reverse` returns a new list with elements in reverse order. The original list is not modified.
+
+This function is useful when you need to reverse the result of a sort, process items from last to first, or reorder data for display purposes.
+
+## Examples
+
+### Example 1: Reverse a list of numbers
+
+```powerquery
+List.Reverse({1, 2, 3, 4, 5})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{5, 4, 3, 2, 1}"}]}
+-->
+
+### Example 2: Reverse a sorted list to get descending order
+
+```powerquery
+let
+    Values = {3, 1, 4, 1, 5, 9, 2, 6},
+    Sorted = List.Sort(Values),
+    Descending = List.Reverse(Sorted)
+in
+    Descending
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{9, 6, 5, 4, 3, 2, 1, 1}"}]}
+-->
+
+### Example 3: Reverse a list of text items
+
+```powerquery
+List.Reverse({"First", "Second", "Third", "Fourth"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Fourth, Third, Second, First}"}]}
+-->

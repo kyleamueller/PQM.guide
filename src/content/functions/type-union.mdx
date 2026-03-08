@@ -1,0 +1,66 @@
+---
+title: "Type.Union"
+slug: "type-union"
+category: "Type"
+description: "Returns the union of a list of types — the most general type that is compatible with all types in the list."
+syntax: "Type.Union(types as list) as type"
+returnType: "type"
+returnDescription: "The most general type compatible with all provided types."
+parameters:
+  - name: "types"
+    type: "list"
+    required: true
+    description: "A list of type values whose union is computed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-isnullable"
+  - "type-nonnullable"
+  - "value-type"
+  - "value-is"
+---
+
+## Remarks
+
+`Type.Union` computes the union type of a list of types — that is, the least specific type to which all provided types are assignable. If the types are not compatible, the result is `type any`.
+
+For example, `Type.Union({type number, type nullable number})` returns `type nullable number`, since it can hold values of either type. `Type.Union({type number, type text})` returns `type any`, as no more specific common type exists.
+
+This function is useful in generic transformations where you need to infer a compatible type for a set of values with potentially varying types.
+
+## Examples
+
+### Example 1: Union of compatible numeric types
+
+```powerquery
+Type.Union({type number, type nullable number})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type nullable number"}]}
+-->
+
+### Example 2: Union of incompatible types produces any
+
+```powerquery
+Type.Union({type number, type text})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type any"}]}
+-->
+
+### Example 3: Union of identical types returns that type
+
+```powerquery
+Type.Union({type text, type text})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+-->

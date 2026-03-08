@@ -1,0 +1,84 @@
+---
+title: "Text.RemoveRange"
+slug: "text-removerange"
+category: "Text"
+description: "Removes a specified number of characters from a text value starting at the given offset."
+syntax: "Text.RemoveRange(text as nullable text, offset as number, optional count as nullable number) as nullable text"
+returnType: "text"
+returnDescription: "A new text value with the specified characters removed."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The original text value."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based position at which to begin removing characters."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The number of characters to remove. If omitted or null, all characters from offset to the end are removed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-insert"
+  - "text-replacerange"
+  - "text-remove"
+  - "text-range"
+---
+
+## Remarks
+
+`Text.RemoveRange` removes `count` characters from `text` beginning at the zero-based `offset` position. The characters before `offset` and after `offset + count` are concatenated to form the result.
+
+If `text` is `null`, the function returns `null`. If `count` is omitted or `null`, all characters from `offset` to the end of the string are removed. If `count` extends beyond the length of the string, all characters from `offset` onward are removed without error.
+
+This is equivalent to: `Text.Start(text, offset) & Text.End(text, Text.Length(text) - offset - count)`
+
+## Examples
+
+### Example 1: Remove characters from the middle
+
+```powerquery
+Text.RemoveRange("Hello World", 5, 6)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+-->
+
+### Example 2: Remove a separator character
+
+```powerquery
+Text.RemoveRange("US-12345", 2, 1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US12345"}]}
+-->
+
+### Example 3: Remove everything from offset to end
+
+```powerquery
+Text.RemoveRange("Hello World", 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+-->
+
+### Example 4: Remove a prefix
+
+```powerquery
+Text.RemoveRange("ID-12345", 0, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"12345"}]}
+-->

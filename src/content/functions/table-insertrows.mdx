@@ -1,0 +1,69 @@
+---
+title: "Table.InsertRows"
+slug: "table-insertrows"
+category: "Table"
+description: "Inserts a list of row records into the table at the given offset."
+syntax: "Table.InsertRows(table as table, offset as number, rows as list) as table"
+returnType: "table"
+returnDescription: "The table with the new rows inserted at the specified position."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to insert rows into."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based index at which to insert the new rows."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of records to insert, where each record field corresponds to a column name."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-replacerows"
+  - "table-combine"
+  - "table-removerows"
+---
+
+## Remarks
+
+`Table.InsertRows` inserts new rows at a specific position within a table. Existing rows at and after the offset are shifted down. Each record in the `rows` list must have fields matching the column names of the table. Missing fields receive `null`; extra fields are ignored.
+
+To append rows at the end, set `offset` to `Table.RowCount(table)`.
+
+## Examples
+
+### Example 1: Insert a row in the middle of a table
+
+```powerquery
+Table.InsertRows(
+    #table({"ID", "Name"}, {{1, "Alice"}, {3, "Carol"}}),
+    1,
+    {[ID = 2, Name = "Bob"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"2","Name":"Bob"},{"ID":"3","Name":"Carol"}]}
+-->
+
+### Example 2: Insert multiple rows at the start
+
+```powerquery
+Table.InsertRows(
+    #table({"ID"}, {{3}, {4}}),
+    0,
+    {[ID = 1], [ID = 2]}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"2"},{"ID":"3"},{"ID":"4"}]}
+-->

@@ -1,0 +1,64 @@
+---
+title: "Time.EndOfHour"
+slug: "time-endofhour"
+category: "Time"
+description: "Returns the last moment of the hour for the given time or datetime value."
+syntax: "Time.EndOfHour(dateTime as any) as any"
+returnType: "any"
+returnDescription: "A time, datetime, or datetimezone value representing XX:59:59.9999999."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A time, datetime, or datetimezone value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-startofhour"
+  - "date-endofday"
+  - "time-hour"
+  - "time-from"
+---
+
+## Remarks
+
+`Time.EndOfHour` returns the very last instant of the clock hour containing the input value: XX:59:59.9999999. When passed a plain `time`, it returns a `time`. When passed a `datetime` or `datetimezone`, it returns the same type with only the time component adjusted to the end of the hour. This is useful for building inclusive hourly range filters.
+
+## Examples
+
+### Example 1: Find the end of the hour for each event time
+
+Add a column showing the last instant of the hour for each event.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
+    "HourEnd", each Time.EndOfHour([EventTime]), type datetime
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HourEnd","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","HourEnd":"2024-03-15T08:59:59.9999999"},{"EventID":2,"EventTime":"2024-03-15T14:00:00","HourEnd":"2024-03-15T14:59:59.9999999"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","HourEnd":"2024-03-16T09:59:59.9999999"}]}
+-->
+
+### Example 2: End of hour for a specific time
+
+Return the last instant of the 14:xx hour.
+
+```powerquery
+#table(
+    type table [Result = time],
+    {{Time.EndOfHour(#time(14, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"14:59:59.9999999"}]}
+-->

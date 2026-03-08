@@ -1,0 +1,84 @@
+---
+title: "Text.At"
+slug: "text-at"
+category: "Text"
+description: "Returns the character at the specified zero-based index position in a text value."
+syntax: "Text.At(text as nullable text, index as number) as nullable text"
+returnType: "text"
+returnDescription: "A single-character text value at the given index."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "index"
+    type: "number"
+    required: true
+    description: "The zero-based index of the character to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-start"
+  - "text-end"
+  - "text-middle"
+  - "text-range"
+  - "text-positionof"
+  - "text-tolist"
+---
+
+## Remarks
+
+`Text.At` returns a single character from `text` at the specified zero-based `index`. The first character is at index 0, the second at index 1, and so on.
+
+If `text` is `null`, the function returns `null`. If `index` is out of range (negative or equal to or greater than the length of the text), an error is raised.
+
+This function behaves similarly to accessing a list item by index. It is equivalent to `Text.Middle(text, index, 1)`.
+
+To extract multiple characters or a range, use `Text.Middle` or `Text.Range`. To get all characters as a list, use `Text.ToList`.
+
+## Examples
+
+### Example 1: Get the first character
+
+```powerquery
+Text.At("Power Query", 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"P"}]}
+-->
+
+### Example 2: Get the sixth character (zero-based index 5)
+
+```powerquery
+Text.At("Power Query", 6)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Q"}]}
+-->
+
+### Example 3: Extract the separator character from a code
+
+```powerquery
+Text.At("US-12345", 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"-"}]}
+-->
+
+### Example 4: Handle null input
+
+```powerquery
+Text.At(null, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+-->

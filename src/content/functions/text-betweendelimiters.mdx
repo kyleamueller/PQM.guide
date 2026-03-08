@@ -1,0 +1,96 @@
+---
+title: "Text.BetweenDelimiters"
+slug: "text-betweendelimiters"
+category: "Text"
+description: "Returns the text between a start delimiter and an end delimiter, with optional occurrence control."
+syntax: "Text.BetweenDelimiters(text as nullable text, startDelimiter as text, endDelimiter as text, optional startIndex as any, optional endIndex as any) as nullable text"
+returnType: "text"
+returnDescription: "The substring found between the specified start and end delimiters."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "startDelimiter"
+    type: "text"
+    required: true
+    description: "The delimiter marking the beginning of the extracted portion."
+  - name: "endDelimiter"
+    type: "text"
+    required: true
+    description: "The delimiter marking the end of the extracted portion."
+  - name: "startIndex"
+    type: "any"
+    required: false
+    description: "A zero-based occurrence index for the start delimiter, or a list {index, RelativePosition.FromEnd}. Defaults to 0."
+  - name: "endIndex"
+    type: "any"
+    required: false
+    description: "A zero-based occurrence index for the end delimiter, or a list {index, RelativePosition.FromEnd}. Defaults to 0."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-beforedelimiter"
+  - "text-afterdelimiter"
+  - "text-split"
+  - "text-positionof"
+---
+
+## Remarks
+
+`Text.BetweenDelimiters` extracts the portion of `text` that lies between a `startDelimiter` and an `endDelimiter`. The search for the end delimiter begins immediately after the start delimiter is found.
+
+The optional `startIndex` and `endIndex` parameters control which occurrence of each delimiter to use:
+- A non-negative integer specifies the zero-based occurrence (0 = first)
+- A list `{n, RelativePosition.FromEnd}` counts occurrences from the end of the string
+
+If either delimiter is not found, an empty string is returned. If `text` is `null`, the function returns `null`.
+
+This function is especially useful for extracting content from structured formats such as XML-like tags, parenthesized values, or bracketed codes.
+
+## Examples
+
+### Example 1: Extract content between parentheses
+
+```powerquery
+Text.BetweenDelimiters("Product (SKU-123) Details", "(", ")")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"SKU-123"}]}
+-->
+
+### Example 2: Extract value between brackets
+
+```powerquery
+Text.BetweenDelimiters("[Start] some content [End]", "[", "]")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Start"}]}
+-->
+
+### Example 3: Extract between the second pair of delimiters
+
+```powerquery
+Text.BetweenDelimiters("(first)(second)(third)", "(", ")", 1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"second"}]}
+-->
+
+### Example 4: Extract year from a formatted string
+
+```powerquery
+Text.BetweenDelimiters("Report[2024]_v2", "[", "]")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024"}]}
+-->

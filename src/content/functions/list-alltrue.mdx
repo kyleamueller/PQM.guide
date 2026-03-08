@@ -1,0 +1,72 @@
+---
+title: "List.AllTrue"
+slug: "list-alltrue"
+category: "List"
+description: "Returns true if all values in the list evaluate to true."
+syntax: "List.AllTrue(list as list) as logical"
+returnType: "logical"
+returnDescription: "True if every value in the list is true (or truthy); false otherwise."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of logical values to evaluate."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-anytrue"
+  - "list-matchesall"
+  - "list-matchesany"
+  - "list-select"
+---
+
+## Remarks
+
+`List.AllTrue` returns `true` if every item in the list is logically true. It returns `false` as soon as any item is `false`. Null values in the list are treated as false.
+
+This function is commonly used to validate that a list of boolean results — such as the output of `List.Transform` applying a condition — all pass.
+
+- An empty list returns `true` (vacuous truth).
+- Null values cause the function to return `false`.
+- Non-logical values may cause an error; use `List.Transform` to coerce values first if needed.
+
+## Examples
+
+### Example 1: All values are true
+
+```powerquery
+List.AllTrue({true, true, true})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: One value is false
+
+```powerquery
+List.AllTrue({true, false, true})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Check all quantities are positive
+
+```powerquery
+let
+    Quantities = {10, 25, 5, 8},
+    AllPositive = List.AllTrue(List.Transform(Quantities, each _ > 0))
+in
+    AllPositive
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

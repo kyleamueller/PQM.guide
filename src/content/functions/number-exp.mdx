@@ -1,0 +1,73 @@
+---
+title: "Number.Exp"
+slug: "number-exp"
+category: "Number"
+description: "Returns e raised to the power of a number (the inverse of Number.Ln)."
+syntax: "Number.Exp(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "e raised to the power of the given number."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The exponent to which e is raised."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-ln"
+  - "number-log"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Exp` computes _e_^x where _e_ is Euler's number (approximately 2.71828). It is the inverse of `Number.Ln`: `Number.Exp(Number.Ln(x)) = x` for any positive x.
+
+Common applications include continuous compounding (finance), exponential growth and decay models, and probability density functions.
+
+`Number.Exp(1)` returns the value of _e_ itself. `Number.Exp(0)` returns `1`.
+
+## Examples
+
+### Example 1: e raised to the power of 1
+
+```powerquery
+Number.Exp(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2.718281828459045}]}
+-->
+
+### Example 2: e raised to the power of 0
+
+```powerquery
+Number.Exp(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 3: Continuous compounding — final value of a principal
+
+Compute `P * e^(r*t)` for P=1000, r=0.05, t=3 years.
+
+```powerquery
+let
+    Principal = 1000,
+    Rate = 0.05,
+    Time = 3,
+    FinalValue = Principal * Number.Exp(Rate * Time)
+in
+    FinalValue
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1161.8341765024749}]}
+-->

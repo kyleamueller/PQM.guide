@@ -1,0 +1,79 @@
+---
+title: "DateTime.AddZone"
+slug: "datetime-addzone"
+category: "DateTime"
+description: "Adds timezone offset information to a datetime value, returning a datetimezone."
+syntax: "DateTime.AddZone(dateTime as datetime, timezoneHours as number, optional timezoneMinutes as nullable number) as datetimezone"
+returnType: "datetimezone"
+returnDescription: "A datetimezone value with the specified UTC offset applied to the input datetime."
+parameters:
+  - name: "dateTime"
+    type: "datetime"
+    required: true
+    description: "The datetime value to which the timezone offset will be added."
+  - name: "timezoneHours"
+    type: "number"
+    required: true
+    description: "The hour component of the UTC offset (e.g., -5 for EST, 1 for CET)."
+  - name: "timezoneMinutes"
+    type: "number"
+    required: false
+    description: "The minutes component of the UTC offset. Defaults to 0. Use 30 for offsets like UTC+5:30."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-switchzone"
+  - "datetimezone-removezone"
+  - "datetimezone-toutc"
+  - "datetimezone-tolocal"
+---
+
+## Remarks
+
+`DateTime.AddZone` annotates a `datetime` value with a UTC offset, producing a `datetimezone`. The time value itself is not adjusted — it is simply tagged with the given offset. To convert a `datetimezone` to a different offset while preserving the instant in time, use `DateTimeZone.SwitchZone`. To strip the timezone back off, use `DateTimeZone.RemoveZone`.
+
+Use `timezoneMinutes` for non-whole-hour offsets, such as UTC+5:30 (India) or UTC+9:30 (Australia Central).
+
+## Examples
+
+### Example 1: Tag datetime values with Eastern Standard Time offset
+
+Add UTC-5 to each datetime to represent EST.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Events, 4),
+        {"EventID", "EventTime"}
+    ),
+    "EventTimeEST",
+    each DateTime.AddZone([EventTime], -5),
+    type datetimezone
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventTimeEST","type":"datetimezone"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","EventTimeEST":"2024-03-15T08:30:00-05:00"},{"EventID":2,"EventTime":"2024-03-15T14:00:00","EventTimeEST":"2024-03-15T14:00:00-05:00"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","EventTimeEST":"2024-03-16T09:15:00-05:00"},{"EventID":4,"EventTime":"2024-03-16T17:45:00","EventTimeEST":"2024-03-16T17:45:00-05:00"}]}
+-->
+
+### Example 2: Apply a half-hour offset (UTC+5:30 for India)
+
+Tag a datetime with the India Standard Time offset.
+
+```powerquery
+#table(
+    type table [LocalTime = datetime, IST = datetimezone],
+    {{#datetime(2024, 3, 15, 12, 0, 0), DateTime.AddZone(#datetime(2024, 3, 15, 12, 0, 0), 5, 30)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"LocalTime","type":"datetime"},{"name":"IST","type":"datetimezone"}],"rows":[{"LocalTime":"2024-03-15T12:00:00","IST":"2024-03-15T12:00:00+05:30"}]}
+-->

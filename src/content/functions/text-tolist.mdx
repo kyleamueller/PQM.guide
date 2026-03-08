@@ -1,0 +1,78 @@
+---
+title: "Text.ToList"
+slug: "text-tolist"
+category: "Text"
+description: "Returns a list of single-character text values, one for each character in the text."
+syntax: "Text.ToList(text as text) as list"
+returnType: "list"
+returnDescription: "A list of single-character text values representing each character in text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to convert to a list of characters."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-at"
+  - "text-split"
+  - "text-combine"
+  - "text-positionofany"
+  - "text-select"
+  - "text-remove"
+---
+
+## Remarks
+
+`Text.ToList` splits a text string into a list where each element is a single character from the original string. The order of characters is preserved.
+
+This is functionally equivalent to `Text.Split` with a one-character delimiter that never appears in the text, but is cleaner for character-level operations. The resulting list can be transformed using standard list functions such as `List.Select`, `List.Transform`, and `List.Accumulate`.
+
+Common uses include character frequency counting, custom filtering, character-by-character transformation, or building lookup structures over individual characters.
+
+## Examples
+
+### Example 1: Convert a word to a list of characters
+
+```powerquery
+Text.ToList("Hello")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["H","e","l","l","o"]}]}
+-->
+
+### Example 2: Count how many times a character appears
+
+```powerquery
+List.Count(List.Select(Text.ToList("Mississippi"), each _ = "s"))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":4}]}
+-->
+
+### Example 3: Get unique characters in a string
+
+```powerquery
+List.Distinct(Text.ToList("banana"))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["b","a","n"]}]}
+-->
+
+### Example 4: Rebuild text after transforming characters
+
+```powerquery
+Text.Combine(List.Transform(Text.ToList("hello"), Text.Upper))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HELLO"}]}
+-->

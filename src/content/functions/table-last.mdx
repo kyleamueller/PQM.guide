@@ -1,0 +1,74 @@
+---
+title: "Table.Last"
+slug: "table-last"
+category: "Table"
+description: "Returns the last row of the table as a record, or a default value if the table is empty."
+syntax: "Table.Last(table as table, optional default as nullable any) as any"
+returnType: "any"
+returnDescription: "The last row as a record, or the default value if the table is empty."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to retrieve the last row from."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Optional value to return if the table is empty. Defaults to null if omitted."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-first"
+  - "table-lastn"
+  - "table-singlerow"
+---
+
+## Remarks
+
+`Table.Last` returns the last row of a table as a record, enabling field access via `[FieldName]` syntax. If the table is empty and no `default` is provided, the function returns `null`.
+
+This function is useful for retrieving the most recent record in a sorted or ordered dataset, such as the latest transaction date or the final entry in a log.
+
+## Examples
+
+### Example 1: Get the last row as a record
+
+```powerquery
+Table.Last(
+    #table({"Date", "Amount"}, {{"2024-01-01", 100}, {"2024-01-02", 200}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Date = \"2024-01-02\", Amount = 200]"}]}
+-->
+
+### Example 2: Access a field from the last row
+
+```powerquery
+Table.Last(
+    #table({"Date", "Amount"}, {{"2024-01-01", 100}, {"2024-01-02", 200}})
+)[Amount]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"200"}]}
+-->
+
+### Example 3: Return a default when the table is empty
+
+```powerquery
+Table.Last(
+    #table({"Date", "Amount"}, {}),
+    [Date = null, Amount = 0]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Date = null, Amount = 0]"}]}
+-->

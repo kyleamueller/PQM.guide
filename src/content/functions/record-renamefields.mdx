@@ -1,0 +1,84 @@
+---
+title: "Record.RenameFields"
+slug: "record-renamefields"
+category: "Record"
+description: "Renames one or more fields in a record by specifying a list of {oldName, newName} pairs."
+syntax: "Record.RenameFields(record as record, renames as list, optional missingField as nullable number) as record"
+returnType: "record"
+returnDescription: "A new record with the specified fields renamed."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The source record."
+  - name: "renames"
+    type: "list"
+    required: true
+    description: "A list of {oldFieldName, newFieldName} pairs. Each element is a two-item list."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a specified old field name does not exist: MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-reorderfields"
+  - "record-removefields"
+  - "record-selectfields"
+  - "record-addfield"
+---
+
+## Remarks
+
+`Record.RenameFields` returns a new record with specified fields renamed. The rename list is a list of two-element lists where the first element is the existing field name and the second is the desired new name.
+
+The optional `missingField` parameter controls behavior when an old name is not found:
+- `MissingField.Error` (default, value 0) — raises an error
+- `MissingField.Ignore` (value 1) — silently skips missing fields
+- `MissingField.UseNull` (value 2) — adds the new field with a null value
+
+Field values and order are preserved; only the names change.
+
+## Examples
+
+### Example 1: Rename a single field
+
+```powerquery
+Record.RenameFields([Name = "Alice", Age = 30], {{"Name", "FullName"}})
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"Age","type":"number"}],"rows":[{"FullName":"Alice","Age":30}]}
+-->
+
+### Example 2: Rename multiple fields at once
+
+```powerquery
+Record.RenameFields(
+    [Nm = "Bob", Ag = 25, Ct = "Seattle"],
+    {{"Nm", "Name"}, {"Ag", "Age"}, {"Ct", "City"}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Bob","Age":25,"City":"Seattle"}]}
+-->
+
+### Example 3: Ignore a missing field gracefully
+
+```powerquery
+Record.RenameFields(
+    [Name = "Alice", Age = 30],
+    {{"Name", "FullName"}, {"Email", "EmailAddress"}},
+    MissingField.Ignore
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"},{"name":"Age","type":"number"}],"rows":[{"FullName":"Alice","Age":30}]}
+-->

@@ -1,0 +1,71 @@
+---
+title: "Table.AlternateRows"
+slug: "table-alternaterows"
+category: "Table"
+description: "Keeps and drops alternating groups of rows based on a repeating keep/drop pattern."
+syntax: "Table.AlternateRows(table as table, offset as number, keepNext as number, dropNext as number) as table"
+returnType: "table"
+returnDescription: "A table containing only the kept rows according to the alternating pattern."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to process."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based index of the first row to start the keep/drop pattern."
+  - name: "keepNext"
+    type: "number"
+    required: true
+    description: "The number of consecutive rows to keep in each cycle."
+  - name: "dropNext"
+    type: "number"
+    required: true
+    description: "The number of consecutive rows to drop after each keep group."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-skip"
+  - "table-firstn"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.AlternateRows` applies a repeating keep/drop pattern to the rows of a table. Starting at `offset`, it keeps `keepNext` rows, then drops `dropNext` rows, and repeats. Rows before `offset` are always kept.
+
+This is useful for parsing data that has a fixed repeating structure, such as every other row being a header or separator.
+
+## Examples
+
+### Example 1: Keep 1 row, drop 1 row, starting at offset 0
+
+```powerquery
+Table.AlternateRows(
+    #table({"Row"}, {{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}}),
+    0, 1, 1
+)
+```
+
+<!--output
+{"columns":[{"name":"Row","type":"any"}],"rows":[{"Row":"A"},{"Row":"C"},{"Row":"E"}]}
+-->
+
+### Example 2: Keep 2 rows, drop 1, starting at offset 1
+
+```powerquery
+Table.AlternateRows(
+    #table({"Row"}, {{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}}),
+    1, 2, 1
+)
+```
+
+<!--output
+{"columns":[{"name":"Row","type":"any"}],"rows":[{"Row":"A"},{"Row":"B"},{"Row":"C"},{"Row":"E"},{"Row":"F"}]}
+-->

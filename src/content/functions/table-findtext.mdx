@@ -1,0 +1,62 @@
+---
+title: "Table.FindText"
+slug: "table-findtext"
+category: "Table"
+description: "Returns rows where any cell contains the given text string (case-insensitive)."
+syntax: "Table.FindText(table as table, text as text) as table"
+returnType: "table"
+returnDescription: "A table containing only the rows where at least one cell contains the search text."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text string to search for across all cells."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-selectrows"
+  - "table-contains"
+---
+
+## Remarks
+
+`Table.FindText` scans every cell in the table and returns rows where at least one cell contains `text` as a substring. The search is case-insensitive. Non-text values in columns are converted to text before comparison.
+
+This function is a broad search tool. For more targeted filtering, prefer `Table.SelectRows` with an explicit condition. `Table.FindText` does not typically fold to the data source, so it may be slow on large datasets.
+
+## Examples
+
+### Example 1: Find rows containing a keyword
+
+```powerquery
+Table.FindText(
+    #table({"Product", "Category"}, {{"Apple iPhone", "Electronics"}, {"Banana", "Groceries"}, {"Apple Watch", "Electronics"}}),
+    "Apple"
+)
+```
+
+<!--output
+{"columns":[{"name":"Product","type":"any"},{"name":"Category","type":"any"}],"rows":[{"Product":"Apple iPhone","Category":"Electronics"},{"Product":"Apple Watch","Category":"Electronics"}]}
+-->
+
+### Example 2: Search is case-insensitive
+
+```powerquery
+Table.FindText(
+    #table({"Notes"}, {{"urgent task"}, {"Normal entry"}, {"URGENT follow-up"}}),
+    "urgent"
+)
+```
+
+<!--output
+{"columns":[{"name":"Notes","type":"any"}],"rows":[{"Notes":"urgent task"},{"Notes":"URGENT follow-up"}]}
+-->

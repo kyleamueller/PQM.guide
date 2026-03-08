@@ -1,0 +1,60 @@
+---
+title: "Value.Optimize"
+slug: "value-optimize"
+category: "Value"
+description: "Returns an optimized form of the given value, hinting to the engine that query optimization should be applied."
+syntax: "Value.Optimize(value as any) as any"
+returnType: "any"
+returnDescription: "The value in an optimized form as determined by the engine."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to optimize."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-expression"
+---
+
+## Remarks
+
+`Value.Optimize` is an engine hint function. When called, it signals to the Power Query evaluation engine that the given value should be evaluated in an optimized fashion. The function returns the same value semantically — the output is equivalent to the input — but the engine may use different evaluation strategies such as caching, folding, or parallel execution.
+
+In practice, `Value.Optimize` is rarely called directly by end users. It is used primarily in custom connector development and advanced scenarios where the developer wants to explicitly trigger optimization passes on a query result.
+
+Calling `Value.Optimize` on a table or other complex value does not change the data; it only affects how the engine processes it internally.
+
+## Examples
+
+### Example 1: Optimize a simple number (no visible change)
+
+```powerquery
+Value.Optimize(42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+-->
+
+### Example 2: Optimize a table value
+
+Input: `Sales`
+
+```powerquery
+let
+    Filtered = Table.SelectRows(Sales, each [Quantity] > 1),
+    Optimized = Value.Optimize(Filtered)
+in
+    Table.RowCount(Optimized)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":72}]}
+-->

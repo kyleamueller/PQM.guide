@@ -1,0 +1,81 @@
+---
+title: "List.MaxN"
+slug: "list-maxn"
+category: "List"
+description: "Returns the N largest values from a list, or values meeting a condition, in descending order."
+syntax: "List.MaxN(list as list, countOrCondition as any, optional comparisonCriteria as any) as list"
+returnType: "list"
+returnDescription: "A list of the N largest values, sorted in descending order."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to search."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many maximum values to return, or a condition function."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: false
+    description: "An optional comparison criteria or comparer function to control ordering."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-minn"
+  - "list-max"
+  - "list-sort"
+  - "list-firstn"
+  - "list-lastn"
+---
+
+## Remarks
+
+`List.MaxN` returns the top `N` values from a list. The result is a list (not a scalar), sorted in descending order. It is the multi-value counterpart of `List.Max`.
+
+- When passed a number `N`, it returns the `N` largest values.
+- When passed a condition function, it returns values sorted descending while the condition is true (applied to the sorted list from the top).
+- Null values are ignored in the comparison.
+- If `N` exceeds the list length, the entire list is returned sorted descending.
+- Duplicates are preserved — if the Nth largest value appears multiple times, all instances may be included.
+
+## Examples
+
+### Example 1: Return the 3 largest numbers
+
+```powerquery
+List.MaxN({15, 3, 42, 8, 27, 1}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{42, 27, 15}"}]}
+-->
+
+### Example 2: Return top values while they exceed a threshold
+
+```powerquery
+List.MaxN({50, 40, 30, 20, 10}, each _ >= 30)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{50, 40, 30}"}]}
+-->
+
+### Example 3: Find the top 3 sales amounts
+
+```powerquery
+let
+    Sales = {1200, 850, 3400, 450, 2100, 975},
+    TopThree = List.MaxN(Sales, 3)
+in
+    TopThree
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3400},{"Result":2100},{"Result":1200}]}
+-->

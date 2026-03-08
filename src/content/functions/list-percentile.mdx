@@ -1,0 +1,95 @@
+---
+title: "List.Percentile"
+slug: "list-percentile"
+category: "List"
+description: "Returns the value at the specified percentile(s) in the list. Percentile is expressed as a number from 0 to 1."
+syntax: "List.Percentile(list as list, percentiles as any, optional options as nullable record) as any"
+returnType: "any"
+returnDescription: "The value at the given percentile, or a list of values if multiple percentiles are specified."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list of numeric values."
+  - name: "percentiles"
+    type: "any"
+    required: true
+    description: "A number from 0 to 1 representing the percentile (e.g., 0.5 for median, 0.75 for 75th percentile), or a list of such numbers."
+  - name: "options"
+    type: "nullable record"
+    required: false
+    description: "An optional record to configure interpolation method. Supports [PercentileMode = PercentileMode.ExclInclusive] or similar options."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-median"
+  - "list-average"
+  - "list-standarddeviation"
+  - "list-max"
+  - "list-min"
+---
+
+## Remarks
+
+`List.Percentile` computes the value at one or more percentiles within a numeric list. Percentiles are specified as values between `0` and `1` (inclusive), where `0` corresponds to the minimum and `1` corresponds to the maximum.
+
+- Pass a single number to get a single percentile value.
+- Pass a list of numbers to get multiple percentile values returned as a list.
+- `0.5` returns the median (equivalent to `List.Median`).
+- Null values in the list are ignored.
+- The `options` record allows specifying the interpolation method via the `PercentileMode` field, using the `PercentileMode` enum (e.g., `PercentileMode.ExclInclusive`, `PercentileMode.InclInclusive`).
+- By default, linear interpolation is used between data points.
+
+## Examples
+
+### Example 1: Median (50th percentile)
+
+```powerquery
+List.Percentile({10, 20, 30, 40, 50}, 0.5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+-->
+
+### Example 2: 75th percentile
+
+```powerquery
+List.Percentile({10, 20, 30, 40, 50, 60, 70, 80}, 0.75)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":62.5}]}
+-->
+
+### Example 3: Multiple percentiles at once
+
+```powerquery
+List.Percentile({10, 20, 30, 40, 50, 60, 70, 80, 90, 100}, {0.25, 0.5, 0.75})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{32.5, 55, 77.5}"}]}
+-->
+
+### Example 4: Quartile analysis of sales data
+
+```powerquery
+let
+    Sales = {1200, 850, 3400, 450, 2100, 975, 1650, 2800},
+    Quartiles = List.Percentile(Sales, {0.25, 0.5, 0.75}),
+    Q1 = Quartiles{0},
+    Median = Quartiles{1},
+    Q3 = Quartiles{2}
+in
+    #table({"Q1", "Median", "Q3"}, {{Q1, Median, Q3}})
+```
+
+<!--output
+{"columns":[{"name":"Q1","type":"number"},{"name":"Median","type":"number"},{"name":"Q3","type":"number"}],"rows":[{"Q1":962.5,"Median":1425,"Q3":2275}]}
+-->

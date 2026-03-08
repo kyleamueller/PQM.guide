@@ -1,0 +1,101 @@
+---
+title: "AnalysisServices.Database"
+slug: "analysisservices-database"
+category: "Accessing Data"
+description: "Returns a navigation table of cubes and tables from an Analysis Services or Azure Analysis Services database."
+syntax: "AnalysisServices.Database(server as text, database as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of cubes, tables, and measures from the specified Analysis Services database."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The Analysis Services server name (e.g., \"myserver\" for on-premises, or \"asazure://eastus.asazure.windows.net/myserver\" for Azure Analysis Services)."
+  - name: "database"
+    type: "text"
+    required: true
+    description: "The name of the Analysis Services database (model) to connect to."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options such as Query (MDX or DAX query text), CommandTimeout, and TypedMeasureColumns."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "odata-feed"
+---
+
+## Remarks
+
+`AnalysisServices.Database` connects to SQL Server Analysis Services (SSAS), Azure Analysis Services (AAS), or a Power BI Premium / Fabric dataset (via the XMLA endpoint) and returns a navigation table of the model's cubes, tables, and perspectives.
+
+**Supported modes**:
+- **Multidimensional (OLAP)**: Traditional cube-based SSAS databases. The navigation table exposes cubes, dimensions, and measures.
+- **Tabular**: SSAS Tabular, Azure Analysis Services, and Power BI Premium XMLA endpoint. Exposes tables and measures.
+
+**Authentication**:
+- On-premises SSAS: Windows authentication (current user or gateway service account).
+- Azure Analysis Services: Microsoft Account (Azure AD / Entra ID) or service principal.
+- Power BI Premium XMLA: Microsoft Account or service principal.
+
+**Server name formats**:
+- On-premises SSAS: `"myserver"` or `"myserver\INSTANCE"`.
+- Azure Analysis Services: `"asazure://eastus.asazure.windows.net/myserver"`.
+- Power BI Premium XMLA: `"powerbi://api.powerbi.com/v1.0/myorg/WorkspaceName"`.
+
+**Query folding**: Not applicable in the traditional sense. Queries are executed as MDX or DAX against the Analysis Services engine, which is highly optimized for analytical workloads.
+
+**Key options**:
+- `Query` (text) — a DAX or MDX query to execute directly against the model.
+- `CommandTimeout` (duration) — query execution timeout.
+- `TypedMeasureColumns` (logical) — return measure columns with their declared data types.
+
+**Usage in Power BI Desktop**: Connecting to another Power BI dataset via the XMLA endpoint enables composite models and cross-dataset analysis.
+
+## Examples
+
+### Example 1: Connect to on-premises SSAS Tabular
+```powerquery
+AnalysisServices.Database("myserver", "SalesModel")
+```
+
+### Example 2: Connect to Azure Analysis Services
+```powerquery
+AnalysisServices.Database(
+    "asazure://eastus.asazure.windows.net/myaasserver",
+    "AdventureWorksDW"
+)
+```
+
+### Example 3: Connect to a Power BI Premium XMLA endpoint
+```powerquery
+AnalysisServices.Database(
+    "powerbi://api.powerbi.com/v1.0/myorg/FinanceWorkspace",
+    "SalesModel"
+)
+```
+
+### Example 4: Execute a DAX query directly
+```powerquery
+AnalysisServices.Database(
+    "myserver",
+    "SalesModel",
+    [Query = "EVALUATE SUMMARIZECOLUMNS('Date'[Year], 'Sales'[TotalSales])"]
+)
+```
+
+### Example 5: Navigate to a table in a Tabular model
+```powerquery
+let
+    Source = AnalysisServices.Database("myserver", "SalesModel"),
+    Model = Source{[Name="Model"]}[Data],
+    FactSales = Model{[Name="FactSales"]}[Data]
+in
+    FactSales
+```

@@ -1,0 +1,75 @@
+---
+title: "Sql.Databases"
+slug: "sql-databases"
+category: "Accessing Data"
+description: "Returns a table of databases available on a SQL Server instance."
+syntax: "Sql.Databases(server as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of databases on the specified SQL Server instance."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The SQL Server hostname, IP address, or named instance (e.g., \"localhost\" or \"myserver.database.windows.net\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with connection options such as ConnectionTimeout and SqlCompatibleWindowsAuth."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "odbc-datasource"
+---
+
+## Remarks
+
+`Sql.Databases` connects to a SQL Server instance and returns a navigation table listing all accessible databases on that server. Each row in the result represents a database, and you can drill into a database to access its tables and views — equivalent to calling `Sql.Database` for that database.
+
+This function is most useful when you need to enumerate databases on a server programmatically, or when the target database name is not known in advance.
+
+**Authentication**: The same authentication options as `Sql.Database` apply — Windows authentication, SQL Server authentication, or Microsoft Account for Azure SQL Database.
+
+**Query folding**: Operations on the resulting navigation table fold back to SQL Server.
+
+**Key options**:
+- `ConnectionTimeout` (duration) — how long to wait when establishing the server connection.
+- `SqlCompatibleWindowsAuth` (logical) — forces SQL Server-compatible Windows authentication mode.
+
+The resulting table has a `Data` column where each cell contains the navigation table for that database (same structure returned by `Sql.Database`).
+
+## Examples
+
+### Example 1: List all databases on a local SQL Server instance
+```powerquery
+Sql.Databases("localhost")
+```
+
+### Example 2: List databases on Azure SQL Server
+```powerquery
+Sql.Databases("myserver.database.windows.net")
+```
+
+### Example 3: Drill into a specific database from the server-level navigation
+```powerquery
+let
+    Server = Sql.Databases("localhost"),
+    AdventureWorks = Server{[Name="AdventureWorks"]}[Data],
+    dbo_Products = AdventureWorks{[Schema="dbo", Item="Product"]}[Data]
+in
+    dbo_Products
+```
+
+### Example 4: List all database names from the server
+```powerquery
+let
+    Source = Sql.Databases("localhost"),
+    DatabaseNames = Source[Name]
+in
+    DatabaseNames
+```

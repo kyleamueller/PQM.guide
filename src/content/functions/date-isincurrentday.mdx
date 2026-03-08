@@ -1,0 +1,64 @@
+---
+title: "Date.IsInCurrentDay"
+slug: "date-isincurrentday"
+category: "Date"
+description: "Returns true if the date is today (local time)."
+syntax: "Date.IsInCurrentDay(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls on today's date, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinnextday"
+  - "date-isinpreviousday"
+  - "date-isincurrentweek"
+  - "date-isincurrentmonth"
+---
+
+## Remarks
+
+`Date.IsInCurrentDay` compares the date component of the input value against today's date as determined by `DateTime.LocalNow()`. It returns `true` if they fall on the same calendar day, regardless of the time component. This function is re-evaluated on each query refresh, making it suitable for dynamic "today" filters.
+
+All `Date.IsIn*` functions use the local system clock (`DateTime.LocalNow`) as their reference point. In Power BI Service scheduled refreshes, this is the time zone of the Power BI gateway or the cloud region.
+
+## Examples
+
+### Example 1: Filter today's orders
+
+Keep only rows from the Sales table where OrderDate is today.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentDay([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08"}]}
+-->
+
+### Example 2: Flag today's rows with a boolean column
+
+Add an IsToday column to identify rows from today.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsToday", each Date.IsInCurrentDay([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsToday","type":"logical"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-07","IsToday":false},{"OrderID":42,"OrderDate":"2026-03-08","IsToday":true}]}
+-->

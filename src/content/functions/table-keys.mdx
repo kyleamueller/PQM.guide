@@ -1,0 +1,61 @@
+---
+title: "Table.Keys"
+slug: "table-keys"
+category: "Table"
+description: "Returns a list of key records defined on the table type."
+syntax: "Table.Keys(table as table) as list"
+returnType: "list"
+returnDescription: "A list of records, each describing a key defined on the table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose key metadata is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-addkey"
+  - "table-schema"
+  - "table-columnnames"
+---
+
+## Remarks
+
+`Table.Keys` returns metadata about keys declared on a table's type. Each element in the returned list is a record with the following fields:
+- `Columns`: a list of column names that form the key
+- `Primary`: a logical indicating whether the key is a primary key
+
+Keys are typically declared using `Table.AddKey` or are inherited from the underlying data source (e.g., SQL Server primary key information). If no keys are defined, an empty list is returned.
+
+## Examples
+
+### Example 1: Inspect keys on a table without any defined keys
+
+```powerquery
+Table.Keys(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{}"}]}
+-->
+
+### Example 2: Inspect keys after adding one
+
+```powerquery
+let
+    Source  = #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
+    WithKey = Table.AddKey(Source, {"ID"}, true)
+in
+    Table.Keys(WithKey)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ID\"}, Primary = true]}"}]}
+-->

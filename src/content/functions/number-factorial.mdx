@@ -1,0 +1,70 @@
+---
+title: "Number.Factorial"
+slug: "number-factorial"
+category: "Number"
+description: "Returns the factorial of a non-negative integer (n! = 1 × 2 × ... × n)."
+syntax: "Number.Factorial(number as number) as number"
+returnType: "number"
+returnDescription: "The factorial of the given non-negative integer."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "A non-negative integer whose factorial is computed. Must be a whole number >= 0."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-combinations"
+  - "number-permutations"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Factorial` computes n! — the product of all positive integers from 1 to n. By convention, `0! = 1`. The result grows extremely rapidly; `Number.Factorial(170)` is near the limit of double-precision floating point, and values beyond that will return infinity.
+
+Factorials are fundamental to combinatorics. They underlie `Number.Combinations` (C(n,k) = n! / (k!(n-k)!)) and `Number.Permutations` (P(n,k) = n! / (n-k)!).
+
+## Examples
+
+### Example 1: Factorial of 5
+
+```powerquery
+Number.Factorial(5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":120}]}
+-->
+
+### Example 2: Factorial of 0 (by convention equals 1)
+
+```powerquery
+Number.Factorial(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 3: Manually verify combinations formula C(5,2)
+
+C(5,2) = 5! / (2! * 3!) = 120 / (2 * 6) = 10
+
+```powerquery
+let
+    N = 5,
+    K = 2,
+    Result = Number.Factorial(N) / (Number.Factorial(K) * Number.Factorial(N - K))
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
+-->

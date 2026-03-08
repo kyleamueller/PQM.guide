@@ -1,0 +1,70 @@
+---
+title: "Double.From"
+slug: "double-from"
+category: "Number"
+description: "Converts a value to a double-precision floating-point number (64-bit IEEE 754)."
+syntax: "Double.From(value as any, optional culture as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "A double-precision (64-bit) floating-point number."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "single-from"
+  - "decimal-from"
+  - "number-from"
+  - "int64-from"
+---
+
+## Remarks
+
+`Double.From` converts a value to a double-precision floating-point number — the standard numeric type used throughout Power Query M. Double-precision provides approximately 15–17 significant decimal digits of precision and covers an enormous range (~±1.8 × 10^308).
+
+Text values are parsed using the specified culture (or the session locale by default). `true` converts to `1.0`, `false` to `0.0`, `null` to `null`.
+
+This is effectively equivalent to `Number.From` in most contexts, since the default M number type is double-precision. Use it explicitly when you need to annotate or enforce the type annotation in a query.
+
+## Examples
+
+### Example 1: Convert text to double
+
+```powerquery
+Double.From("3.14159")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3.14159}]}
+-->
+
+### Example 2: Convert an integer to double
+
+```powerquery
+Double.From(42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+-->
+
+### Example 3: Parse a German-formatted decimal
+
+```powerquery
+Double.From("1.234,56", "de-DE")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.56}]}
+-->

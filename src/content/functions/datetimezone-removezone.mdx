@@ -1,0 +1,67 @@
+---
+title: "DateTimeZone.RemoveZone"
+slug: "datetimezone-removezone"
+category: "DateTimeZone"
+description: "Strips the timezone information from a datetimezone value, returning a datetime."
+syntax: "DateTimeZone.RemoveZone(dateTimeZone as nullable datetimezone) as nullable datetime"
+returnType: "datetime"
+returnDescription: "A datetime value with the same date and time as the input, but without timezone offset information."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "The datetimezone value to strip timezone information from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-addzone"
+  - "datetimezone-switchzone"
+  - "datetimezone-toutc"
+  - "datetimezone-tolocal"
+---
+
+## Remarks
+
+`DateTimeZone.RemoveZone` strips the UTC offset from a `datetimezone` value and returns a plain `datetime` with the same date and time components. The time value is not adjusted — only the timezone annotation is removed. This differs from `DateTimeZone.ToUtc`, which first converts the time to UTC before removing the zone.
+
+Use this function when you need a `datetime` for compatibility with functions or destinations that do not accept `datetimezone` values. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Strip timezone from event timestamps
+
+Remove the timezone offset from datetimezone values, keeping the local time component.
+
+Input: `Events`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
+    {{"EventTimeZone", DateTimeZone.RemoveZone, type datetime}}
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetime"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00"},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00"},{"EventID":3,"EventTimeZone":"2024-03-16T09:15:00"},{"EventID":4,"EventTimeZone":"2024-03-16T17:45:00"}]}
+-->
+
+### Example 2: Remove zone from a specific datetimezone
+
+Strip the offset from a literal datetimezone value.
+
+```powerquery
+#table(
+    type table [WithZone = datetimezone, WithoutZone = datetime],
+    {{#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0),
+      DateTimeZone.RemoveZone(#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"WithZone","type":"datetimezone"},{"name":"WithoutZone","type":"datetime"}],"rows":[{"WithZone":"2024-03-15T14:30:00-05:00","WithoutZone":"2024-03-15T14:30:00"}]}
+-->

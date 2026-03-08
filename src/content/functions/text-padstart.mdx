@@ -1,0 +1,86 @@
+---
+title: "Text.PadStart"
+slug: "text-padstart"
+category: "Text"
+description: "Pads the start of a text value with a character to reach at least the specified total length."
+syntax: "Text.PadStart(text as nullable text, count as number, optional character as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The text value left-padded to at least count total characters."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The minimum total length of the resulting text."
+  - name: "character"
+    type: "text"
+    required: false
+    description: "The single character to use for padding. Defaults to a space character if omitted or null."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-padend"
+  - "text-trim"
+  - "text-trimstart"
+  - "text-repeat"
+---
+
+## Remarks
+
+`Text.PadStart` adds `character` characters to the left (start) of `text` until the total length is at least `count`. If `text` is already `count` characters or longer, it is returned unchanged.
+
+If `character` is omitted or `null`, a space (`" "`) is used. The `character` argument must be exactly one character long; providing a multi-character string raises an error.
+
+If `text` is `null`, the function returns `null`.
+
+Left-padding is commonly used to zero-pad numeric strings, align fixed-width report columns, or format codes to a consistent length.
+
+## Examples
+
+### Example 1: Zero-pad a number to five digits
+
+```powerquery
+Text.PadStart("42", 5, "0")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"00042"}]}
+-->
+
+### Example 2: Pad with spaces (default)
+
+```powerquery
+Text.PadStart("Hello", 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"     Hello"}]}
+-->
+
+### Example 3: Text already meets minimum length — no padding added
+
+```powerquery
+Text.PadStart("Hello", 3, "0")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+-->
+
+### Example 4: Pad account number to eight digits
+
+```powerquery
+Text.PadStart("1234", 8, "0")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"00001234"}]}
+-->

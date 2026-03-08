@@ -1,0 +1,72 @@
+---
+title: "Time.ToText"
+slug: "time-totext"
+category: "Time"
+description: "Converts a time value to a text string."
+syntax: "Time.ToText(time as nullable time, optional options as any) as nullable text"
+returnType: "text"
+returnDescription: "A text representation of the time, or null if the input is null."
+parameters:
+  - name: "time"
+    type: "time"
+    required: true
+    description: "The time value to convert to text."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string, e.g., \"HH:mm\") and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-fromtext"
+  - "time-from"
+  - "datetime-totext"
+  - "date-totext"
+---
+
+## Remarks
+
+`Time.ToText` formats a `time` value as a text string. Without options, it produces a 24-hour string such as `"14:30:00"`. Use the `Format` field in the options record to apply custom patterns such as `"h:mm tt"` (12-hour with AM/PM) or `"HH:mm"` (24-hour without seconds). The `Culture` field controls locale-specific formatting. Format strings follow .NET custom time format conventions.
+
+If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Format event times in 12-hour AM/PM format
+
+Convert time values to 12-hour format strings for display.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "StartTime"}),
+    "DisplayTime",
+    each Time.ToText([StartTime], [Format="h:mm tt"]),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"StartTime","type":"time"},{"name":"DisplayTime","type":"text"}],"rows":[{"EventID":1,"StartTime":"08:30:00","DisplayTime":"8:30 AM"},{"EventID":2,"StartTime":"14:00:00","DisplayTime":"2:00 PM"},{"EventID":3,"StartTime":"09:15:00","DisplayTime":"9:15 AM"},{"EventID":4,"StartTime":"17:45:00","DisplayTime":"5:45 PM"}]}
+-->
+
+### Example 2: Format a specific time value
+
+Format 14:30:00 in 24-hour abbreviated format.
+
+```powerquery
+#table(
+    type table [Time = time, Formatted = text],
+    {{#time(14, 30, 0), Time.ToText(#time(14, 30, 0), [Format="HH:mm"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Time","type":"time"},{"name":"Formatted","type":"text"}],"rows":[{"Time":"14:30:00","Formatted":"14:30"}]}
+-->

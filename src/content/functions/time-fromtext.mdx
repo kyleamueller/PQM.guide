@@ -1,0 +1,69 @@
+---
+title: "Time.FromText"
+slug: "time-fromtext"
+category: "Time"
+description: "Converts a text representation of a time to a time value."
+syntax: "Time.FromText(text as nullable text, optional options as any) as nullable time"
+returnType: "time"
+returnDescription: "A time value parsed from the given text, or null if the input is null."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "A text string representing a time, such as \"14:30:00\" or \"2:30 PM\"."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string, e.g., \"HH:mm:ss\") and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-totext"
+  - "time-from"
+  - "datetime-fromtext"
+---
+
+## Remarks
+
+`Time.FromText` parses a text value into a `time`. Without options, it attempts common formats such as `"HH:mm:ss"` or `"HH:mm"`. Use the `options` record to supply a custom `Format` pattern or a `Culture` for locale-specific strings. Format strings follow .NET custom time format conventions.
+
+If the text is `null`, the function returns `null`. If parsing fails, the function raises an error.
+
+## Examples
+
+### Example 1: Parse time strings from a schedule table
+
+Convert text time values in a schedule table to typed time values.
+
+Input: `Schedule`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Schedule, 4), {"EventID", "StartTimeText"}),
+    {{"StartTimeText", each Time.FromText(_), type time}}
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"StartTimeText","type":"time"}],"rows":[{"EventID":1,"StartTimeText":"08:30:00"},{"EventID":2,"StartTimeText":"14:00:00"},{"EventID":3,"StartTimeText":"09:15:00"},{"EventID":4,"StartTimeText":"17:45:00"}]}
+-->
+
+### Example 2: Parse a 12-hour format time string
+
+Parse a time in 12-hour AM/PM format.
+
+```powerquery
+#table(
+    type table [TextTime = text, Parsed = time],
+    {{"02:30:00 PM", Time.FromText("02:30:00 PM", [Format="hh:mm:ss tt", Culture="en-US"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"TextTime","type":"text"},{"name":"Parsed","type":"time"}],"rows":[{"TextTime":"02:30:00 PM","Parsed":"14:30:00"}]}
+-->

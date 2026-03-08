@@ -1,0 +1,68 @@
+---
+title: "Table.StopFolding"
+slug: "table-stopfolding"
+category: "Table"
+description: "Returns a new table that prevents any further query folding, forcing local evaluation."
+syntax: "Table.StopFolding(table as table) as table"
+returnType: "table"
+returnDescription: "A table that is identical to the input but will not fold subsequent operations to the data source."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to prevent from further query folding."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-buffer"
+  - "table-schema"
+---
+
+## Remarks
+
+`Table.StopFolding` breaks the query folding chain. Any transformations applied after this function are evaluated locally in the Power Query engine rather than being translated and sent to the data source (e.g., as SQL). The table's data and structure are unchanged.
+
+Use this function when:
+- You want to ensure predictable local evaluation of a step.
+- A downstream transformation is incompatible with folding and you want to control exactly where the data is fetched.
+- You are debugging and want to isolate which steps fold vs. which are evaluated locally.
+
+Note that breaking folding can significantly increase query execution time for large data sources because all data must be retrieved before local operations begin.
+
+## Examples
+
+### Example 1: Stop folding before a custom transformation
+
+```powerquery
+let
+    Source  = Sql.Database("server", "db"),
+    Orders  = Source{[Schema="dbo", Item="Orders"]}[Data],
+    Stopped = Table.StopFolding(Orders),
+    Filtered = Table.SelectRows(Stopped, each [Amount] > 100)
+in
+    Filtered
+```
+
+<!--output
+{"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Returns filtered rows evaluated locally after stopping fold at Stopped step."}]}
+-->
+
+### Example 2: Stop folding to ensure local evaluation
+
+```powerquery
+let
+    Source  = OData.Feed("https://services.odata.org/V4/Northwind/"),
+    Products = Source{[Name="Products"]}[Data],
+    Local    = Table.StopFolding(Products)
+in
+    Table.RowCount(Local)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"77"}]}
+-->

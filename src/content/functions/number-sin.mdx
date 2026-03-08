@@ -1,0 +1,69 @@
+---
+title: "Number.Sin"
+slug: "number-sin"
+category: "Number"
+description: "Returns the sine of an angle specified in radians."
+syntax: "Number.Sin(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The sine of the angle in radians, in the range [-1, 1]."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The angle in radians."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-cos"
+  - "number-tan"
+  - "number-asin"
+---
+
+## Remarks
+
+`Number.Sin` returns the trigonometric sine of an angle measured in radians. The result is always in the range [-1, 1].
+
+To convert degrees to radians before calling this function, multiply by `Number.PI / 180`:
+
+```powerquery
+Number.Sin(degrees * Number.PI / 180)
+```
+
+`Number.Sin(0)` returns `0`, `Number.Sin(Number.PI / 2)` returns `1`, and `Number.Sin(Number.PI)` returns approximately `0` (floating-point rounding may produce a very small non-zero value).
+
+## Examples
+
+### Example 1: Sine of 0 radians
+
+```powerquery
+Number.Sin(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 2: Sine of 90 degrees (π/2 radians)
+
+```powerquery
+Number.Sin(Number.PI / 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 3: Sine of 30 degrees
+
+```powerquery
+Number.Sin(30 * Number.PI / 180)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.49999999999999994}]}
+-->

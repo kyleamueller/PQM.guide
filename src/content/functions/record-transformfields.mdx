@@ -1,0 +1,89 @@
+---
+title: "Record.TransformFields"
+slug: "record-transformfields"
+category: "Record"
+description: "Applies transformation functions to specified fields in a record, returning a new record with the transformed values."
+syntax: "Record.TransformFields(record as record, transformOperations as list, optional missingField as nullable number) as record"
+returnType: "record"
+returnDescription: "A new record with the specified fields transformed."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The source record."
+  - name: "transformOperations"
+    type: "list"
+    required: true
+    description: "A list of transformation operations. Each element is a two-item list {fieldName, transformFunction} or a three-item list {fieldName, transformFunction, newFieldName}."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a specified field does not exist: MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-renamefields"
+  - "record-addfield"
+  - "record-removefields"
+  - "record-selectfields"
+---
+
+## Remarks
+
+`Record.TransformFields` applies functions to specified fields within a record. Each operation in the `transformOperations` list is either:
+
+- A two-element list `{fieldName, function}` — transforms the named field in place
+- A three-element list `{fieldName, function, newFieldName}` — transforms and renames the field
+
+The transform function receives the current field value and returns the new value. Fields not listed in `transformOperations` are returned unchanged.
+
+This function is the record-level equivalent of `Table.TransformColumns` for tables.
+
+## Examples
+
+### Example 1: Uppercase a text field
+
+```powerquery
+Record.TransformFields(
+    [Name = "alice", Age = 30],
+    {{"Name", Text.Upper}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"}],"rows":[{"Name":"ALICE","Age":30}]}
+-->
+
+### Example 2: Transform multiple fields
+
+```powerquery
+Record.TransformFields(
+    [Name = "bob", Age = 25.7],
+    {
+        {"Name", Text.Proper},
+        {"Age", Number.RoundDown}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"}],"rows":[{"Name":"Bob","Age":25}]}
+-->
+
+### Example 3: Transform and rename a field
+
+```powerquery
+Record.TransformFields(
+    [price = 9.99, qty = 3],
+    {{"price", each _ * 1.1, "PriceWithTax"}}
+)
+```
+
+<!--output
+{"columns":[{"name":"PriceWithTax","type":"number"},{"name":"qty","type":"number"}],"rows":[{"PriceWithTax":10.989000000000001,"qty":3}]}
+-->

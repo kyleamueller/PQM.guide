@@ -1,0 +1,72 @@
+---
+title: "Duration.TotalHours"
+slug: "duration-totalhours"
+category: "Duration"
+description: "Returns the total duration expressed as a fractional number of hours."
+syntax: "Duration.TotalHours(duration as nullable duration) as nullable number"
+returnType: "number"
+returnDescription: "The total number of hours (including fractional parts) represented by the duration."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "A duration value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-totaldays"
+  - "duration-totalminutes"
+  - "duration-totalseconds"
+  - "duration-hours"
+  - "duration-from"
+---
+
+## Remarks
+
+`Duration.TotalHours` returns the entire duration as a decimal number of hours. For example, 1 day and 6 hours returns `30.0`. This differs from `Duration.Hours`, which returns only the hours component (e.g., `6` for the same input). Use `Duration.TotalHours` when you need elapsed time as a single numeric value, such as for rate or SLA calculations. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Calculate total hours per order processing time
+
+Compute the total hours elapsed between order and ship date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(Sales, each [ShipDate] <> null),
+        {"OrderID", "OrderDate", "ShipDate"}
+    ),
+    "ProcessingHours",
+    each Duration.TotalHours(
+        DateTime.From([ShipDate]) - DateTime.From([OrderDate])
+    ),
+    type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"ShipDate","type":"date"},{"name":"ProcessingHours","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","ShipDate":"2024-01-17","ProcessingHours":48},{"OrderID":2,"OrderDate":"2024-01-18","ShipDate":"2024-01-21","ProcessingHours":72},{"OrderID":3,"OrderDate":"2024-02-01","ShipDate":"2024-02-03","ProcessingHours":48}]}
+-->
+
+### Example 2: Total hours for a mixed duration
+
+Return the total hours for a duration spanning 1 day and 6 hours.
+
+```powerquery
+#table(
+    type table [Duration = duration, TotalHours = number],
+    {{#duration(1, 6, 0, 0), Duration.TotalHours(#duration(1, 6, 0, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"TotalHours","type":"number"}],"rows":[{"Duration":"1.06:00:00","TotalHours":30}]}
+-->

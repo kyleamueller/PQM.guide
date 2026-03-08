@@ -1,0 +1,77 @@
+---
+title: "Table.FirstValue"
+slug: "table-firstvalue"
+category: "Table"
+description: "Returns the value in the first row and first column of the table, or a default value if the table is empty."
+syntax: "Table.FirstValue(table as table, optional default as nullable any) as any"
+returnType: "any"
+returnDescription: "The scalar value from the first cell of the table, or the default if the table is empty."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to read the first value from."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Optional value to return if the table is empty. Defaults to null."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-first"
+  - "table-singlerow"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.FirstValue` is a shortcut to extract a single scalar value from the first row and first column of a table. It is commonly used after filtering a table to a single expected row, to read a configuration setting or lookup result without needing to unpack a record.
+
+If the table is empty, the function returns `null` by default, or the specified `default` value. This is safer than chaining `Table.First(...)[Column]` when the table might be empty.
+
+## Examples
+
+### Example 1: Get the first value from a single-column table
+
+```powerquery
+Table.FirstValue(
+    #table({"MaxRows"}, {{1000}})
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"1000"}]}
+-->
+
+### Example 2: Return a default when the table is empty
+
+```powerquery
+Table.FirstValue(
+    #table({"Setting"}, {}),
+    "DefaultValue"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"DefaultValue"}]}
+-->
+
+### Example 3: Look up a parameter value
+
+```powerquery
+let
+    Params  = #table({"Name", "Value"}, {{"StartDate", "2024-01-01"}, {"EndDate", "2024-12-31"}}),
+    Filtered = Table.SelectRows(Params, each [Name] = "StartDate"),
+    Projected = Table.SelectColumns(Filtered, {"Value"})
+in
+    Table.FirstValue(Projected)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"2024-01-01"}]}
+-->

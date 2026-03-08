@@ -1,0 +1,62 @@
+---
+title: "Date.IsInPreviousYear"
+slug: "date-isinpreviousyear"
+category: "Date"
+description: "Returns true if the date falls in the previous calendar year."
+syntax: "Date.IsInPreviousYear(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the calendar year immediately before the current year, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentyear"
+  - "date-isinnextyear"
+  - "date-isinpreviousnyears"
+  - "date-isinpreviousquarter"
+---
+
+## Remarks
+
+`Date.IsInPreviousYear` returns `true` if the input date falls anywhere within the calendar year immediately before the current year (as determined by `DateTime.LocalNow()`). For example, if today is in 2026, this function returns `true` for any date in 2025. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter last year's orders
+
+Keep only rows where OrderDate falls in the previous calendar year.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousYear([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":30,"OrderDate":"2025-01-10"},{"OrderID":35,"OrderDate":"2025-10-20"},{"OrderID":37,"OrderDate":"2025-12-31"}]}
+-->
+
+### Example 2: Flag last year's rows
+
+Add a boolean column identifying rows from the previous year.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsLastYear", each Date.IsInPreviousYear([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastYear","type":"logical"}],"rows":[{"OrderID":28,"OrderDate":"2024-11-15","IsLastYear":false},{"OrderID":30,"OrderDate":"2025-01-10","IsLastYear":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastYear":false}]}
+-->

@@ -1,0 +1,88 @@
+---
+title: "Record.FieldOrDefault"
+slug: "record-fieldordefault"
+category: "Record"
+description: "Returns the value of a named field from a record, or a default value if the field does not exist."
+syntax: "Record.FieldOrDefault(record as record, field as text, optional defaultValue as nullable any) as nullable any"
+returnType: "any"
+returnDescription: "The value of the specified field, or defaultValue (null if omitted) when the field is absent."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The record to retrieve the field from."
+  - name: "field"
+    type: "text"
+    required: true
+    description: "The name of the field to retrieve."
+  - name: "defaultValue"
+    type: "any"
+    required: false
+    description: "The value to return when the field does not exist. Defaults to null."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-field"
+  - "record-hasfields"
+  - "record-fieldnames"
+---
+
+## Remarks
+
+`Record.FieldOrDefault` is the safe alternative to `Record.Field` and the `[FieldName]` syntax. When a field does not exist in the record, accessing it with `record[FieldName]` raises an error; `Record.FieldOrDefault` instead returns `null` (or a specified default value).
+
+Use this when working with semi-structured or inconsistent data where records may have varying schemas across rows.
+
+## Examples
+
+### Example 1: Retrieve an existing field
+
+```powerquery
+Record.FieldOrDefault([Name = "Alice", Age = 30], "Name")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice"}]}
+-->
+
+### Example 2: Return null when field is missing
+
+```powerquery
+Record.FieldOrDefault([Name = "Alice", Age = 30], "Email")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":null}]}
+-->
+
+### Example 3: Return a custom default when field is missing
+
+```powerquery
+Record.FieldOrDefault([Name = "Alice"], "Email", "no-email@example.com")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"no-email@example.com"}]}
+-->
+
+### Example 4: Safely extract an optional field from each Sales row
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
+    "Notes",
+    each Record.FieldOrDefault(_, "Notes", ""),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"OrderID":1,"Notes":""},{"OrderID":2,"Notes":""},{"OrderID":3,"Notes":""}]}
+-->

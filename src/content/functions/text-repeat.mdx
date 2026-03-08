@@ -1,0 +1,77 @@
+---
+title: "Text.Repeat"
+slug: "text-repeat"
+category: "Text"
+description: "Returns a text value composed of the input text repeated a specified number of times."
+syntax: "Text.Repeat(text as nullable text, count as number) as nullable text"
+returnType: "text"
+returnDescription: "The text value repeated count times."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to repeat."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of times to repeat the text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-combine"
+  - "text-padstart"
+  - "text-padend"
+---
+
+## Remarks
+
+`Text.Repeat` concatenates `text` with itself `count` times. If `count` is 0, an empty string is returned. If `text` is `null`, the function returns `null`.
+
+Common uses include generating separators, padding patterns, or building test data strings. When combined with `Text.Length`, it can be used to create fixed-length fill strings.
+
+## Examples
+
+### Example 1: Repeat a string three times
+
+```powerquery
+Text.Repeat("abc", 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"abcabcabc"}]}
+-->
+
+### Example 2: Create a separator line
+
+```powerquery
+Text.Repeat("-", 20)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"--------------------"}]}
+-->
+
+### Example 3: Repeat a multi-character pattern
+
+```powerquery
+Text.Repeat("AB", 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"ABABABAB"}]}
+-->
+
+### Example 4: Zero repetitions returns empty string
+
+```powerquery
+Text.Repeat("Hello", 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":""}]}
+-->

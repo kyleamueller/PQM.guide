@@ -1,0 +1,105 @@
+---
+title: "Text.PositionOf"
+slug: "text-positionof"
+category: "Text"
+description: "Returns the position of the first (or specified) occurrence of a substring within a text value, or -1 if not found."
+syntax: "Text.PositionOf(text as text, substring as text, optional occurrence as nullable number, optional comparer as nullable function) as any"
+returnType: "any"
+returnDescription: "The zero-based position of the occurrence, -1 if not found, or a list of positions when Occurrence.All is used."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to search within."
+  - name: "substring"
+    type: "text"
+    required: true
+    description: "The substring to find."
+  - name: "occurrence"
+    type: "number"
+    required: false
+    description: "Specifies which occurrence to find. Use Occurrence.First (default), Occurrence.Last, or Occurrence.All."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "A comparer function to control case sensitivity or culture. Use Comparer.OrdinalIgnoreCase for case-insensitive search."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-positionofany"
+  - "text-contains"
+  - "text-startswith"
+  - "text-endswith"
+  - "comparer-ordinalignorecase"
+  - "comparer-ordinal"
+---
+
+## Remarks
+
+`Text.PositionOf` searches for `substring` within `text` and returns the zero-based character position of the match. Returns `-1` if the substring is not found.
+
+The optional `occurrence` parameter accepts values from the `Occurrence` enum:
+- `Occurrence.First` (default, value `0`) — returns the position of the first match
+- `Occurrence.Last` (value `1`) — returns the position of the last match
+- `Occurrence.All` (value `2`) — returns a list of all match positions
+
+The optional `comparer` parameter controls how character comparison is performed. By default, an ordinal (byte-by-byte) comparison is used, which is case-sensitive. Pass `Comparer.OrdinalIgnoreCase` for case-insensitive searches.
+
+Use `Text.Contains` when you only need to know whether a substring exists, not its position.
+
+## Examples
+
+### Example 1: Find the position of the first occurrence
+
+```powerquery
+Text.PositionOf("Hello World Hello", "Hello")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 2: Find the position of the last occurrence
+
+```powerquery
+Text.PositionOf("Hello World Hello", "Hello", Occurrence.Last)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":12}]}
+-->
+
+### Example 3: Return all positions
+
+```powerquery
+Text.PositionOf("abcabc", "a", Occurrence.All)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[0,3]}]}
+-->
+
+### Example 4: Substring not found returns -1
+
+```powerquery
+Text.PositionOf("Hello World", "xyz")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 5: Case-insensitive search
+
+```powerquery
+Text.PositionOf("Hello World", "hello", Occurrence.First, Comparer.OrdinalIgnoreCase)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->

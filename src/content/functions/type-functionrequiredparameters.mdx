@@ -1,0 +1,71 @@
+---
+title: "Type.FunctionRequiredParameters"
+slug: "type-functionrequiredparameters"
+category: "Type"
+description: "Returns the minimum number of required parameters for a function type."
+syntax: "Type.FunctionRequiredParameters(type as type) as number"
+returnType: "number"
+returnDescription: "The count of required (non-optional) parameters in the function type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A function type whose required parameter count is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-functionparameters"
+  - "type-functionreturn"
+  - "value-type"
+---
+
+## Remarks
+
+`Type.FunctionRequiredParameters` returns the number of parameters that must always be provided when calling a function. Optional parameters (declared with the `optional` keyword) are not counted.
+
+Use `Value.Type(fn)` to get the function type before passing it to this function.
+
+This is useful for building validation logic, documentation, or dynamic dispatch based on the arity of a function.
+
+## Examples
+
+### Example 1: Required parameters of a two-argument function
+
+```powerquery
+let
+    FType = type function (x as number, y as number) as number
+in
+    Type.FunctionRequiredParameters(FType)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
+-->
+
+### Example 2: Optional parameters are not counted
+
+```powerquery
+let
+    FType = type function (x as number, optional y as nullable number) as number
+in
+    Type.FunctionRequiredParameters(FType)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 3: Check required parameters of Number.Round
+
+```powerquery
+Type.FunctionRequiredParameters(Value.Type(Number.Round))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->

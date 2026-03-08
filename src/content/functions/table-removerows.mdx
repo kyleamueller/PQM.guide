@@ -1,0 +1,69 @@
+---
+title: "Table.RemoveRows"
+slug: "table-removerows"
+category: "Table"
+description: "Removes a specified number of rows starting at a given offset."
+syntax: "Table.RemoveRows(table as table, offset as number, optional count as nullable number) as table"
+returnType: "table"
+returnDescription: "The table with the specified rows removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to remove rows from."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based index of the first row to remove."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The number of rows to remove. Defaults to 1 if omitted."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removefirstn"
+  - "table-removelastn"
+  - "table-skip"
+  - "table-range"
+---
+
+## Remarks
+
+`Table.RemoveRows` removes rows from a specific position in the table. The `offset` parameter is zero-based. If `count` is omitted, only the single row at `offset` is removed. If `count` exceeds the number of remaining rows, all rows from `offset` to the end of the table are removed.
+
+Use `Table.RemoveFirstN` or `Table.RemoveLastN` for simpler removal from the start or end of the table.
+
+## Examples
+
+### Example 1: Remove one row at a given offset
+
+```powerquery
+Table.RemoveRows(
+    #table({"ID"}, {{1}, {2}, {3}, {4}}),
+    1
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"3"},{"ID":"4"}]}
+-->
+
+### Example 2: Remove multiple rows
+
+```powerquery
+Table.RemoveRows(
+    #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
+    1,
+    3
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"5"}]}
+-->

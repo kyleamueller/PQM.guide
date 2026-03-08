@@ -1,0 +1,66 @@
+---
+title: "DateTime.IsInNextNSeconds"
+slug: "datetime-isinnextnseconds"
+category: "DateTime"
+description: "Returns true if the datetime falls within the next N seconds."
+syntax: "DateTime.IsInNextNSeconds(dateTime as any, seconds as number) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the next N seconds after the current second, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+  - name: "seconds"
+    type: "number"
+    required: true
+    description: "The number of seconds ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isinnextsecond"
+  - "datetime-isinpreviousnseconds"
+  - "datetime-isinnextnminutes"
+  - "datetime-isinnextnhours"
+---
+
+## Remarks
+
+`DateTime.IsInNextNSeconds` returns `true` if the input `datetime` or `datetimezone` value falls within the next N complete seconds after the current second. The current second is not included; use `DateTime.IsInCurrentSecond` to also match the current second. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events in the next 30 seconds
+
+Keep only rows where EventTime falls within the next 30 seconds.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInNextNSeconds([EventTime], 30)
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":70,"EventTime":"2026-03-08T10:32:55"},{"EventID":71,"EventTime":"2026-03-08T10:33:10"}]}
+-->
+
+### Example 2: Flag events in the next 60 seconds
+
+Add a boolean column for events occurring in the next minute (60 seconds).
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "InNext60Sec", each DateTime.IsInNextNSeconds([EventTime], 60), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InNext60Sec","type":"logical"}],"rows":[{"EventID":69,"EventTime":"2026-03-08T10:32:44","InNext60Sec":false},{"EventID":70,"EventTime":"2026-03-08T10:32:55","InNext60Sec":true},{"EventID":72,"EventTime":"2026-03-08T10:34:00","InNext60Sec":false}]}
+-->

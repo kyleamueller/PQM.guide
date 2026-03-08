@@ -1,0 +1,72 @@
+---
+title: "Table.ReplaceMatchingRows"
+slug: "table-replacematchingrows"
+category: "Table"
+description: "Replaces rows that match specified records with new values."
+syntax: "Table.ReplaceMatchingRows(table as table, rows as list, optional equationCriteria as any) as table"
+returnType: "table"
+returnDescription: "The table with matching rows replaced by their corresponding replacement records."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to update."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of {oldRow, newRow} pairs, where each pair is a two-element list: the record to match and the record to replace it with."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to restrict matching to specific fields."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-replacerows"
+  - "table-removematchingrows"
+  - "table-replacevalue"
+---
+
+## Remarks
+
+`Table.ReplaceMatchingRows` accepts a list of `{oldRecord, newRecord}` pairs. For each pair, any table row that matches `oldRecord` is replaced with `newRecord`. All matching rows are replaced, not just the first occurrence.
+
+This function operates on whole rows. To replace values within individual cells, use `Table.ReplaceValue`.
+
+## Examples
+
+### Example 1: Replace a matching row
+
+```powerquery
+Table.ReplaceMatchingRows(
+    #table({"ID", "Status"}, {{1, "Pending"}, {2, "Done"}, {3, "Pending"}}),
+    {
+        {[ID = 1, Status = "Pending"], [ID = 1, Status = "Approved"]}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Status","type":"any"}],"rows":[{"ID":"1","Status":"Approved"},{"ID":"2","Status":"Done"},{"ID":"3","Status":"Pending"}]}
+-->
+
+### Example 2: Replace multiple rows
+
+```powerquery
+Table.ReplaceMatchingRows(
+    #table({"Code"}, {{"A"}, {"B"}, {"C"}}),
+    {
+        {[Code = "A"], [Code = "Alpha"]},
+        {[Code = "C"], [Code = "Charlie"]}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Code","type":"any"}],"rows":[{"Code":"Alpha"},{"Code":"B"},{"Code":"Charlie"}]}
+-->

@@ -1,0 +1,77 @@
+---
+title: "Number.FromText"
+slug: "number-fromtext"
+category: "Number"
+description: "Converts a text representation of a number to a number value, with optional locale-aware parsing."
+syntax: "Number.FromText(text as nullable text, optional culture as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "The numeric value represented by the text string."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text string to convert to a number."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string (e.g., \"en-US\", \"de-DE\") that controls how decimal and thousand separators are interpreted."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-from"
+  - "number-totext"
+---
+
+## Remarks
+
+`Number.FromText` parses a text value into a number. It accepts standard numeric representations including integers, decimals, and scientific notation (e.g., `"1.5e3"`). When no culture is specified, the engine uses the locale of the current session.
+
+Use the optional `culture` parameter when your source data uses a non-default locale. For example, German-formatted numbers use a comma as the decimal separator (`"1.234,56"`), which would fail without specifying `"de-DE"`.
+
+Special text values `"NaN"`, `"Infinity"`, and `"-Infinity"` are also recognized.
+
+## Examples
+
+### Example 1: Parse a simple decimal string
+
+```powerquery
+Number.FromText("3.14")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3.14}]}
+-->
+
+### Example 2: Parse a German-formatted number with culture
+
+German formatting uses `.` as the thousands separator and `,` as the decimal separator.
+
+```powerquery
+Number.FromText("1.234,56", "de-DE")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.56}]}
+-->
+
+### Example 3: Parse numbers in a table column
+
+Convert a text column of prices to numbers.
+
+Input: `Sales`
+
+```powerquery
+Table.TransformColumns(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "UnitPrice"}),
+    {{"UnitPrice", each Number.FromText(Text.From(_)), type number}}
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25},{"OrderID":2,"UnitPrice":150},{"OrderID":3,"UnitPrice":75}]}
+-->

@@ -1,0 +1,63 @@
+---
+title: "Table.TransformRows"
+slug: "table-transformrows"
+category: "Table"
+description: "Applies a transform function to each row (as a record) and returns a list of the results."
+syntax: "Table.TransformRows(table as table, transform as function) as list"
+returnType: "list"
+returnDescription: "A list where each element is the result of applying the transform function to a row record."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to iterate over."
+  - name: "transform"
+    type: "function"
+    required: true
+    description: "A function that accepts a row as a record and returns a value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-transformcolumns"
+  - "table-addcolumn"
+  - "table-torecords"
+---
+
+## Remarks
+
+`Table.TransformRows` iterates over each row of a table as a record and applies a transform function, returning the collection of results as a list. Unlike `Table.AddColumn`, which adds a computed column back into the table, `Table.TransformRows` produces a flat list of arbitrary values — records, lists, scalars, or any M value.
+
+This function is useful when you need to map rows to a different structure entirely, rather than just adding or transforming columns.
+
+## Examples
+
+### Example 1: Extract formatted strings from each row
+
+```powerquery
+Table.TransformRows(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}}),
+    each [Name] & ": " & Text.From([Score])
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Alice: 95\", \"Bob: 82\"}"}]}
+-->
+
+### Example 2: Transform rows into records with computed fields
+
+```powerquery
+Table.TransformRows(
+    #table({"Price", "Qty"}, {{10, 5}, {20, 3}}),
+    each [Price = [Price], Qty = [Qty], Total = [Price] * [Qty]]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Price=10, Qty=5, Total=50], [Price=20, Qty=3, Total=60]}"}]}
+-->

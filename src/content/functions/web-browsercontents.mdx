@@ -1,0 +1,89 @@
+---
+title: "Web.BrowserContents"
+slug: "web-browsercontents"
+category: "Accessing Data"
+description: "Returns the HTML of a URL as rendered by a web browser, including JavaScript-generated content."
+syntax: "Web.BrowserContents(url as text, optional options as nullable record) as text"
+returnType: "text"
+returnDescription: "The fully rendered HTML source of the web page after JavaScript execution, as a text value."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the web page to render."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options. Supports WaitFor to control when the browser considers the page fully loaded."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+  - "web-page"
+  - "web-headers"
+  - "html-table"
+---
+
+## Remarks
+
+`Web.BrowserContents` opens the specified URL in a headless browser (Chromium-based), executes JavaScript, waits for the page to render, and returns the resulting HTML as text. This differs from `Web.Contents`, which fetches only the raw HTTP response without executing JavaScript.
+
+Use `Web.BrowserContents` when the data you need is loaded dynamically by JavaScript — for example, tables rendered by a JavaScript framework, or content that appears only after client-side API calls complete.
+
+**Availability**: This function is only available in Power BI Desktop. It is not supported in Power BI Service, Excel, or dataflows. Scheduled refresh in the cloud requires an on-premises data gateway with access to a supported browser.
+
+**Authentication**: Anonymous access only. The function does not support credential-based authentication. If a page requires login, you cannot use `Web.BrowserContents` directly.
+
+**Query folding**: Not supported.
+
+**The `WaitFor` option**: The `options` record can include a `WaitFor` field to control when Power Query considers the page fully loaded:
+- `[WaitFor = [Timeout = duration]]` — wait up to the specified duration.
+- `[WaitFor = [Element = cssSelector]]` — wait until a specific CSS selector appears in the DOM.
+
+**Typical workflow**: The returned text is raw HTML. Pass it to `Web.Page` or `Html.Table` to extract structured data from the rendered content.
+
+## Examples
+
+### Example 1: Fetch the rendered HTML of a page
+```powerquery
+Web.BrowserContents("https://example.com/dynamic-table")
+```
+
+### Example 2: Render a page and extract tables using Web.Page
+```powerquery
+let
+    Html = Web.BrowserContents("https://example.com/dynamic-table"),
+    Tables = Web.Page(Html),
+    FirstTable = Tables{0}[Data]
+in
+    FirstTable
+```
+
+### Example 3: Wait for a specific element before capturing HTML
+```powerquery
+let
+    Html = Web.BrowserContents(
+        "https://example.com/slow-loading",
+        [WaitFor = [Element = "table.data-table"]]
+    ),
+    Tables = Web.Page(Html),
+    Data = Tables{0}[Data]
+in
+    Data
+```
+
+### Example 4: Wait with a timeout
+```powerquery
+let
+    Html = Web.BrowserContents(
+        "https://example.com/dashboard",
+        [WaitFor = [Timeout = #duration(0, 0, 0, 30)]]
+    )
+in
+    Html
+```

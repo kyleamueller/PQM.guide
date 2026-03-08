@@ -1,0 +1,83 @@
+---
+title: "Number.ToText"
+slug: "number-totext"
+category: "Number"
+description: "Converts a number to a text string, with optional format specifier and culture for locale-aware formatting."
+syntax: "Number.ToText(number as nullable number, optional format as nullable text, optional culture as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "A text representation of the number, formatted according to the optional format and culture."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number to convert to text."
+  - name: "format"
+    type: "text"
+    required: false
+    description: "An optional .NET format specifier such as \"D\" (decimal integer), \"F2\" (fixed 2 decimal places), \"P\" (percentage), \"E\" (scientific), \"C\" (currency), or \"G\" (general)."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string (e.g., \"en-US\", \"de-DE\") that controls locale-specific formatting such as decimal and thousand separators."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-fromtext"
+  - "number-round"
+---
+
+## Remarks
+
+`Number.ToText` converts a number to a text string. When called with no format, it returns a general representation of the number. The optional `format` parameter follows standard .NET numeric format specifiers:
+
+- `"D"` — Integer (no decimal places, e.g., `"42"`)
+- `"F"` or `"F2"` — Fixed-point with specified decimal places (e.g., `"3.14"`)
+- `"P"` — Percentage (e.g., `"75.00%"`)
+- `"E"` — Scientific notation (e.g., `"3.14E+000"`)
+- `"C"` — Currency symbol added based on culture
+- `"G"` — General (default compact representation)
+- `"N"` — Number with thousands separators
+
+The `culture` parameter controls locale-specific symbols. For example, `"de-DE"` uses a comma as the decimal separator.
+
+## Examples
+
+### Example 1: Convert a number to fixed 2 decimal places
+
+```powerquery
+Number.ToText(3.14159, "F2")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"3.14"}]}
+-->
+
+### Example 2: Format a ratio as a percentage
+
+```powerquery
+Number.ToText(0.8753, "P1")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"87.5%"}]}
+-->
+
+### Example 3: Format numbers in a column with thousands separators
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Revenue"}),
+    "FormattedRevenue", each Number.ToText([Revenue], "N2"), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"FormattedRevenue","type":"text"}],"rows":[{"OrderID":1,"Revenue":25000,"FormattedRevenue":"25,000.00"},{"OrderID":2,"Revenue":150000,"FormattedRevenue":"150,000.00"},{"OrderID":3,"Revenue":75000,"FormattedRevenue":"75,000.00"}]}
+-->

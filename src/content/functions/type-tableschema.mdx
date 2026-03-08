@@ -1,0 +1,68 @@
+---
+title: "Type.TableSchema"
+slug: "type-tableschema"
+category: "Type"
+description: "Returns a table describing the columns of a table type, including column names, positions, type names, and kinds."
+syntax: "Type.TableSchema(type as type) as table"
+returnType: "table"
+returnDescription: "A table with columns Name, Position, TypeName, and Kind describing each column of the table type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A table type whose schema is described."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-tablecolumn"
+  - "type-tablekeys"
+  - "type-addtablekey"
+  - "value-type"
+---
+
+## Remarks
+
+`Type.TableSchema` returns a descriptive table summarizing the columns declared in a table type. The result includes these columns:
+
+- `Name` — the column name
+- `Position` — the zero-based column index
+- `TypeName` — the name of the column's type as text (e.g., `"number"`, `"text"`)
+- `Kind` — the kind of the type (e.g., `"Primitive"`, `"Nullable"`)
+
+This function is useful for programmatically inspecting table schemas, generating documentation, or building generic data validation routines.
+
+## Examples
+
+### Example 1: Get the schema of a typed table
+
+```powerquery
+let
+    T = #table(
+        type table [OrderID = number, Product = text, UnitPrice = nullable number],
+        {{1, "Widget A", 25.0}}
+    ),
+    Schema = Type.TableSchema(Value.Type(T))
+in
+    Schema
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"number","Kind":"Primitive"},{"Name":"Product","Position":1,"TypeName":"text","Kind":"Primitive"},{"Name":"UnitPrice","Position":2,"TypeName":"nullable number","Kind":"Nullable"}]}
+-->
+
+### Example 2: Count columns in a table type
+
+Input: `Sales`
+
+```powerquery
+Table.RowCount(Type.TableSchema(Value.Type(Sales)))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":7}]}
+-->

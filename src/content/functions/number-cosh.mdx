@@ -1,0 +1,71 @@
+---
+title: "Number.Cosh"
+slug: "number-cosh"
+category: "Number"
+description: "Returns the hyperbolic cosine of a number."
+syntax: "Number.Cosh(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The hyperbolic cosine of the number, always >= 1."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number whose hyperbolic cosine is computed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-sinh"
+  - "number-tanh"
+  - "number-exp"
+---
+
+## Remarks
+
+`Number.Cosh` returns the hyperbolic cosine, defined as:
+
+cosh(x) = (e^x + e^(−x)) / 2
+
+The hyperbolic cosine is always >= 1 and has its minimum at x = 0 where it equals 1. It is an even function: `cosh(−x) = cosh(x)`. The catenary curve — the shape of a hanging chain — is described by cosh.
+
+The fundamental hyperbolic identity is: cosh²(x) − sinh²(x) = 1.
+
+## Examples
+
+### Example 1: Hyperbolic cosine of 0
+
+```powerquery
+Number.Cosh(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 2: Hyperbolic cosine of 1
+
+```powerquery
+Number.Cosh(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.5430806348152437}]}
+-->
+
+### Example 3: Verify hyperbolic identity cosh²(x) - sinh²(x) = 1
+
+```powerquery
+let
+    X = 3,
+    Identity = Number.Cosh(X)^2 - Number.Sinh(X)^2
+in
+    Number.Round(Identity, 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->

@@ -1,0 +1,82 @@
+---
+title: "List.Positions"
+slug: "list-positions"
+category: "List"
+description: "Returns a list of zero-based index positions for all elements in the given list."
+syntax: "List.Positions(list as list) as list"
+returnType: "list"
+returnDescription: "A list of integers {0, 1, 2, ...} with one entry per element in the source list."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list whose positions are to be returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-positionof"
+  - "list-count"
+  - "list-range"
+  - "list-numbers"
+  - "list-zip"
+---
+
+## Remarks
+
+`List.Positions` returns a list of zero-based integer indices corresponding to each element in the input list. For a list of length `N`, it returns `{0, 1, 2, ..., N-1}`.
+
+This is equivalent to `List.Numbers(0, List.Count(list))` or `{0..List.Count(list)-1}`.
+
+The primary use case is pairing each element with its index using `List.Zip` or `List.Transform`, enabling index-aware iteration without a custom counter.
+
+- For an empty list, returns an empty list `{}`.
+- The result is always a list of consecutive integers starting at 0.
+
+## Examples
+
+### Example 1: Get positions of a list
+
+```powerquery
+List.Positions({"A", "B", "C", "D"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{0, 1, 2, 3}"}]}
+-->
+
+### Example 2: Pair each item with its index using List.Zip
+
+```powerquery
+let
+    Items = {"Alpha", "Beta", "Gamma"},
+    Indexed = List.Zip({List.Positions(Items), Items})
+in
+    Indexed
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
+-->
+
+### Example 3: Filter items by even index positions
+
+```powerquery
+let
+    Items = {"A", "B", "C", "D", "E", "F"},
+    Positions = List.Positions(Items),
+    EvenIndexItems = List.Transform(
+        List.Select(Positions, each Number.Mod(_, 2) = 0),
+        each Items{_}
+    )
+in
+    EvenIndexItems
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, C, E}"}]}
+-->

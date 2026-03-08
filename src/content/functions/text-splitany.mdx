@@ -1,0 +1,79 @@
+---
+title: "Text.SplitAny"
+slug: "text-splitany"
+category: "Text"
+description: "Splits a text value at any character found in the separators string, returning a list of substrings."
+syntax: "Text.SplitAny(text as text, separators as text) as list"
+returnType: "list"
+returnDescription: "A list of text values split at any occurrence of any character in separators."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to split."
+  - name: "separators"
+    type: "text"
+    required: true
+    description: "A text value whose individual characters are each treated as a delimiter."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-split"
+  - "splitter-splittextbyanydelimiter"
+  - "splitter-splittextbydelimiter"
+---
+
+## Remarks
+
+`Text.SplitAny` treats each character in the `separators` string as an individual delimiter. The `text` is split at every occurrence of any one of those characters. This differs from `Text.Split`, which treats the entire `separators` argument as a single multi-character delimiter.
+
+Consecutive separator characters produce empty strings in the result list, similar to how `Text.Split` behaves.
+
+To split on a single multi-character delimiter, use `Text.Split`. To use a splitter function in a table transformation, see `Splitter.SplitTextByAnyDelimiter`.
+
+## Examples
+
+### Example 1: Split on either comma or semicolon
+
+```powerquery
+Text.SplitAny("a,b;c,d", ",;")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["a","b","c","d"]}]}
+-->
+
+### Example 2: Split a path on both slash styles
+
+```powerquery
+Text.SplitAny("C:/Users\\Kyle/Documents", "/\\")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["C:","Users","Kyle","Documents"]}]}
+-->
+
+### Example 3: Split on whitespace characters
+
+```powerquery
+Text.SplitAny("one two	three", " 	")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["one","two","three"]}]}
+-->
+
+### Example 4: Split on a single character (equivalent to Text.Split)
+
+```powerquery
+Text.SplitAny("a-b-c", "-")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["a","b","c"]}]}
+-->

@@ -1,0 +1,108 @@
+---
+title: "List.TransformMany"
+slug: "list-transformmany"
+category: "List"
+description: "Projects each element of a list to a collection, then applies a result transformation to each (original element, projected element) pair. Similar to SelectMany / flatMap."
+syntax: "List.TransformMany(list as list, collectionTransform as function, resultTransform as function) as list"
+returnType: "list"
+returnDescription: "A flat list of results produced by applying resultTransform to each pair of (original item, projected collection item)."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "collectionTransform"
+    type: "function"
+    required: true
+    description: "A function that takes an item from the source list and returns a list (the projected collection for that item)."
+  - name: "resultTransform"
+    type: "function"
+    required: true
+    description: "A function that takes two arguments — the original item and each projected collection item — and returns the final result value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-transform"
+  - "list-combine"
+  - "list-zip"
+  - "list-accumulate"
+  - "list-select"
+---
+
+## Remarks
+
+`List.TransformMany` is the M equivalent of `SelectMany` (LINQ) or `flatMap`. It performs a two-stage transformation:
+
+1. **collectionTransform**: Applied to each item in `list`, producing a collection (list) per item.
+2. **resultTransform**: Applied to each `(originalItem, collectionItem)` pair, producing the final output value.
+
+The results are flattened into a single output list.
+
+This is useful for cross-joining a list with sub-lists, expanding nested structures, or generating cartesian products.
+
+- If `collectionTransform` returns an empty list for an item, no output is produced for that item.
+- The output list length equals the total number of elements across all projected collections.
+
+## Examples
+
+### Example 1: Cross-join two lists (cartesian product)
+
+Generate all combinations of colors and sizes.
+
+```powerquery
+let
+    Colors = {"Red", "Blue"},
+    Sizes = {"S", "M", "L"},
+    Combinations = List.TransformMany(
+        Colors,
+        each Sizes,
+        (color, size) => color & "-" & size
+    )
+in
+    Combinations
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Red-S, Red-M, Red-L, Blue-S, Blue-M, Blue-L}"}]}
+-->
+
+### Example 2: Expand a list of numbers into their factors
+
+```powerquery
+let
+    Numbers = {4, 6},
+    Expanded = List.TransformMany(
+        Numbers,
+        each List.Numbers(1, _),
+        (n, factor) => Text.From(n) & ":" & Text.From(factor)
+    )
+in
+    Expanded
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{4:1, 4:2, 4:3, 4:4, 6:1, 6:2, 6:3, 6:4, 6:5, 6:6}"}]}
+-->
+
+### Example 3: Flatten nested lists with context
+
+```powerquery
+let
+    Departments = {[Dept="Sales", Members={"Alice","Bob"}], [Dept="IT", Members={"Carol"}]},
+    Flattened = List.TransformMany(
+        Departments,
+        each _[Members],
+        (dept, member) => dept[Dept] & " - " & member
+    )
+in
+    Flattened
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Sales - Alice, Sales - Bob, IT - Carol}"}]}
+-->

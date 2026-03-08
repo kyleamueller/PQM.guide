@@ -1,0 +1,71 @@
+---
+title: "Table.FromPartitions"
+slug: "table-frompartitions"
+category: "Table"
+description: "Creates a table from a list of partition tables with a synthetic partition column added."
+syntax: "Table.FromPartitions(partitionColumn as text, partitions as list) as table"
+returnType: "table"
+returnDescription: "A combined table with all partition rows and a new column identifying which partition each row came from."
+parameters:
+  - name: "partitionColumn"
+    type: "text"
+    required: true
+    description: "The name for the new column that identifies the partition each row came from."
+  - name: "partitions"
+    type: "list"
+    required: true
+    description: "A list of {partitionValue, table} pairs, where each pair contains the partition identifier and its corresponding table."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-partitionvalues"
+  - "table-partition"
+  - "table-combine"
+  - "table-fromrows"
+---
+
+## Remarks
+
+`Table.FromPartitions` combines multiple tables (partitions) into a single table, adding a column to identify which partition each row originated from. Each element of `partitions` is a two-element list: `{partitionValue, table}`.
+
+This function is the logical inverse of `Table.Partition` and is useful for reassembling data that was previously split or for constructing a union of labeled sub-tables.
+
+## Examples
+
+### Example 1: Combine two partition tables with a Year column
+
+```powerquery
+Table.FromPartitions(
+    "Year",
+    {
+        {2023, #table({"Product", "Sales"}, {{"A", 100}, {"B", 200}})},
+        {2024, #table({"Product", "Sales"}, {{"A", 150}, {"B", 250}})}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Year","type":"any"},{"name":"Product","type":"any"},{"name":"Sales","type":"any"}],"rows":[{"Year":"2023","Product":"A","Sales":"100"},{"Year":"2023","Product":"B","Sales":"200"},{"Year":"2024","Product":"A","Sales":"150"},{"Year":"2024","Product":"B","Sales":"250"}]}
+-->
+
+### Example 2: Combine monthly partitions
+
+```powerquery
+Table.FromPartitions(
+    "Month",
+    {
+        {"Jan", #table({"Amount"}, {{500}})},
+        {"Feb", #table({"Amount"}, {{620}})},
+        {"Mar", #table({"Amount"}, {{480}})}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Month","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"Month":"Jan","Amount":"500"},{"Month":"Feb","Amount":"620"},{"Month":"Mar","Amount":"480"}]}
+-->

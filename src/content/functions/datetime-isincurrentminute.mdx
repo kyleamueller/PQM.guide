@@ -1,0 +1,62 @@
+---
+title: "DateTime.IsInCurrentMinute"
+slug: "datetime-isincurrentminute"
+category: "DateTime"
+description: "Returns true if the datetime falls within the current minute."
+syntax: "DateTime.IsInCurrentMinute(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the current clock minute, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isincurrenthour"
+  - "datetime-isincurrentsecond"
+  - "datetime-isinpreviousminute"
+  - "datetime-isinnextminute"
+---
+
+## Remarks
+
+`DateTime.IsInCurrentMinute` returns `true` if the input `datetime` or `datetimezone` value falls within the same clock minute as now (as determined by `DateTime.LocalNow()`). The minute window runs from HH:MM:00 to HH:MM:59.9999999. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events from the current minute
+
+Keep only rows where EventTime falls within the current minute.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInCurrentMinute([EventTime])
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":45,"EventTime":"2026-03-08T10:32:15"},{"EventID":46,"EventTime":"2026-03-08T10:32:50"}]}
+-->
+
+### Example 2: Flag current-minute rows
+
+Add a boolean column for events that occurred in the current minute.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "IsCurrentMinute", each DateTime.IsInCurrentMinute([EventTime]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsCurrentMinute","type":"logical"}],"rows":[{"EventID":44,"EventTime":"2026-03-08T10:31:59","IsCurrentMinute":false},{"EventID":45,"EventTime":"2026-03-08T10:32:15","IsCurrentMinute":true}]}
+-->

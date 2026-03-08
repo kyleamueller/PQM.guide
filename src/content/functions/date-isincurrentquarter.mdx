@@ -1,0 +1,63 @@
+---
+title: "Date.IsInCurrentQuarter"
+slug: "date-isincurrentquarter"
+category: "Date"
+description: "Returns true if the date falls within the current calendar quarter."
+syntax: "Date.IsInCurrentQuarter(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date is in the current quarter, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentmonth"
+  - "date-isincurrentyear"
+  - "date-isinpreviousquarter"
+  - "date-isinnextquarter"
+  - "date-quarterofyear"
+---
+
+## Remarks
+
+`Date.IsInCurrentQuarter` returns `true` if the input date falls within the same calendar quarter as today (`DateTime.LocalNow()`). Quarters are defined as: Q1 (Jan–Mar), Q2 (Apr–Jun), Q3 (Jul–Sep), Q4 (Oct–Dec). The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter this quarter's sales
+
+Keep only rows where OrderDate falls in the current quarter.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentQuarter([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10"},{"OrderID":40,"OrderDate":"2026-02-20"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+-->
+
+### Example 2: Flag current-quarter rows
+
+Add a boolean column to identify rows from the current quarter.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsCurrentQuarter", each Date.IsInCurrentQuarter([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentQuarter","type":"logical"}],"rows":[{"OrderID":36,"OrderDate":"2025-12-15","IsCurrentQuarter":false},{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentQuarter":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentQuarter":true}]}
+-->

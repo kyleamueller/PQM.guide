@@ -1,0 +1,63 @@
+---
+title: "Date.IsInCurrentYear"
+slug: "date-isincurrentyear"
+category: "Date"
+description: "Returns true if the date falls within the current calendar year."
+syntax: "Date.IsInCurrentYear(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date is in the current year, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentmonth"
+  - "date-isincurrentquarter"
+  - "date-isinpreviousyear"
+  - "date-isinnextyear"
+  - "date-isinyeartodate"
+---
+
+## Remarks
+
+`Date.IsInCurrentYear` returns `true` if the input date falls anywhere within the same calendar year as today (`DateTime.LocalNow()`), from January 1 through December 31. The function is re-evaluated on each query refresh. To limit results to dates up to and including today, use `Date.IsInYearToDate` instead.
+
+## Examples
+
+### Example 1: Filter this year's orders
+
+Keep only rows where OrderDate falls in the current year.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentYear([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10"},{"OrderID":40,"OrderDate":"2026-02-20"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+-->
+
+### Example 2: Flag current-year rows
+
+Add a boolean column to identify rows from the current year.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "IsCurrentYear", each Date.IsInCurrentYear([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentYear","type":"logical"}],"rows":[{"OrderID":36,"OrderDate":"2025-11-15","IsCurrentYear":false},{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentYear":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentYear":true}]}
+-->

@@ -1,0 +1,75 @@
+---
+title: "Date.ToText"
+slug: "date-totext"
+category: "Date"
+description: "Converts a date value to a text string."
+syntax: "Date.ToText(date as nullable date, optional options as any) as nullable text"
+returnType: "text"
+returnDescription: "A text representation of the date, or null if the input is null."
+parameters:
+  - name: "date"
+    type: "date"
+    required: true
+    description: "The date value to convert to text."
+  - name: "options"
+    type: "any"
+    required: false
+    description: "A record or culture text string. Supported record fields: Format (custom format string, e.g., \"dd/MM/yyyy\") and Culture (e.g., \"en-US\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-fromtext"
+  - "date-dayofweekname"
+  - "date-monthname"
+  - "datetime-totext"
+---
+
+## Remarks
+
+`Date.ToText` formats a `date` value as a text string. Without options, it produces an ISO 8601-style string (e.g., `"2024-03-15"`). Use the `Format` field in the options record to apply custom patterns such as `"dd/MM/yyyy"` or `"MMMM d, yyyy"`. The `Culture` field controls locale-specific formatting (e.g., month names). Format strings follow .NET custom date format conventions.
+
+If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Format dates as "Month DD, YYYY" strings
+
+Convert OrderDate to a long-form date string for reporting.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 4),
+        {"OrderID", "OrderDate"}
+    ),
+    "OrderDateText",
+    each Date.ToText([OrderDate], [Format="MMMM d, yyyy"]),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"OrderDateText","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","OrderDateText":"January 15, 2024"},{"OrderID":2,"OrderDate":"2024-01-18","OrderDateText":"January 18, 2024"},{"OrderID":3,"OrderDate":"2024-02-01","OrderDateText":"February 1, 2024"},{"OrderID":4,"OrderDate":"2024-02-10","OrderDateText":"February 10, 2024"}]}
+-->
+
+### Example 2: Format a date in UK style with a specific culture
+
+Return a date in "dd/MM/yyyy" format for UK locale.
+
+```powerquery
+#table(
+    type table [Date = date, Formatted = text],
+    {{#date(2024, 3, 15), Date.ToText(#date(2024, 3, 15), [Format="dd/MM/yyyy", Culture="en-GB"])}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"Formatted","type":"text"}],"rows":[{"Date":"2024-03-15","Formatted":"15/03/2024"}]}
+-->

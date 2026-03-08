@@ -1,0 +1,70 @@
+---
+title: "Table.MinN"
+slug: "table-minn"
+category: "Table"
+description: "Returns the N rows with the lowest values according to the given comparison criteria."
+syntax: "Table.MinN(table as table, comparisonCriteria as any, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "A table containing the rows with the N lowest values."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: true
+    description: "A column name, list of column names, or comparer function defining the sort order."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many bottom rows to return, or a condition function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-min"
+  - "table-maxn"
+  - "table-sort"
+  - "table-lastn"
+---
+
+## Remarks
+
+`Table.MinN` returns the `N` rows with the lowest values for the specified comparison criteria, in ascending order. If `countOrCondition` is a function, rows are returned from the bottom of the sorted table while the function returns true.
+
+This is the counterpart to `Table.MaxN` and is useful for bottom-N analysis.
+
+## Examples
+
+### Example 1: Get the bottom 2 rows by score
+
+```powerquery
+Table.MinN(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}, {"Dave", 70}}),
+    "Score",
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Dave","Score":"70"},{"Name":"Bob","Score":"82"}]}
+-->
+
+### Example 2: Get all rows with score below 85
+
+```powerquery
+Table.MinN(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}, {"Dave", 70}}),
+    "Score",
+    each [Score] < 85
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Dave","Score":"70"},{"Name":"Bob","Score":"82"}]}
+-->

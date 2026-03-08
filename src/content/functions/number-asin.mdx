@@ -1,0 +1,63 @@
+---
+title: "Number.Asin"
+slug: "number-asin"
+category: "Number"
+description: "Returns the arcsine (inverse sine) of a number, in radians."
+syntax: "Number.Asin(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The arcsine of the number in radians, in the range [-π/2, π/2]."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "A value in the range [-1, 1] whose arcsine is computed."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-sin"
+  - "number-acos"
+  - "number-atan"
+---
+
+## Remarks
+
+`Number.Asin` is the inverse of `Number.Sin`. Given a value in [-1, 1], it returns the angle in radians whose sine equals that value. The result is in the range [-π/2, π/2].
+
+Input values outside [-1, 1] return `NaN`. To convert the result from radians to degrees, multiply by `180 / Number.PI`.
+
+## Examples
+
+### Example 1: Arcsine of 1 (90 degrees)
+
+```powerquery
+Number.Asin(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.5707963267948966}]}
+-->
+
+### Example 2: Arcsine of 0.5 (30 degrees)
+
+```powerquery
+Number.Asin(0.5) * 180 / Number.PI
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+-->
+
+### Example 3: Arcsine of 0
+
+```powerquery
+Number.Asin(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->

@@ -1,0 +1,89 @@
+---
+title: "AzureStorage.Tables"
+slug: "azurestorage-tables"
+category: "Accessing Data"
+description: "Returns a navigation table of Azure Table Storage tables from the specified storage account."
+syntax: "AzureStorage.Tables(account as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table where each row represents an Azure Table Storage table, with a Data column containing the table's entities as a Power Query table."
+parameters:
+  - name: "account"
+    type: "text"
+    required: true
+    description: "The Azure Storage account name (e.g., \"mystorageaccount\") or the full Table service URL (e.g., \"https://mystorageaccount.table.core.windows.net\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with additional connection options."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "azurestorage-blobs"
+  - "odata-feed"
+---
+
+## Remarks
+
+`AzureStorage.Tables` connects to Azure Table Storage and returns a navigation table listing all tables in the storage account. Each table's entities (rows) are accessible by drilling into the `Data` column of the corresponding table row.
+
+Azure Table Storage is a NoSQL key-value store that organizes data into tables with entities. Each entity has a `PartitionKey`, `RowKey`, `Timestamp`, and any number of additional typed properties.
+
+**Authentication**: Supports Account Key (storage account name + access key) and Shared Access Signature (SAS). Configure the key in the Power Query credentials dialog using the storage account name as the credential scope. Azure Active Directory (Entra ID) authentication is available in recent versions.
+
+**Query folding**: Limited. Filters on `PartitionKey` and `RowKey` can be pushed to the Table Storage API. Other filters are applied in Power Query after retrieval.
+
+**Columns in entity tables**: Every entity table includes at minimum:
+- `PartitionKey` (text) — logical partition identifier.
+- `RowKey` (text) — unique row identifier within a partition.
+- `Timestamp` (datetimezone) — last modified timestamp (maintained by Azure).
+- Additional application-defined columns vary by entity.
+
+**Large tables**: Azure Table Storage returns up to 1,000 entities per request. Continuation tokens are handled automatically by Power Query to retrieve all entities.
+
+**OData alternative**: Azure Table Storage exposes an OData interface. `OData.Feed` can also be used to query Table Storage, which may offer more filtering flexibility.
+
+## Examples
+
+### Example 1: List all tables in a storage account
+```powerquery
+AzureStorage.Tables("mystorageaccount")
+```
+
+### Example 2: Connect using the full Table service URL
+```powerquery
+AzureStorage.Tables("https://mystorageaccount.table.core.windows.net")
+```
+
+### Example 3: Read all entities from a specific table
+```powerquery
+let
+    Account = AzureStorage.Tables("mystorageaccount"),
+    SalesTable = Account{[Name="Sales"]}[Data]
+in
+    SalesTable
+```
+
+### Example 4: Filter entities by PartitionKey
+```powerquery
+let
+    Account = AzureStorage.Tables("mystorageaccount"),
+    Events = Account{[Name="Events"]}[Data],
+    NorthAmerica = Table.SelectRows(Events, each [PartitionKey] = "NorthAmerica")
+in
+    NorthAmerica
+```
+
+### Example 5: Select specific columns from a Table Storage entity
+```powerquery
+let
+    Account = AzureStorage.Tables("mystorageaccount"),
+    Products = Account{[Name="Products"]}[Data],
+    Selected = Table.SelectColumns(Products, {"PartitionKey", "RowKey", "ProductName", "Price", "InStock"})
+in
+    Selected
+```

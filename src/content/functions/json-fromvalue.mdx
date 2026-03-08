@@ -1,0 +1,110 @@
+---
+title: "Json.FromValue"
+slug: "json-fromvalue"
+category: "Accessing Data"
+description: "Serializes an M value to JSON and returns it as binary."
+syntax: "Json.FromValue(value as any, optional encoding as nullable number) as binary"
+returnType: "binary"
+returnDescription: "The JSON representation of the input value as binary data, encoded using the specified encoding (default UTF-8)."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The M value to serialize. Can be a record, list, table, text, number, logical, null, date, datetime, or duration."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The text encoding to use. Use TextEncoding.Utf8 (65001) for UTF-8 (default), TextEncoding.Utf16 (1200) for UTF-16."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "json-document"
+  - "web-contents"
+---
+
+## Remarks
+
+`Json.FromValue` converts an M value into its JSON representation and returns the result as a binary value. This is the inverse of `Json.Document`, which parses JSON into M values.
+
+**Supported types**: Most M types serialize to JSON naturally:
+- `record` → JSON object `{}`
+- `list` → JSON array `[]`
+- `table` → JSON array of objects
+- `text` → JSON string
+- `number` → JSON number
+- `logical` → JSON boolean
+- `null` → JSON `null`
+- `date`, `datetime`, `datetimezone`, `duration` → JSON string (ISO 8601 format)
+
+**Result type**: The return value is `binary`. To get the JSON as readable text, wrap the result with `Text.FromBinary`:
+```powerquery
+Text.FromBinary(Json.FromValue(myValue))
+```
+
+**Use cases**:
+- Constructing a JSON request body for use with `Web.Contents` (POST/PUT requests to REST APIs).
+- Saving M data structures as JSON files.
+- Logging or debugging M values in a human-readable format.
+
+**Encoding**: The default encoding is UTF-8. Pass `TextEncoding.Utf16` (1200) if the target system requires UTF-16.
+
+**Limitations**: Binary values, function values, and type values cannot be serialized to JSON and will raise an error.
+
+## Examples
+
+### Example 1: Serialize a record to JSON
+```powerquery
+Json.FromValue([Name = "Alice", Age = 30, Active = true])
+// Result (binary): {"Name":"Alice","Age":30,"Active":true}
+```
+
+### Example 2: Convert JSON binary to readable text
+```powerquery
+Text.FromBinary(Json.FromValue([City = "London", Country = "UK"]))
+// Result: "{""City"":""London"",""Country"":""UK""}"
+```
+
+### Example 3: Serialize a list
+```powerquery
+Text.FromBinary(Json.FromValue({1, 2, 3, "four", true, null}))
+// Result: "[1,2,3,""four"",true,null]"
+```
+
+### Example 4: Build a JSON POST body for a REST API call
+```powerquery
+let
+    RequestBody = Json.FromValue([
+        reportType = "Sales",
+        startDate  = "2024-01-01",
+        endDate    = "2024-12-31",
+        filters    = [region = "North America"]
+    ]),
+    Response = Web.Contents(
+        "https://api.example.com/reports",
+        [
+            Headers = [#"Content-Type" = "application/json"],
+            Content  = RequestBody
+        ]
+    ),
+    Result = Json.Document(Response)
+in
+    Result
+```
+
+### Example 5: Serialize a table to a JSON array of objects
+```powerquery
+let
+    Data = #table(
+        {"Product", "Sales"},
+        {{"Widget A", 1500}, {"Widget B", 2300}}
+    ),
+    JsonText = Text.FromBinary(Json.FromValue(Data))
+in
+    JsonText
+// Result: [{"Product":"Widget A","Sales":1500},{"Product":"Widget B","Sales":2300}]
+```

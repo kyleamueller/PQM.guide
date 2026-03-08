@@ -1,0 +1,79 @@
+---
+title: "Number.Sign"
+slug: "number-sign"
+category: "Number"
+description: "Returns a number indicating the sign of a value: 1 for positive, -1 for negative, 0 for zero."
+syntax: "Number.Sign(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "1 if the number is positive, -1 if negative, 0 if zero, null if null."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number whose sign is evaluated."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-abs"
+  - "number-from"
+---
+
+## Remarks
+
+`Number.Sign` returns `1` for any positive number, `-1` for any negative number, and `0` for zero. If the input is `null`, it returns `null`. This function is useful for directional classification — for example, labeling rows as gains, losses, or flat, or for applying signed operations without branching logic.
+
+## Examples
+
+### Example 1: Sign of a positive number
+
+```powerquery
+Number.Sign(42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 2: Sign of a negative number
+
+```powerquery
+Number.Sign(-5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 3: Sign of zero
+
+```powerquery
+Number.Sign(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 4: Classify profit/loss rows in Sales
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Profit"}),
+    "Direction",
+    each if Number.Sign([Profit]) = 1 then "Gain"
+         else if Number.Sign([Profit]) = -1 then "Loss"
+         else "Flat",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Profit","type":"number"},{"name":"Direction","type":"text"}],"rows":[{"OrderID":1,"Profit":500,"Direction":"Gain"},{"OrderID":2,"Profit":-200,"Direction":"Loss"},{"OrderID":3,"Profit":0,"Direction":"Flat"},{"OrderID":4,"Profit":1200,"Direction":"Gain"}]}
+-->

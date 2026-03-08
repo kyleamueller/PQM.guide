@@ -1,0 +1,78 @@
+---
+title: "List.Split"
+slug: "list-split"
+category: "List"
+description: "Splits a list into a list of sub-lists, each of a specified maximum size."
+syntax: "List.Split(list as list, pageSize as number) as list"
+returnType: "list"
+returnDescription: "A list of lists, where each inner list contains at most pageSize items."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list to split."
+  - name: "pageSize"
+    type: "number"
+    required: true
+    description: "The maximum number of items in each sub-list (chunk size)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-firstn"
+  - "list-skip"
+  - "list-range"
+  - "list-zip"
+---
+
+## Remarks
+
+`List.Split` divides a list into consecutive chunks (pages), each containing at most `pageSize` items. If the total number of items is not evenly divisible by `pageSize`, the last sub-list will contain the remaining items (fewer than `pageSize`).
+
+This function is useful for batching API calls, chunking large datasets for processing, or implementing pagination logic.
+
+- The result is a **list of lists**, not a flat list.
+- The `pageSize` must be a positive integer.
+- If the source list is empty, the result is an empty list.
+- All chunks except possibly the last will have exactly `pageSize` items.
+
+## Examples
+
+### Example 1: Split into chunks of 3
+
+```powerquery
+List.Split({1, 2, 3, 4, 5, 6, 7, 8, 9}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}"}]}
+-->
+
+### Example 2: Last chunk may be smaller
+
+```powerquery
+List.Split({1, 2, 3, 4, 5}, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1, 2}, {3, 4}, {5}}"}]}
+-->
+
+### Example 3: Process a list in batches of 100
+
+```powerquery
+let
+    AllIDs = List.Numbers(1, 250),
+    Batches = List.Split(AllIDs, 100),
+    BatchCount = List.Count(Batches)
+in
+    BatchCount
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->

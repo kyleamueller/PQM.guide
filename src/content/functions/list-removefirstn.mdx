@@ -1,0 +1,75 @@
+---
+title: "List.RemoveFirstN"
+slug: "list-removefirstn"
+category: "List"
+description: "Removes the first N items from a list, or items from the start while a condition is true."
+syntax: "List.RemoveFirstN(list as list, countOrCondition as any) as list"
+returnType: "list"
+returnDescription: "A new list with the first N items removed."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many items to remove from the start, or a condition function that removes items while it returns true."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-removelastn"
+  - "list-skip"
+  - "list-firstn"
+  - "list-removerange"
+  - "list-select"
+---
+
+## Remarks
+
+`List.RemoveFirstN` is equivalent to `List.Skip` — it removes the first `N` items from a list and returns the remainder. It accepts either a count or a condition function.
+
+- **Number**: Removes the first `N` items. If `N` is larger than the list, an empty list is returned.
+- **Condition function**: Removes items from the start of the list while the condition returns `true`, stopping at the first item that fails.
+- This function does not modify the original list; it returns a new list.
+
+## Examples
+
+### Example 1: Remove the first 2 items
+
+```powerquery
+List.RemoveFirstN({1, 2, 3, 4, 5}, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{3, 4, 5}"}]}
+-->
+
+### Example 2: Remove items while value is less than 30
+
+```powerquery
+List.RemoveFirstN({10, 20, 30, 40, 50}, each _ < 30)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{30, 40, 50}"}]}
+-->
+
+### Example 3: Skip header-like rows (remove first 3)
+
+```powerquery
+let
+    Rows = {"Header", "Subtitle", "---", "Data1", "Data2", "Data3"},
+    DataOnly = List.RemoveFirstN(Rows, 3)
+in
+    DataOnly
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
+-->

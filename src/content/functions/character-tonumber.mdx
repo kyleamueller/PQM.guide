@@ -1,0 +1,84 @@
+---
+title: "Character.ToNumber"
+slug: "character-tonumber"
+category: "Text"
+description: "Returns the Unicode code point number for the given character."
+syntax: "Character.ToNumber(character as text) as number"
+returnType: "number"
+returnDescription: "The numeric Unicode code point of the character."
+parameters:
+  - name: "character"
+    type: "text"
+    required: true
+    description: "A single-character text value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "character-fromnumber"
+  - "text-tolist"
+  - "text-at"
+---
+
+## Remarks
+
+`Character.ToNumber` returns the Unicode code point (an integer) for the given single character. This is the inverse of `Character.FromNumber`.
+
+The `character` argument must be a single-character text value. Passing a multi-character string or empty string raises an error.
+
+Common uses include:
+- Testing whether a character is alphabetic, numeric, or a control character by comparing its code point to known ranges
+- Sorting characters by Unicode value
+- Computing character-level transformations
+- Detecting non-printable or control characters in data
+
+## Examples
+
+### Example 1: Get the code point for uppercase A
+
+```powerquery
+Character.ToNumber("A")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":65}]}
+-->
+
+### Example 2: Get the code point for a space
+
+```powerquery
+Character.ToNumber(" ")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":32}]}
+-->
+
+### Example 3: Check whether a character is a digit
+
+```powerquery
+let
+    ch = "7",
+    code = Character.ToNumber(ch),
+    isDigit = code >= 48 and code <= 57
+in
+    isDigit
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 4: Get code points for each character in a word
+
+```powerquery
+List.Transform(Text.ToList("ABC"), Character.ToNumber)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[65,66,67]}]}
+-->

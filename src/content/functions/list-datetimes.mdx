@@ -1,0 +1,81 @@
+---
+title: "List.DateTimes"
+slug: "list-datetimes"
+category: "List"
+description: "Generates a list of datetime values starting from a given datetime, with a specified count and step duration."
+syntax: "List.DateTimes(start as datetime, count as number, step as duration) as list"
+returnType: "list"
+returnDescription: "A list of datetime values of length count, beginning at start and incrementing by step."
+parameters:
+  - name: "start"
+    type: "datetime"
+    required: true
+    description: "The starting datetime value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of datetime values to generate."
+  - name: "step"
+    type: "duration"
+    required: true
+    description: "The duration to add between each successive datetime."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-dates"
+  - "list-datetimezones"
+  - "list-times"
+  - "list-durations"
+  - "list-numbers"
+---
+
+## Remarks
+
+`List.DateTimes` generates a sequence of `datetime` values, useful for creating time-series data, generating hourly or sub-hourly intervals, or producing datetime-based lookup lists.
+
+- The `step` parameter uses `#duration(days, hours, minutes, seconds)` to specify the interval.
+- For hourly intervals, use `#duration(0, 1, 0, 0)`.
+- For 15-minute intervals, use `#duration(0, 0, 15, 0)`.
+- `count` must be a non-negative integer; 0 returns an empty list.
+- Use `List.Dates` when only date values are needed, or `List.DateTimeZones` when timezone information is required.
+
+## Examples
+
+### Example 1: Generate hourly datetimes for a day
+
+```powerquery
+List.DateTimes(#datetime(2024, 1, 1, 0, 0, 0), 24, #duration(0, 1, 0, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-01-01 00:00:00"},{"Result":"2024-01-01 01:00:00"},{"Result":"2024-01-01 02:00:00"},{"Result":"..."}]}
+-->
+
+### Example 2: Generate 15-minute intervals
+
+```powerquery
+List.DateTimes(#datetime(2024, 3, 15, 8, 0, 0), 8, #duration(0, 0, 15, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15 08:00:00"},{"Result":"2024-03-15 08:15:00"},{"Result":"2024-03-15 08:30:00"},{"Result":"2024-03-15 08:45:00"},{"Result":"2024-03-15 09:00:00"},{"Result":"2024-03-15 09:15:00"},{"Result":"2024-03-15 09:30:00"},{"Result":"2024-03-15 09:45:00"}]}
+-->
+
+### Example 3: Create a datetime table for a week at noon
+
+```powerquery
+let
+    DateTimes = List.DateTimes(#datetime(2024, 1, 1, 12, 0, 0), 7, #duration(1, 0, 0, 0)),
+    AsTable = Table.FromList(DateTimes, Splitter.SplitByNothing(), {"DateTime"})
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"DateTime","type":"datetime"}],"rows":[{"DateTime":"2024-01-01 12:00:00"},{"DateTime":"2024-01-02 12:00:00"},{"DateTime":"2024-01-03 12:00:00"},{"DateTime":"..."}]}
+-->

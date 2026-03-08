@@ -1,0 +1,68 @@
+---
+title: "Splitter.SplitByNothing"
+slug: "splitter-splitbynothing"
+category: "Splitter"
+description: "Returns a splitter function that does not split its input — it returns each value as a single-element list."
+syntax: "Splitter.SplitByNothing() as function"
+returnType: "function"
+returnDescription: "A function that wraps each input value in a single-element list without splitting it."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "splitter-splittextbydelimiter"
+  - "splitter-splittextbylengths"
+  - "splitter-splittextbypositions"
+  - "splitter-splittextbywhitespace"
+---
+
+## Remarks
+
+`Splitter.SplitByNothing` returns a splitter function that wraps its input in a single-element list, effectively performing no split. Each value passed to the returned function is returned unchanged as `{value}`.
+
+This function is used as a no-op splitter in contexts where a splitter function is required by the API but splitting is not desired. For example, when using `Table.SplitColumn` or other functions that take a splitter argument, passing `Splitter.SplitByNothing()` preserves the original column values as single-element lists.
+
+## Examples
+
+### Example 1: Apply the no-op splitter to a value
+
+```powerquery
+Splitter.SplitByNothing()("Hello World")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Hello World"]}]}
+-->
+
+### Example 2: Use in Table.SplitColumn as a no-op
+
+```powerquery
+Table.SplitColumn(
+    #table({"Name"}, {{"Alice"}, {"Bob"}}),
+    "Name",
+    Splitter.SplitByNothing()
+)
+```
+
+<!--output
+{"columns":[{"name":"Name.1","type":"text"}],"rows":[{"Name.1":"Alice"},{"Name.1":"Bob"}]}
+-->
+
+### Example 3: Confirm it produces a single-element list
+
+```powerquery
+let
+    splitter = Splitter.SplitByNothing(),
+    result = splitter("Power Query")
+in
+    List.Count(result)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->

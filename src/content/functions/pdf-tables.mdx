@@ -1,0 +1,104 @@
+---
+title: "Pdf.Tables"
+slug: "pdf-tables"
+category: "Accessing Data"
+description: "Extracts tables from a PDF file and returns them as a navigation table."
+syntax: "Pdf.Tables(pdf as binary, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table where each row represents a table found in the PDF, with columns for Id, Name, Page, Kind, and Data."
+parameters:
+  - name: "pdf"
+    type: "binary"
+    required: true
+    description: "The binary content of the PDF file, typically obtained from File.Contents or Web.Contents."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options including StartPage (number), EndPage (number), MultiPage (logical), and Implementation (text)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "file-contents"
+  - "web-contents"
+  - "folder-files"
+  - "folder-contents"
+---
+
+## Remarks
+
+`Pdf.Tables` extracts tabular data from PDF documents. It uses heuristic algorithms to detect table structures based on the visual layout of text and lines in the PDF. The function returns a navigation table listing all detected tables across all pages.
+
+**Input**: The `pdf` parameter must be a binary value. Obtain it using `File.Contents` for local files or `Web.Contents` for PDF files hosted at a URL.
+
+**Navigation table columns**:
+- `Id` (text) — a unique identifier for the table (e.g., `"Table001"`).
+- `Name` (text) — same as `Id` by default.
+- `Page` (number) — the page number on which the table was found.
+- `Kind` (text) — always `"Table"`.
+- `Data` (table) — the extracted table content.
+
+**Key options**:
+- `StartPage` (number) — the first page to extract from (1-based). Useful for large PDFs.
+- `EndPage` (number) — the last page to extract from. Combine with `StartPage` to target specific page ranges.
+- `MultiPage` (logical) — when `true`, attempts to merge tables that span multiple pages into a single table.
+- `Implementation` (text) — set to `"1.3"` to use a newer extraction implementation.
+
+**Limitations**:
+- Works best on PDFs with well-defined table borders or consistent column alignment. PDFs that are scanned images (not text-based) are not supported — OCR is not applied.
+- Complex merged cells or irregularly structured tables may not extract cleanly.
+- Password-protected PDFs cannot be read.
+
+**Authentication**: Not applicable — authentication is handled by the function that provides the binary (e.g., `Web.Contents`).
+
+**Query folding**: Not supported.
+
+## Examples
+
+### Example 1: Extract all tables from a local PDF file
+```powerquery
+Pdf.Tables(File.Contents("C:\Reports\AnnualReport.pdf"))
+```
+
+### Example 2: Extract tables from a PDF hosted at a URL
+```powerquery
+Pdf.Tables(Web.Contents("https://example.com/reports/q4-results.pdf"))
+```
+
+### Example 3: Access the first table found in a PDF
+```powerquery
+let
+    Source = Pdf.Tables(File.Contents("C:\Data\SalesReport.pdf")),
+    FirstTable = Source{0}[Data]
+in
+    FirstTable
+```
+
+### Example 4: Extract tables from specific pages only
+```powerquery
+let
+    Source = Pdf.Tables(
+        File.Contents("C:\Data\LargeReport.pdf"),
+        [StartPage = 5, EndPage = 10]
+    ),
+    FirstTable = Source{0}[Data]
+in
+    FirstTable
+```
+
+### Example 5: Combine PDF files from a folder and extract tables
+```powerquery
+let
+    Files = Folder.Files("C:\Reports\PDFs"),
+    Pdfs = Table.SelectRows(Files, each [Extension] = ".pdf"),
+    AddTables = Table.AddColumn(Pdfs, "Tables", each Pdf.Tables([Content])),
+    Expanded = Table.ExpandTableColumn(AddTables, "Tables", {"Name", "Data"}),
+    FirstSheets = Table.SelectRows(Expanded, each [Name] = "Table001"),
+    Combined = Table.Combine(FirstSheets[Data])
+in
+    Combined
+```

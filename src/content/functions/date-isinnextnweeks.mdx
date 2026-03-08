@@ -1,0 +1,66 @@
+---
+title: "Date.IsInNextNWeeks"
+slug: "date-isinnextnweeks"
+category: "Date"
+description: "Returns true if the date falls within the next N calendar weeks."
+syntax: "Date.IsInNextNWeeks(dateTime as any, weeks as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the next N weeks after the current week, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "weeks"
+    type: "number"
+    required: true
+    description: "The number of weeks ahead to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinnextweek"
+  - "date-isinpreviousnweeks"
+  - "date-isinnextndays"
+  - "date-isinnextnmonths"
+---
+
+## Remarks
+
+`Date.IsInNextNWeeks` returns `true` if the input date falls within the next N complete calendar weeks (Sunday–Saturday) after the current week. The current week itself is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Find tasks due in the next 2 weeks
+
+Keep only rows where DueDate falls within the next 2 calendar weeks.
+
+```powerquery
+Table.SelectRows(
+    Tasks,
+    each Date.IsInNextNWeeks([DueDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":6,"DueDate":"2026-03-15","TaskName":"Client call"},{"TaskID":7,"DueDate":"2026-03-20","TaskName":"Review budget"}]}
+-->
+
+### Example 2: Flag deliverables due in the next 4 weeks
+
+Add a boolean column for items due within the next 4 weeks.
+
+```powerquery
+Table.AddColumn(
+    Deliverables,
+    "DueInNext4Weeks", each Date.IsInNextNWeeks([DueDate], 4), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"DelivID","type":"text"},{"name":"DueDate","type":"date"},{"name":"DueInNext4Weeks","type":"logical"}],"rows":[{"DelivID":"D01","DueDate":"2026-03-20","DueInNext4Weeks":true},{"DelivID":"D02","DueDate":"2026-04-15","DueInNext4Weeks":false}]}
+-->

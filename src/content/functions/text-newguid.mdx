@@ -1,0 +1,64 @@
+---
+title: "Text.NewGuid"
+slug: "text-newguid"
+category: "Text"
+description: "Returns a new randomly generated GUID as a text string."
+syntax: "Text.NewGuid() as text"
+returnType: "text"
+returnDescription: "A new GUID in standard lowercase format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "guid-from"
+  - "text-newguid"
+---
+
+## Remarks
+
+`Text.NewGuid` generates a new version-4 (random) GUID each time it is called and returns it as a lowercase text string in the standard 8-4-4-4-12 hexadecimal format.
+
+Because `Text.NewGuid` is a volatile function (its result changes on each evaluation), Power Query may call it multiple times during a single refresh. If a stable, unique identifier per row is needed, consider generating GUIDs outside Power Query and loading them as data, or using a deterministic surrogate key approach.
+
+In Power Query Online and dataflows, volatile functions may be evaluated differently to support query folding and caching.
+
+## Examples
+
+### Example 1: Generate a single GUID
+
+```powerquery
+Text.NewGuid()
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72"}]}
+-->
+
+### Example 2: Add a GUID column to a table
+
+```powerquery
+Table.AddColumn(
+    #table({"Name"}, {{"Alice"}, {"Bob"}}),
+    "ID",
+    each Text.NewGuid()
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"ID","type":"text"}],"rows":[{"Name":"Alice","ID":"c1a2b3d4-e5f6-7890-abcd-ef1234567890"},{"Name":"Bob","ID":"d4e5f6a7-b8c9-0123-4567-89abcdef0123"}]}
+-->
+
+### Example 3: Validate GUID format with Guid.From
+
+```powerquery
+Guid.From(Text.NewGuid())
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"f0e1d2c3-b4a5-6789-0abc-def012345678"}]}
+-->

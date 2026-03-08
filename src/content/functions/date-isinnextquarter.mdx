@@ -1,0 +1,62 @@
+---
+title: "Date.IsInNextQuarter"
+slug: "date-isinnextquarter"
+category: "Date"
+description: "Returns true if the date falls in the next calendar quarter."
+syntax: "Date.IsInNextQuarter(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls in the quarter immediately after the current quarter, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isincurrentquarter"
+  - "date-isinpreviousquarter"
+  - "date-isinnextnquarters"
+  - "date-isinnextmonth"
+---
+
+## Remarks
+
+`Date.IsInNextQuarter` returns `true` if the input date falls within the calendar quarter immediately following the current quarter (as determined by `DateTime.LocalNow()`). For example, if today is in Q1, this function returns `true` for any date in Q2. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter next quarter's pipeline
+
+Keep only opportunities expected to close in the next quarter.
+
+```powerquery
+Table.SelectRows(
+    Pipeline,
+    each Date.IsInNextQuarter([ExpectedClose])
+)
+```
+
+<!--output
+{"columns":[{"name":"OppID","type":"text"},{"name":"ExpectedClose","type":"date"},{"name":"OpportunityName","type":"text"}],"rows":[{"OppID":"O001","ExpectedClose":"2026-04-15","OpportunityName":"Deal A"},{"OppID":"O003","ExpectedClose":"2026-06-30","OpportunityName":"Deal C"}]}
+-->
+
+### Example 2: Flag next-quarter opportunities
+
+Add a boolean column identifying next-quarter deals.
+
+```powerquery
+Table.AddColumn(
+    Pipeline,
+    "NextQuarter", each Date.IsInNextQuarter([ExpectedClose]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OppID","type":"text"},{"name":"ExpectedClose","type":"date"},{"name":"NextQuarter","type":"logical"}],"rows":[{"OppID":"O001","ExpectedClose":"2026-04-15","NextQuarter":true},{"OppID":"O002","ExpectedClose":"2026-03-20","NextQuarter":false},{"OppID":"O004","ExpectedClose":"2026-07-01","NextQuarter":false}]}
+-->

@@ -1,0 +1,79 @@
+---
+title: "Value.Compare"
+slug: "value-compare"
+category: "Value"
+description: "Compares two values and returns -1, 0, or 1 indicating their relative order."
+syntax: "Value.Compare(value1 as any, value2 as any, optional comparer as nullable function) as number"
+returnType: "number"
+returnDescription: "-1 if value1 < value2, 0 if equal, 1 if value1 > value2."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The first value."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The second value."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "An optional comparer function. When omitted, the default ordering semantics are used."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-equals"
+  - "value-nullableequals"
+  - "list-sort"
+---
+
+## Remarks
+
+`Value.Compare` returns a signed integer indicating the ordering relationship between two values:
+
+- `-1` — value1 is less than value2
+- `0` — the values are equal
+- `1` — value1 is greater than value2
+
+This function is useful for building custom sort comparers, range checks, and ordering logic. The return value is compatible with the comparer functions expected by `List.Sort` and related functions.
+
+An optional `comparer` function can be provided for locale-aware or case-insensitive comparisons (e.g., `Comparer.OrdinalIgnoreCase`).
+
+## Examples
+
+### Example 1: Compare numbers
+
+```powerquery
+Value.Compare(3, 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 2: Equal values return 0
+
+```powerquery
+Value.Compare("abc", "abc")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 3: Use as a custom comparer in List.Sort
+
+Sort a list of text values case-insensitively:
+
+```powerquery
+List.Sort({"banana", "Apple", "cherry"}, (a, b) => Value.Compare(a, b, Comparer.OrdinalIgnoreCase))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Apple","banana","cherry"]}]}
+-->

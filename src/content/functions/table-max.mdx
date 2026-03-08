@@ -1,0 +1,82 @@
+---
+title: "Table.Max"
+slug: "table-max"
+category: "Table"
+description: "Returns the row with the maximum value according to the given comparison criteria."
+syntax: "Table.Max(table as table, comparisonCriteria as any, optional default as nullable any) as any"
+returnType: "any"
+returnDescription: "The row with the highest value as a record, or the default if the table is empty."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: true
+    description: "A column name (text), a list of column names, or a comparer function to determine ordering."
+  - name: "default"
+    type: "any"
+    required: false
+    description: "Optional value to return if the table is empty. Defaults to null."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-maxn"
+  - "table-min"
+  - "table-sort"
+  - "table-first"
+---
+
+## Remarks
+
+`Table.Max` returns the entire row (as a record) that contains the maximum value for the given comparison criteria. If multiple rows share the maximum value, the first one encountered is returned. Field values can be accessed using record field access: `Table.Max(t, "Score")[Name]`.
+
+For the top N rows, use `Table.MaxN`. For just the maximum cell value without the full row, access the field directly from the returned record.
+
+## Examples
+
+### Example 1: Get the row with the highest score
+
+```powerquery
+Table.Max(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
+    "Score"
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"Carol\", Score = 99]"}]}
+-->
+
+### Example 2: Get the name of the top scorer
+
+```powerquery
+Table.Max(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
+    "Score"
+)[Name]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Carol"}]}
+-->
+
+### Example 3: Return a default for an empty table
+
+```powerquery
+Table.Max(
+    #table({"Name", "Score"}, {}),
+    "Score",
+    [Name = "N/A", Score = 0]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"N/A\", Score = 0]"}]}
+-->

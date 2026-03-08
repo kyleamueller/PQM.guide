@@ -1,0 +1,70 @@
+---
+title: "Date.MonthName"
+slug: "date-monthname"
+category: "Date"
+description: "Returns the name of the month for the given date."
+syntax: "Date.MonthName(dateTime as any, optional culture as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "The localized name of the month (e.g., \"March\")."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture code such as \"en-US\" or \"de-DE\" that controls the language of the returned month name."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-month"
+  - "date-dayofweekname"
+  - "date-totext"
+---
+
+## Remarks
+
+`Date.MonthName` returns the full, localized name of the month for a given `date`, `datetime`, or `datetimezone` value. When no `culture` is provided, the host environment's locale is used. For abbreviated month names (e.g., "Mar"), use `Date.ToText` with the format string `"MMM"`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Add month name column to Sales table
+
+Add a column with the full month name for each order date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "MonthName", each Date.MonthName([OrderDate]), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"MonthName","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","MonthName":"January"},{"OrderID":2,"OrderDate":"2024-01-18","MonthName":"January"},{"OrderID":3,"OrderDate":"2024-02-01","MonthName":"February"},{"OrderID":4,"OrderDate":"2024-02-10","MonthName":"February"},{"OrderID":5,"OrderDate":"2024-03-05","MonthName":"March"}]}
+-->
+
+### Example 2: Month name in German
+
+Return the month name in German using the culture parameter.
+
+```powerquery
+#table(
+    type table [Date = date, MonthDE = text],
+    {{#date(2024, 3, 15), Date.MonthName(#date(2024, 3, 15), "de-DE")}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"MonthDE","type":"text"}],"rows":[{"Date":"2024-03-15","MonthDE":"März"}]}
+-->

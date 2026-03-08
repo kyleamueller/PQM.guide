@@ -1,0 +1,83 @@
+---
+title: "List.RemoveMatchingItems"
+slug: "list-removematchingitems"
+category: "List"
+description: "Removes all occurrences of items found in the second list from the first list."
+syntax: "List.RemoveMatchingItems(list1 as list, list2 as list, optional equationCriteria as any) as list"
+returnType: "list"
+returnDescription: "A new list with all occurrences of list2 items removed from list1."
+parameters:
+  - name: "list1"
+    type: "list"
+    required: true
+    description: "The source list to remove items from."
+  - name: "list2"
+    type: "list"
+    required: true
+    description: "The list of values to remove from list1."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "An optional equation criteria to control how equality is determined."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-removeitems"
+  - "list-difference"
+  - "list-removenulls"
+  - "list-select"
+---
+
+## Remarks
+
+`List.RemoveMatchingItems` removes **all occurrences** of any value in `list2` from `list1`. Unlike `List.Difference` (which is a set operation returning distinct values), this function preserves duplicates in `list1` that are not in `list2`.
+
+The key distinction from `List.RemoveItems`:
+- `List.RemoveMatchingItems` removes **every** occurrence of matching values.
+- `List.RemoveItems` removes one occurrence per matched item.
+
+- Comparison is case-sensitive for text by default.
+- Pass `Comparer.OrdinalIgnoreCase` for case-insensitive removal.
+- Returns a new list; the original is not modified.
+
+## Examples
+
+### Example 1: Remove all matching values
+
+```powerquery
+List.RemoveMatchingItems({1, 2, 3, 2, 4, 2, 5}, {2, 4})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 3, 5}"}]}
+-->
+
+### Example 2: Remove stopwords from a word list
+
+```powerquery
+let
+    Words = {"the", "quick", "the", "brown", "fox", "the"},
+    Stopwords = {"the", "a", "an"},
+    Filtered = List.RemoveMatchingItems(Words, Stopwords)
+in
+    Filtered
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{quick, brown, fox}"}]}
+-->
+
+### Example 3: Case-insensitive removal
+
+```powerquery
+List.RemoveMatchingItems({"Apple", "APPLE", "Banana", "apple"}, {"apple"}, Comparer.OrdinalIgnoreCase)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Banana}"}]}
+-->

@@ -1,0 +1,73 @@
+---
+title: "Table.ReplaceRows"
+slug: "table-replacerows"
+category: "Table"
+description: "Replaces a specified number of rows starting at an offset with a new set of row records."
+syntax: "Table.ReplaceRows(table as table, offset as number, count as number, rows as list) as table"
+returnType: "table"
+returnDescription: "The table with the specified rows replaced by the new rows."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to modify."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based index of the first row to replace."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of rows to remove starting at offset."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of records to insert in place of the removed rows."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-insertrows"
+  - "table-removerows"
+  - "table-replacematchingrows"
+---
+
+## Remarks
+
+`Table.ReplaceRows` removes `count` rows starting at `offset` and inserts the new `rows` in their place. The number of replacement rows does not need to match `count` — you can replace 2 rows with 1, or 1 row with 3. Each replacement record must have fields corresponding to table column names.
+
+## Examples
+
+### Example 1: Replace one row
+
+```powerquery
+Table.ReplaceRows(
+    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}, {3, "Carol"}}),
+    1,
+    1,
+    {[ID = 99, Name = "Zara"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"99","Name":"Zara"},{"ID":"3","Name":"Carol"}]}
+-->
+
+### Example 2: Replace two rows with one
+
+```powerquery
+Table.ReplaceRows(
+    #table({"ID"}, {{1}, {2}, {3}, {4}}),
+    1,
+    2,
+    {[ID = 99]}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"99"},{"ID":"4"}]}
+-->

@@ -1,0 +1,81 @@
+---
+title: "Excel.CurrentWorkbook"
+slug: "excel-currentworkbook"
+category: "Accessing Data"
+description: "Returns a navigation table of tables and named ranges from the current Excel workbook."
+syntax: "Excel.CurrentWorkbook(optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table where each row represents a table or named range in the current workbook, with columns for Name, Content, and Kind."
+parameters:
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with additional options."
+compatibility:
+  pbiDesktop: false
+  pbiService: false
+  excelDesktop: true
+  excelOnline: true
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "excel-workbook"
+---
+
+## Remarks
+
+`Excel.CurrentWorkbook` is an Excel-only function that returns a navigation table of all named tables (`ListObject` objects) and named ranges defined in the Excel workbook that contains the current Power Query query. It is used exclusively within Excel's Power Query editor to reference data within the same workbook.
+
+**Excel only**: This function is not available in Power BI Desktop, Power BI Service, dataflows, or any other Power Query environment. Attempting to use it outside of Excel will result in an error.
+
+**What is returned**: The navigation table includes:
+- `Name` (text) — the name of the table or named range.
+- `Content` (table) — the data as a table.
+- `Kind` (text) — either `"Table"` (for Excel tables / `ListObject`) or `"DefinedName"` (for named ranges).
+
+**Self-referencing warning**: Referencing the same table that a query is loaded into creates a circular dependency. Always reference a different named table or named range as the source.
+
+**No authentication required**: The workbook is local, so no credentials are involved.
+
+**Query folding**: Not supported.
+
+**Common patterns**:
+- Use a named table (created via Insert > Table in Excel) as a parameter table that controls query behavior.
+- Use named ranges to store configuration values (e.g., a file path, a date filter) that users can update directly in the spreadsheet.
+
+## Examples
+
+### Example 1: List all tables and named ranges in the workbook
+```powerquery
+Excel.CurrentWorkbook()
+```
+
+### Example 2: Access a specific named table
+```powerquery
+let
+    Source = Excel.CurrentWorkbook(),
+    SalesTable = Source{[Name="SalesData"]}[Content]
+in
+    SalesTable
+```
+
+### Example 3: Read a parameter value from a named range
+```powerquery
+let
+    Source = Excel.CurrentWorkbook(),
+    ParamTable = Source{[Name="Parameters"]}[Content],
+    StartDate = ParamTable{0}[Value]
+in
+    StartDate
+```
+
+### Example 4: Use a workbook table as a filter list
+```powerquery
+let
+    AllData = Excel.CurrentWorkbook(){[Name="AllOrders"]}[Content],
+    AllowList = Excel.CurrentWorkbook(){[Name="AllowedRegions"]}[Content],
+    AllowedValues = AllowList[Region],
+    Filtered = Table.SelectRows(AllData, each List.Contains(AllowedValues, [Region]))
+in
+    Filtered
+```

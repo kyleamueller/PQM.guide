@@ -1,0 +1,88 @@
+---
+title: "Table.PositionOf"
+slug: "table-positionof"
+category: "Table"
+description: "Returns the zero-based row index of the first (or all) rows matching the given record, or -1 if not found."
+syntax: "Table.PositionOf(table as table, row as record, optional occurrence as nullable number, optional equationCriteria as any) as any"
+returnType: "any"
+returnDescription: "A row index number, a list of row indices, or -1 if no match is found."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "row"
+    type: "record"
+    required: true
+    description: "A record whose fields are matched against table rows."
+  - name: "occurrence"
+    type: "number"
+    required: false
+    description: "Optional. Use Occurrence.First (0), Occurrence.Last (1), or Occurrence.All (2) to control which positions are returned."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to restrict which fields are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-positionofany"
+  - "table-contains"
+  - "table-selectrows"
+  - "table-range"
+---
+
+## Remarks
+
+`Table.PositionOf` returns the zero-based index of the first row that matches the given record. If no match is found, it returns `-1`. By supplying an `occurrence` value you can retrieve the last match position or all match positions as a list:
+
+- `Occurrence.First` (default): first matching position
+- `Occurrence.Last`: last matching position
+- `Occurrence.All`: list of all matching positions
+
+## Examples
+
+### Example 1: Find the position of a row
+
+```powerquery
+Table.PositionOf(
+    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Carol"}}),
+    [Name = "Bob"]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"1"}]}
+-->
+
+### Example 2: Row not found returns -1
+
+```powerquery
+Table.PositionOf(
+    #table({"Name"}, {{"Alice"}, {"Bob"}}),
+    [Name = "Dave"]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"-1"}]}
+-->
+
+### Example 3: Find all positions of a matching row
+
+```powerquery
+Table.PositionOf(
+    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Alice"}}),
+    [Name = "Alice"],
+    Occurrence.All
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 2}"}]}
+-->

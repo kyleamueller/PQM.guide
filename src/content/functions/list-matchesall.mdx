@@ -1,0 +1,77 @@
+---
+title: "List.MatchesAll"
+slug: "list-matchesall"
+category: "List"
+description: "Returns true if the condition function returns true for every item in the list."
+syntax: "List.MatchesAll(list as list, condition as function) as logical"
+returnType: "logical"
+returnDescription: "True if the condition returns true for all items; false if any item fails the condition."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to test."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "A function that takes a list item and returns a logical value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-matchesany"
+  - "list-alltrue"
+  - "list-anytrue"
+  - "list-select"
+---
+
+## Remarks
+
+`List.MatchesAll` applies a condition function to every item in the list and returns `true` only if every item satisfies the condition. It is the list equivalent of the "for all" quantifier.
+
+Unlike `List.AllTrue`, which expects a pre-computed list of logical values, `List.MatchesAll` accepts any list and a predicate function applied on the fly.
+
+- An empty list returns `true` (vacuous truth).
+- The function short-circuits: evaluation stops as soon as a failing item is found.
+- Equivalent to `List.AllTrue(List.Transform(list, condition))`, but may short-circuit earlier.
+
+## Examples
+
+### Example 1: Check if all numbers are positive
+
+```powerquery
+List.MatchesAll({1, 5, 3, 8}, each _ > 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 2: Check fails when one item doesn't match
+
+```powerquery
+List.MatchesAll({1, 5, -3, 8}, each _ > 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+### Example 3: Validate all order amounts exceed minimum
+
+```powerquery
+let
+    OrderAmounts = {150.00, 225.50, 89.99, 310.00},
+    MinOrder = 50.00,
+    AllValid = List.MatchesAll(OrderAmounts, each _ >= MinOrder)
+in
+    AllValid
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->

@@ -1,0 +1,70 @@
+---
+title: "Table.ColumnsOfType"
+slug: "table-columnsoftype"
+category: "Table"
+description: "Returns a list of column names whose types match any of the given types."
+syntax: "Table.ColumnsOfType(table as table, listOfTypes as list) as list"
+returnType: "list"
+returnDescription: "A list of column names that match any type in the provided list."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to inspect."
+  - name: "listOfTypes"
+    type: "list"
+    required: true
+    description: "A list of types to match against column types (e.g., {type text, type number})."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-columnnames"
+  - "table-columntypes"
+  - "table-selectcolumns"
+  - "table-transformcolumntypes"
+---
+
+## Remarks
+
+`Table.ColumnsOfType` inspects the type metadata of each column and returns names of columns whose type matches any type in `listOfTypes`. This is useful for dynamically targeting columns of a specific data type — for example, to transform all `text` columns or remove all `number` columns without hard-coding column names.
+
+Type matching uses the table's declared column types. If columns have `type any`, they may not be matched by specific types like `type text`.
+
+## Examples
+
+### Example 1: Find all text columns
+
+```powerquery
+let
+    Source = #table(
+        type table [Name = text, Age = number, City = text],
+        {{"Alice", 30, "NYC"}, {"Bob", 25, "LA"}}
+    )
+in
+    Table.ColumnsOfType(Source, {type text})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Name\", \"City\"}"}]}
+-->
+
+### Example 2: Find text and number columns
+
+```powerquery
+let
+    Source = #table(
+        type table [Name = text, Score = number, Active = logical],
+        {{"Alice", 95, true}}
+    )
+in
+    Table.ColumnsOfType(Source, {type text, type number})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Name\", \"Score\"}"}]}
+-->

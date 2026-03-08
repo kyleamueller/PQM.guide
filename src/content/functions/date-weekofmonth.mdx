@@ -1,0 +1,70 @@
+---
+title: "Date.WeekOfMonth"
+slug: "date-weekofmonth"
+category: "Date"
+description: "Returns the week number within the month (1–6) for the given date."
+syntax: "Date.WeekOfMonth(dateTime as any, optional firstDayOfWeek as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "An integer from 1 to 6 representing the week number within the month."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value."
+  - name: "firstDayOfWeek"
+    type: "number"
+    required: false
+    description: "A Day.* constant specifying the first day of the week. Defaults to Day.Sunday (0). Use Day.Monday (1) for ISO weeks."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-weekofyear"
+  - "date-startofweek"
+  - "date-dayofweek"
+---
+
+## Remarks
+
+`Date.WeekOfMonth` returns the week number within the month, starting from 1. The `firstDayOfWeek` parameter controls which day starts a new week (default Sunday). Week 1 contains the first day of the month; partial weeks at month boundaries are still counted. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Add week-of-month to Sales table
+
+Add a column showing the week number within the month for each order.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "WeekOfMonth", each Date.WeekOfMonth([OrderDate]), Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"WeekOfMonth","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","WeekOfMonth":3},{"OrderID":2,"OrderDate":"2024-01-18","WeekOfMonth":3},{"OrderID":3,"OrderDate":"2024-02-01","WeekOfMonth":1},{"OrderID":4,"OrderDate":"2024-02-10","WeekOfMonth":2},{"OrderID":5,"OrderDate":"2024-03-05","WeekOfMonth":1}]}
+-->
+
+### Example 2: Week of month using Monday as start of week
+
+Return the week-of-month for March 15, 2024 with Monday as the first day.
+
+```powerquery
+#table(
+    type table [Date = date, WeekOfMonth = number],
+    {{#date(2024, 3, 15), Date.WeekOfMonth(#date(2024, 3, 15), Day.Monday)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Date","type":"date"},{"name":"WeekOfMonth","type":"number"}],"rows":[{"Date":"2024-03-15","WeekOfMonth":3}]}
+-->

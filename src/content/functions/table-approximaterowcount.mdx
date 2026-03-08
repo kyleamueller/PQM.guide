@@ -1,0 +1,57 @@
+---
+title: "Table.ApproximateRowCount"
+slug: "table-approximaterowcount"
+category: "Table"
+description: "Returns an approximate row count that may be faster than Table.RowCount for large folded queries."
+syntax: "Table.ApproximateRowCount(table as table) as number"
+returnType: "number"
+returnDescription: "An approximate number of rows in the table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose approximate row count is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-rowcount"
+  - "table-isempty"
+---
+
+## Remarks
+
+`Table.ApproximateRowCount` returns an approximate count of rows in a table. For data sources that support query folding, this function may fold to a fast server-side approximation (such as statistics-based row estimates in SQL Server) instead of performing a full `COUNT(*)`. This makes it much faster for large tables when an exact count is not required.
+
+If the data source does not support an approximate count, the function may fall back to a full row count identical to `Table.RowCount`. Do not rely on this function when an exact count is required.
+
+## Examples
+
+### Example 1: Get an approximate row count
+
+```powerquery
+Table.ApproximateRowCount(Sales)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"1000000"}]}
+-->
+
+### Example 2: Use as a quick size check
+
+```powerquery
+let
+    Source = Sql.Database("server", "db"),
+    Orders = Source{[Schema="dbo", Item="Orders"]}[Data],
+    ApproxCount = Table.ApproximateRowCount(Orders)
+in
+    ApproxCount
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"5432100"}]}
+-->

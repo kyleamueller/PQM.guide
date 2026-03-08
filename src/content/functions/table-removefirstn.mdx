@@ -1,0 +1,64 @@
+---
+title: "Table.RemoveFirstN"
+slug: "table-removefirstn"
+category: "Table"
+description: "Removes the first N rows of a table, or rows while a condition is true."
+syntax: "Table.RemoveFirstN(table as table, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "The table with the first N rows (or leading conditional rows) removed."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to remove rows from."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many rows to remove, or a condition function that removes rows while it returns true."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removelastn"
+  - "table-removerows"
+  - "table-skip"
+  - "table-firstn"
+---
+
+## Remarks
+
+`Table.RemoveFirstN` removes rows from the top of the table. When passed a number, it removes that many rows. When passed a function, it removes rows from the top as long as the condition is satisfied — once a row fails the condition, removal stops and the remaining rows are returned.
+
+This function is equivalent to `Table.Skip` when given a number.
+
+## Examples
+
+### Example 1: Remove the first 2 rows
+
+```powerquery
+Table.RemoveFirstN(
+    #table({"ID"}, {{1}, {2}, {3}, {4}}),
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"3"},{"ID":"4"}]}
+-->
+
+### Example 2: Remove rows while value is less than 3
+
+```powerquery
+Table.RemoveFirstN(
+    #table({"ID"}, {{1}, {2}, {3}, {4}}),
+    each [ID] < 3
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"3"},{"ID":"4"}]}
+-->

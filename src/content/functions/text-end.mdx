@@ -1,0 +1,80 @@
+---
+title: "Text.End"
+slug: "text-end"
+category: "Text"
+description: "Returns a text value of the specified length from the end of a text value."
+syntax: "Text.End(text as nullable text, count as number) as nullable text"
+returnType: "text"
+returnDescription: "The last count characters of text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of characters to return from the end of the text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-start"
+  - "text-middle"
+  - "text-range"
+  - "text-at"
+---
+
+## Remarks
+
+`Text.End` extracts a substring from the end of a text value. It returns the last `count` characters of `text`.
+
+If `text` is `null`, the function returns `null`. If `count` is greater than the length of `text`, the entire text is returned. If `count` is 0, an empty text string `""` is returned.
+
+This function is commonly used to extract suffixes, file extensions, or the trailing portion of a formatted string such as a phone number or product code.
+
+## Examples
+
+### Example 1: Get the last four characters of a string
+
+```powerquery
+Text.End("Hello World", 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"World"}]}
+-->
+
+### Example 2: Extract a file extension
+
+```powerquery
+Text.End("report_2024.xlsx", 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"xlsx"}]}
+-->
+
+### Example 3: Get the last four digits of a phone number
+
+```powerquery
+Text.End("555-867-5309", 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"5309"}]}
+-->
+
+### Example 4: Handle null input
+
+```powerquery
+Text.End(null, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+-->

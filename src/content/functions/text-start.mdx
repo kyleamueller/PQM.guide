@@ -1,0 +1,80 @@
+---
+title: "Text.Start"
+slug: "text-start"
+category: "Text"
+description: "Returns a text value of the specified length from the start of a text value."
+syntax: "Text.Start(text as nullable text, count as number) as nullable text"
+returnType: "text"
+returnDescription: "The first count characters of text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The source text value."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of characters to return from the start of the text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-end"
+  - "text-middle"
+  - "text-range"
+  - "text-at"
+---
+
+## Remarks
+
+`Text.Start` extracts a substring from the beginning of a text value. It returns the first `count` characters of `text`.
+
+If `text` is `null`, the function returns `null`. If `count` is greater than the length of `text`, the entire text is returned without error. If `count` is 0, an empty text string `""` is returned.
+
+This function is commonly used to extract prefixes, abbreviations, or fixed-width fields from the left side of a string.
+
+## Examples
+
+### Example 1: Get the first five characters of a string
+
+```powerquery
+Text.Start("Hello World", 5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+-->
+
+### Example 2: Extract a country code prefix
+
+```powerquery
+Text.Start("US-12345", 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US"}]}
+-->
+
+### Example 3: Handle null input
+
+```powerquery
+Text.Start(null, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+-->
+
+### Example 4: Count exceeds text length
+
+```powerquery
+Text.Start("Hi", 10)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hi"}]}
+-->

@@ -1,0 +1,73 @@
+---
+title: "Date.AddQuarters"
+slug: "date-addquarters"
+category: "Date"
+description: "Adds a specified number of quarters to a date value."
+syntax: "Date.AddQuarters(dateTime as any, numberOfQuarters as number) as any"
+returnType: "any"
+returnDescription: "The date resulting from adding the specified number of quarters to the input value."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "The date, datetime, or datetimezone value to add quarters to."
+  - name: "numberOfQuarters"
+    type: "number"
+    required: true
+    description: "The number of quarters to add. Use negative values to subtract quarters."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-addmonths"
+  - "date-addyears"
+  - "date-addweeks"
+  - "date-quarterofyear"
+---
+
+## Remarks
+
+`Date.AddQuarters` adds or subtracts a number of quarters (3-month periods) from a `date`, `datetime`, or `datetimezone` value. One quarter equals three months, so `Date.AddQuarters(d, 1)` is equivalent to `Date.AddMonths(d, 3)`. Passing a negative `numberOfQuarters` subtracts quarters. The return type matches the input type.
+
+End-of-month clamping applies: if the resulting month has fewer days than the input day, the result is clamped to the last day of that month (e.g., adding one quarter to January 31 gives April 30).
+
+## Examples
+
+### Example 1: Add one quarter to a date column
+
+Calculate the end-of-warranty date one quarter after the purchase date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "WarrantyEnd", each Date.AddQuarters([OrderDate], 1), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"WarrantyEnd","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","WarrantyEnd":"2024-04-15"},{"OrderID":2,"OrderDate":"2024-01-18","WarrantyEnd":"2024-04-18"},{"OrderID":3,"OrderDate":"2024-02-01","WarrantyEnd":"2024-05-01"},{"OrderID":4,"OrderDate":"2024-02-10","WarrantyEnd":"2024-05-10"},{"OrderID":5,"OrderDate":"2024-03-05","WarrantyEnd":"2024-06-05"}]}
+-->
+
+### Example 2: Subtract two quarters from a date
+
+Find the date two quarters before a reference date.
+
+```powerquery
+#table(
+    type table [ReferenceDate = date, TwoQuartersBack = date],
+    {{#date(2024, 9, 30), Date.AddQuarters(#date(2024, 9, 30), -2)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"ReferenceDate","type":"date"},{"name":"TwoQuartersBack","type":"date"}],"rows":[{"ReferenceDate":"2024-09-30","TwoQuartersBack":"2024-03-30"}]}
+-->

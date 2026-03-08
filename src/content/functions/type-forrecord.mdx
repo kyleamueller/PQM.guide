@@ -1,0 +1,87 @@
+---
+title: "Type.ForRecord"
+slug: "type-forrecord"
+category: "Type"
+description: "Constructs a record type from a record of field type descriptors."
+syntax: "Type.ForRecord(fields as record, optional isOpen as nullable logical) as type"
+returnType: "type"
+returnDescription: "A record type with the specified field types."
+parameters:
+  - name: "fields"
+    type: "record"
+    required: true
+    description: "A record where each field name maps to a descriptor record with fields Type (a type value) and Optional (a logical)."
+  - name: "isOpen"
+    type: "logical"
+    required: false
+    description: "When true, the resulting type is an open record type. Defaults to false (closed)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-recordfields"
+  - "type-openrecord"
+  - "type-closedrecord"
+  - "type-isopenrecord"
+---
+
+## Remarks
+
+`Type.ForRecord` programmatically constructs a record type. The `fields` parameter is a record where each field corresponds to a column in the desired type. Each field value must be a record with two fields:
+
+- `Type` — the type of the field (e.g., `type text`, `type number`)
+- `Optional` — a logical indicating whether the field is optional (`true`) or required (`false`)
+
+This function is useful for dynamically constructing type annotations in generic transformations or when building custom connector schemas.
+
+## Examples
+
+### Example 1: Construct a closed record type with required fields
+
+```powerquery
+Type.ForRecord(
+    [
+        Name = [Type = type text, Optional = false],
+        Age  = [Type = type number, Optional = false]
+    ],
+    false
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type [Name = text, Age = number]"}]}
+-->
+
+### Example 2: Construct an open record type with an optional field
+
+```powerquery
+Type.ForRecord(
+    [
+        CustomerID = [Type = type number, Optional = false],
+        Email = [Type = type text, Optional = true]
+    ],
+    true
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type [CustomerID = number, Email = (optional text), ...]"}]}
+-->
+
+### Example 3: Verify fields of the constructed type
+
+```powerquery
+let
+    RT = Type.ForRecord([Name = [Type = type text, Optional = false]], false),
+    Fields = Type.RecordFields(RT)
+in
+    Record.ToTable(Fields)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":[Type=type text, Optional=false]}]}
+-->

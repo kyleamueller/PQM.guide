@@ -1,0 +1,63 @@
+---
+title: "Table.PartitionValues"
+slug: "table-partitionvalues"
+category: "Table"
+description: "Returns a table describing the partition values for a partitioned data source."
+syntax: "Table.PartitionValues(table as table) as table"
+returnType: "table"
+returnDescription: "A table where each row represents a partition with its key column values."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "A table from a partitioned data source."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-frompartitions"
+  - "table-partition"
+  - "table-schema"
+---
+
+## Remarks
+
+`Table.PartitionValues` retrieves metadata about the partitions of a partitioned data source. Each row in the returned table corresponds to one partition and contains the partition key column values. This function is relevant for connectors that expose partitioned data, such as certain cloud data sources or Fabric lakehouses.
+
+This function is primarily used in advanced connector development and data source exploration scenarios.
+
+## Examples
+
+### Example 1: List partition values for a partitioned table
+
+```powerquery
+let
+    Source = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net"),
+    PartitionedTable = Source{[Name = "sales"]}[Data],
+    Partitions = Table.PartitionValues(PartitionedTable)
+in
+    Partitions
+```
+
+<!--output
+{"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"}]}
+-->
+
+### Example 2: Inspect partition metadata
+
+```powerquery
+let
+    Source = Lakehouse.Contents(null){[workspaceId = "...", lakehouseId = "..."]}[Data],
+    SalesTable = Source{[Id = "sales", ItemKind = "Table"]}[Data],
+    PartitionInfo = Table.PartitionValues(SalesTable)
+in
+    PartitionInfo
+```
+
+<!--output
+{"columns":[{"name":"PartitionKey","type":"any"}],"rows":[{"PartitionKey":"2023"},{"PartitionKey":"2024"}]}
+-->

@@ -1,0 +1,120 @@
+---
+title: "Html.Table"
+slug: "html-table"
+category: "Accessing Data"
+description: "Extracts data from HTML content into a table using CSS selectors to define columns."
+syntax: "Html.Table(html as any, columnNameSelectorPairs as list, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table where each column is populated by evaluating the corresponding CSS selector against the HTML content."
+parameters:
+  - name: "html"
+    type: "any"
+    required: true
+    description: "The HTML content to parse. Can be a text value or binary (e.g., from Web.Contents or Web.BrowserContents)."
+  - name: "columnNameSelectorPairs"
+    type: "list"
+    required: true
+    description: "A list of two-element lists, where each inner list is {columnName as text, cssSelector as text}. The CSS selector is evaluated for each row to extract the cell value."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options. Supports RowSelector (text) to define a CSS selector for determining rows."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+  - "web-page"
+  - "web-browsercontents"
+---
+
+## Remarks
+
+`Html.Table` gives precise control over HTML extraction using CSS selectors. Unlike `Web.Page`, which automatically detects HTML `<table>` elements, `Html.Table` lets you target any HTML structure — including `<div>`-based layouts, `<ul>` lists, or custom markup — by specifying CSS selectors for each column.
+
+**How it works**:
+1. The `RowSelector` option (defaulting to `"tr"` if not specified) defines what constitutes a "row" in the HTML.
+2. For each row element, each CSS selector in `columnNameSelectorPairs` is evaluated relative to that row to extract the cell value.
+3. The extracted text content of the matched element becomes the cell value.
+
+**CSS selectors**: Standard CSS selector syntax is supported, including element selectors (`td`), class selectors (`.price`), ID selectors (`#total`), attribute selectors (`[data-value]`), descendant combinators (`table.results td.name`), and pseudo-classes like `:nth-child()`.
+
+**Authentication**: `Html.Table` does not make HTTP requests. Authentication is handled by the function that fetches the HTML (e.g., `Web.Contents`).
+
+**Query folding**: Not supported.
+
+**Attribute extraction**: By default, the inner text of the matched element is returned. To extract an attribute value (such as `href` from an anchor), append the attribute name in square brackets to the selector: `"a[href]"` returns the `href` attribute value.
+
+## Examples
+
+### Example 1: Extract a simple HTML table by row and column selectors
+```powerquery
+let
+    Html = Web.Contents("https://example.com/products"),
+    Table = Html.Table(
+        Html,
+        {
+            {"Product", "td.product-name"},
+            {"Price",   "td.product-price"},
+            {"Stock",   "td.product-stock"}
+        },
+        [RowSelector = "table.product-list tr"]
+    )
+in
+    Table
+```
+
+### Example 2: Extract links from a page
+```powerquery
+let
+    Html = Web.Contents("https://example.com/resources"),
+    Links = Html.Table(
+        Html,
+        {
+            {"Label", "a"},
+            {"URL",   "a[href]"}
+        },
+        [RowSelector = "ul.resource-list li"]
+    )
+in
+    Links
+```
+
+### Example 3: Parse inline HTML text
+```powerquery
+let
+    RawHtml = "<table><tr><td>Apple</td><td>1.20</td></tr><tr><td>Banana</td><td>0.50</td></tr></table>",
+    Result = Html.Table(
+        RawHtml,
+        {
+            {"Fruit", "td:nth-child(1)"},
+            {"Price", "td:nth-child(2)"}
+        },
+        [RowSelector = "tr"]
+    )
+in
+    Result
+```
+
+### Example 4: Combine with Web.BrowserContents for JavaScript-rendered pages
+```powerquery
+let
+    Html = Web.BrowserContents(
+        "https://example.com/dynamic-data",
+        [WaitFor = [Element = "table.results"]]
+    ),
+    Data = Html.Table(
+        Html,
+        {
+            {"Name",  "td.name"},
+            {"Score", "td.score"}
+        },
+        [RowSelector = "table.results tr.data-row"]
+    )
+in
+    Data
+```

@@ -1,0 +1,85 @@
+---
+title: "Table.PositionOfAny"
+slug: "table-positionofany"
+category: "Table"
+description: "Returns the first position of any row in the table that matches any record in the given list."
+syntax: "Table.PositionOfAny(table as table, rows as list, optional occurrence as nullable number, optional equationCriteria as any) as any"
+returnType: "any"
+returnDescription: "A row index, a list of row indices, or -1 if no match is found."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of records to search for."
+  - name: "occurrence"
+    type: "number"
+    required: false
+    description: "Optional. Use Occurrence.First (0), Occurrence.Last (1), or Occurrence.All (2) to control which positions are returned."
+  - name: "equationCriteria"
+    type: "any"
+    required: false
+    description: "Optional. Column name(s) or comparer to restrict which fields are compared."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-positionof"
+  - "table-containsany"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.PositionOfAny` is like `Table.PositionOf` but accepts a list of candidate records instead of a single record. It returns the position of the first table row that matches any of the provided records. If no match is found for any candidate, it returns `-1`.
+
+The `occurrence` parameter controls whether to return the first match, last match, or all matches as a list.
+
+## Examples
+
+### Example 1: Find the first position of any matching row
+
+```powerquery
+Table.PositionOfAny(
+    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Carol"}}),
+    {[Name = "Carol"], [Name = "Bob"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"1"}]}
+-->
+
+### Example 2: No match returns -1
+
+```powerquery
+Table.PositionOfAny(
+    #table({"Name"}, {{"Alice"}, {"Bob"}}),
+    {[Name = "Dave"], [Name = "Eve"]}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"-1"}]}
+-->
+
+### Example 3: Return all matching positions
+
+```powerquery
+Table.PositionOfAny(
+    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Carol"}, {"Alice"}}),
+    {[Name = "Alice"], [Name = "Carol"]},
+    Occurrence.All
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 2, 3}"}]}
+-->

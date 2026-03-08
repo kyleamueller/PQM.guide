@@ -1,0 +1,64 @@
+---
+title: "DateTime.IsInCurrentSecond"
+slug: "datetime-isincurrentsecond"
+category: "DateTime"
+description: "Returns true if the datetime falls within the current second."
+syntax: "DateTime.IsInCurrentSecond(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the current clock second, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isincurrentminute"
+  - "datetime-isincurrenthour"
+  - "datetime-isinprevioussecond"
+  - "datetime-isinnextsecond"
+---
+
+## Remarks
+
+`DateTime.IsInCurrentSecond` returns `true` if the input `datetime` or `datetimezone` value falls within the same clock second as now (as determined by `DateTime.LocalNow()`). The second window spans HH:MM:SS.0000000 to HH:MM:SS.9999999. The function is re-evaluated on each query refresh.
+
+Due to the precision of query evaluation timing, this function is primarily useful in high-frequency streaming or event-processing scenarios.
+
+## Examples
+
+### Example 1: Filter events from the current second
+
+Keep only rows where EventTime falls within the current second.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInCurrentSecond([EventTime])
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":50,"EventTime":"2026-03-08T10:32:45.123"},{"EventID":51,"EventTime":"2026-03-08T10:32:45.987"}]}
+-->
+
+### Example 2: Flag current-second rows
+
+Add a boolean column for events in the current second.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "IsCurrentSecond", each DateTime.IsInCurrentSecond([EventTime]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsCurrentSecond","type":"logical"}],"rows":[{"EventID":49,"EventTime":"2026-03-08T10:32:44.999","IsCurrentSecond":false},{"EventID":50,"EventTime":"2026-03-08T10:32:45.123","IsCurrentSecond":true}]}
+-->

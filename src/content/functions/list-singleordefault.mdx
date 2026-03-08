@@ -1,0 +1,90 @@
+---
+title: "List.SingleOrDefault"
+slug: "list-singleordefault"
+category: "List"
+description: "Returns the single element of a list, or a default value if the list is empty. Throws an error if the list has more than one element."
+syntax: "List.SingleOrDefault(list as list, optional default as nullable any) as any"
+returnType: "any"
+returnDescription: "The single item in the list, the default value if the list is empty, or an error if more than one item exists."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list expected to contain zero or one elements."
+  - name: "default"
+    type: "nullable any"
+    required: false
+    description: "The value to return if the list is empty. Defaults to null if not specified."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-single"
+  - "list-first"
+  - "list-isempty"
+  - "list-count"
+---
+
+## Remarks
+
+`List.SingleOrDefault` is a null-safe version of `List.Single`. It returns the single element from the list if exactly one exists, returns the `default` value (or `null`) if the list is empty, and throws an error if the list has more than one element.
+
+This function is commonly used for lookups where no match is acceptable (returns null or a sentinel value) but multiple matches indicate a data quality issue.
+
+- If `default` is omitted, `null` is returned for an empty list.
+- A list with more than one element throws an error regardless of the `default` parameter.
+- To also handle the multiple-element case without errors, use `List.First` instead.
+
+## Examples
+
+### Example 1: Single element returns that element
+
+```powerquery
+List.SingleOrDefault({99})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":99}]}
+-->
+
+### Example 2: Empty list returns null (default)
+
+```powerquery
+List.SingleOrDefault({})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"null"}]}
+-->
+
+### Example 3: Empty list returns a custom default
+
+```powerquery
+List.SingleOrDefault({}, -1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 4: Safe lookup with fallback
+
+```powerquery
+let
+    Prices = #table({"Product", "Price"}, {{"Widget", 9.99}, {"Gadget", 24.99}}),
+    LookupProduct = "Thingamajig",
+    MatchedPrice = List.SingleOrDefault(
+        Table.SelectRows(Prices, each [Product] = LookupProduct)[Price],
+        0
+    )
+in
+    MatchedPrice
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->

@@ -1,0 +1,78 @@
+---
+title: "Guid.From"
+slug: "guid-from"
+category: "Text"
+description: "Returns a validated and normalized GUID text value from the given text representation."
+syntax: "Guid.From(value as nullable text) as nullable text"
+returnType: "text"
+returnDescription: "A normalized GUID string in lowercase format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, or null if value is null."
+parameters:
+  - name: "value"
+    type: "text"
+    required: true
+    description: "A text value representing a GUID. May include or omit hyphens, and may use uppercase or lowercase hex digits."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-newguid"
+---
+
+## Remarks
+
+`Guid.From` parses and normalizes a text value into a standard GUID (Globally Unique Identifier) format. The input may be in various common GUID formats, including with or without hyphens, with or without braces, and in any case (upper or lower). The output is always normalized to lowercase with hyphens.
+
+If `value` is `null`, the function returns `null`. If `value` is not a valid GUID representation, an error is raised.
+
+This function is useful for cleaning and standardizing GUID values loaded from external sources that may store them inconsistently (e.g., all caps, no hyphens, with curly braces).
+
+Accepted input formats include:
+- `"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"` (32 hex digits, no hyphens)
+- `"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"` (standard with hyphens)
+- `"{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"` (with curly braces)
+
+## Examples
+
+### Example 1: Normalize a lowercase GUID with hyphens
+
+```powerquery
+Guid.From("a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72"}]}
+-->
+
+### Example 2: Normalize an uppercase GUID
+
+```powerquery
+Guid.From("A3F8C2D1-4B7E-4F2A-9C6D-1E8B3A5F0D72")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72"}]}
+-->
+
+### Example 3: Parse a GUID without hyphens
+
+```powerquery
+Guid.From("a3f8c2d14b7e4f2a9c6d1e8b3a5f0d72")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72"}]}
+-->
+
+### Example 4: Handle null input
+
+```powerquery
+Guid.From(null)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+-->

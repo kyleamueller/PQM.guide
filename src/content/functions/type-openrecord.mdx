@@ -1,0 +1,64 @@
+---
+title: "Type.OpenRecord"
+slug: "type-openrecord"
+category: "Type"
+description: "Returns an open version of a record type, allowing values to have additional fields beyond those declared."
+syntax: "Type.OpenRecord(type as type) as type"
+returnType: "type"
+returnDescription: "An open record type derived from the given record type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A record type to open. Must be a record type."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-closedrecord"
+  - "type-isopenrecord"
+  - "type-forrecord"
+  - "type-recordfields"
+---
+
+## Remarks
+
+`Type.OpenRecord` converts a closed record type into an open record type. An open record type allows values to carry extra fields not declared in the type definition.
+
+If the input is already an open record type, it is returned unchanged. This is the complement of `Type.ClosedRecord`.
+
+Open record types are useful when you want to declare required fields for validation or type-checking while still permitting additional data to flow through without raising type errors.
+
+## Examples
+
+### Example 1: Open a closed record type
+
+```powerquery
+let
+    Closed = Type.ClosedRecord(type record),
+    Opened = Type.OpenRecord(Closed)
+in
+    Type.IsOpenRecord(Opened)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Open a typed record type with declared fields
+
+```powerquery
+let
+    Closed = Type.ForRecord([Name = [Type = type text, Optional = false]], false),
+    Opened = Type.OpenRecord(Closed)
+in
+    Type.IsOpenRecord(Opened)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->

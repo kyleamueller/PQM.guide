@@ -1,0 +1,71 @@
+---
+title: "Number.Ln"
+slug: "number-ln"
+category: "Number"
+description: "Returns the natural logarithm (base e) of a number."
+syntax: "Number.Ln(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The natural logarithm of the number (log base e)."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The number whose natural logarithm is computed. Must be positive for a real result."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-log"
+  - "number-log10"
+  - "number-exp"
+  - "number-power"
+---
+
+## Remarks
+
+`Number.Ln` computes the natural logarithm — the logarithm to base _e_ (approximately 2.71828). It is the inverse of `Number.Exp`: `Number.Ln(Number.Exp(x)) = x`.
+
+Inputs must be positive real numbers for a defined result. Passing `0` returns negative infinity; passing a negative number returns `NaN`.
+
+Common uses include continuous compounding calculations, entropy, normalizing skewed data, and log-scale transformations.
+
+## Examples
+
+### Example 1: Natural log of e
+
+```powerquery
+Number.Ln(Number.E)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 2: Natural log of 1
+
+```powerquery
+Number.Ln(1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 3: Compute log-transformed revenue
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Revenue"}),
+    "LnRevenue", each Number.Ln([Revenue]), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"LnRevenue","type":"number"}],"rows":[{"OrderID":1,"Revenue":1000,"LnRevenue":6.907755278982137},{"OrderID":2,"Revenue":5000,"LnRevenue":8.517193191416238},{"OrderID":3,"Revenue":250,"LnRevenue":5.521460917862246},{"OrderID":4,"Revenue":12000,"LnRevenue":9.392661956393784}]}
+-->

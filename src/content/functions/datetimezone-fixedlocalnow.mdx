@@ -1,0 +1,64 @@
+---
+title: "DateTimeZone.FixedLocalNow"
+slug: "datetimezone-fixedlocalnow"
+category: "DateTimeZone"
+description: "Returns the current local date and time with UTC offset, fixed for the entire query evaluation."
+syntax: "DateTimeZone.FixedLocalNow() as datetimezone"
+returnType: "datetimezone"
+returnDescription: "The local date, time, and UTC offset at which query evaluation began."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-localnow"
+  - "datetimezone-fixedutcnow"
+  - "datetime-fixedlocalnow"
+  - "datetimezone-utcnow"
+---
+
+## Remarks
+
+`DateTimeZone.FixedLocalNow` returns the current local date and time including the UTC offset as a `datetimezone` value, fixed to the moment query evaluation began. Unlike `DateTimeZone.LocalNow()`, all calls to `DateTimeZone.FixedLocalNow()` within a single query will return the same timestamp, making it suitable for consistent time-based calculations.
+
+Use this function when you need a stable, timezone-aware reference point across multiple computed columns or transformation steps in a single query.
+
+## Examples
+
+### Example 1: Calculate time since each event with a stable local timestamp
+
+Use a fixed local timestamp to consistently measure elapsed time across multiple steps.
+
+```powerquery
+let
+    Now = DateTimeZone.FixedLocalNow(),
+    Source = Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
+    WithElapsed = Table.AddColumn(Source, "HoursSince",
+        each Duration.TotalHours(DateTimeZone.RemoveZone(Now) - [EventTime]),
+        type number)
+in
+    WithElapsed
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HoursSince","type":"number"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00","HoursSince":18805.5},{"EventID":2,"EventTime":"2024-03-01T14:00:00","HoursSince":17694.0}]}
+-->
+
+### Example 2: Return the fixed local now with timezone
+
+Show the current datetimezone value.
+
+```powerquery
+#table(
+    type table [FixedLocalNow = datetimezone],
+    {{DateTimeZone.FixedLocalNow()}}
+)
+```
+
+<!--output
+{"columns":[{"name":"FixedLocalNow","type":"datetimezone"}],"rows":[{"FixedLocalNow":"2026-03-08T10:00:00-06:00"}]}
+-->

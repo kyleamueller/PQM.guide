@@ -1,0 +1,66 @@
+---
+title: "DateTime.IsInPreviousNMinutes"
+slug: "datetime-isinpreviousnminutes"
+category: "DateTime"
+description: "Returns true if the datetime falls within the previous N clock minutes."
+syntax: "DateTime.IsInPreviousNMinutes(dateTime as any, minutes as number) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the N minutes before the current minute, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+  - name: "minutes"
+    type: "number"
+    required: true
+    description: "The number of minutes back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isinpreviousminute"
+  - "datetime-isinnextnminutes"
+  - "datetime-isinpreviousnhours"
+  - "datetime-isinpreviousnseconds"
+---
+
+## Remarks
+
+`DateTime.IsInPreviousNMinutes` returns `true` if the input `datetime` or `datetimezone` value falls within the N complete clock minutes preceding the current minute. The current minute itself is not included; use `DateTime.IsInCurrentMinute` to also match the current minute. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events from the previous 15 minutes
+
+Keep only rows where EventTime falls within the previous 15 minutes.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInPreviousNMinutes([EventTime], 15)
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":55,"EventTime":"2026-03-08T10:18:00"},{"EventID":58,"EventTime":"2026-03-08T10:25:00"}]}
+-->
+
+### Example 2: Flag events from the past 30 minutes
+
+Add a boolean column for events in the previous 30 minutes.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "InPrev30Min", each DateTime.IsInPreviousNMinutes([EventTime], 30), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InPrev30Min","type":"logical"}],"rows":[{"EventID":50,"EventTime":"2026-03-08T10:00:00","InPrev30Min":false},{"EventID":55,"EventTime":"2026-03-08T10:18:00","InPrev30Min":true},{"EventID":60,"EventTime":"2026-03-08T10:32:00","InPrev30Min":false}]}
+-->

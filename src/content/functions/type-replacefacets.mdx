@@ -1,0 +1,65 @@
+---
+title: "Type.ReplaceFacets"
+slug: "type-replacefacets"
+category: "Type"
+description: "Returns a new type with the specified facets replaced, allowing customization of type constraints such as precision and scale."
+syntax: "Type.ReplaceFacets(type as type, facets as record) as type"
+returnType: "type"
+returnDescription: "A new type with the provided facets applied."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The base type whose facets are replaced."
+  - name: "facets"
+    type: "record"
+    required: true
+    description: "A record specifying the facet values to set (e.g., [Precision = 10, Scale = 2])."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-facets"
+  - "value-type"
+---
+
+## Remarks
+
+`Type.ReplaceFacets` returns a new type value that is identical to the input type except that the specified facets are replaced with the provided values. Facets are type constraints such as `Precision`, `Scale`, and `MaxLength`.
+
+This function is useful when constructing type metadata for custom connectors or when annotating data with specific precision constraints from a schema.
+
+The facets record only needs to include the facet fields you want to change — other facets are inherited from the source type.
+
+## Examples
+
+### Example 1: Set precision and scale on a number type
+
+```powerquery
+let
+    BaseType = type number,
+    Constrained = Type.ReplaceFacets(BaseType, [Precision = 10, Scale = 2])
+in
+    Type.Facets(Constrained)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+-->
+
+### Example 2: Set MaxLength on a text type
+
+```powerquery
+let
+    T = Type.ReplaceFacets(type text, [MaxLength = 100])
+in
+    Type.Facets(T)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"MaxLength","Value":100}]}
+-->

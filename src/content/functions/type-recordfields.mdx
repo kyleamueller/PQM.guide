@@ -1,0 +1,70 @@
+---
+title: "Type.RecordFields"
+slug: "type-recordfields"
+category: "Type"
+description: "Returns a record describing the fields of a record type, where each field value is a record with Type and Optional sub-fields."
+syntax: "Type.RecordFields(type as type) as record"
+returnType: "record"
+returnDescription: "A record where each field name maps to a descriptor record with Type and Optional properties."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A record type whose field descriptors are returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-forrecord"
+  - "type-isopenrecord"
+  - "type-openrecord"
+  - "type-closedrecord"
+---
+
+## Remarks
+
+`Type.RecordFields` inspects a record type and returns a metadata record describing its declared fields. Each field in the result record has the same name as the field in the type, and its value is a record with two properties:
+
+- `Type` — the type of the field
+- `Optional` — `true` if the field is optional, `false` if required
+
+This function is the inverse of `Type.ForRecord`. Use it to programmatically inspect type schemas, particularly in custom connectors or generic transformation functions.
+
+## Examples
+
+### Example 1: Inspect fields of a typed record type
+
+```powerquery
+let
+    RT = Type.ForRecord(
+        [
+            Name = [Type = type text, Optional = false],
+            Age  = [Type = type number, Optional = true]
+        ],
+        false
+    )
+in
+    Record.ToTable(Type.RecordFields(RT))
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":[Type=type text, Optional=false]},{"Name":"Age","Value":[Type=type number, Optional=true]}]}
+-->
+
+### Example 2: Check the type of the Name field
+
+```powerquery
+let
+    RT = Type.ForRecord([Name = [Type = type text, Optional = false]], false),
+    Fields = Type.RecordFields(RT)
+in
+    Fields[Name][Type]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+-->

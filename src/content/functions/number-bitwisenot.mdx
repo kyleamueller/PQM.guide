@@ -1,0 +1,69 @@
+---
+title: "Number.BitwiseNot"
+slug: "number-bitwisenot"
+category: "Number"
+description: "Performs a bitwise NOT (bitwise complement) on an integer value, flipping all bits."
+syntax: "Number.BitwiseNot(number as number) as number"
+returnType: "number"
+returnDescription: "The bitwise complement of the integer, equivalent to -(number + 1)."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The integer whose bits are flipped."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-bitwiseand"
+  - "number-bitwiseor"
+  - "number-bitwisexor"
+---
+
+## Remarks
+
+`Number.BitwiseNot` flips every bit in the integer representation of the input. For a signed 64-bit integer representation, the result is `-(number + 1)`. This is the one's complement operation.
+
+For example, `Number.BitwiseNot(0)` returns `-1`, and `Number.BitwiseNot(-1)` returns `0`.
+
+This function is useful in bitmasking scenarios where you need the inverse of a bitmask — for example, clearing all bits that are set in a mask.
+
+## Examples
+
+### Example 1: Bitwise NOT of 0
+
+```powerquery
+Number.BitwiseNot(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 2: Bitwise NOT of a positive integer
+
+NOT(5) = -(5+1) = -6
+
+```powerquery
+Number.BitwiseNot(5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-6}]}
+-->
+
+### Example 3: Clear bits using NOT as an inverse mask
+
+Clear bit 2 (value 4) from a flags value of 7:
+
+```powerquery
+Number.BitwiseAnd(7, Number.BitwiseNot(4))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->

@@ -1,0 +1,63 @@
+---
+title: "Table.SelectRowsWithErrors"
+slug: "table-selectrowswitherrors"
+category: "Table"
+description: "Returns rows that contain at least one error value, optionally limited to specified columns."
+syntax: "Table.SelectRowsWithErrors(table as table, optional columns as nullable list) as table"
+returnType: "table"
+returnDescription: "A table containing only rows that have at least one error value."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to inspect."
+  - name: "columns"
+    type: "list"
+    required: false
+    description: "Optional list of column names. Only errors in those columns qualify a row. If omitted, all columns are checked."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-removerowswitherrors"
+  - "table-replaceerrorvalues"
+  - "table-selectrows"
+---
+
+## Remarks
+
+`Table.SelectRowsWithErrors` is the complement of `Table.RemoveRowsWithErrors`. It returns only the rows that contain at least one error, useful for auditing and diagnosing data quality issues after import or type conversion steps.
+
+When `columns` is specified, only errors in those columns cause a row to be included. Errors in other columns are ignored.
+
+## Examples
+
+### Example 1: Return all rows that contain errors
+
+```powerquery
+let
+    Source = #table({"ID", "Value"}, {{1, 10}, {2, error "bad"}, {3, 30}})
+in
+    Table.SelectRowsWithErrors(Source)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"2","Value":"[Error]"}]}
+-->
+
+### Example 2: Only check a specific column for errors
+
+```powerquery
+let
+    Source = #table({"ID", "Value"}, {{1, error "bad"}, {2, 20}, {3, error "bad"}})
+in
+    Table.SelectRowsWithErrors(Source, {"Value"})
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"[Error]"},{"ID":"3","Value":"[Error]"}]}
+-->

@@ -1,0 +1,68 @@
+---
+title: "Type.TableKeys"
+slug: "type-tablekeys"
+category: "Type"
+description: "Returns the list of key definitions for a table type."
+syntax: "Type.TableKeys(type as type) as list"
+returnType: "list"
+returnDescription: "A list of key records, each with Columns (list of column names) and Primary (logical) fields."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A table type whose key definitions are returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-addtablekey"
+  - "type-replacetablekeys"
+  - "type-tableschema"
+  - "type-tablecolumn"
+---
+
+## Remarks
+
+`Type.TableKeys` returns the key metadata declared on a table type. Each element of the returned list is a record with two fields:
+
+- `Columns` — a list of column name strings that form the key
+- `Primary` — `true` if this is the primary key, `false` for alternate keys
+
+Keys are important for query folding and relationship management in Power BI. They can be defined using `Type.AddTableKey` or `Table.AddKey`.
+
+If no keys are defined on the table type, an empty list is returned.
+
+## Examples
+
+### Example 1: A table type with no keys
+
+```powerquery
+let
+    T = #table(type table [ID = number, Name = text], {{1, "Alice"}}),
+    Keys = Type.TableKeys(Value.Type(T))
+in
+    List.Count(Keys)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 2: Inspect keys after adding one
+
+```powerquery
+let
+    T = #table(type table [ID = number, Name = text], {{1, "Alice"}}),
+    TWithKey = Table.AddKey(T, {"ID"}, true),
+    Keys = Type.TableKeys(Value.Type(TWithKey))
+in
+    Keys{0}
+```
+
+<!--output
+{"columns":[{"name":"Columns","type":"any"},{"name":"Primary","type":"logical"}],"rows":[{"Columns":["ID"],"Primary":true}]}
+-->

@@ -1,0 +1,66 @@
+---
+title: "DateTimeZone.ToRecord"
+slug: "datetimezone-torecord"
+category: "DateTimeZone"
+description: "Returns a record with Year, Month, Day, Hour, Minute, Second, ZoneHours, and ZoneMinutes fields from a datetimezone value."
+syntax: "DateTimeZone.ToRecord(dateTimeZone as datetimezone) as record"
+returnType: "record"
+returnDescription: "A record containing the Year, Month, Day, Hour, Minute, Second, ZoneHours, and ZoneMinutes components of the datetimezone."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "A datetimezone value to decompose into its components."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-torecord"
+  - "datetime-torecord"
+  - "datetimezone-zonehours"
+  - "datetimezone-zoneminutes"
+  - "datetimezone-from"
+---
+
+## Remarks
+
+`DateTimeZone.ToRecord` decomposes a `datetimezone` value into a record with eight fields: `Year`, `Month`, `Day`, `Hour`, `Minute`, `Second`, `ZoneHours`, and `ZoneMinutes`. This is useful when you need all components at once without calling individual accessor functions. You can expand the resulting record into table columns using `Table.ExpandRecordColumn`.
+
+## Examples
+
+### Example 1: Expand datetimezone components into columns
+
+Decompose EventTimeZone into all its component fields.
+
+Input: `Events`
+
+```powerquery
+Table.ExpandRecordColumn(
+    Table.AddColumn(
+        Table.SelectColumns(Table.FirstN(Events, 3), {"EventID", "EventTimeZone"}),
+        "Parts", each DateTimeZone.ToRecord([EventTimeZone])
+    ),
+    "Parts",
+    {"Year", "Month", "Day", "Hour", "Minute", "Second", "ZoneHours", "ZoneMinutes"}
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"},{"name":"ZoneHours","type":"number"},{"name":"ZoneMinutes","type":"number"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","Year":2024,"Month":3,"Day":15,"Hour":8,"Minute":30,"Second":0,"ZoneHours":-5,"ZoneMinutes":0}]}
+-->
+
+### Example 2: Decompose a specific datetimezone value
+
+Return the component record for a literal datetimezone.
+
+```powerquery
+DateTimeZone.ToRecord(#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30))
+```
+
+<!--output
+{"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Year","Value":2024},{"Field":"Month","Value":3},{"Field":"Day","Value":15},{"Field":"Hour","Value":14},{"Field":"Minute","Value":30},{"Field":"Second","Value":0},{"Field":"ZoneHours","Value":5},{"Field":"ZoneMinutes","Value":30}]}
+-->

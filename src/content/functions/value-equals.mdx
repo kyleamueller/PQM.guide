@@ -1,0 +1,81 @@
+---
+title: "Value.Equals"
+slug: "value-equals"
+category: "Value"
+description: "Returns true if two values are equal, with an optional custom comparer function."
+syntax: "Value.Equals(value1 as any, value2 as any, optional comparer as nullable function) as logical"
+returnType: "logical"
+returnDescription: "True if value1 and value2 are equal, false otherwise."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The first value to compare."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The second value to compare."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "An optional comparer function that accepts two values and returns -1, 0, or 1. When omitted, the default equality semantics are used."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-compare"
+  - "value-nullableequals"
+  - "value-is"
+---
+
+## Remarks
+
+`Value.Equals` compares two values for equality using M's default equality semantics. It is equivalent to the `=` operator for most primitive types. Unlike the `=` operator however, `Value.Equals` can accept a custom comparer function via the optional third parameter, allowing case-insensitive text comparison, locale-aware comparison, or other custom equality logic.
+
+Note that `null = null` in M evaluates to `null` (three-valued logic), whereas `Value.Equals(null, null)` returns `true`. Use `Value.NullableEquals` when you need three-valued null handling.
+
+## Examples
+
+### Example 1: Compare two equal numbers
+
+```powerquery
+Value.Equals(42, 42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Compare two different values
+
+```powerquery
+Value.Equals("hello", "world")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 3: Null equals null returns true (unlike the = operator)
+
+```powerquery
+Value.Equals(null, null)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 4: Case-insensitive comparison using a comparer
+
+```powerquery
+Value.Equals("Hello", "hello", Comparer.OrdinalIgnoreCase)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->

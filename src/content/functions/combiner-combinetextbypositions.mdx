@@ -1,0 +1,75 @@
+---
+title: "Combiner.CombineTextByPositions"
+slug: "combiner-combinetextbypositions"
+category: "Combiner"
+description: "Returns a combiner function that places text values into fixed positions within a result string, padding as needed."
+syntax: "Combiner.CombineTextByPositions(positions as list, optional template as nullable text) as function"
+returnType: "function"
+returnDescription: "A function that accepts a list of text values and places each at the corresponding position in the output."
+parameters:
+  - name: "positions"
+    type: "list"
+    required: true
+    description: "A list of zero-based character positions specifying where each text value should be placed in the output."
+  - name: "template"
+    type: "text"
+    required: false
+    description: "An optional template text used as the base string. If omitted, the output is built from spaces."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "combiner-combinetextbyranges"
+  - "combiner-combinetextbydelimiter"
+  - "combiner-combinetextbyeachdelimiter"
+  - "splitter-splittextbypositions"
+---
+
+## Remarks
+
+`Combiner.CombineTextByPositions` is the inverse of `Splitter.SplitTextByPositions`. It returns a combiner function that, when called with a list of text values, inserts each value at the corresponding zero-based character position in the output string.
+
+The `positions` list must be in ascending order and its length must match the number of text values provided. Gaps between positions are filled with spaces (or with characters from the `template` if one is supplied).
+
+This function is primarily used with `Table.CombineColumns` to merge column values into a fixed-width formatted string.
+
+## Examples
+
+### Example 1: Combine two values at fixed positions
+
+```powerquery
+Combiner.CombineTextByPositions({0, 5})({"Hello", "World"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelloWorld"}]}
+-->
+
+### Example 2: Combine with a gap between values
+
+```powerquery
+Combiner.CombineTextByPositions({0, 10})({"Hello", "World"})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello     World"}]}
+-->
+
+### Example 3: Use with Table.CombineColumns
+
+```powerquery
+Table.CombineColumns(
+    #table({"First", "Last"}, {{"John", "Doe"}}),
+    {"First", "Last"},
+    Combiner.CombineTextByPositions({0, 10}),
+    "FullName"
+)
+```
+
+<!--output
+{"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"John      Doe"}]}
+-->

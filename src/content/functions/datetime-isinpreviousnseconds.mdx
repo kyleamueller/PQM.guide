@@ -1,0 +1,66 @@
+---
+title: "DateTime.IsInPreviousNSeconds"
+slug: "datetime-isinpreviousnseconds"
+category: "DateTime"
+description: "Returns true if the datetime falls within the previous N seconds."
+syntax: "DateTime.IsInPreviousNSeconds(dateTime as any, seconds as number) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the N seconds before the current second, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+  - name: "seconds"
+    type: "number"
+    required: true
+    description: "The number of seconds back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isinprevioussecond"
+  - "datetime-isinnextnseconds"
+  - "datetime-isinpreviousnminutes"
+  - "datetime-isinpreviousnhours"
+---
+
+## Remarks
+
+`DateTime.IsInPreviousNSeconds` returns `true` if the input `datetime` or `datetimezone` value falls within the N complete seconds preceding the current second. The current second is not included; use `DateTime.IsInCurrentSecond` to also match the current second. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events from the previous 30 seconds
+
+Keep only rows where EventTime falls within the previous 30 seconds.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInPreviousNSeconds([EventTime], 30)
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":68,"EventTime":"2026-03-08T10:32:16"},{"EventID":69,"EventTime":"2026-03-08T10:32:40"}]}
+-->
+
+### Example 2: Flag events from the past 60 seconds
+
+Add a boolean column for events in the previous 60 seconds.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "InPrev60Sec", each DateTime.IsInPreviousNSeconds([EventTime], 60), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InPrev60Sec","type":"logical"}],"rows":[{"EventID":66,"EventTime":"2026-03-08T10:31:30","InPrev60Sec":false},{"EventID":68,"EventTime":"2026-03-08T10:32:16","InPrev60Sec":true},{"EventID":70,"EventTime":"2026-03-08T10:32:46","InPrev60Sec":false}]}
+-->

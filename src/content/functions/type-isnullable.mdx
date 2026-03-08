@@ -1,0 +1,69 @@
+---
+title: "Type.IsNullable"
+slug: "type-isnullable"
+category: "Type"
+description: "Returns true if the given type is a nullable type — one that can hold null values."
+syntax: "Type.IsNullable(type as type) as logical"
+returnType: "logical"
+returnDescription: "True if the type is nullable, false otherwise."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "The type to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-nonnullable"
+  - "value-type"
+  - "value-is"
+---
+
+## Remarks
+
+`Type.IsNullable` returns `true` when a type is marked as nullable — meaning values of that type can be `null`. In Power Query M, nullable types are expressed using the `nullable` keyword, for example `nullable number` or `nullable text`.
+
+The built-in primitive types (like `type number`, `type text`) are non-nullable by default. Their nullable forms (`nullable number`) are distinct type values.
+
+Use `Type.IsNullable` when inspecting type metadata or building generic functions that must handle nullable variants of a type.
+
+## Examples
+
+### Example 1: Check a nullable type
+
+```powerquery
+Type.IsNullable(type nullable number)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Check a non-nullable type
+
+```powerquery
+Type.IsNullable(type number)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 3: Check if the type of a column annotation is nullable
+
+```powerquery
+let
+    ColType = Value.Type(42),
+    IsNullable = Type.IsNullable(ColType)
+in
+    IsNullable
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->

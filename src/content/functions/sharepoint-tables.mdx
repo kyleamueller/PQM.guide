@@ -1,0 +1,91 @@
+---
+title: "SharePoint.Tables"
+slug: "sharepoint-tables"
+category: "Accessing Data"
+description: "Returns a navigation table of SharePoint list data from the specified SharePoint site."
+syntax: "SharePoint.Tables(url as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table where each row represents a SharePoint list, with a Data column containing the list items as a table."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the SharePoint site (e.g., \"https://contoso.sharepoint.com/sites/Finance\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options. Supports ApiVersion to specify the SharePoint REST API version, and ViewColumns to select specific columns."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sharepoint-contents"
+  - "sharepoint-files"
+  - "odata-feed"
+---
+
+## Remarks
+
+`SharePoint.Tables` connects to a SharePoint site and returns a navigation table of all SharePoint lists. Each list's data (list items) is accessible via the `Data` column. This is the preferred function for reading structured data stored in SharePoint lists, as opposed to files in document libraries (use `SharePoint.Files` for those).
+
+**Authentication**: Microsoft Account (OAuth) for SharePoint Online, or Windows/Basic credentials for SharePoint on-premises. Configure credentials using the site root URL as the credential scope.
+
+**Query folding**: SharePoint.Tables supports partial query folding. Row filters on simple column values may be pushed to the SharePoint REST API as `$filter` parameters. However, complex transformations occur in Power Query.
+
+**SharePoint list columns**: SharePoint lists can have complex column types (People, Lookup, Managed Metadata, etc.). These are returned as records or text depending on the column type. Use `Table.ExpandRecordColumn` to unpack record-type columns.
+
+**Comparison with OData.Feed**: SharePoint's OData endpoint (`/_api/lists`) is also accessible via `OData.Feed`. `SharePoint.Tables` provides a more user-friendly navigation experience and handles SharePoint-specific authentication more seamlessly.
+
+**Key option**:
+- `ApiVersion` (number) — the SharePoint REST API version. Defaults to 15.
+
+**Item limit**: By default, SharePoint REST API returns up to 5,000 items per request. `SharePoint.Tables` handles pagination automatically to retrieve all items.
+
+## Examples
+
+### Example 1: List all SharePoint lists on a site
+```powerquery
+SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance")
+```
+
+### Example 2: Access a specific list by name
+```powerquery
+let
+    Source = SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance"),
+    BudgetList = Source{[Name="Budget Tracker"]}[Data]
+in
+    BudgetList
+```
+
+### Example 3: Read a SharePoint list and expand a lookup column
+```powerquery
+let
+    Source = SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance"),
+    Projects = Source{[Name="Projects"]}[Data],
+    Expanded = Table.ExpandRecordColumn(Projects, "Category", {"Value"}, {"Category.Value"})
+in
+    Expanded
+```
+
+### Example 4: Filter list items in Power Query
+```powerquery
+let
+    Source = SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance"),
+    Tasks = Source{[Name="Tasks"]}[Data],
+    OpenTasks = Table.SelectRows(Tasks, each [Status] = "In Progress")
+in
+    OpenTasks
+```
+
+### Example 5: Connect to SharePoint on-premises
+```powerquery
+let
+    Source = SharePoint.Tables("https://sharepoint.contoso.local/sites/HR", [ApiVersion = 15]),
+    EmployeeList = Source{[Name="Employees"]}[Data]
+in
+    EmployeeList
+```

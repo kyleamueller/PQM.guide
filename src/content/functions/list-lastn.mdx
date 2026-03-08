@@ -1,0 +1,76 @@
+---
+title: "List.LastN"
+slug: "list-lastn"
+category: "List"
+description: "Returns the last N items from a list, or items at the end of the list that satisfy a condition."
+syntax: "List.LastN(list as list, countOrCondition as any) as any"
+returnType: "any"
+returnDescription: "A list of the last N items, or a list of items from the end while the condition holds true."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many items to return from the end, or a function that returns true for items to include from the end of the list."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-firstn"
+  - "list-last"
+  - "list-skip"
+  - "list-removelastn"
+  - "list-range"
+---
+
+## Remarks
+
+`List.LastN` returns a **list** of items from the end of the source list. It accepts either a number or a condition function:
+
+- **Number**: Returns the last `N` items. If `N` exceeds the list length, the entire list is returned.
+- **Condition function**: Returns all consecutive items from the **end** of the list for which the condition is `true`, scanning backward.
+
+When using a condition, the function scans from the end and stops at the first item that fails the condition — items before that point are excluded even if they would satisfy the condition.
+
+## Examples
+
+### Example 1: Return the last 3 items
+
+```powerquery
+List.LastN({10, 20, 30, 40, 50}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{30, 40, 50}"}]}
+-->
+
+### Example 2: Return items from the end while value is greater than 25
+
+```powerquery
+List.LastN({10, 20, 30, 40, 50}, each _ > 25)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{30, 40, 50}"}]}
+-->
+
+### Example 3: Get last week of dates from a date list
+
+```powerquery
+let
+    Dates = List.Dates(#date(2024, 1, 1), 14, #duration(1, 0, 0, 0)),
+    LastWeek = List.LastN(Dates, 7)
+in
+    LastWeek
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-08"},{"Result":"2024-01-09"},{"Result":"2024-01-10"},{"Result":"2024-01-11"},{"Result":"2024-01-12"},{"Result":"2024-01-13"},{"Result":"2024-01-14"}]}
+-->

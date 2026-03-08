@@ -1,0 +1,81 @@
+---
+title: "Web.Page"
+slug: "web-page"
+category: "Accessing Data"
+description: "Returns the contents of an HTML document parsed into a table of tables, extracting all HTML tables found on the page."
+syntax: "Web.Page(webPage as any) as table"
+returnType: "table"
+returnDescription: "A table where each row represents an HTML table or element found in the document, with a Data column containing the extracted table."
+parameters:
+  - name: "webPage"
+    type: "any"
+    required: true
+    description: "The HTML content to parse. Typically the result of Web.Contents, but can also be a text value containing raw HTML."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+  - "web-browsercontents"
+  - "web-headers"
+  - "html-table"
+---
+
+## Remarks
+
+`Web.Page` parses an HTML document and returns a navigation table of all HTML `<table>` elements found in the document. Each row in the result includes the table's `Caption`, `Source`, `ClassName`, `Id`, and `Data` columns, where `Data` contains the actual extracted table.
+
+The input is typically the binary result of `Web.Contents`, but can also be text. Power Query automatically handles the binary-to-HTML parsing.
+
+**Authentication**: Authentication for the underlying URL is handled by `Web.Contents`. `Web.Page` itself does not make HTTP requests — it only parses the HTML content you provide.
+
+**Query folding**: `Web.Page` does not support query folding. All filtering and transformation occurs in Power Query after the HTML is fetched.
+
+**Limitations**:
+- `Web.Page` is not available in Power BI Service (cloud refreshes) because it relies on a browser-based rendering engine. Use scheduled refresh via an on-premises data gateway.
+- JavaScript-rendered content is not executed. Tables that are dynamically loaded by JavaScript will not be captured. Use `Web.BrowserContents` for those cases.
+- The function returns all tables found, including navigation tables and other incidental HTML tables on the page. You typically need to identify the correct table by index or by inspecting the `Caption` column.
+
+The `Source` column indicates the HTML context of each extracted table (e.g., whether it was inside a `<div>`, `<section>`, etc.).
+
+## Examples
+
+### Example 1: Extract all tables from a web page
+```powerquery
+let
+    Source = Web.Page(Web.Contents("https://en.wikipedia.org/wiki/List_of_countries_by_GDP"))
+in
+    Source
+```
+
+### Example 2: Select the first table from a web page
+```powerquery
+let
+    Source = Web.Page(Web.Contents("https://en.wikipedia.org/wiki/List_of_countries_by_GDP")),
+    FirstTable = Source{0}[Data]
+in
+    FirstTable
+```
+
+### Example 3: Find a table by its caption
+```powerquery
+let
+    Source = Web.Page(Web.Contents("https://example.com/data")),
+    TargetTable = Source{[Caption="Sales Data"]}[Data]
+in
+    TargetTable
+```
+
+### Example 4: Parse raw HTML text
+```powerquery
+let
+    Html = "<table><tr><th>Name</th><th>Value</th></tr><tr><td>Alpha</td><td>1</td></tr></table>",
+    Parsed = Web.Page(Html),
+    TableData = Parsed{0}[Data]
+in
+    TableData
+```

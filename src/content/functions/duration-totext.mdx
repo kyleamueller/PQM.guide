@@ -1,0 +1,71 @@
+---
+title: "Duration.ToText"
+slug: "duration-totext"
+category: "Duration"
+description: "Converts a duration value to its text representation."
+syntax: "Duration.ToText(duration as nullable duration) as nullable text"
+returnType: "text"
+returnDescription: "A text string in the format \"D.HH:MM:SS\" representing the duration, or null if the input is null."
+parameters:
+  - name: "duration"
+    type: "duration"
+    required: true
+    description: "The duration value to convert to text."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-fromtext"
+  - "duration-from"
+  - "duration-days"
+  - "duration-totaldays"
+---
+
+## Remarks
+
+`Duration.ToText` formats a `duration` value as a text string using the format `"D.HH:MM:SS"` (days, hours, minutes, seconds). Durations shorter than one day omit the day part (e.g., `"02:30:00"`). Fractional seconds are included when present. This is useful for displaying elapsed times in a human-readable format or for serializing durations for export.
+
+This function is the inverse of `Duration.FromText`. If the input is `null`, the function returns `null`.
+
+## Examples
+
+### Example 1: Display duration values as text for a report
+
+Convert duration values in the Logs table to formatted text strings.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(OrderLog, each [DurationMinutes] <> null),
+        {"LogID", "DurationMinutes"}
+    ),
+    "DurationText",
+    each Duration.ToText(#duration(0, 0, [DurationMinutes], 0)),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"DurationText","type":"text"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"DurationText":"1.04:45:00"},{"LogID":"L004","DurationMinutes":2745,"DurationText":"1.21:45:00"},{"LogID":"L006","DurationMinutes":1065,"DurationText":"0.17:45:00"}]}
+-->
+
+### Example 2: Convert a specific duration to text
+
+Format a literal duration of 3 days, 5 hours, and 30 minutes.
+
+```powerquery
+#table(
+    type table [Duration = duration, AsText = text],
+    {{#duration(3, 5, 30, 0), Duration.ToText(#duration(3, 5, 30, 0))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Duration","type":"duration"},{"name":"AsText","type":"text"}],"rows":[{"Duration":"3.05:30:00","AsText":"3.05:30:00"}]}
+-->

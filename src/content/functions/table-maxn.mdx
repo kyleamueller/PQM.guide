@@ -1,0 +1,70 @@
+---
+title: "Table.MaxN"
+slug: "table-maxn"
+category: "Table"
+description: "Returns the top N rows with the highest values according to the given comparison criteria."
+syntax: "Table.MaxN(table as table, comparisonCriteria as any, countOrCondition as any) as table"
+returnType: "table"
+returnDescription: "A table containing the rows with the N highest values."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to search."
+  - name: "comparisonCriteria"
+    type: "any"
+    required: true
+    description: "A column name, list of column names, or comparer function defining the sort order."
+  - name: "countOrCondition"
+    type: "any"
+    required: true
+    description: "A number specifying how many top rows to return, or a condition function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-max"
+  - "table-minn"
+  - "table-sort"
+  - "table-firstn"
+---
+
+## Remarks
+
+`Table.MaxN` returns the `N` rows with the highest values for the specified comparison criteria. The rows are returned in descending order of the criteria. If `countOrCondition` is a function, rows are returned from the top of the sorted table while the function returns true.
+
+This function is useful for top-N analysis such as finding the top 5 products by sales.
+
+## Examples
+
+### Example 1: Get the top 2 rows by score
+
+```powerquery
+Table.MaxN(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}, {"Dave", 88}}),
+    "Score",
+    2
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Carol","Score":"99"},{"Name":"Alice","Score":"95"}]}
+-->
+
+### Example 2: Get all rows with score above 90
+
+```powerquery
+Table.MaxN(
+    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
+    "Score",
+    each [Score] >= 90
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Carol","Score":"99"},{"Name":"Alice","Score":"95"}]}
+-->

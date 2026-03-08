@@ -1,0 +1,92 @@
+---
+title: "Odbc.Query"
+slug: "odbc-query"
+category: "Accessing Data"
+description: "Returns a table from an ODBC data source by executing the specified SQL query."
+syntax: "Odbc.Query(connectionString as any, query as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table containing the results of the SQL query executed against the ODBC data source."
+parameters:
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "An ODBC connection string as text (e.g., \"DSN=MyDSN;\") or a record of connection string key-value pairs."
+  - name: "query"
+    type: "text"
+    required: true
+    description: "The SQL query to execute against the data source."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options such as CommandTimeout and ConnectionTimeout."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "odbc-datasource"
+  - "sql-database"
+---
+
+## Remarks
+
+`Odbc.Query` executes a SQL statement directly against an ODBC data source and returns the result as a table. Unlike `Odbc.DataSource`, which provides a navigation table for interactive exploration, `Odbc.Query` is designed for situations where you know exactly what SQL you want to run.
+
+**When to use `Odbc.Query` vs `Odbc.DataSource`**:
+- Use `Odbc.Query` when you have a specific SQL query (potentially complex, with joins, aggregations, or database-specific syntax) that you want to execute as-is.
+- Use `Odbc.DataSource` when you want to browse available tables and let Power Query generate folded SQL automatically.
+
+**Query folding**: `Odbc.Query` results are typically not further foldable — the SQL is sent as-is to the ODBC driver. Subsequent Power Query transformations are applied in-memory. If you need folding on top of an ODBC source, use `Odbc.DataSource` and navigate to the table instead.
+
+**Driver requirement**: The appropriate ODBC driver for the target data source must be installed and accessible (64-bit for Power BI Desktop).
+
+**Connection string**: Accepts the same formats as `Odbc.DataSource` — a text DSN/driver string or a record of key-value pairs.
+
+**Key options**:
+- `CommandTimeout` (duration) — maximum time to wait for the query to complete.
+- `ConnectionTimeout` (duration) — maximum time to wait when establishing the connection.
+
+**Use cases**: Executing stored procedures, running complex database-specific queries, or bypassing the navigation table for direct query execution against a legacy or non-standard ODBC source.
+
+## Examples
+
+### Example 1: Run a query using a DSN
+```powerquery
+Odbc.Query("DSN=MyDataSource;", "SELECT * FROM Orders WHERE Status = 'Open'")
+```
+
+### Example 2: Run a query using a full connection string
+```powerquery
+Odbc.Query(
+    "Driver={PostgreSQL Unicode};Server=myserver;Database=sales;UID=user;PWD=pass;",
+    "SELECT product_id, SUM(quantity) AS total_sold FROM order_lines GROUP BY product_id ORDER BY total_sold DESC"
+)
+```
+
+### Example 3: Use a record for the connection string
+```powerquery
+Odbc.Query(
+    [Driver = "SQL Server", Server = "myserver", Database = "Northwind"],
+    "SELECT TOP 100 OrderID, CustomerID, OrderDate FROM Orders ORDER BY OrderDate DESC"
+)
+```
+
+### Example 4: Execute a stored procedure
+```powerquery
+Odbc.Query(
+    "DSN=MyDB;",
+    "EXEC dbo.usp_GetMonthlySales @Year=2024, @Month=3"
+)
+```
+
+### Example 5: Set a command timeout for long-running queries
+```powerquery
+Odbc.Query(
+    "DSN=DataWarehouse;",
+    "SELECT * FROM FactSales WHERE SaleDate >= '2023-01-01'",
+    [CommandTimeout = #duration(0, 0, 10, 0)]
+)
+```

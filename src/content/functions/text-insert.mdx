@@ -1,0 +1,85 @@
+---
+title: "Text.Insert"
+slug: "text-insert"
+category: "Text"
+description: "Inserts a text value into another text value at the specified offset position."
+syntax: "Text.Insert(text as nullable text, offset as number, newText as text) as nullable text"
+returnType: "text"
+returnDescription: "A new text value with newText inserted at the given offset."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The original text value."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based position at which to insert newText."
+  - name: "newText"
+    type: "text"
+    required: true
+    description: "The text value to insert."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-replace"
+  - "text-removerange"
+  - "text-replacerange"
+  - "text-start"
+  - "text-end"
+---
+
+## Remarks
+
+`Text.Insert` inserts `newText` into `text` at the zero-based `offset` position. All characters at and after `offset` in the original text are shifted right to accommodate the inserted content.
+
+If `text` is `null`, the function returns `null`. An `offset` of 0 prepends `newText` to the beginning of `text`. An `offset` equal to the length of `text` appends `newText` to the end.
+
+This is equivalent to: `Text.Start(text, offset) & newText & Text.End(text, Text.Length(text) - offset)`
+
+## Examples
+
+### Example 1: Insert a space between two words
+
+```powerquery
+Text.Insert("HelloWorld", 5, " ")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
+-->
+
+### Example 2: Insert a dash into a phone number
+
+```powerquery
+Text.Insert("5558675309", 3, "-")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"555-8675309"}]}
+-->
+
+### Example 3: Prepend a prefix
+
+```powerquery
+Text.Insert("12345", 0, "ID-")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"ID-12345"}]}
+-->
+
+### Example 4: Append a suffix
+
+```powerquery
+Text.Insert("Report", 6, "_Final")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Report_Final"}]}
+-->

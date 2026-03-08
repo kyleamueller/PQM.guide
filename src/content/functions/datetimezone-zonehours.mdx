@@ -1,0 +1,67 @@
+---
+title: "DateTimeZone.ZoneHours"
+slug: "datetimezone-zonehours"
+category: "DateTimeZone"
+description: "Returns the hour component of the UTC offset for a datetimezone value."
+syntax: "DateTimeZone.ZoneHours(dateTimeZone as datetimezone) as number"
+returnType: "number"
+returnDescription: "An integer representing the hours component of the UTC offset (e.g., -5 for UTC-5, 5 for UTC+5:30)."
+parameters:
+  - name: "dateTimeZone"
+    type: "datetimezone"
+    required: true
+    description: "A datetimezone value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-zoneminutes"
+  - "datetimezone-torecord"
+  - "datetimezone-switchzone"
+  - "datetimezone-toutc"
+---
+
+## Remarks
+
+`DateTimeZone.ZoneHours` returns the whole-hours component of the UTC offset for a `datetimezone` value. For a value with offset `+05:30`, this returns `5`. For `-08:00`, it returns `-8`. To get the minutes component of the offset, use `DateTimeZone.ZoneMinutes`. Together, these functions let you extract timezone metadata without decomposing the entire value via `DateTimeZone.ToRecord`.
+
+## Examples
+
+### Example 1: Extract the timezone hour offset from event timestamps
+
+Add a column showing the UTC offset hours for each event's timezone.
+
+Input: `Events`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
+    "OffsetHours",
+    each DateTimeZone.ZoneHours([EventTimeZone]),
+    Int64.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"OffsetHours","type":"number"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","OffsetHours":-5},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00+01:00","OffsetHours":1},{"EventID":3,"EventTimeZone":"2024-03-16T09:15:00+05:30","OffsetHours":5},{"EventID":4,"EventTimeZone":"2024-03-16T17:45:00+00:00","OffsetHours":0}]}
+-->
+
+### Example 2: Get the zone hours for a specific datetimezone
+
+Return the offset hours for a literal datetimezone with a +5:30 offset.
+
+```powerquery
+#table(
+    type table [DTZ = datetimezone, ZoneHours = number],
+    {{#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30),
+      DateTimeZone.ZoneHours(#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"ZoneHours","type":"number"}],"rows":[{"DTZ":"2024-03-15T14:30:00+05:30","ZoneHours":5}]}
+-->

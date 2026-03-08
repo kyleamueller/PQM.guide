@@ -1,0 +1,65 @@
+---
+title: "Date.EndOfDay"
+slug: "date-endofday"
+category: "Date"
+description: "Returns the last moment of the day for the given date or datetime value."
+syntax: "Date.EndOfDay(dateTime as any) as any"
+returnType: "any"
+returnDescription: "A datetime or datetimezone value representing 23:59:59.9999999 on the given day."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-startofday"
+  - "date-endofmonth"
+  - "date-endofweek"
+  - "date-endofquarter"
+  - "date-endofyear"
+---
+
+## Remarks
+
+`Date.EndOfDay` returns a `datetime` (or `datetimezone`, if the input is a `datetimezone`) representing the very last instant of the day: 23:59:59.9999999. When passed a plain `date`, the result is a `datetime`. This is useful for building inclusive date range filters where you need to capture every event that occurred on a given day.
+
+## Examples
+
+### Example 1: Filter events that occurred on or before the end of a specific day
+
+Keep only rows where EventTime falls on or before the end of January 15, 2024.
+
+Input: `Events`
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each [EventTime] <= Date.EndOfDay(#date(2024, 1, 15))
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00"},{"EventID":2,"EventTime":"2024-01-15T23:59:59"}]}
+-->
+
+### Example 2: End-of-day for a specific date
+
+Return the last instant of March 15, 2024.
+
+```powerquery
+#table(
+    type table [Result = datetime],
+    {{Date.EndOfDay(#date(2024, 3, 15))}}
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T23:59:59.9999999"}]}
+-->

@@ -1,0 +1,85 @@
+---
+title: "Text.InferNumberType"
+slug: "text-infernumbertype"
+category: "Text"
+description: "Infers the most specific numeric type that can represent the given text value."
+syntax: "Text.InferNumberType(text as text, optional culture as nullable text) as type"
+returnType: "type"
+returnDescription: "A Power Query type value such as type Int8, type Int64, type Double, or type Decimal that best represents the number in text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text representation of a number."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "A culture string (e.g., \"en-US\", \"de-DE\") that controls how number formats are parsed. Defaults to the current locale."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-from"
+  - "character-fromnumber"
+  - "character-tonumber"
+---
+
+## Remarks
+
+`Text.InferNumberType` examines a text string that represents a number and returns the most precise M type value that can hold it without loss of information. For example, `"42"` might infer `type Int8`, while `"3.14"` might infer `type Double`.
+
+The returned value is a Power Query `type` value, not a number. It is primarily useful for dynamic type inference scenarios, such as schema detection when loading CSV data or building generic transformation functions.
+
+The optional `culture` parameter allows locale-aware number parsing. For example, in `"de-DE"` the string `"1.234,56"` would be interpreted as 1234.56 (period as thousands separator, comma as decimal).
+
+This is an advanced function primarily used in custom connector development and data profiling scenarios.
+
+## Examples
+
+### Example 1: Infer type for a whole number
+
+```powerquery
+Text.InferNumberType("42")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type Int8"}]}
+-->
+
+### Example 2: Infer type for a decimal value
+
+```powerquery
+Text.InferNumberType("3.14159")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type Double"}]}
+-->
+
+### Example 3: Infer type using a European locale
+
+```powerquery
+Text.InferNumberType("1.234,56", "de-DE")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type Double"}]}
+-->
+
+### Example 4: Use the inferred type to convert a value
+
+```powerquery
+let
+    inferredType = Text.InferNumberType("100"),
+    converted = Value.FromText("100")
+in
+    converted
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":100}]}
+-->

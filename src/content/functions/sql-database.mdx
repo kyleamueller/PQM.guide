@@ -1,0 +1,93 @@
+---
+title: "Sql.Database"
+slug: "sql-database"
+category: "Accessing Data"
+description: "Returns a navigation table of tables and views from a SQL Server database."
+syntax: "Sql.Database(server as text, database as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of tables and views from the specified SQL Server database."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The SQL Server hostname, IP address, or named instance (e.g., \"myserver.database.windows.net\" or \"localhost\\SQLEXPRESS\")."
+  - name: "database"
+    type: "text"
+    required: true
+    description: "The name of the database to connect to on the SQL Server instance."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with connection options such as CommandTimeout, CreateNavigationProperties, HierarchicalNavigation, ConnectionTimeout, Query, and SqlCompatibleWindowsAuth."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-databases"
+  - "odbc-datasource"
+  - "odbc-query"
+---
+
+## Remarks
+
+`Sql.Database` connects to a SQL Server instance and returns a navigation table of the tables, views, and stored procedures within the specified database. The function supports both on-premises SQL Server and Azure SQL Database.
+
+**Authentication**: Power Query supports Windows authentication, database authentication (username/password), and Microsoft account authentication for Azure SQL. The authentication method is configured in the data source credentials dialog, not in the function itself.
+
+**Query folding**: SQL Server is a fully foldable data source. Filter, sort, join, group, and aggregation operations written in Power Query are translated into SQL and executed on the server. This significantly reduces the amount of data transferred and improves performance. Use `Value.NativeQuery` or the `Query` option to pass raw SQL if needed.
+
+**Key options**:
+- `CommandTimeout` (duration) — how long to wait for a command to complete before timing out.
+- `ConnectionTimeout` (duration) — how long to wait when establishing a connection.
+- `CreateNavigationProperties` (logical) — whether to generate navigation properties based on foreign key relationships. Defaults to `true`.
+- `HierarchicalNavigation` (logical) — whether to group tables by schema in the navigation table. Defaults to `false`.
+- `Query` (text) — a native SQL query to run instead of navigating to a table.
+- `SqlCompatibleWindowsAuth` (logical) — whether to force SQL Server-compatible Windows authentication.
+
+When connecting to **Azure SQL Database**, use the fully qualified server name (e.g., `myserver.database.windows.net`) and select Microsoft Account or database credentials.
+
+## Examples
+
+### Example 1: Connect to a local SQL Server database
+```powerquery
+Sql.Database("localhost", "AdventureWorks")
+```
+
+### Example 2: Connect to Azure SQL Database
+```powerquery
+Sql.Database("myserver.database.windows.net", "SalesDB")
+```
+
+### Example 3: Connect and navigate directly to a table
+```powerquery
+let
+    Source = Sql.Database("myserver.database.windows.net", "SalesDB"),
+    dbo_Orders = Source{[Schema="dbo", Item="Orders"]}[Data]
+in
+    dbo_Orders
+```
+
+### Example 4: Use a native SQL query via options
+```powerquery
+Sql.Database(
+    "localhost",
+    "AdventureWorks",
+    [Query = "SELECT TOP 100 * FROM Sales.SalesOrderHeader ORDER BY OrderDate DESC"]
+)
+```
+
+### Example 5: Enable hierarchical navigation and set a command timeout
+```powerquery
+Sql.Database(
+    "localhost",
+    "AdventureWorks",
+    [
+        HierarchicalNavigation = true,
+        CommandTimeout = #duration(0, 0, 5, 0)
+    ]
+)
+```

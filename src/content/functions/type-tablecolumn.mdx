@@ -1,0 +1,69 @@
+---
+title: "Type.TableColumn"
+slug: "type-tablecolumn"
+category: "Type"
+description: "Returns the type of a specific column in a table type."
+syntax: "Type.TableColumn(type as type, column as text) as type"
+returnType: "type"
+returnDescription: "The type of the specified column in the table type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A table type whose column type is queried."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name of the column whose type is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-tableschema"
+  - "type-tablekeys"
+  - "value-type"
+  - "table-transformcolumntypes"
+---
+
+## Remarks
+
+`Type.TableColumn` returns the declared type of a named column within a table type. This function operates on the **type** of a table, not the table itself. To obtain a table's type, use `Value.Type(table)`.
+
+If the column does not exist in the table type, an error is raised.
+
+This is useful for generic transformations where you need to inspect or compare column types programmatically before applying operations.
+
+## Examples
+
+### Example 1: Get the type of a column in a typed table
+
+```powerquery
+let
+    T = #table(type table [Name = text, Age = number], {{"Alice", 30}}),
+    TType = Value.Type(T),
+    ColType = Type.TableColumn(TType, "Age")
+in
+    ColType
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
+-->
+
+### Example 2: Check if a column type is nullable
+
+```powerquery
+let
+    T = #table(type table [Score = nullable number], {{null}}),
+    ColType = Type.TableColumn(Value.Type(T), "Score")
+in
+    Type.IsNullable(ColType)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->

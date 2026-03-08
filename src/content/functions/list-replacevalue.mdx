@@ -1,0 +1,83 @@
+---
+title: "List.ReplaceValue"
+slug: "list-replacevalue"
+category: "List"
+description: "Replaces occurrences of a specified value in a list with a new value, using a replacer function to perform the substitution."
+syntax: "List.ReplaceValue(list as list, oldValue as any, newValue as any, replacer as function) as list"
+returnType: "list"
+returnDescription: "A new list with the specified value replaced by the new value wherever it matches."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "oldValue"
+    type: "any"
+    required: true
+    description: "The value to search for and replace."
+  - name: "newValue"
+    type: "any"
+    required: true
+    description: "The value to substitute in place of oldValue."
+  - name: "replacer"
+    type: "function"
+    required: true
+    description: "A replacer function that determines the replacement logic. Use Replacer.ReplaceValue for exact replacement or Replacer.ReplaceText for text substitution."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-replacematchingitems"
+  - "list-replacerange"
+  - "list-transform"
+  - "list-select"
+---
+
+## Remarks
+
+`List.ReplaceValue` replaces items in a list using a replacer function. The `replacer` parameter controls how the comparison and substitution are performed:
+
+- `Replacer.ReplaceValue` — performs an exact equality match and replaces matching items with `newValue`.
+- `Replacer.ReplaceText` — performs a text substring replacement, replacing occurrences of `oldValue` (a text substring) within each text item with `newValue`.
+
+This function is the list counterpart of the similarly-named table column replacement functions.
+
+- All occurrences of `oldValue` are replaced.
+- Items that don't match are passed through unchanged.
+- When using `Replacer.ReplaceText`, each item must be a text value.
+
+## Examples
+
+### Example 1: Replace a specific value using ReplaceValue
+
+```powerquery
+List.ReplaceValue({1, 2, 3, 2, 4}, 2, 99, Replacer.ReplaceValue)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 99, 3, 99, 4}"}]}
+-->
+
+### Example 2: Replace null values with zero
+
+```powerquery
+List.ReplaceValue({10, null, 30, null}, null, 0, Replacer.ReplaceValue)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{10, 0, 30, 0}"}]}
+-->
+
+### Example 3: Replace text substring within each item using ReplaceText
+
+```powerquery
+List.ReplaceValue({"Hello World", "World Peace", "New World"}, "World", "Earth", Replacer.ReplaceText)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Hello Earth, Earth Peace, New Earth}"}]}
+-->

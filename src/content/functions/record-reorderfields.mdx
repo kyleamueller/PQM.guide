@@ -1,0 +1,89 @@
+---
+title: "Record.ReorderFields"
+slug: "record-reorderfields"
+category: "Record"
+description: "Returns a new record with fields reordered according to the specified list. Fields not in the list follow after in their original order."
+syntax: "Record.ReorderFields(record as record, fieldOrder as list, optional missingField as nullable number) as record"
+returnType: "record"
+returnDescription: "A new record with fields in the specified order."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "The source record."
+  - name: "fieldOrder"
+    type: "list"
+    required: true
+    description: "A list of field name text values specifying the desired order."
+  - name: "missingField"
+    type: "number"
+    required: false
+    description: "Controls behavior when a specified field does not exist: MissingField.Error (default), MissingField.Ignore, or MissingField.UseNull."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "record-renamefields"
+  - "record-selectfields"
+  - "record-removefields"
+---
+
+## Remarks
+
+`Record.ReorderFields` returns a new record with fields placed in the order specified by `fieldOrder`. Fields not listed appear at the end, maintaining their relative order from the original record. Field values are unchanged.
+
+The optional `missingField` parameter controls behavior when a name in `fieldOrder` is not found in the record:
+- `MissingField.Error` (default) — raises an error
+- `MissingField.Ignore` — skips the missing name silently
+- `MissingField.UseNull` — adds the field with a null value
+
+## Examples
+
+### Example 1: Reorder a record's fields
+
+```powerquery
+Record.ReorderFields(
+    [City = "New York", Name = "Alice", Age = 30],
+    {"Name", "Age", "City"}
+)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"New York"}]}
+-->
+
+### Example 2: Unlisted fields appear at the end
+
+```powerquery
+Record.ReorderFields(
+    [D = 4, A = 1, C = 3, B = 2],
+    {"A", "B"}
+)
+```
+
+<!--output
+{"columns":[{"name":"A","type":"number"},{"name":"B","type":"number"},{"name":"D","type":"number"},{"name":"C","type":"number"}],"rows":[{"A":1,"B":2,"D":4,"C":3}]}
+-->
+
+### Example 3: Reorder fields from the first Customers row
+
+Input: `Customers`
+
+```powerquery
+let
+    Row = Customers{0},
+    Reordered = Record.ReorderFields(
+        Record.SelectFields(Row, {"CustomerID", "Name", "City", "Country"}),
+        {"Name", "CustomerID", "Country", "City"}
+    )
+in
+    Record.ToTable(Reordered)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":"Alice"},{"Name":"CustomerID","Value":1},{"Name":"Country","Value":"USA"},{"Name":"City","Value":"New York"}]}
+-->

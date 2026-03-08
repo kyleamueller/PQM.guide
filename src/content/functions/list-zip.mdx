@@ -1,0 +1,89 @@
+---
+title: "List.Zip"
+slug: "list-zip"
+category: "List"
+description: "Transposes a list of lists, combining the Nth elements of each list into new inner lists."
+syntax: "List.Zip(lists as list) as list"
+returnType: "list"
+returnDescription: "A list of lists where each inner list contains the Nth element from each of the input lists."
+parameters:
+  - name: "lists"
+    type: "list"
+    required: true
+    description: "A list of lists to zip together."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-positions"
+  - "list-transformmany"
+  - "list-combine"
+  - "list-transform"
+---
+
+## Remarks
+
+`List.Zip` transposes a list of lists. Given `{{a1, a2, a3}, {b1, b2, b3}}`, it returns `{{a1, b1}, {a2, b2}, {a3, b3}}`. Each output inner list combines elements at the same index position from all input lists.
+
+This is equivalent to a matrix transpose operation. It is commonly used to pair elements from multiple parallel lists — for example, combining a list of keys with a list of values, or pairing items with their positions from `List.Positions`.
+
+- The output length equals the length of the **shortest** input list (extra elements in longer lists are dropped).
+- If any input list is empty, the result is an empty list.
+- For two-list zipping, the output is a list of two-element lists: `{{a1, b1}, {a2, b2}, ...}`.
+- Applying `List.Zip` twice to a rectangular list of lists returns the original arrangement.
+
+## Examples
+
+### Example 1: Zip two lists into pairs
+
+```powerquery
+List.Zip({{1, 2, 3}, {"A", "B", "C"}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1, A}, {2, B}, {3, C}}"}]}
+-->
+
+### Example 2: Pair items with their index positions
+
+```powerquery
+let
+    Items = {"Alpha", "Beta", "Gamma"},
+    Indexed = List.Zip({List.Positions(Items), Items})
+in
+    Indexed
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
+-->
+
+### Example 3: Zip three lists (transpose a matrix)
+
+```powerquery
+List.Zip({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1, 4, 7}, {2, 5, 8}, {3, 6, 9}}"}]}
+-->
+
+### Example 4: Convert zipped pairs to a table
+
+```powerquery
+let
+    Keys = {"Name", "Age", "City"},
+    Values = {"Alice", 30, "Seattle"},
+    Zipped = List.Zip({Keys, Values}),
+    AsTable = Table.FromRows({Values}, Keys)
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"Seattle"}]}
+-->

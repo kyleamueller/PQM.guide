@@ -1,0 +1,63 @@
+---
+title: "Type.ClosedRecord"
+slug: "type-closedrecord"
+category: "Type"
+description: "Returns a closed version of a record type, disallowing fields beyond those declared in the type."
+syntax: "Type.ClosedRecord(type as type) as type"
+returnType: "type"
+returnDescription: "A closed record type derived from the given record type."
+parameters:
+  - name: "type"
+    type: "type"
+    required: true
+    description: "A record type to close. Must be a record type."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-openrecord"
+  - "type-isopenrecord"
+  - "type-forrecord"
+  - "type-recordfields"
+---
+
+## Remarks
+
+`Type.ClosedRecord` converts a record type into a closed record type. A closed record type requires that values have exactly the fields declared in the type — no additional fields are permitted.
+
+If the type is already closed, it is returned unchanged. This complements `Type.OpenRecord`.
+
+Closed record types are useful for strict schema validation and for signaling that a record is fully described by its declared fields.
+
+## Examples
+
+### Example 1: Close the base record type
+
+```powerquery
+let
+    Closed = Type.ClosedRecord(type record)
+in
+    Type.IsOpenRecord(Closed)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 2: Close a typed record and verify
+
+```powerquery
+let
+    Open = Type.ForRecord([Name = [Type = type text, Optional = false]], true),
+    Closed = Type.ClosedRecord(Open)
+in
+    Type.IsOpenRecord(Closed)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->

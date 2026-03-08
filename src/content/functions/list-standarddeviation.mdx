@@ -1,0 +1,79 @@
+---
+title: "List.StandardDeviation"
+slug: "list-standarddeviation"
+category: "List"
+description: "Returns the sample standard deviation of the values in the list."
+syntax: "List.StandardDeviation(numberList as list) as nullable number"
+returnType: "nullable number"
+returnDescription: "The sample standard deviation of the numeric values in the list, or null if the list is empty."
+parameters:
+  - name: "numberList"
+    type: "list"
+    required: true
+    description: "The list of numbers to compute the standard deviation for."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-covariance"
+  - "list-average"
+  - "list-median"
+  - "list-percentile"
+  - "list-sum"
+---
+
+## Remarks
+
+`List.StandardDeviation` computes the **sample standard deviation** of a numeric list — that is, it divides by `n - 1` (Bessel's correction), not `n`. This is the appropriate measure when working with a sample from a larger population.
+
+Standard deviation measures the average spread of values around the mean. A higher value indicates greater variability.
+
+- Returns `null` if the list is empty or contains only one element (where sample standard deviation is undefined).
+- Null values in the list are ignored.
+- To compute the population standard deviation (divide by `n`), use `List.Covariance` with a list paired with itself, or implement it manually.
+
+## Examples
+
+### Example 1: Standard deviation of a simple list
+
+```powerquery
+List.StandardDeviation({2, 4, 4, 4, 5, 5, 7, 9})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
+-->
+
+### Example 2: High variability vs. low variability
+
+```powerquery
+let
+    Consistent = List.StandardDeviation({10, 11, 10, 9, 10}),
+    Volatile = List.StandardDeviation({1, 50, 3, 98, 5})
+in
+    #table({"Consistent StdDev", "Volatile StdDev"}, {{Consistent, Volatile}})
+```
+
+<!--output
+{"columns":[{"name":"Consistent StdDev","type":"number"},{"name":"Volatile StdDev","type":"number"}],"rows":[{"Consistent StdDev":0.707106781,"Volatile StdDev":44.384194}]}
+-->
+
+### Example 3: Detect outliers using standard deviation
+
+```powerquery
+let
+    Values = {100, 105, 98, 102, 97, 200, 103},
+    Mean = List.Average(Values),
+    StdDev = List.StandardDeviation(Values),
+    Outliers = List.Select(Values, each Number.Abs(_ - Mean) > 2 * StdDev)
+in
+    Outliers
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{200}"}]}
+-->

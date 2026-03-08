@@ -1,0 +1,80 @@
+---
+title: "Text.ToBinary"
+slug: "text-tobinary"
+category: "Text"
+description: "Encodes a text value into binary using the specified character encoding."
+syntax: "Text.ToBinary(text as text, optional encoding as nullable number) as binary"
+returnType: "binary"
+returnDescription: "A binary value containing the encoded text."
+parameters:
+  - name: "text"
+    type: "text"
+    required: true
+    description: "The text value to encode."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "A TextEncoding value specifying the character encoding. Defaults to TextEncoding.Utf8 (65001). Common values: TextEncoding.Ascii (20127), TextEncoding.Unicode (1200), TextEncoding.Utf8 (65001)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-frombinary"
+  - "lines-tobinary"
+  - "lines-totext"
+---
+
+## Remarks
+
+`Text.ToBinary` encodes a text value into a binary representation using the specified character encoding. This is the inverse of `Text.FromBinary`.
+
+The `encoding` parameter accepts values from the `TextEncoding` enum:
+- `TextEncoding.Utf8` (65001) — default
+- `TextEncoding.Ascii` (20127)
+- `TextEncoding.Unicode` / `TextEncoding.Utf16` (1200)
+- `TextEncoding.Utf16BE` (1201)
+- `TextEncoding.Utf32` (12000)
+- `TextEncoding.Windows` (1252)
+
+Common uses include preparing text for binary storage, generating file content, computing checksums or hashes, or creating payloads for web APIs that expect binary-encoded data.
+
+## Examples
+
+### Example 1: Encode text as UTF-8
+
+```powerquery
+Text.ToBinary("Hello World")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8gV29ybGQ="}]}
+-->
+
+### Example 2: Encode text with explicit UTF-8 encoding
+
+```powerquery
+Text.ToBinary("Power Query", TextEncoding.Utf8)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"UG93ZXIgUXVlcnk="}]}
+-->
+
+### Example 3: Round-trip encode and decode
+
+```powerquery
+let
+    original = "Hello",
+    encoded = Text.ToBinary(original, TextEncoding.Utf8),
+    decoded = Text.FromBinary(encoded, TextEncoding.Utf8)
+in
+    decoded
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+-->

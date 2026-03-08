@@ -1,0 +1,69 @@
+---
+title: "Value.Metadata"
+slug: "value-metadata"
+category: "Value"
+description: "Returns the metadata record associated with a value."
+syntax: "Value.Metadata(value as any) as record"
+returnType: "record"
+returnDescription: "The metadata record attached to the value, or an empty record if none exists."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose metadata record is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-replacemetadata"
+  - "value-removemetadata"
+  - "value-type"
+---
+
+## Remarks
+
+In Power Query M, every value can carry an associated **metadata record** — an auxiliary record of key-value pairs attached to the value without changing its underlying data. Metadata is used by the engine to carry extra information such as column display names, type annotations, and data source information.
+
+`Value.Metadata` retrieves this metadata record. If the value has no metadata, an empty record (`[]`) is returned.
+
+Metadata does not affect equality comparisons or type checks — `1 meta [Source = "Sales"]` compares equal to `1`.
+
+## Examples
+
+### Example 1: Retrieve metadata from a value with metadata
+
+```powerquery
+Value.Metadata(1 meta [Source = "Sales", Verified = true])
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Source","Value":"Sales"},{"Name":"Verified","Value":true}]}
+-->
+
+### Example 2: A value without metadata returns an empty record
+
+```powerquery
+Value.Metadata(42)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[]}
+-->
+
+### Example 3: Access a specific metadata field
+
+```powerquery
+let
+    Annotated = "hello" meta [Language = "en", Source = "Config"],
+    Meta = Value.Metadata(Annotated)
+in
+    Meta[Language]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"en"}]}
+-->

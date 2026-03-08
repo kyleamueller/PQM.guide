@@ -1,0 +1,81 @@
+---
+title: "Table.AddJoinColumn"
+slug: "table-addjoincolumn"
+category: "Table"
+description: "Adds a column of nested tables from a second table by matching each row by key."
+syntax: "Table.AddJoinColumn(table1 as table, key1 as any, table2 as function, key2 as any, newColumnName as text) as table"
+returnType: "table"
+returnDescription: "The original table with a new column containing nested tables of matching rows from table2."
+parameters:
+  - name: "table1"
+    type: "table"
+    required: true
+    description: "The left table to add a column to."
+  - name: "key1"
+    type: "any"
+    required: true
+    description: "A column name or list of column names from table1 used as the join key."
+  - name: "table2"
+    type: "function"
+    required: true
+    description: "A function or table providing the right-side data to match against."
+  - name: "key2"
+    type: "any"
+    required: true
+    description: "A column name or list of column names from table2 used as the join key."
+  - name: "newColumnName"
+    type: "text"
+    required: true
+    description: "The name for the new nested table column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-join"
+  - "table-expandtablecolumn"
+  - "table-addjoincolumn"
+---
+
+## Remarks
+
+`Table.AddJoinColumn` is similar to `Table.NestedJoin` but is designed for use in custom connector scenarios where the right-side data (`table2`) may be a function that is called per key. For standard table-to-table joins in Power Query, `Table.NestedJoin` is typically preferred.
+
+The result adds a column to `table1` where each cell is a nested table of matching rows from `table2`. Use `Table.ExpandTableColumn` to flatten the nested results.
+
+## Examples
+
+### Example 1: Add a nested join column
+
+```powerquery
+let
+    Orders    = #table({"OrderID", "CustomerID"}, {{1, 10}, {2, 20}, {3, 10}}),
+    Customers = #table({"CustomerID", "Name"}, {{10, "Alice"}, {20, "Bob"}}),
+    Result    = Table.AddJoinColumn(Orders, "CustomerID", Customers, "CustomerID", "CustomerDetails")
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerID","type":"any"},{"name":"CustomerDetails","type":"table"}],"rows":[{"OrderID":"1","CustomerID":"10","CustomerDetails":"[Table]"},{"OrderID":"2","CustomerID":"20","CustomerDetails":"[Table]"},{"OrderID":"3","CustomerID":"10","CustomerDetails":"[Table]"}]}
+-->
+
+### Example 2: Expand the nested column
+
+```powerquery
+let
+    Orders    = #table({"OrderID", "CustomerID"}, {{1, 10}, {2, 20}}),
+    Customers = #table({"CustomerID", "Name"}, {{10, "Alice"}, {20, "Bob"}}),
+    Joined    = Table.AddJoinColumn(Orders, "CustomerID", Customers, "CustomerID", "CustomerDetails"),
+    Expanded  = Table.ExpandTableColumn(Joined, "CustomerDetails", {"Name"})
+in
+    Expanded
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"OrderID":"1","CustomerID":"10","Name":"Alice"},{"OrderID":"2","CustomerID":"20","Name":"Bob"}]}
+-->

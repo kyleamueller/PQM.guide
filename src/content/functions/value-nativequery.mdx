@@ -1,0 +1,88 @@
+---
+title: "Value.NativeQuery"
+slug: "value-nativequery"
+category: "Value"
+description: "Executes a native query (e.g., SQL) against a data source, bypassing M query folding."
+syntax: "Value.NativeQuery(target as any, query as text, optional parameters as any, optional options as nullable record) as any"
+returnType: "any"
+returnDescription: "The result of executing the native query against the target data source."
+parameters:
+  - name: "target"
+    type: "any"
+    required: true
+    description: "The data source or connection against which the native query is executed (e.g., a SQL database connection or table)."
+  - name: "query"
+    type: "text"
+    required: true
+    description: "The native query string (e.g., a SQL SELECT statement)."
+  - name: "parameters"
+    type: "any"
+    required: false
+    description: "An optional record or list of parameter values for parameterized queries."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record of additional options, such as [EnableFolding = true] to allow query folding on top of the native query result."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-optimize"
+---
+
+## Remarks
+
+`Value.NativeQuery` passes a native query string directly to a data source, bypassing the M query folding pipeline. This is useful when:
+
+- You need to use database-specific SQL syntax that M cannot express or fold
+- You want fine-grained control over the query sent to the data source
+- Performance requires a specific query plan that M folding would not generate
+
+The `target` is typically a database connection object, such as the result of `Sql.Database(...)`, or a table within that connection.
+
+**Security note**: Do not construct native queries by string concatenation with user input, as this can expose your queries to SQL injection. Use parameterized queries via the `parameters` argument when incorporating external values.
+
+By default, M cannot fold further operations on top of a native query result. Pass `[EnableFolding = true]` in `options` to allow folding (supported on connectors that implement it).
+
+## Examples
+
+### Example 1: Execute a SQL query against a SQL Server database
+
+```powerquery
+let
+    Source = Sql.Database("myserver", "AdventureWorks"),
+    Result = Value.NativeQuery(
+        Source,
+        "SELECT TOP 10 ProductID, Name, ListPrice FROM Production.Product ORDER BY ListPrice DESC"
+    )
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+-->
+
+### Example 2: Parameterized native query
+
+```powerquery
+let
+    Source = Sql.Database("myserver", "AdventureWorks"),
+    MinPrice = 1000,
+    Result = Value.NativeQuery(
+        Source,
+        "SELECT ProductID, Name, ListPrice FROM Production.Product WHERE ListPrice >= @MinPrice",
+        [MinPrice = MinPrice]
+    )
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+-->

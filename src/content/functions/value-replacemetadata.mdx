@@ -1,0 +1,81 @@
+---
+title: "Value.ReplaceMetadata"
+slug: "value-replacemetadata"
+category: "Value"
+description: "Returns a copy of a value with its metadata replaced by the given metadata record."
+syntax: "Value.ReplaceMetadata(value as any, metadataRecord as record) as any"
+returnType: "any"
+returnDescription: "The same value with its metadata replaced by metadataRecord."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose metadata is replaced."
+  - name: "metadataRecord"
+    type: "record"
+    required: true
+    description: "The new metadata record to attach to the value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-metadata"
+  - "value-removemetadata"
+  - "value-type"
+---
+
+## Remarks
+
+`Value.ReplaceMetadata` attaches a new metadata record to a value, replacing any existing metadata entirely. It is equivalent to the `value meta record` expression in M.
+
+Metadata does not affect the value itself — the underlying data, type, and equality semantics are unchanged. Metadata is used to carry supplementary information such as display names, documentation annotations, or provenance data.
+
+To add metadata rather than replace it, read the existing metadata with `Value.Metadata`, merge with `Record.Combine`, and apply with `Value.ReplaceMetadata`.
+
+## Examples
+
+### Example 1: Attach a metadata record to a number
+
+```powerquery
+let
+    Annotated = Value.ReplaceMetadata(42, [Source = "Calculated", Verified = true]),
+    Meta = Value.Metadata(Annotated)
+in
+    Meta[Source]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Calculated"}]}
+-->
+
+### Example 2: Replace existing metadata
+
+```powerquery
+let
+    Original = "hello" meta [Tag = "old"],
+    Updated = Value.ReplaceMetadata(Original, [Tag = "new"]),
+    Meta = Value.Metadata(Updated)
+in
+    Meta[Tag]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"new"}]}
+-->
+
+### Example 3: The underlying value is unchanged
+
+```powerquery
+let
+    Annotated = Value.ReplaceMetadata(100, [Note = "special"])
+in
+    Annotated + 5
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":105}]}
+-->

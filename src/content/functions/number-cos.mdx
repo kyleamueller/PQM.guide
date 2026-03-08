@@ -1,0 +1,69 @@
+---
+title: "Number.Cos"
+slug: "number-cos"
+category: "Number"
+description: "Returns the cosine of an angle specified in radians."
+syntax: "Number.Cos(number as nullable number) as nullable number"
+returnType: "number"
+returnDescription: "The cosine of the angle in radians, in the range [-1, 1]."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The angle in radians."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-sin"
+  - "number-tan"
+  - "number-acos"
+---
+
+## Remarks
+
+`Number.Cos` returns the trigonometric cosine of an angle measured in radians. The result is always in the range [-1, 1].
+
+To convert degrees to radians, multiply by `Number.PI / 180`:
+
+```powerquery
+Number.Cos(degrees * Number.PI / 180)
+```
+
+`Number.Cos(0)` returns `1` and `Number.Cos(Number.PI)` returns `-1`.
+
+## Examples
+
+### Example 1: Cosine of 0 radians
+
+```powerquery
+Number.Cos(0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+### Example 2: Cosine of 180 degrees (π radians)
+
+```powerquery
+Number.Cos(Number.PI)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
+-->
+
+### Example 3: Cosine of 60 degrees
+
+```powerquery
+Number.Cos(60 * Number.PI / 180)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.5000000000000001}]}
+-->

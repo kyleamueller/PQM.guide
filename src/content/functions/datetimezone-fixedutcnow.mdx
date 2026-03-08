@@ -1,0 +1,63 @@
+---
+title: "DateTimeZone.FixedUtcNow"
+slug: "datetimezone-fixedutcnow"
+category: "DateTimeZone"
+description: "Returns the current UTC date and time as a datetimezone, fixed for the entire query evaluation."
+syntax: "DateTimeZone.FixedUtcNow() as datetimezone"
+returnType: "datetimezone"
+returnDescription: "The current UTC date and time with a +00:00 offset, fixed at the start of query evaluation."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-utcnow"
+  - "datetimezone-fixedlocalnow"
+  - "datetime-fixedlocalnow"
+  - "datetimezone-toutc"
+---
+
+## Remarks
+
+`DateTimeZone.FixedUtcNow` returns the current UTC date and time as a `datetimezone` value with a `+00:00` offset, fixed to the moment query evaluation began. Unlike `DateTimeZone.UtcNow()`, all calls within a single query will return the same value. This makes it ideal for audit timestamps, consistent age calculations, or any scenario requiring a stable UTC reference point.
+
+## Examples
+
+### Example 1: Stamp each row with a consistent UTC refresh time
+
+Add a column to every row recording when the data was last refreshed.
+
+Input: `Sales`
+
+```powerquery
+let
+    RefreshTime = DateTimeZone.FixedUtcNow(),
+    Source = Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "OrderDate"}),
+    WithStamp = Table.AddColumn(Source, "RefreshedAtUTC",
+        each RefreshTime, type datetimezone)
+in
+    WithStamp
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"RefreshedAtUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":2,"OrderDate":"2024-01-18","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":3,"OrderDate":"2024-02-01","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":4,"OrderDate":"2024-02-10","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"}]}
+-->
+
+### Example 2: Return the fixed UTC now
+
+Show the current UTC datetimezone value.
+
+```powerquery
+#table(
+    type table [FixedUTCNow = datetimezone],
+    {{DateTimeZone.FixedUtcNow()}}
+)
+```
+
+<!--output
+{"columns":[{"name":"FixedUTCNow","type":"datetimezone"}],"rows":[{"FixedUTCNow":"2026-03-08T16:00:00+00:00"}]}
+-->

@@ -1,0 +1,80 @@
+---
+title: "List.RemoveRange"
+slug: "list-removerange"
+category: "List"
+description: "Removes a specified number of items from a list starting at a given index position."
+syntax: "List.RemoveRange(list as list, index as number, optional count as nullable number) as list"
+returnType: "list"
+returnDescription: "A new list with the specified range of items removed."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The source list."
+  - name: "index"
+    type: "number"
+    required: true
+    description: "The zero-based index at which to start removing items."
+  - name: "count"
+    type: "nullable number"
+    required: false
+    description: "The number of items to remove. Defaults to 1 if not specified."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-insertrange"
+  - "list-replacerange"
+  - "list-range"
+  - "list-removefirstn"
+  - "list-removelastn"
+---
+
+## Remarks
+
+`List.RemoveRange` removes a contiguous block of items from a list, starting at the given zero-based `index`. The `count` parameter specifies how many items to remove; if omitted, a single item is removed.
+
+- An `index` of `0` starts removal from the first item.
+- If `count` extends beyond the end of the list, all items from `index` onward are removed.
+- The original list is not modified; a new list is returned.
+- Use `List.InsertRange` or `List.ReplaceRange` for inserting or replacing ranges.
+
+## Examples
+
+### Example 1: Remove 2 items starting at index 1
+
+```powerquery
+List.RemoveRange({1, 2, 3, 4, 5}, 1, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 4, 5}"}]}
+-->
+
+### Example 2: Remove a single item (default count)
+
+```powerquery
+List.RemoveRange({"A", "B", "C", "D"}, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, B, D}"}]}
+-->
+
+### Example 3: Remove from the middle of a list
+
+```powerquery
+let
+    Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun"},
+    WithoutQ2 = List.RemoveRange(Months, 3, 3)
+in
+    WithoutQ2
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Jan, Feb, Mar}"}]}
+-->

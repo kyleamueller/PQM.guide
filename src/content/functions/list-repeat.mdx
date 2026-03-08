@@ -1,0 +1,73 @@
+---
+title: "List.Repeat"
+slug: "list-repeat"
+category: "List"
+description: "Returns a list created by repeating the given list a specified number of times."
+syntax: "List.Repeat(list as list, count as number) as list"
+returnType: "list"
+returnDescription: "A new list that is the source list concatenated with itself count times."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to repeat."
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of times to repeat the list."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-combine"
+  - "list-numbers"
+  - "list-transform"
+---
+
+## Remarks
+
+`List.Repeat` concatenates the input list with itself `count` times, producing a longer list. This is useful for creating repeated patterns, padding lists, or generating cyclic sequences.
+
+- `count` must be a non-negative integer.
+- If `count` is `0`, an empty list is returned.
+- If `count` is `1`, a copy of the original list is returned.
+- The result has `List.Count(list) * count` elements.
+
+## Examples
+
+### Example 1: Repeat a list 3 times
+
+```powerquery
+List.Repeat({1, 2, 3}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{1, 2, 3, 1, 2, 3, 1, 2, 3}"}]}
+-->
+
+### Example 2: Create a repeating pattern of labels
+
+```powerquery
+List.Repeat({"Q1", "Q2", "Q3", "Q4"}, 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Q1, Q2, Q3, Q4, Q1, Q2, Q3, Q4, Q1, Q2, Q3, Q4}"}]}
+-->
+
+### Example 3: Pad a list with a repeated filler value
+
+```powerquery
+let
+    FillerList = List.Repeat({null}, 5)
+in
+    FillerList
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{null, null, null, null, null}"}]}
+-->

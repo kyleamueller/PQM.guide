@@ -1,0 +1,83 @@
+---
+title: "Value.NullableEquals"
+slug: "value-nullableequals"
+category: "Value"
+description: "Compares two values for equality, returning null if either value is null (three-valued logic)."
+syntax: "Value.NullableEquals(value1 as any, value2 as any, optional comparer as nullable function) as nullable logical"
+returnType: "logical"
+returnDescription: "True if equal, false if not equal, null if either value is null."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The first value to compare."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The second value to compare."
+  - name: "comparer"
+    type: "function"
+    required: false
+    description: "An optional comparer function for custom equality semantics."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-equals"
+  - "value-compare"
+  - "value-is"
+---
+
+## Remarks
+
+`Value.NullableEquals` implements SQL-style three-valued equality: when either operand is `null`, the result is `null` rather than `true` or `false`. This matches the behavior of the M `=` operator for nullable values.
+
+This contrasts with `Value.Equals(null, null)` which returns `true` regardless of null inputs.
+
+Use `Value.NullableEquals` when you need standard SQL-style null propagation, such as when building JOIN-like logic or filtering comparisons that must propagate unknown (null) results.
+
+## Examples
+
+### Example 1: Both values are non-null and equal
+
+```powerquery
+Value.NullableEquals(1, 1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 2: Either value is null — returns null
+
+```powerquery
+Value.NullableEquals(1, null)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":null}]}
+-->
+
+### Example 3: Null equals null returns null (SQL behavior)
+
+```powerquery
+Value.NullableEquals(null, null)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":null}]}
+-->
+
+### Example 4: Non-null unequal values
+
+```powerquery
+Value.NullableEquals("hello", "world")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->

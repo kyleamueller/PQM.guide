@@ -1,0 +1,74 @@
+---
+title: "Percentage.From"
+slug: "percentage-from"
+category: "Number"
+description: "Converts a value to a percentage number type."
+syntax: "Percentage.From(value as any, optional culture as nullable text) as nullable number"
+returnType: "number"
+returnDescription: "A number typed as a percentage."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to convert. Accepts number, text, logical, or null."
+  - name: "culture"
+    type: "text"
+    required: false
+    description: "An optional culture string for locale-aware parsing of text values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "decimal-from"
+  - "number-from"
+  - "number-totext"
+---
+
+## Remarks
+
+`Percentage.From` converts a value to the percentage data type in Power Query M. The underlying numeric value is stored as a decimal (e.g., `0.25` represents 25%). The percentage type is primarily a display annotation — it signals to the host application (such as Power BI Desktop) that the value should be formatted as a percentage.
+
+When converting from text, the value is interpreted as a raw decimal unless the text includes a `%` symbol. For example, `"25%"` converts to `0.25` in some environments.
+
+Text values are parsed using the specified culture. `true` converts to `1`, `false` to `0`, `null` to `null`.
+
+## Examples
+
+### Example 1: Convert a decimal to percentage type
+
+```powerquery
+Percentage.From(0.25)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.25}]}
+-->
+
+### Example 2: Convert text
+
+```powerquery
+Percentage.From("0.75")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.75}]}
+-->
+
+### Example 3: Add a percentage column to a table
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Discount"}),
+    "DiscountPct", each Percentage.From([Discount]), Percentage.Type
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Discount","type":"number"},{"name":"DiscountPct","type":"number"}],"rows":[{"OrderID":1,"Discount":0.1,"DiscountPct":0.1},{"OrderID":2,"Discount":0.25,"DiscountPct":0.25},{"OrderID":3,"Discount":0.05,"DiscountPct":0.05}]}
+-->

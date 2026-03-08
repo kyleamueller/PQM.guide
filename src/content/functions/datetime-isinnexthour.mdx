@@ -1,0 +1,62 @@
+---
+title: "DateTime.IsInNextHour"
+slug: "datetime-isinnexthour"
+category: "DateTime"
+description: "Returns true if the datetime falls in the next clock hour."
+syntax: "DateTime.IsInNextHour(dateTime as any) as logical"
+returnType: "logical"
+returnDescription: "true if the datetime falls within the clock hour immediately after the current hour, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A datetime or datetimezone value to test."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetime-isincurrenthour"
+  - "datetime-isinprevioushour"
+  - "datetime-isinnextnhours"
+  - "datetime-isinnextminute"
+---
+
+## Remarks
+
+`DateTime.IsInNextHour` returns `true` if the input `datetime` or `datetimezone` value falls within the clock hour immediately following the current hour (as determined by `DateTime.LocalNow()`). For example, if it is currently 10:xx, this function returns `true` for any datetime between 11:00:00 and 11:59:59.9999999. The function is re-evaluated on each query refresh.
+
+## Examples
+
+### Example 1: Filter events scheduled for the next hour
+
+Keep only rows where EventTime falls in the next clock hour.
+
+```powerquery
+Table.SelectRows(
+    Events,
+    each DateTime.IsInNextHour([EventTime])
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventName","type":"text"}],"rows":[{"EventID":55,"EventTime":"2026-03-08T11:15:00","EventName":"Team standup"},{"EventID":56,"EventTime":"2026-03-08T11:45:00","EventName":"Code review"}]}
+-->
+
+### Example 2: Flag next-hour events
+
+Add a boolean column for events in the next hour.
+
+```powerquery
+Table.AddColumn(
+    Events,
+    "IsNextHour", each DateTime.IsInNextHour([EventTime]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsNextHour","type":"logical"}],"rows":[{"EventID":54,"EventTime":"2026-03-08T10:50:00","IsNextHour":false},{"EventID":55,"EventTime":"2026-03-08T11:15:00","IsNextHour":true},{"EventID":57,"EventTime":"2026-03-08T12:00:00","IsNextHour":false}]}
+-->

@@ -1,0 +1,97 @@
+---
+title: "Folder.Files"
+slug: "folder-files"
+category: "Accessing Data"
+description: "Returns a table of all files in a folder and its subfolders, including their binary content."
+syntax: "Folder.Files(folderPath as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table with one row per file (recursively including subfolders), with columns for Name, Folder Path, Date accessed, Date modified, Date created, Extension, Attributes, and Content."
+parameters:
+  - name: "folderPath"
+    type: "text"
+    required: true
+    description: "The full path to the root folder to read (e.g., \"C:\\Data\\Reports\" or a UNC path like \"\\\\server\\share\\folder\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with additional options."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "folder-contents"
+  - "file-contents"
+  - "csv-document"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`Folder.Files` reads a folder recursively and returns a table listing every file found in the folder and all of its subfolders. It is the recursive counterpart to `Folder.Contents`, which only reads the immediate children of a folder.
+
+Subfolders themselves are not listed as rows — only files are included. The `Folder Path` column tells you which subfolder each file came from.
+
+**Columns returned**:
+- `Name` (text) — the file name including extension.
+- `Folder Path` (text) — the full folder path containing the file (not including the file name itself).
+- `Date accessed` (datetime) — last access timestamp.
+- `Date modified` (datetime) — last modification timestamp.
+- `Date created` (datetime) — creation timestamp.
+- `Extension` (text) — the file extension including the leading dot (e.g., `.csv`).
+- `Attributes` (record) — a record of file system attributes (Hidden, ReadOnly, System, Directory).
+- `Content` (binary) — the binary content of the file.
+
+**Authentication**: Determined by the Windows credentials of the user or gateway. No Power Query credential configuration is required for local paths.
+
+**Query folding**: Not supported.
+
+**Power BI Service**: Not available for direct cloud refresh. An on-premises data gateway is required for local or network folder paths.
+
+**Performance**: Because `Folder.Files` loads binary content for every file it finds, large folders with many files can be slow. Filter rows early (by extension, date, or name) to reduce the number of files whose `Content` column is accessed. Power Query uses lazy evaluation, so filtering before expanding `Content` avoids reading files you do not need.
+
+**Typical combine-files pattern**: This function is the basis for the "Combine Files" experience in Power Query UI. The standard pattern is: get file list, filter to the target file type, then use `Table.TransformColumns` or `Table.AddColumn` to parse each `Content` value.
+
+## Examples
+
+### Example 1: List all files recursively in a folder
+```powerquery
+Folder.Files("C:\Data\Reports")
+```
+
+### Example 2: Combine all Excel workbooks in a folder tree
+```powerquery
+let
+    Source = Folder.Files("C:\Data\Reports"),
+    ExcelFiles = Table.SelectRows(Source, each [Extension] = ".xlsx"),
+    AddedSheets = Table.AddColumn(ExcelFiles, "Workbook", each Excel.Workbook([Content])),
+    Expanded = Table.ExpandTableColumn(AddedSheets, "Workbook", {"Name", "Data"}),
+    FilteredSheets = Table.SelectRows(Expanded, each [Name] = "Sheet1"),
+    Combined = Table.Combine(FilteredSheets[Data])
+in
+    Combined
+```
+
+### Example 3: Combine all CSV files across subfolders
+```powerquery
+let
+    Source = Folder.Files("C:\Data\Exports"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv"),
+    Parsed = Table.AddColumn(CsvFiles, "Data", each Csv.Document([Content], [Delimiter=",", Encoding=65001])),
+    Combined = Table.Combine(Parsed[Data])
+in
+    Combined
+```
+
+### Example 4: Find the most recently modified file in a folder tree
+```powerquery
+let
+    Source = Folder.Files("C:\Data\Reports"),
+    Sorted = Table.Sort(Source, {{"Date modified", Order.Descending}}),
+    Latest = Sorted{0}
+in
+    Latest
+```

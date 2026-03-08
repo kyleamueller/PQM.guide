@@ -1,0 +1,80 @@
+---
+title: "List.Covariance"
+slug: "list-covariance"
+category: "List"
+description: "Returns the sample covariance of two lists of numbers."
+syntax: "List.Covariance(numberList1 as list, numberList2 as list) as nullable number"
+returnType: "nullable number"
+returnDescription: "The sample covariance between the two lists, or null if the lists are empty."
+parameters:
+  - name: "numberList1"
+    type: "list"
+    required: true
+    description: "The first list of numbers."
+  - name: "numberList2"
+    type: "list"
+    required: true
+    description: "The second list of numbers. Must have the same length as numberList1."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-average"
+  - "list-standarddeviation"
+  - "list-sum"
+  - "list-count"
+---
+
+## Remarks
+
+`List.Covariance` computes the **sample covariance** between two numeric lists. Covariance measures how much two variables change together — a positive covariance means they tend to increase together, while a negative covariance means one tends to increase as the other decreases.
+
+The formula used is the sample covariance: the sum of `(x - mean_x) * (y - mean_y)` divided by `n - 1`, where `n` is the number of paired observations.
+
+- Both lists must have the same number of elements.
+- Returns `null` if either list is empty.
+- Null values in the lists are treated as errors; use `List.RemoveNulls` or `List.Select` to clean data first if needed.
+- This is the **sample** covariance (divides by n-1), not the population covariance (divides by n).
+
+## Examples
+
+### Example 1: Covariance of two correlated lists
+
+```powerquery
+List.Covariance({2, 4, 6, 8}, {1, 3, 5, 7})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5.333333333}]}
+-->
+
+### Example 2: Covariance of price and sales volume
+
+Check whether price increases correlate with volume decreases.
+
+```powerquery
+let
+    Prices = {10, 20, 30, 40, 50},
+    Volumes = {500, 420, 350, 260, 180},
+    Cov = List.Covariance(Prices, Volumes)
+in
+    #table({"Covariance"}, {{Cov}})
+```
+
+<!--output
+{"columns":[{"name":"Covariance","type":"number"}],"rows":[{"Covariance":-2050}]}
+-->
+
+### Example 3: Uncorrelated lists
+
+```powerquery
+List.Covariance({1, 2, 3, 4}, {4, 3, 2, 1})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1.666666667}]}
+-->

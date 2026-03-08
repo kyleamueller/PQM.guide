@@ -1,0 +1,78 @@
+---
+title: "Table.FromRows"
+slug: "table-fromrows"
+category: "Table"
+description: "Constructs a table from a list of row lists, with optional column names or types."
+syntax: "Table.FromRows(rows as list, optional columns as any) as table"
+returnType: "table"
+returnDescription: "A table built from the provided list of row value lists."
+parameters:
+  - name: "rows"
+    type: "list"
+    required: true
+    description: "A list of lists, where each inner list represents a row of values."
+  - name: "columns"
+    type: "any"
+    required: false
+    description: "Optional. A list of column names, a table type, or a list of {name, type} pairs defining column names and types."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromrecords"
+  - "table-fromcolumns"
+  - "table-fromlist"
+---
+
+## Remarks
+
+`Table.FromRows` is a convenient way to construct a table from a list of row lists. Each inner list corresponds to one row of data, with values positionally mapped to columns.
+
+The `columns` parameter accepts:
+- A list of column name strings: `{"Col1", "Col2"}`
+- A table type: `type table [Name = text, Age = number]`
+- Omitted: columns are named `Column1`, `Column2`, etc.
+
+This function is commonly used in unit tests, for creating lookup tables inline, or for constructing small reference tables without a data source.
+
+## Examples
+
+### Example 1: Create a table with default column names
+
+```powerquery
+Table.FromRows({{1, "Alice"}, {2, "Bob"}, {3, "Carol"}})
+```
+
+<!--output
+{"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"}],"rows":[{"Column1":"1","Column2":"Alice"},{"Column1":"2","Column2":"Bob"},{"Column1":"3","Column2":"Carol"}]}
+-->
+
+### Example 2: Create a table with named columns
+
+```powerquery
+Table.FromRows(
+    {{1, "Alice", 30}, {2, "Bob", 25}},
+    {"ID", "Name", "Age"}
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"},{"name":"Age","type":"any"}],"rows":[{"ID":"1","Name":"Alice","Age":"30"},{"ID":"2","Name":"Bob","Age":"25"}]}
+-->
+
+### Example 3: Create a typed table
+
+```powerquery
+Table.FromRows(
+    {{1, "Alice"}, {2, "Bob"}},
+    type table [ID = number, Name = text]
+)
+```
+
+<!--output
+{"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"2","Name":"Bob"}]}
+-->

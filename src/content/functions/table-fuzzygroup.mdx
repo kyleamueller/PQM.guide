@@ -1,0 +1,75 @@
+---
+title: "Table.FuzzyGroup"
+slug: "table-fuzzygroup"
+category: "Table"
+description: "Groups rows using fuzzy matching on key column(s), tolerating typos and spelling variations."
+syntax: "Table.FuzzyGroup(table as table, key as any, aggregatedColumns as list, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A grouped table where similar key values are clustered together."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to group."
+  - name: "key"
+    type: "any"
+    required: true
+    description: "A column name or list of column names to group by using fuzzy matching."
+  - name: "aggregatedColumns"
+    type: "list"
+    required: true
+    description: "A list of {newColumnName, aggregationFunction} or {newColumnName, aggregationFunction, newColumnType} triples defining aggregated output columns."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "Optional record with fuzzy options: Threshold, IgnoreCase, IgnoreSpace, NumberOfMatches, TransformationTable."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-group"
+  - "table-fuzzyjoin"
+  - "table-addfuzzyclustercolumn"
+  - "table-distinct"
+---
+
+## Remarks
+
+`Table.FuzzyGroup` works like `Table.Group` but uses fuzzy string matching to cluster similar key values together. For example, "Micosoft", "Microsoft", and "MICROSOFT" would all be grouped under a single canonical representative value.
+
+The representative value chosen for each cluster is typically the most common form or the first encountered, depending on the data. Use `Table.AddFuzzyClusterColumn` if you want to see the cluster assignments without aggregating.
+
+## Examples
+
+### Example 1: Group with fuzzy matching on company names
+
+```powerquery
+Table.FuzzyGroup(
+    #table({"Company", "Amount"}, {{"Microsoft", 100}, {"Micosoft", 80}, {"Google", 200}, {"Gogle", 50}}),
+    "Company",
+    {{"TotalAmount", List.Sum, type number}},
+    [Threshold = 0.8]
+)
+```
+
+<!--output
+{"columns":[{"name":"Company","type":"any"},{"name":"TotalAmount","type":"number"}],"rows":[{"Company":"Microsoft","TotalAmount":"180"},{"Company":"Google","TotalAmount":"250"}]}
+-->
+
+### Example 2: Count occurrences of similar values
+
+```powerquery
+Table.FuzzyGroup(
+    #table({"City"}, {{"New York"}, {"New-York"}, {"Newyork"}, {"London"}}),
+    "City",
+    {{"Count", List.Count, type number}}
+)
+```
+
+<!--output
+{"columns":[{"name":"City","type":"any"},{"name":"Count","type":"number"}],"rows":[{"City":"New York","Count":"3"},{"City":"London","Count":"1"}]}
+-->

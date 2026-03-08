@@ -1,0 +1,72 @@
+---
+title: "Number.BitwiseShiftRight"
+slug: "number-bitwiseshiftright"
+category: "Number"
+description: "Shifts the bits of an integer right by a specified number of positions."
+syntax: "Number.BitwiseShiftRight(number as number, shift as number) as number"
+returnType: "number"
+returnDescription: "The integer with bits shifted right by the specified number of positions."
+parameters:
+  - name: "number"
+    type: "number"
+    required: true
+    description: "The integer whose bits are shifted."
+  - name: "shift"
+    type: "number"
+    required: true
+    description: "The number of bit positions to shift right. Must be a non-negative integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "number-bitwiseshiftleft"
+  - "number-bitwiseand"
+  - "number-bitwiseor"
+---
+
+## Remarks
+
+`Number.BitwiseShiftRight` shifts the binary representation of `number` to the right by `shift` positions. High-order bits are filled based on the sign of the original value (arithmetic right shift). Shifting right by `n` is equivalent to integer division by 2^n.
+
+This is useful for extracting packed fields from integer values, scaling down bit-encoded data, or working with binary-encoded flags.
+
+## Examples
+
+### Example 1: Shift 16 right by 2 (divide by 4)
+
+```powerquery
+Number.BitwiseShiftRight(16, 2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":4}]}
+-->
+
+### Example 2: Extract high nibble (upper 4 bits) from a byte
+
+```powerquery
+Number.BitwiseShiftRight(0b10110101, 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":11}]}
+-->
+
+### Example 3: Undo a left shift
+
+```powerquery
+let
+    Original = 5,
+    Shifted = Number.BitwiseShiftLeft(Original, 3),
+    Restored = Number.BitwiseShiftRight(Shifted, 3)
+in
+    Restored
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
+-->

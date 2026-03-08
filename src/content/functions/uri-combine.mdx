@@ -1,0 +1,88 @@
+---
+title: "Uri.Combine"
+slug: "uri-combine"
+category: "Uri"
+description: "Combines a base URI and a relative URI into a single resolved URI, following standard URI resolution rules."
+syntax: "Uri.Combine(baseUri as text, relativeUri as text) as text"
+returnType: "text"
+returnDescription: "A fully resolved URI text value."
+parameters:
+  - name: "baseUri"
+    type: "text"
+    required: true
+    description: "The base URI to resolve against."
+  - name: "relativeUri"
+    type: "text"
+    required: true
+    description: "The relative URI to resolve. May be an absolute path, relative path, or full URI."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "text-combine"
+  - "text-afterdelimiter"
+  - "text-beforedelimiter"
+---
+
+## Remarks
+
+`Uri.Combine` follows standard RFC 3986 URI resolution rules to combine a base URI with a relative reference. This is the correct way to build URLs in Power Query rather than using simple string concatenation, because it correctly handles path traversal, trailing slashes, and protocol-relative references.
+
+Key behaviors:
+- If `relativeUri` is an absolute URI (starts with a scheme like `https://`), it is returned as-is.
+- If `relativeUri` starts with `/`, it replaces the path on the base URI's host.
+- If `relativeUri` is a relative path (no leading `/`), it is resolved relative to the directory portion of the base URI's path.
+- Trailing slashes on `baseUri` matter: `https://example.com/api/` + `items` = `https://example.com/api/items`, but `https://example.com/api` + `items` = `https://example.com/items`.
+
+Use this function instead of `&` or `Text.Combine` when constructing URLs to avoid common path-joining bugs.
+
+## Examples
+
+### Example 1: Combine a base URL with a relative path
+
+```powerquery
+Uri.Combine("https://api.example.com/v1/", "users")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v1/users"}]}
+-->
+
+### Example 2: Absolute path replaces the base path
+
+```powerquery
+Uri.Combine("https://api.example.com/v1/users", "/v2/orders")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v2/orders"}]}
+-->
+
+### Example 3: Relative path without trailing slash on base
+
+```powerquery
+Uri.Combine("https://api.example.com/v1/users", "orders")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v1/orders"}]}
+-->
+
+### Example 4: Build a paginated API URL
+
+```powerquery
+let
+    baseUrl = "https://api.example.com/data/",
+    page = 3,
+    url = Uri.Combine(baseUrl, "records?page=" & Number.ToText(page))
+in
+    url
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/data/records?page=3"}]}
+-->

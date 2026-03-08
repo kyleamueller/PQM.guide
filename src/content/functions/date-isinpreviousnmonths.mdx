@@ -1,0 +1,68 @@
+---
+title: "Date.IsInPreviousNMonths"
+slug: "date-isinpreviousnmonths"
+category: "Date"
+description: "Returns true if the date falls within the previous N calendar months."
+syntax: "Date.IsInPreviousNMonths(dateTime as any, months as number) as logical"
+returnType: "logical"
+returnDescription: "true if the date falls within the N months before the current month, false otherwise."
+parameters:
+  - name: "dateTime"
+    type: "any"
+    required: true
+    description: "A date, datetime, or datetimezone value to test."
+  - name: "months"
+    type: "number"
+    required: true
+    description: "The number of months back to include. Must be a positive integer."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-isinpreviousmonth"
+  - "date-isinnextnmonths"
+  - "date-isinpreviousnquarters"
+  - "date-isinpreviousnweeks"
+---
+
+## Remarks
+
+`Date.IsInPreviousNMonths` returns `true` if the input date falls within the N complete calendar months preceding the current month. The current month itself is not included; use `Date.IsInCurrentMonth` to also match the current month. The function is re-evaluated on each query refresh.
+
+For example, if today is in March and `months = 3`, it matches any date in December, January, or February.
+
+## Examples
+
+### Example 1: Filter orders from the previous 3 months
+
+Keep only rows where OrderDate falls within the previous 3 calendar months.
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousNMonths([OrderDate], 3)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":35,"OrderDate":"2025-12-10"},{"OrderID":37,"OrderDate":"2026-01-20"},{"OrderID":39,"OrderDate":"2026-02-25"}]}
+-->
+
+### Example 2: Flag orders from the past 6 months
+
+Add a boolean column identifying orders from the previous 6 months.
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "PreviousSixMonths", each Date.IsInPreviousNMonths([OrderDate], 6), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"PreviousSixMonths","type":"logical"}],"rows":[{"OrderID":30,"OrderDate":"2025-08-15","PreviousSixMonths":false},{"OrderID":35,"OrderDate":"2025-12-10","PreviousSixMonths":true},{"OrderID":42,"OrderDate":"2026-03-08","PreviousSixMonths":false}]}
+-->

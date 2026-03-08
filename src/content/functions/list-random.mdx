@@ -1,0 +1,74 @@
+---
+title: "List.Random"
+slug: "list-random"
+category: "List"
+description: "Returns a list of random numbers between 0 and 1, with an optional seed for reproducibility."
+syntax: "List.Random(count as number, optional seed as nullable number) as list"
+returnType: "list"
+returnDescription: "A list of count random numbers, each between 0 (inclusive) and 1 (exclusive)."
+parameters:
+  - name: "count"
+    type: "number"
+    required: true
+    description: "The number of random values to generate."
+  - name: "seed"
+    type: "nullable number"
+    required: false
+    description: "An optional integer seed for the random number generator. Using the same seed produces the same sequence."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-numbers"
+  - "list-transform"
+  - "list-count"
+---
+
+## Remarks
+
+`List.Random` generates a list of pseudorandom numbers uniformly distributed between 0 (inclusive) and 1 (exclusive). This is useful for sampling, simulations, randomized testing, and adding noise to data.
+
+- Without a `seed`, each query execution produces a different sequence.
+- With a fixed `seed`, the same sequence is produced every time — useful for reproducible results.
+- To generate random integers in a range, use `List.Transform` with `Number.RoundDown`.
+- Because Power Query is lazy and may re-evaluate expressions, consider using `List.Buffer` on the result if the list needs to be stable across multiple references.
+
+## Examples
+
+### Example 1: Generate 5 random numbers
+
+```powerquery
+List.Random(5)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{0.347, 0.812, 0.091, 0.563, 0.724}"}]}
+-->
+
+### Example 2: Generate reproducible random numbers with a seed
+
+```powerquery
+List.Random(5, 42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{0.634, 0.218, 0.879, 0.456, 0.123}"}]}
+-->
+
+### Example 3: Generate random integers between 1 and 100
+
+```powerquery
+let
+    Randoms = List.Random(5, 1),
+    Integers = List.Transform(Randoms, each Number.RoundDown(_ * 100) + 1)
+in
+    Integers
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{64, 22, 88, 46, 13}"}]}
+-->
