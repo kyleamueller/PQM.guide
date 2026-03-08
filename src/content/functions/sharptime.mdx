@@ -1,0 +1,81 @@
+---
+title: "#time"
+slug: "sharptime"
+category: "Time"
+description: "Creates a time value from hour, minute, and second components."
+syntax: "#time(hour as number, minute as number, second as number) as time"
+returnType: "time"
+returnDescription: "A time value representing the specified time of day."
+parameters:
+  - name: "hour"
+    type: "number"
+    required: true
+    description: "The hour component (0–23)."
+  - name: "minute"
+    type: "number"
+    required: true
+    description: "The minute component (0–59)."
+  - name: "second"
+    type: "number"
+    required: true
+    description: "The second component (0–59, can include fractional seconds)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "time-hour"
+  - "time-minute"
+  - "time-second"
+  - "sharpdate"
+  - "sharpdatetime"
+---
+
+## Remarks
+
+`#time` is M's literal constructor for creating `time` values — a time of day with no date or timezone component.
+
+The `second` argument can include fractional seconds (e.g. `30.5`). Out-of-range values (hour > 23, minute > 59, etc.) produce an error.
+
+A `time` value has no date part. To combine a date and a time into a datetime, use addition: `#date(2024, 3, 15) + #time(14, 30, 0)` returns `#datetime(2024, 3, 15, 14, 30, 0)`.
+
+## Examples
+
+### Example 1: Create a time literal
+
+```powerquery
+#time(14, 30, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"14:30:00"}]}
+-->
+
+### Example 2: Extract hour, minute, and second
+
+```powerquery
+let
+    t = #time(14, 30, 45),
+    h = Time.Hour(t),
+    m = Time.Minute(t),
+    s = Time.Second(t)
+in
+    {h, m, s}
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{14, 30, 45}"}]}
+-->
+
+### Example 3: Combine date and time into a datetime
+
+```powerquery
+#date(2024, 3, 15) + #time(14, 30, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T14:30:00"}]}
+-->

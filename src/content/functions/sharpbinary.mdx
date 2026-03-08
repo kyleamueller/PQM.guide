@@ -1,0 +1,70 @@
+---
+title: "#binary"
+slug: "sharpbinary"
+category: "Binary"
+description: "Creates a binary value from a list of byte values or a base-64 encoded text string."
+syntax: "#binary(value as any) as binary"
+returnType: "binary"
+returnDescription: "A binary value constructed from the provided bytes or encoded text."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "Either a list of byte values (numbers 0–255) or a base-64 encoded text string."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-from"
+  - "binary-fromtext"
+  - "binary-totext"
+---
+
+## Remarks
+
+`#binary` is M's literal constructor for creating `binary` values. It accepts either a list of byte values (integers 0–255) or a base-64 encoded text string.
+
+Binary values in M represent raw byte sequences. They are primarily used when working with binary data sources such as files, streams, or web API responses that return non-text payloads.
+
+When passing a text string, it must be valid base-64. Passing a list of integers outside the 0–255 range produces an error.
+
+## Examples
+
+### Example 1: Create a binary value from a list of bytes
+
+```powerquery
+#binary({72, 101, 108, 108, 111})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8="}]}
+-->
+
+### Example 2: Create a binary value from a base-64 string
+
+```powerquery
+#binary("SGVsbG8=")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8="}]}
+-->
+
+### Example 3: Round-trip binary to text and back
+
+```powerquery
+let
+    Original = #binary({72, 101, 108, 108, 111}),
+    Encoded  = Binary.ToText(Original),
+    Decoded  = Binary.FromText(Encoded)
+in
+    Decoded
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8="}]}
+-->

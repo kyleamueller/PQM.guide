@@ -1,0 +1,83 @@
+---
+title: "#duration"
+slug: "sharpduration"
+category: "Duration"
+description: "Creates a duration value from days, hours, minutes, and seconds components."
+syntax: "#duration(days as number, hours as number, minutes as number, seconds as number) as duration"
+returnType: "duration"
+returnDescription: "A duration value representing the specified span of time."
+parameters:
+  - name: "days"
+    type: "number"
+    required: true
+    description: "The number of days in the duration."
+  - name: "hours"
+    type: "number"
+    required: true
+    description: "The number of hours (added to the days component)."
+  - name: "minutes"
+    type: "number"
+    required: true
+    description: "The number of minutes (added to the hours component)."
+  - name: "seconds"
+    type: "number"
+    required: true
+    description: "The number of seconds (can include fractional seconds)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "duration-days"
+  - "duration-hours"
+  - "sharpdate"
+  - "sharpdatetime"
+---
+
+## Remarks
+
+`#duration` is M's literal constructor for creating `duration` values — a span of time expressed as days, hours, minutes, and seconds.
+
+All four arguments are additive and can be fractional. The total duration is the sum of all components: `days * 86400 + hours * 3600 + minutes * 60 + seconds` seconds.
+
+Durations are most commonly obtained by subtracting two dates or datetimes of the same type. `#duration` lets you construct a specific span inline, useful for date arithmetic: adding 30 days (`#duration(30, 0, 0, 0)`), or representing a time interval.
+
+Duration is not a number — you cannot multiply a duration by a scalar directly. Use `Duration.TotalDays` to convert to a number first, or `Duration.From` to construct from a total.
+
+## Examples
+
+### Example 1: Create a duration literal (1 day, 2 hours, 30 minutes)
+
+```powerquery
+#duration(1, 2, 30, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"P1DT2H30M"}]}
+-->
+
+### Example 2: Add a duration to a date
+
+```powerquery
+#date(2024, 1, 1) + #duration(30, 0, 0, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-31"}]}
+-->
+
+### Example 3: Extract total hours from a duration
+
+```powerquery
+let
+    d = #duration(1, 6, 0, 0)
+in
+    Duration.TotalHours(d)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+-->

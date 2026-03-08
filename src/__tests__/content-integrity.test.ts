@@ -7,6 +7,7 @@ import {
   getAllPatternSlugs,
   getPatternBySlug,
 } from "@/lib/mdx";
+import officialSpecSlugs from "./fixtures/official-spec-slugs.json";
 
 // ---------------------------------------------------------------------------
 // Functions
@@ -90,6 +91,16 @@ describe("Function MDX integrity", () => {
       expect(typeof content, slug).toBe("string");
       expect(content.trim().length, `${slug}: empty content`).toBeGreaterThan(0);
       expect(content, `${slug}: missing ## Examples`).toContain("## Examples");
+    }
+  });
+
+  it("every function slug exists in the official Power Query M spec", () => {
+    const specSet = new Set(officialSpecSlugs);
+    for (const slug of slugs) {
+      expect(
+        specSet.has(slug),
+        `"${slug}" is not in the official Power Query M spec`
+      ).toBe(true);
     }
   });
 });

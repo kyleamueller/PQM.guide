@@ -1,0 +1,93 @@
+---
+title: "#datetimezone"
+slug: "sharpdatetimezone"
+category: "DateTimeZone"
+description: "Creates a datetimezone value from date, time, and UTC offset components."
+syntax: "#datetimezone(year as number, month as number, day as number, hour as number, minute as number, second as number, offsetHours as number, offsetMinutes as number) as datetimezone"
+returnType: "datetimezone"
+returnDescription: "A datetimezone value representing the specified date and time with UTC offset."
+parameters:
+  - name: "year"
+    type: "number"
+    required: true
+    description: "The year component (e.g. 2024)."
+  - name: "month"
+    type: "number"
+    required: true
+    description: "The month component (1–12)."
+  - name: "day"
+    type: "number"
+    required: true
+    description: "The day component (1–31, depending on month)."
+  - name: "hour"
+    type: "number"
+    required: true
+    description: "The hour component (0–23)."
+  - name: "minute"
+    type: "number"
+    required: true
+    description: "The minute component (0–59)."
+  - name: "second"
+    type: "number"
+    required: true
+    description: "The second component (0–59, can include fractional seconds)."
+  - name: "offsetHours"
+    type: "number"
+    required: true
+    description: "The UTC offset in hours (e.g. -5 for UTC-5, 0 for UTC)."
+  - name: "offsetMinutes"
+    type: "number"
+    required: true
+    description: "The UTC offset minutes component (typically 0 or 30)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "datetimezone-removezone"
+  - "datetimezone-tolocal"
+  - "sharpdatetime"
+---
+
+## Remarks
+
+`#datetimezone` is M's literal constructor for creating `datetimezone` values — a datetime paired with an explicit UTC offset. This is the only M type that can unambiguously represent a specific instant in time.
+
+The offset is expressed as a pair of integers (`offsetHours`, `offsetMinutes`). UTC is represented as `0, 0`. UTC-5 is `-5, 0`. UTC+5:30 (India Standard Time) is `5, 30`.
+
+Use `DateTimeZone.RemoveZone` to strip the offset and get a plain datetime. Use `DateTimeZone.ToUtc` to convert to UTC. In Power BI Service and scheduled dataflow refreshes, `DateTimeZone.LocalNow()` returns UTC — not your local machine's time — so prefer `#datetimezone` or UTC-aware functions for scheduling logic.
+
+## Examples
+
+### Example 1: Create a datetimezone literal (UTC-5)
+
+```powerquery
+#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetimezone"}],"rows":[{"Result":"2024-03-15T14:30:00-05:00"}]}
+-->
+
+### Example 2: Convert to UTC
+
+```powerquery
+DateTimeZone.ToUtc(#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetimezone"}],"rows":[{"Result":"2024-03-15T19:30:00+00:00"}]}
+-->
+
+### Example 3: Remove the timezone offset
+
+```powerquery
+DateTimeZone.RemoveZone(#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T14:30:00"}]}
+-->

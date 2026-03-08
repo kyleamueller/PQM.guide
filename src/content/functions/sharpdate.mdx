@@ -1,0 +1,80 @@
+---
+title: "#date"
+slug: "sharpdate"
+category: "Date"
+description: "Creates a date value from year, month, and day components."
+syntax: "#date(year as number, month as number, day as number) as date"
+returnType: "date"
+returnDescription: "A date value representing the specified calendar date."
+parameters:
+  - name: "year"
+    type: "number"
+    required: true
+    description: "The year component (e.g. 2024)."
+  - name: "month"
+    type: "number"
+    required: true
+    description: "The month component (1–12)."
+  - name: "day"
+    type: "number"
+    required: true
+    description: "The day component (1–31, depending on month)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "date-from"
+  - "date-year"
+  - "date-month"
+  - "date-day"
+  - "date-adddays"
+---
+
+## Remarks
+
+`#date` is M's literal constructor for creating `date` values. It is the canonical way to write a specific calendar date inline in M code.
+
+The arguments must be valid calendar values — out-of-range values (e.g. month 13, day 32) produce an error at evaluation time.
+
+`#date` produces a value of type `date` only (no time component). To construct a datetime, use `#datetime`. To convert a date to a datetime, use `DateTime.From`.
+
+## Examples
+
+### Example 1: Create a date literal
+
+```powerquery
+#date(2024, 3, 15)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-03-15"}]}
+-->
+
+### Example 2: Use a date literal in arithmetic
+
+```powerquery
+let
+    start = #date(2024, 1, 1),
+    end   = #date(2024, 12, 31),
+    days  = Duration.Days(end - start)
+in
+    days
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":365}]}
+-->
+
+### Example 3: Add days to a date literal
+
+```powerquery
+#date(2024, 1, 1) + #duration(30, 0, 0, 0)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-31"}]}
+-->
