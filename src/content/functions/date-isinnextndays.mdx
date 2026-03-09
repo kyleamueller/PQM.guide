@@ -33,36 +33,59 @@ relatedFunctions:
 
 `Date.IsInNextNDays` returns `true` if the input date falls between tomorrow and N days from today (inclusive). Today itself is not included; use `Date.IsInCurrentDay` if you also need to match today. The function is re-evaluated on each query refresh.
 
-For example, with `days = 7`, it matches any date from tomorrow through 7 days from now (a 7-day window starting tomorrow).
+For example, with `days = 7`, it matches any date from tomorrow through 7 days from now — a 7-day window starting tomorrow and ending 7 days out. This is useful for "expiring soon" alerts, upcoming deadline views, or delivery windows.
+
+Note the boundary behavior: `Date.IsInNextNDays(d, 1)` matches only tomorrow and is equivalent to `Date.IsInNextDay`. To include today in the window, add `or Date.IsInCurrentDay([OrderDate])`. For a full rolling window anchored to today (including today), consider computing `[OrderDate] >= Date.From(DateTime.LocalNow()) and [OrderDate] <= Date.AddDays(Date.From(DateTime.LocalNow()), N)`.
 
 ## Examples
 
-### Example 1: Find tasks due in the next 14 days
+### Example 1: Find orders due in the next 7 days
 
-Keep only rows where DueDate falls within the next 14 days.
+Keep only rows where OrderDate falls within the next 7 days.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Tasks,
-    each Date.IsInNextNDays([DueDate], 14)
+    Sales,
+    each Date.IsInNextNDays([OrderDate], 7)
 )
 ```
 
 <!--output
-{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":5,"DueDate":"2026-03-09","TaskName":"Submit report"},{"TaskID":6,"DueDate":"2026-03-15","TaskName":"Client call"},{"TaskID":7,"DueDate":"2026-03-20","TaskName":"Review budget"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-03-09"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-03-12"}]}
 -->
 
-### Example 2: Flag rows expiring in the next 30 days
+### Example 2: Flag orders expiring in the next 30 days
 
-Add a boolean column for items expiring within 30 days.
+Add a boolean column for orders expiring within 30 days.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Licenses,
-    "ExpiringSoon", each Date.IsInNextNDays([ExpiryDate], 30), type logical
+    Sales,
+    "DueInNext30", each Date.IsInNextNDays([OrderDate], 30), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"LicenseID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"ExpiringSoon","type":"logical"}],"rows":[{"LicenseID":"L001","ExpiryDate":"2026-03-20","ExpiringSoon":true},{"LicenseID":"L002","ExpiryDate":"2026-04-05","ExpiringSoon":true},{"LicenseID":"L003","ExpiryDate":"2026-06-01","ExpiringSoon":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DueInNext30","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","DueInNext30":false},{"OrderID":43,"OrderDate":"2026-03-09","DueInNext30":true},{"OrderID":44,"OrderDate":"2026-04-07","DueInNext30":true},{"OrderID":45,"OrderDate":"2026-05-01","DueInNext30":false}]}
+-->
+
+### Example 3: Include today in the next-N-days window
+
+Combine IsInCurrentDay and IsInNextNDays to capture a rolling window from today through the next 7 days.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentDay([OrderDate]) or Date.IsInNextNDays([OrderDate], 7)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":42,"CustomerName":"Charlie","OrderDate":"2026-03-08"},{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-03-09"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-03-12"}]}
 -->

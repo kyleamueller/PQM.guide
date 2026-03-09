@@ -35,36 +35,64 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.MaxN` returns the `N` rows with the highest values for the specified comparison criteria. The rows are returned in descending order of the criteria. If `countOrCondition` is a function, rows are returned from the top of the sorted table while the function returns true.
+`Table.MaxN` returns the top N rows by the specified comparison criteria, ordered from highest to lowest. When `countOrCondition` is a number, it returns exactly that many rows. When it is a function (predicate), it returns rows from the top of the sorted order while the predicate is true — stopping as soon as the first non-matching row is found.
 
-This function is useful for top-N analysis such as finding the top 5 products by sales.
+`Table.MaxN` is useful for top-N analysis — finding the top 3 customers by revenue, the 5 most expensive products, or all orders above a threshold. It is equivalent to `Table.FirstN(Table.Sort(table, {criteria, Order.Descending}), N)` but expresses the intent more directly.
+
+Note that when using a condition function as `countOrCondition`, the condition is applied to the rows in the already-sorted (descending) order. A row that fails the condition stops the scan — any rows after it are not considered even if they would satisfy the predicate. This is a "leading contiguous" behavior, not a filter.
 
 ## Examples
 
-### Example 1: Get the top 2 rows by score
+### Example 1: Top 3 orders by unit price
 
 ```powerquery
-Table.MaxN(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}, {"Dave", 88}}),
-    "Score",
-    2
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice", "Quantity"},
+        {{1,"Alice","Widget A",25.00,4},{2,"Bob","Gadget B",50.00,2},
+         {3,"Charlie","Widget C",15.00,10},{4,"Alice","Gadget D",75.00,1},
+         {6,"Bob","Thingamajig E",120.00,1}}
+    )
+in
+    Table.MaxN(Sales, "UnitPrice", 3)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Carol","Score":"99"},{"Name":"Alice","Score":"95"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75","Quantity":"1"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"}]}
 -->
 
-### Example 2: Get all rows with score above 90
+### Example 2: All orders with unit price at or above 50
+
+Using a condition function instead of a count retrieves all leading rows above a threshold.
 
 ```powerquery
-Table.MaxN(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
-    "Score",
-    each [Score] >= 90
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice"},
+        {{1,"Alice","Widget A",25.00},{2,"Bob","Gadget B",50.00},
+         {4,"Alice","Gadget D",75.00},{6,"Bob","Thingamajig E",120.00}}
+    )
+in
+    Table.MaxN(Sales, "UnitPrice", each [UnitPrice] >= 50)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Carol","Score":"99"},{"Name":"Alice","Score":"95"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50"}]}
+-->
+
+### Example 3: Top 2 highest-paid employees
+
+```powerquery
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Salary = number],
+        {{"E001","alice smith","Sales",55000},{"E002","BOB JONES","Engineering",95000},
+         {"E003","Charlie Brown","Marketing",72000},{"E005","Eve Martinez","Sales",88000}}
+    )
+in
+    Table.MaxN(Employees, "Salary", 2)
+```
+
+<!--output
+{"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E005","FullName":"Eve Martinez","Department":"Sales","Salary":"88000"}]}
 -->

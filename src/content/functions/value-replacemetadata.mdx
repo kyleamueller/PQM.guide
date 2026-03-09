@@ -30,11 +30,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Value.ReplaceMetadata` attaches a new metadata record to a value, replacing any existing metadata entirely. It is equivalent to the `value meta record` expression in M.
+`Value.ReplaceMetadata` attaches a new metadata record to a value, **replacing any existing metadata entirely**. It is the function form of the `value meta record` M expression — `Value.ReplaceMetadata(v, r)` is equivalent to `v meta r`.
 
-Metadata does not affect the value itself — the underlying data, type, and equality semantics are unchanged. Metadata is used to carry supplementary information such as display names, documentation annotations, or provenance data.
+Metadata is supplementary information carried alongside a value without changing the value itself. The underlying data, type kind, and equality semantics are all unaffected — `Value.ReplaceMetadata(42, [Tag = "x"])` is still equal to `42`.
 
-To add metadata rather than replace it, read the existing metadata with `Value.Metadata`, merge with `Record.Combine`, and apply with `Value.ReplaceMetadata`.
+Important behaviors:
+
+- **Full replacement**: `Value.ReplaceMetadata` discards all previous metadata and replaces it with the provided record. It does not merge. To add fields to existing metadata without losing others, use the pattern: `Value.ReplaceMetadata(v, Record.Combine({Value.Metadata(v), [NewField = "value"]}))`.
+- **Lost on operations**: most M operations (arithmetic, string operations, table transforms) strip metadata from their outputs. Metadata must be explicitly re-attached if needed after a transformation.
+- **Engine use**: Power Query uses metadata internally to carry display format hints, column descriptions (`Documentation.FieldCaption`), and data source provenance information.
 
 ## Examples
 
@@ -52,7 +56,7 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Calculated"}]}
 -->
 
-### Example 2: Replace existing metadata
+### Example 2: Replace existing metadata — old fields are discarded
 
 ```powerquery
 let
@@ -67,7 +71,7 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"new"}]}
 -->
 
-### Example 3: The underlying value is unchanged
+### Example 3: The underlying value is unchanged by metadata replacement
 
 ```powerquery
 let

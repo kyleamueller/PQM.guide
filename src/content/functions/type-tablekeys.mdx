@@ -27,18 +27,20 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.TableKeys` returns the key metadata declared on a table type. Each element of the returned list is a record with two fields:
+`Type.TableKeys` returns the list of key definitions declared on a table type. Each element of the returned list is a record with two fields:
 
-- `Columns` — a list of column name strings that form the key
-- `Primary` — `true` if this is the primary key, `false` for alternate keys
+- `Columns` — a list of column name text values that form the key
+- `Primary` — `true` for the primary key, `false` for an alternate key
 
-Keys are important for query folding and relationship management in Power BI. They can be defined using `Type.AddTableKey` or `Table.AddKey`.
+If no keys are defined on the table type, an empty list (`{}`) is returned.
 
-If no keys are defined on the table type, an empty list is returned.
+Keys in Power BI inform the engine about uniqueness constraints on tables and are used to enable and optimize relationships between tables in the data model. They can be added to a table type using `Type.AddTableKey`, set in bulk using `Type.ReplaceTableKeys`, or applied directly to a table using `Table.AddKey`.
+
+`Type.TableKeys` is the read-side complement to `Type.AddTableKey` and `Type.ReplaceTableKeys`. It is useful for inspecting a table's declared schema, validating that expected key constraints are in place, or building generic connector utilities that need to be aware of key definitions.
 
 ## Examples
 
-### Example 1: A table type with no keys
+### Example 1: A table type with no declared keys returns an empty list
 
 ```powerquery
 let
@@ -52,7 +54,7 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 2: Inspect keys after adding one
+### Example 2: Inspect key details after adding a primary key
 
 ```powerquery
 let
@@ -65,4 +67,20 @@ in
 
 <!--output
 {"columns":[{"name":"Columns","type":"any"},{"name":"Primary","type":"logical"}],"rows":[{"Columns":["ID"],"Primary":true}]}
+-->
+
+### Example 3: Check whether a table has a primary key declared
+
+```powerquery
+let
+    T = #table(type table [OrderID = number, Product = text], {{1, "Widget A"}}),
+    TWithKey = Table.AddKey(T, {"OrderID"}, true),
+    Keys = Type.TableKeys(Value.Type(TWithKey)),
+    HasPrimary = List.AnyTrue(List.Transform(Keys, each _[Primary]))
+in
+    HasPrimary
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->

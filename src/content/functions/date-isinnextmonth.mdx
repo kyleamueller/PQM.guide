@@ -27,7 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInNextMonth` returns `true` if the input date falls within the calendar month immediately after the current month (as determined by `DateTime.LocalNow()`). For example, if today is in March, this function returns `true` for any date in April. The function is re-evaluated on each query refresh.
+`Date.IsInNextMonth` returns `true` if the input date falls within the calendar month immediately after the current month (as determined by `DateTime.LocalNow()`). For example, if today is in March, this function returns `true` for any date in April — including dates beyond the current day in April. The function is re-evaluated on each query refresh.
+
+This function is useful for surfacing upcoming renewals, upcoming billing cycles, or forward-looking pipeline data. It matches exactly one month: the next calendar month, not the next 30 days. For a 30-day rolling lookahead, use `Date.IsInNextNDays(30)` instead.
+
+For a broader forward window spanning multiple months, use `Date.IsInNextNMonths` with the desired number of months.
 
 ## Examples
 
@@ -46,17 +50,35 @@ Table.SelectRows(
 {"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"SubID":12,"RenewalDate":"2026-04-10","Customer":"Contoso"},{"SubID":15,"RenewalDate":"2026-04-25","Customer":"Fabrikam"}]}
 -->
 
-### Example 2: Flag next-month rows
+### Example 2: Flag next-month orders in Sales table
 
-Add a boolean column identifying rows due next month.
+Add a boolean column identifying orders placed in the next calendar month.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Subscriptions,
-    "RenewsNextMonth", each Date.IsInNextMonth([RenewalDate]), type logical
+    Sales,
+    "IsNextMonth", each Date.IsInNextMonth([OrderDate]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"RenewsNextMonth","type":"logical"}],"rows":[{"SubID":10,"RenewalDate":"2026-03-15","RenewsNextMonth":false},{"SubID":12,"RenewalDate":"2026-04-10","RenewsNextMonth":true},{"SubID":14,"RenewalDate":"2026-05-20","RenewsNextMonth":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsNextMonth","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","IsNextMonth":false},{"OrderID":43,"OrderDate":"2026-04-10","IsNextMonth":true},{"OrderID":44,"OrderDate":"2026-05-20","IsNextMonth":false}]}
+-->
+
+### Example 3: Count orders expected next month
+
+Count the number of upcoming orders scheduled for next month.
+
+Input: `Sales`
+
+```powerquery
+List.Count(
+    Table.SelectRows(Sales, each Date.IsInNextMonth([OrderDate]))[OrderID]
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->

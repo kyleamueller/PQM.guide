@@ -27,15 +27,18 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.ClosedRecord` converts a record type into a closed record type. A closed record type requires that values have exactly the fields declared in the type — no additional fields are permitted.
+`Type.ClosedRecord` converts a record type into a **closed** record type. In Power Query M's type system, record types are either open or closed:
 
-If the type is already closed, it is returned unchanged. This complements `Type.OpenRecord`.
+- An **open** record type permits values to have fields beyond those declared in the type. The base `type record` is open.
+- A **closed** record type requires values to have exactly the declared fields — no additional fields are allowed.
 
-Closed record types are useful for strict schema validation and for signaling that a record is fully described by its declared fields.
+`Type.ClosedRecord` returns the closed version of whatever record type is passed in. If the type is already closed, it is returned unchanged. The declared field names and field types are preserved — only the open/closed flag changes. The complement of this function is `Type.OpenRecord`.
+
+Closed record types are important in custom connector development and schema enforcement scenarios. When a type is closed, the M engine and tooling know the record's structure is fully specified, which can enable optimizations and stricter validation. Use `Type.IsOpenRecord` to test whether a type is open or closed before converting.
 
 ## Examples
 
-### Example 1: Close the base record type
+### Example 1: Close the base record type and verify
 
 ```powerquery
 let
@@ -48,7 +51,7 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
-### Example 2: Close a typed record and verify
+### Example 2: Close a typed record with declared fields
 
 ```powerquery
 let
@@ -60,4 +63,20 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+### Example 3: Round-trip open → close → open preserves field declarations
+
+```powerquery
+let
+    RT = Type.ForRecord([ID = [Type = type number, Optional = false]], false),
+    Opened = Type.OpenRecord(RT),
+    Closed = Type.ClosedRecord(Opened),
+    Fields = Type.RecordFields(Closed)
+in
+    Fields[ID][Type]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
 -->

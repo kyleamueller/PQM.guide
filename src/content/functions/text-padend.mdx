@@ -35,52 +35,55 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.PadEnd` adds `character` characters to the right (end) of `text` until the total length is at least `count`. If `text` is already `count` characters or longer, it is returned unchanged.
+`Text.PadEnd` adds `character` to the right (end) of `text` until the total length reaches at least `count`. If `text` is already `count` characters or longer, it is returned unchanged — no truncation occurs.
 
-If `character` is omitted or `null`, a space (`" "`) is used. The `character` argument must be exactly one character long; providing a multi-character string raises an error.
+If `character` is omitted or `null`, a space (`" "`) is used. The `character` argument must be exactly one character long; providing a multi-character string raises an error. If `text` is `null`, the function returns `null`.
 
-If `text` is `null`, the function returns `null`.
+Right-padding is primarily useful for producing fixed-width output — for example, when writing to positional text files, aligning columns in a report, or normalizing category codes to a consistent length. For left-padding (e.g., zero-padding numeric IDs), use `Text.PadStart` instead.
 
-Right-padding is commonly used for fixed-width text file output, aligning columns in reports, or filling codes to a standard length.
+Note that `Text.PadEnd` guarantees a **minimum** length, not an exact length. If the input is already longer than `count`, it is returned as-is. If you need to truncate long values as well as pad short ones, combine with `Text.Start` first: `Text.PadEnd(Text.Start(text, count), count, " ")`.
 
 ## Examples
 
-### Example 1: Pad a label to ten characters with spaces
+### Example 1: Right-pad a name to a fixed width with spaces
 
 ```powerquery
-Text.PadEnd("Hello", 10)
+Text.PadEnd("Alice", 15)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello     "}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice          "}]}
 -->
 
-### Example 2: Pad with a custom character
+### Example 2: Pad a category code to a standard length with dashes
 
 ```powerquery
-Text.PadEnd("abc", 6, "-")
+Text.PadEnd("Widgets", 12, "-")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"abc---"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Widgets-----"}]}
 -->
 
-### Example 3: Text already meets minimum length — no padding added
+### Example 3: No padding when text already exceeds the minimum length
 
 ```powerquery
-Text.PadEnd("Hello World", 5)
+Text.PadEnd("Engineering", 8)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Engineering"}]}
 -->
 
-### Example 4: Pad a product code to eight characters
+### Example 4: Normalize region codes to a fixed width in a table column
 
 ```powerquery
-Text.PadEnd("A12", 8, "0")
+Table.TransformColumns(
+    #table({"Region"}, {{"East"}, {"West"}, {"North"}}),
+    {{"Region", each Text.PadEnd(_, 8), type text}}
+)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"A1200000"}]}
+{"columns":[{"name":"Region","type":"text"}],"rows":[{"Region":"East    "},{"Region":"West    "},{"Region":"North   "}]}
 -->

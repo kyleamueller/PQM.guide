@@ -29,15 +29,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.FromText` parses a text value into a number. It accepts standard numeric representations including integers, decimals, and scientific notation (e.g., `"1.5e3"`). When no culture is specified, the engine uses the locale of the current session.
+`Number.FromText` parses a text value into a number. It recognizes integers, decimal numbers, and scientific notation (e.g., `"1.5e3"` → 1500). It also recognizes the special strings `"NaN"`, `"Infinity"`, and `"-Infinity"`. When no culture is specified, the engine uses the session locale.
 
-Use the optional `culture` parameter when your source data uses a non-default locale. For example, German-formatted numbers use a comma as the decimal separator (`"1.234,56"`), which would fail without specifying `"de-DE"`.
+The most important use of the optional `culture` parameter is handling locale-specific decimal and thousands separators. In `"en-US"`, the decimal separator is `.` and the thousands separator is `,` (e.g., `"1,234.56"`). In `"de-DE"` (German) and many European locales, these are reversed: `.` is the thousands separator and `,` is the decimal (e.g., `"1.234,56"`). Failing to specify the correct culture will cause parsing errors or silently incorrect values.
 
-Special text values `"NaN"`, `"Infinity"`, and `"-Infinity"` are also recognized.
+`Number.FromText` raises an error if the text cannot be parsed as a number. Use `try Number.FromText(text) otherwise null` to safely handle unparseable values in bulk conversions. For simple type conversion without locale concerns, `Number.From(value)` is a more concise alternative that handles the same cases plus non-text inputs.
 
 ## Examples
 
-### Example 1: Parse a simple decimal string
+### Example 1: Parse a decimal string in the default locale
 
 ```powerquery
 Number.FromText("3.14")
@@ -59,19 +59,23 @@ Number.FromText("1.234,56", "de-DE")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.56}]}
 -->
 
-### Example 3: Parse numbers in a table column
+### Example 3: Safely parse a text column that may contain non-numeric values
 
-Convert a text column of prices to numbers.
-
-Input: `Sales`
+Use `try`/`otherwise` to return null for unparseable values instead of raising errors.
 
 ```powerquery
-Table.TransformColumns(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "UnitPrice"}),
-    {{"UnitPrice", each Number.FromText(Text.From(_)), type number}}
-)
+let
+    Data = #table({"ID", "PriceText"}, {{1, "25.00"}, {2, "N/A"}, {3, "75.50"}}),
+    WithParsed = Table.AddColumn(
+        Data,
+        "Price",
+        each try Number.FromText([PriceText]) otherwise null,
+        type number
+    )
+in
+    WithParsed
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25},{"OrderID":2,"UnitPrice":150},{"OrderID":3,"UnitPrice":75}]}
+{"columns":[{"name":"ID","type":"number"},{"name":"PriceText","type":"text"},{"name":"Price","type":"number"}],"rows":[{"ID":1,"PriceText":"25.00","Price":25},{"ID":2,"PriceText":"N/A","Price":null},{"ID":3,"PriceText":"75.50","Price":75.5}]}
 -->

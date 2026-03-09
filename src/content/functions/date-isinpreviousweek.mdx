@@ -29,11 +29,17 @@ relatedFunctions:
 
 `Date.IsInPreviousWeek` returns `true` if the input date falls within the Sunday–Saturday calendar week immediately preceding the current week. The current week is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
 
+The week boundary is always Sunday–Saturday. If your organization uses Monday-based weeks, build the filter manually using `Date.StartOfWeek` and `Date.EndOfWeek` with `Day.Monday`.
+
+Use this function for week-over-week comparison dashboards, for identifying last week's shipments or activity, or as the "comparison period" when current week vs. previous week metrics are needed.
+
 ## Examples
 
 ### Example 1: Filter last week's orders
 
-Keep only rows from the Sales table where OrderDate was in the previous calendar week.
+Keep only rows where OrderDate fell in the previous Sunday–Saturday week.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -50,6 +56,8 @@ Table.SelectRows(
 
 Add a boolean column identifying orders from the previous week.
 
+Input: `Sales`
+
 ```powerquery
 Table.AddColumn(
     Sales,
@@ -59,4 +67,26 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastWeek","type":"logical"}],"rows":[{"OrderID":39,"OrderDate":"2026-02-25","IsLastWeek":false},{"OrderID":40,"OrderDate":"2026-03-02","IsLastWeek":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastWeek":false}]}
+-->
+
+### Example 3: Add a week period label for week-over-week comparison
+
+Tag rows as current week, last week, or other for dashboard segmentation.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "WeekPeriod",
+    each
+        if Date.IsInCurrentWeek([OrderDate]) then "This Week"
+        else if Date.IsInPreviousWeek([OrderDate]) then "Last Week"
+        else "Other",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"WeekPeriod","type":"text"}],"rows":[{"OrderID":39,"OrderDate":"2026-02-25","WeekPeriod":"Other"},{"OrderID":40,"OrderDate":"2026-03-02","WeekPeriod":"Last Week"},{"OrderID":42,"OrderDate":"2026-03-08","WeekPeriod":"This Week"}]}
 -->

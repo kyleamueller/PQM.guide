@@ -27,36 +27,67 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.IsInNextSecond` returns `true` if the input `datetime` or `datetimezone` value falls within the clock second immediately following the current second (as determined by `DateTime.LocalNow()`). The current second is not included. The function is re-evaluated on each query refresh.
+`DateTime.IsInNextSecond` returns `true` if the input `datetime` or `datetimezone` value falls within the clock second immediately following the current second, as determined by `DateTime.LocalNow()`. The current second is not included. The function is re-evaluated on each query refresh, but in practice this is so fine-grained that it will almost never match data in a real Power Query dataset.
+
+`DateTime.IsInNextSecond` is effectively a real-time streaming predicate. In any standard Power BI or Excel scenario where data is loaded from a table or database, query evaluation takes more than one second, making it practically impossible for rows to fall within the "next second" window consistently. This function is only meaningful in scenarios where M is evaluated in a true real-time engine.
+
+For practical second-level filtering over a meaningful window, compute an explicit threshold: `DateTime.LocalNow() + #duration(0, 0, 0, N)` and compare directly rather than relying on the IsInNextSecond predicate.
 
 ## Examples
 
-### Example 1: Filter events in the next second
+### Example 1: Demonstrate next-second evaluation
 
-Keep only rows where EventTime falls in the next clock second.
+Show that IsInNextSecond flags only timestamps exactly one second ahead.
 
 ```powerquery
-Table.SelectRows(
-    Events,
-    each DateTime.IsInNextSecond([EventTime])
-)
+let
+    Now = DateTime.FixedLocalNow()
+in
+    #table(
+        type table [Description = text, Timestamp = datetime, IsNextSecond = logical],
+        {
+            {"Previous second", Now - #duration(0, 0, 0, 1), DateTime.IsInNextSecond(Now - #duration(0, 0, 0, 1))},
+            {"Current second",  Now,                          DateTime.IsInNextSecond(Now)},
+            {"Next second",     Now + #duration(0, 0, 0, 1), DateTime.IsInNextSecond(Now + #duration(0, 0, 0, 1))}
+        }
+    )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":75,"EventTime":"2026-03-08T10:32:46.100"},{"EventID":76,"EventTime":"2026-03-08T10:32:46.900"}]}
+{"columns":[{"name":"Description","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"IsNextSecond","type":"logical"}],"rows":[{"Description":"Previous second","Timestamp":"2026-03-08T09:59:59","IsNextSecond":false},{"Description":"Current second","Timestamp":"2026-03-08T10:00:00","IsNextSecond":false},{"Description":"Next second","Timestamp":"2026-03-08T10:00:01","IsNextSecond":true}]}
 -->
 
-### Example 2: Flag next-second events
+### Example 2: Flag next-second entries in log data
 
-Add a boolean column for events occurring in the next second.
+Add a boolean column for log entries in the next clock second (typically all false in batch data).
 
 ```powerquery
 Table.AddColumn(
-    Events,
-    "IsNextSecond", each DateTime.IsInNextSecond([EventTime]), type logical
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "IsNextSecond", each DateTime.IsInNextSecond([Timestamp]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsNextSecond","type":"logical"}],"rows":[{"EventID":74,"EventTime":"2026-03-08T10:32:45.500","IsNextSecond":false},{"EventID":75,"EventTime":"2026-03-08T10:32:46.100","IsNextSecond":true},{"EventID":77,"EventTime":"2026-03-08T10:32:47.000","IsNextSecond":false}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"IsNextSecond","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","IsNextSecond":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","IsNextSecond":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","IsNextSecond":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","IsNextSecond":false}]}
+-->
+
+### Example 3: Alternative approach using an explicit time threshold
+
+For reliable second-level lookahead filtering, compare against an explicit computed threshold instead.
+
+```powerquery
+let
+    Now = DateTime.FixedLocalNow(),
+    LookAheadSeconds = 5,
+    Threshold = Now + #duration(0, 0, 0, LookAheadSeconds)
+in
+    Table.SelectRows(
+        OrderLog,
+        each [Timestamp] > Now and [Timestamp] <= Threshold
+    )
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[]}
 -->

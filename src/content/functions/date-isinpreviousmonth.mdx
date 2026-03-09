@@ -29,11 +29,17 @@ relatedFunctions:
 
 `Date.IsInPreviousMonth` returns `true` if the input date falls within the calendar month immediately before the current month (as determined by `DateTime.LocalNow()`). For example, if today is in March, this function returns `true` for any date in February. The function is re-evaluated on each query refresh.
 
+This is one of the most commonly used `Date.IsIn*` functions, typically used for month-over-month reporting — for example, comparing last month's revenue to the current month. It matches the full prior calendar month, from the first to the last day.
+
+To compare against a broader range of prior months, use `Date.IsInPreviousNMonths`. To include the current month in the same filter, add `or Date.IsInCurrentMonth([OrderDate])`.
+
 ## Examples
 
 ### Example 1: Filter last month's orders
 
-Keep only rows from the Sales table where OrderDate was in the previous month.
+Keep only rows where OrderDate falls in the previous calendar month.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -50,6 +56,8 @@ Table.SelectRows(
 
 Add a boolean column identifying rows from the previous month.
 
+Input: `Sales`
+
 ```powerquery
 Table.AddColumn(
     Sales,
@@ -59,4 +67,26 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastMonth","type":"logical"}],"rows":[{"OrderID":37,"OrderDate":"2026-01-20","IsLastMonth":false},{"OrderID":38,"OrderDate":"2026-02-10","IsLastMonth":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastMonth":false}]}
+-->
+
+### Example 3: Tag rows with a period label for month-over-month comparison
+
+Add a label to distinguish current month, last month, and all other periods.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "Period",
+    each
+        if Date.IsInCurrentMonth([OrderDate]) then "Current Month"
+        else if Date.IsInPreviousMonth([OrderDate]) then "Last Month"
+        else "Other",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Period","type":"text"}],"rows":[{"OrderID":37,"OrderDate":"2026-01-20","Period":"Other"},{"OrderID":38,"OrderDate":"2026-02-10","Period":"Last Month"},{"OrderID":42,"OrderDate":"2026-03-08","Period":"Current Month"}]}
 -->

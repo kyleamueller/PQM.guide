@@ -31,12 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Product` multiplies all values in a numeric list together and returns the result. This is useful for compound growth calculations, factorial computations, and any scenario requiring sequential multiplication.
+`List.Product` multiplies all values in a numeric list together and returns the result. This is the multiplicative equivalent of `List.Sum`. Common use cases include compound growth calculations (multiplying a series of rate factors), factorial-style computations, and scenarios where values are expressed as multipliers.
 
-- Returns `null` if the list is empty.
-- Null values in the list are skipped (treated as if they are not present).
-- Including `0` in the list will produce a result of `0`.
-- Use `Precision.Double` as the second argument to use IEEE 754 double-precision floating-point arithmetic, which may differ from the default decimal arithmetic for very large or very small numbers.
+Returns `null` if the list is empty. Null values in the list are skipped — they do not contribute to the product and do not cause an error. Including `0` in the list produces a result of `0` regardless of other values.
+
+The optional `precision` parameter accepts `Precision.Double` to use IEEE 754 double-precision floating-point arithmetic. This can differ from the default decimal arithmetic for very large or very small numbers, and may be needed for interoperability with systems that use double-precision math. For most business data, the default is sufficient.
 
 ## Examples
 

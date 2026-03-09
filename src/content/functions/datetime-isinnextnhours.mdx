@@ -31,36 +31,57 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.IsInNextNHours` returns `true` if the input `datetime` or `datetimezone` value falls within the next N complete clock hours after the current hour. The current hour itself is not included; use `DateTime.IsInCurrentHour` to also match the current hour. The function is re-evaluated on each query refresh.
+`DateTime.IsInNextNHours` returns `true` if the input `datetime` or `datetimezone` value falls within the next N complete clock hours after the current hour. The current hour itself is not included — use `DateTime.IsInCurrentHour` to also include the current hour. The function is re-evaluated on each query refresh, and the `hours` argument must be a positive integer.
+
+Like all `DateTime.IsIn*` functions, the reference clock is `DateTime.LocalNow()`. In Power BI Service and Dataflows, "local" typically means the cloud region's UTC time rather than your personal timezone. Be aware of this when building hour-level filters in cloud-refresh scenarios.
+
+`DateTime.IsInNextNHours` is more practical than `DateTime.IsInNextHour` for use cases that require a meaningful lookahead window — for example, flagging scheduled maintenance events in the next 4 hours, or surfacing SLA-critical orders due in the next 8 hours.
 
 ## Examples
 
-### Example 1: Filter events in the next 4 hours
+### Example 1: Filter log entries in the next 4 clock hours
 
-Keep only rows where EventTime falls within the next 4 clock hours.
+Keep only rows where Timestamp falls within the next 4 complete clock hours.
 
 ```powerquery
 Table.SelectRows(
-    Events,
-    each DateTime.IsInNextNHours([EventTime], 4)
+    OrderLog,
+    each DateTime.IsInNextNHours([Timestamp], 4)
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventName","type":"text"}],"rows":[{"EventID":55,"EventTime":"2026-03-08T11:15:00","EventName":"Standup"},{"EventID":56,"EventTime":"2026-03-08T13:30:00","EventName":"Review"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[]}
 -->
 
-### Example 2: Flag events in the next 8 hours
+### Example 2: Flag entries in the next 8 hours
 
-Add a boolean column identifying events within the next 8 hours.
+Add a boolean column identifying log entries within the next 8 hours.
 
 ```powerquery
 Table.AddColumn(
-    Events,
-    "InNext8Hours", each DateTime.IsInNextNHours([EventTime], 8), type logical
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "InNext8Hours", each DateTime.IsInNextNHours([Timestamp], 8), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"InNext8Hours","type":"logical"}],"rows":[{"EventID":54,"EventTime":"2026-03-08T10:30:00","InNext8Hours":false},{"EventID":55,"EventTime":"2026-03-08T11:15:00","InNext8Hours":true},{"EventID":60,"EventTime":"2026-03-08T20:00:00","InNext8Hours":false}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"InNext8Hours","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","InNext8Hours":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","InNext8Hours":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","InNext8Hours":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","InNext8Hours":false}]}
+-->
+
+### Example 3: Combine current hour and next N hours for a full lookahead window
+
+Flag entries from the current hour through the next 6 hours for a 7-hour alert window.
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "In7HourWindow",
+    each DateTime.IsInCurrentHour([Timestamp]) or DateTime.IsInNextNHours([Timestamp], 6),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"In7HourWindow","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","In7HourWindow":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","In7HourWindow":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","In7HourWindow":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","In7HourWindow":false}]}
 -->

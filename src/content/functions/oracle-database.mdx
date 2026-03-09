@@ -30,29 +30,26 @@ relatedFunctions:
 
 ## Remarks
 
-`Oracle.Database` connects to an Oracle Database instance and returns a navigation table of tables, views, and other database objects visible to the authenticated user. The connector uses the Oracle Data Provider for .NET (ODP.NET) or the Oracle ODBC driver.
+`Oracle.Database` connects to an Oracle Database instance and returns a navigation table of tables, views, and other database objects visible to the authenticated user. Objects are organized by schema (Oracle database user), and you navigate by schema name and object name to access the data.
 
-**Driver requirement**: An Oracle client must be installed on the machine running Power Query. This can be:
-- Oracle Data Access Components (ODAC) with ODP.NET Managed Driver (recommended).
-- 32-bit Oracle client for 32-bit Excel.
-- Power BI Desktop bundles a managed ODP.NET driver for convenience, but for some configurations an explicit Oracle client installation is required.
+**Driver requirements**: Power BI Desktop bundles an Oracle Data Provider for .NET (ODP.NET) managed driver, which works for most configurations without requiring a separate Oracle client installation. However, for connecting to older Oracle servers or using TNS aliases that require a `tnsnames.ora` file, you may need to install Oracle Data Access Components (ODAC) on the machine. For 32-bit Excel, you must install the 32-bit Oracle client separately. Ensure the installed client bitness matches the Power Query host: 64-bit for Power BI Desktop, 32-bit or 64-bit for Excel depending on version.
 
-**Authentication**: Oracle database authentication (username and password) is the most common. Windows authentication is supported when the Oracle server is configured for it (Kerberos). Configure credentials in the Power Query credentials dialog.
+**Server string formats**: The `server` parameter accepts several formats:
+- Easy Connect: `"myserver/ORCL"` (host/service name, assumes default port 1521) or `"myserver:1521/ORCL"` (explicit port).
+- TNS alias: `"PROD_DB"` — requires a `tnsnames.ora` file configured on the client machine that resolves the alias.
+- Full TNS descriptor: `"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=myserver)(PORT=1521))(CONNECT_DATA=(SID=ORCL)))"` — no `tnsnames.ora` required.
 
-**Server string formats**:
-- Easy Connect: `"myserver:1521/ORCL"` or `"myserver/ORCL"` (assumes default port 1521).
-- TNS alias: `"MYDB"` (requires a properly configured `tnsnames.ora` file on the client).
-- Full descriptor: `"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=myserver)(PORT=1521))(CONNECT_DATA=(SID=ORCL)))"`.
+**Authentication**: Database username and password authentication is most common. Configure credentials in the Power Query data source credentials dialog — do not embed credentials in the M query. Windows-integrated authentication (Kerberos) is supported when the Oracle server is configured for it (`sqlnet.authentication_services = (NTS)`).
 
-**Query folding**: Oracle supports query folding. Filters, projections, and aggregations are pushed to the Oracle server as SQL.
+**Query folding**: Oracle supports full query folding. Filters, projections, sorting, joins, groupings, and aggregations are translated into Oracle SQL and executed on the server.
 
 **Key options**:
-- `CommandTimeout` (duration) — query execution timeout.
-- `CreateNavigationProperties` (logical) — generate navigation properties based on foreign key constraints.
-- `HierarchicalNavigation` (logical) — group tables by schema owner in the navigation table.
-- `Query` (text) — run a native Oracle SQL query directly.
+- `CommandTimeout` (duration) — maximum time to wait for a query to complete.
+- `CreateNavigationProperties` (logical) — generate navigation properties based on Oracle foreign key constraints.
+- `HierarchicalNavigation` (logical) — group the navigation table by schema owner.
+- `Query` (text) — execute a native Oracle SQL query directly instead of navigating to a table.
 
-**Schema navigation**: Oracle organizes objects by schema (database user). The navigation table typically shows objects owned by all accessible schemas.
+**Power BI Service**: Oracle is not supported for direct cloud refresh. An on-premises data gateway with the Oracle client installed is required for scheduled refresh.
 
 ## Examples
 
@@ -61,7 +58,7 @@ relatedFunctions:
 Oracle.Database("myserver/ORCL")
 ```
 
-### Example 2: Connect with explicit host and port
+### Example 2: Connect with explicit host, port, and service name
 ```powerquery
 Oracle.Database("myserver:1521/ORCL")
 ```
@@ -71,7 +68,7 @@ Oracle.Database("myserver:1521/ORCL")
 Oracle.Database("PROD_DB")
 ```
 
-### Example 4: Navigate to a specific table in a schema
+### Example 4: Navigate to a specific table in a named schema
 ```powerquery
 let
     Source = Oracle.Database("myserver/ORCL"),
@@ -80,10 +77,10 @@ in
     SalesOrders
 ```
 
-### Example 5: Run a native Oracle SQL query
+### Example 5: Run a native Oracle SQL query using the Query option
 ```powerquery
 Oracle.Database(
     "myserver/ORCL",
-    [Query = "SELECT * FROM SALES.ORDERS WHERE ROWNUM <= 1000"]
+    [Query = "SELECT ORDER_ID, CUSTOMER_ID, ORDER_DATE FROM SALES.ORDERS WHERE ROWNUM <= 1000"]
 )
 ```

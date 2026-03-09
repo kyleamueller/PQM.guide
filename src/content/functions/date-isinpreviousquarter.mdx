@@ -27,13 +27,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInPreviousQuarter` returns `true` if the input date falls within the calendar quarter immediately preceding the current quarter (as determined by `DateTime.LocalNow()`). For example, if today is in Q1, this function returns `true` for any date in Q4 of the prior year. The function is re-evaluated on each query refresh.
+`Date.IsInPreviousQuarter` returns `true` if the input date falls within the calendar quarter immediately preceding the current quarter (as determined by `DateTime.LocalNow()`). For example, if today is in Q1 (Jan–Mar), this function returns `true` for any date in Q4 (Oct–Dec) of the prior year. The function is re-evaluated on each query refresh.
+
+This is one of the most useful `Date.IsIn*` functions for quarter-over-quarter comparison reporting. It matches exactly one quarter — the immediately prior one. For a broader historical window, use `Date.IsInPreviousNQuarters`. To include the current quarter as well, add `or Date.IsInCurrentQuarter([OrderDate])`.
 
 ## Examples
 
-### Example 1: Filter last quarter's sales
+### Example 1: Filter last quarter's orders
 
-Keep only rows where OrderDate falls in the previous quarter.
+Keep only rows where OrderDate falls in the previous calendar quarter.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -50,6 +54,8 @@ Table.SelectRows(
 
 Add a boolean column identifying rows from the previous quarter.
 
+Input: `Sales`
+
 ```powerquery
 Table.AddColumn(
     Sales,
@@ -59,4 +65,26 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastQuarter","type":"logical"}],"rows":[{"OrderID":34,"OrderDate":"2025-09-15","IsLastQuarter":false},{"OrderID":35,"OrderDate":"2025-10-10","IsLastQuarter":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastQuarter":false}]}
+-->
+
+### Example 3: Tag rows with current or previous quarter labels
+
+Assign period labels for a quarter-over-quarter dashboard view.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "QuarterPeriod",
+    each
+        if Date.IsInCurrentQuarter([OrderDate]) then "Current Quarter"
+        else if Date.IsInPreviousQuarter([OrderDate]) then "Previous Quarter"
+        else "Other",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"QuarterPeriod","type":"text"}],"rows":[{"OrderID":35,"OrderDate":"2025-10-10","QuarterPeriod":"Previous Quarter"},{"OrderID":38,"OrderDate":"2026-01-10","QuarterPeriod":"Current Quarter"},{"OrderID":42,"OrderDate":"2026-03-08","QuarterPeriod":"Current Quarter"}]}
 -->

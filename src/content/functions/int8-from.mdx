@@ -36,15 +36,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Int8.From` converts a value to a signed 8-bit integer, allowing values from -128 to 127. Values outside this range raise an error. Fractional numbers are rounded using the specified rounding mode, defaulting to round-toward-even (banker's rounding).
+`Int8.From` converts a value to a **signed** 8-bit integer, covering the range -128 to 127. This is the signed counterpart to `Byte.From` (unsigned, 0–255). Values outside the -128 to 127 range raise an error at runtime. Fractional numbers are rounded before conversion; the default rounding mode is round-half-to-even (banker's rounding). Pass `RoundingMode.AwayFromZero` to get conventional rounding.
 
-Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+This type is rarely used in typical Power Query data transformation because most integer work uses `Int32.From` or `Int64.From`. `Int8.From` is primarily useful when working with compact binary protocols, interfacing with systems that explicitly declare `TINYINT SIGNED` columns, or building custom connector schemas that must match a source's 8-bit signed integer type.
 
-Use this type when interfacing with systems or binary formats that use compact signed byte fields.
+Text values are parsed as numbers — scientific notation and decimal strings are accepted. Logical `true` converts to `1`, `false` to `0`, and `null` returns `null`. If you need to check whether a value is within the valid range before converting, test `value >= -128 and value <= 127` first.
 
 ## Examples
 
-### Example 1: Convert a positive number
+### Example 1: Convert a positive integer
 
 ```powerquery
 Int8.From(100)
@@ -54,22 +54,28 @@ Int8.From(100)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":100}]}
 -->
 
-### Example 2: Convert a negative number
+### Example 2: Convert a negative integer at the lower bound
 
 ```powerquery
-Int8.From(-50)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-50}]}
--->
-
-### Example 3: Convert a text value
-
-```powerquery
-Int8.From("-128")
+Int8.From(-128)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-128}]}
+-->
+
+### Example 3: Rounding a decimal — default banker's rounding vs. away-from-zero
+
+```powerquery
+#table(
+    {"Input", "Default (Banker's)", "AwayFromZero"},
+    {
+        {2.5, Int8.From(2.5), Int8.From(2.5, null, RoundingMode.AwayFromZero)},
+        {3.5, Int8.From(3.5), Int8.From(3.5, null, RoundingMode.AwayFromZero)}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Input","type":"number"},{"name":"Default (Banker's)","type":"number"},{"name":"AwayFromZero","type":"number"}],"rows":[{"Input":2.5,"Default (Banker's)":2,"AwayFromZero":3},{"Input":3.5,"Default (Banker's)":4,"AwayFromZero":4}]}
 -->

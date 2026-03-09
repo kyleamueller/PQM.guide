@@ -27,9 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.IsInCurrentHour` returns `true` if the input `datetime` or `datetimezone` value falls within the same clock hour as now (as determined by `DateTime.LocalNow()`). The hour window runs from HH:00:00 to HH:59:59.9999999. The function is re-evaluated on each query refresh.
+`DateTime.IsInCurrentHour` returns `true` if the input `datetime` or `datetimezone` value falls within the same clock hour as now, as determined by `DateTime.LocalNow()`. The hour window runs from HH:00:00 to HH:59:59.9999999. The function is re-evaluated on each query refresh, so results will differ between refreshes depending on the current time.
 
-All `DateTime.IsIn*` functions use the local system clock (`DateTime.LocalNow`) as their reference point. These fine-grained time functions are most useful in streaming or near-real-time data scenarios.
+All `DateTime.IsIn*` functions use the local system clock (`DateTime.LocalNow`) as their reference point. In Power BI Service and Dataflows, "local" typically means the cloud region's system time (often UTC), not your personal timezone. Keep this in mind when using these functions in cloud-refresh scenarios — a filter for "current hour" may behave unexpectedly if the service timezone differs from your data's timezone.
+
+These fine-grained time functions (`IsInCurrentHour`, `IsInNextHour`, `IsInPreviousHour`) are most useful in streaming or near-real-time data pipelines where data is refreshed frequently — not in standard daily-refresh Power BI reports. Combine with `DateTime.IsInCurrentMinute` or similar for even more precise filtering.
 
 ## Examples
 
@@ -39,26 +41,43 @@ Keep only rows where EventTime falls within the current clock hour.
 
 ```powerquery
 Table.SelectRows(
-    Events,
-    each DateTime.IsInCurrentHour([EventTime])
+    OrderLog,
+    each DateTime.IsInCurrentHour([Timestamp])
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":42,"EventTime":"2026-03-08T10:05:00"},{"EventID":43,"EventTime":"2026-03-08T10:47:00"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[]}
 -->
 
 ### Example 2: Flag current-hour rows
 
-Add a boolean column identifying events from the current hour.
+Add a boolean column identifying log entries from the current hour.
 
 ```powerquery
 Table.AddColumn(
-    Events,
-    "IsCurrentHour", each DateTime.IsInCurrentHour([EventTime]), type logical
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "IsCurrentHour", each DateTime.IsInCurrentHour([Timestamp]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsCurrentHour","type":"logical"}],"rows":[{"EventID":41,"EventTime":"2026-03-08T09:55:00","IsCurrentHour":false},{"EventID":42,"EventTime":"2026-03-08T10:05:00","IsCurrentHour":true}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"IsCurrentHour","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","IsCurrentHour":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","IsCurrentHour":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","IsCurrentHour":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","IsCurrentHour":false}]}
+-->
+
+### Example 3: Combine current and previous hour for a two-hour window
+
+Flag events from either the current hour or the immediately preceding hour.
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "InRecentHour",
+    each DateTime.IsInCurrentHour([Timestamp]) or DateTime.IsInPreviousHour([Timestamp]),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"InRecentHour","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","InRecentHour":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","InRecentHour":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","InRecentHour":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","InRecentHour":false}]}
 -->

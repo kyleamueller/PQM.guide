@@ -34,22 +34,20 @@ relatedFunctions:
 
 ## Remarks
 
-`MySql.Database` connects to a MySQL server and returns a navigation table of tables and views from the specified database. The connector requires the MySQL Connector/NET (or compatible ODBC driver) to be installed on the machine running Power Query.
+`MySql.Database` connects to a MySQL server and returns a navigation table of tables and views from the specified database. The navigation table is organized by schema; drill into a schema to see its tables, then into a table to access the data. The function supports MySQL Community, MySQL Enterprise, Amazon Aurora (MySQL-compatible), Azure Database for MySQL, and other MySQL-compatible engines.
 
-**Authentication**: Supports database authentication (username and password) and Windows authentication. Configure credentials in the Power Query credentials dialog. The authentication type must match what is configured on the MySQL server.
+**Driver requirements**: Power BI Desktop bundles a MySQL connector based on MySQL Connector/NET. If you encounter driver errors, download and install the latest MySQL Connector/NET from MySQL's official site and restart Power BI Desktop. For Excel, you may need to install the connector separately. The connector must be 64-bit for Power BI Desktop; 32-bit connectors are required for 32-bit Excel.
 
-**Driver requirement**: The MySQL connector in Power BI Desktop uses the MySQL Connector/NET. Ensure it is installed and up to date. In Power BI Service, MySQL is not directly supported for cloud refresh without an on-premises data gateway.
+**Authentication**: Database authentication (username and password) is the most common method. Configure credentials in the Power Query data source settings dialog — do not embed credentials in the M query itself. Windows authentication (Kerberos) is supported when the MySQL server is configured for it. The `UID` and `PWD` parameters should not appear in the M code; enter them only in the credentials dialog.
 
-**Query folding**: MySQL supports query folding. Filters, projections, and aggregations applied in Power Query are translated into SQL and executed on the MySQL server.
+**Query folding**: MySQL supports query folding. Filters (`Table.SelectRows`), column projections (`Table.SelectColumns`), joins, groupings, and aggregations applied in Power Query are translated into SQL and executed on the MySQL server. This reduces data transfer and dramatically improves performance for large tables.
 
-**Custom port**: To connect on a non-default port (default is 3306), append the port to the server string: `"myserver.com:3307"`.
+**Custom port and connection options**: The default MySQL port is 3306. To connect on a different port, append it to the server string (e.g., `"myserver.com:3307"`). Key options in the options record include:
+- `CommandTimeout` (duration) — maximum time to wait for a query before timing out.
+- `CreateNavigationProperties` (logical) — generate navigation properties from foreign key relationships.
+- `ReturnSingleDatabase` (logical) — when `true`, scopes the navigation table to the specified database only, rather than showing a server-level listing.
 
-**Key options**:
-- `CommandTimeout` (duration) — maximum time to wait for a query to complete.
-- `CreateNavigationProperties` (logical) — generate navigation properties from foreign keys.
-- `ReturnSingleDatabase` (logical) — when `true`, returns only the specified database's objects rather than a server-level navigation table.
-
-**SSL/TLS**: MySQL connections can be encrypted. SSL settings are typically configured at the driver or server level.
+**Power BI Service**: MySQL is not supported for direct cloud refresh without an on-premises data gateway. Install the gateway on a machine that can reach the MySQL server, and configure MySQL credentials in the gateway's data source settings.
 
 ## Examples
 
@@ -58,12 +56,12 @@ relatedFunctions:
 MySql.Database("myserver.com", "salesdb")
 ```
 
-### Example 2: Connect to MySQL on a custom port
+### Example 2: Connect to MySQL on a non-default port
 ```powerquery
 MySql.Database("myserver.com:3307", "analytics")
 ```
 
-### Example 3: Navigate to a specific table
+### Example 3: Navigate to a specific table in the database
 ```powerquery
 let
     Source = MySql.Database("myserver.com", "salesdb"),
@@ -72,7 +70,7 @@ in
     OrdersTable
 ```
 
-### Example 4: Set a command timeout
+### Example 4: Set a command timeout for long-running queries
 ```powerquery
 MySql.Database(
     "myserver.com",

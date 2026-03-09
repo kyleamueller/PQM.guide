@@ -29,11 +29,13 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.ReplaceFacets` returns a new type value that is identical to the input type except that the specified facets are replaced with the provided values. Facets are type constraints such as `Precision`, `Scale`, and `MaxLength`.
+`Type.ReplaceFacets` returns a new type value that is identical to the input type except that the facets specified in the `facets` record are replaced with the provided values. **Facets** are type constraint properties beyond the base kind — for example, `Precision` and `Scale` for numeric types, or `MaxLength` for text types.
 
-This function is useful when constructing type metadata for custom connectors or when annotating data with specific precision constraints from a schema.
+The `facets` record only needs to include the fields you want to set. Any facets not mentioned in the record retain their values from the source type. To inspect the current facets of a type before replacing them, use `Type.Facets`.
 
-The facets record only needs to include the facet fields you want to change — other facets are inherited from the source type.
+`Type.ReplaceFacets` is most useful in custom connector development, where you need to construct M type values that carry database-level schema constraints (such as `DECIMAL(10, 2)` precision from a SQL source). It is the write-side counterpart to the read-side `Type.Facets`. The resulting type can be applied to a value with `Value.ReplaceType`.
+
+Note that setting facets does not validate or constrain actual data values at runtime — M's type system uses facets as metadata, not as enforcement mechanisms during evaluation.
 
 ## Examples
 
@@ -62,4 +64,18 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"MaxLength","Value":100}]}
+-->
+
+### Example 3: Clear a facet by setting it to null
+
+```powerquery
+let
+    Constrained = Type.ReplaceFacets(type number, [Precision = 10, Scale = 2]),
+    Cleared = Type.ReplaceFacets(Constrained, [Precision = null, Scale = null])
+in
+    Type.Facets(Cleared)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":null},{"Name":"Scale","Value":null}]}
 -->

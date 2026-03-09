@@ -27,13 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.NonNullCount` returns the number of items in a list that are not null. This is equivalent to `List.Count(List.Select(list, each _ <> null))` but is more readable and concise.
+`List.NonNullCount` returns the count of non-null items in a list. It is equivalent to `List.Count(List.Select(list, each _ <> null))` but more readable. Unlike `List.Count`, which counts every element including nulls, `List.NonNullCount` counts only items with actual values.
 
-This function is useful for calculating fill rates, data quality metrics, or counting valid responses in survey data.
+This function is commonly used for data quality reporting: calculating fill rates, checking how many cells in a column have values, or counting valid responses in survey data. To derive the null count, subtract from `List.Count(list)`.
 
-- An empty list returns `0`.
-- Counts all non-null values regardless of their type (numbers, text, dates, etc.).
-- To get the null count, subtract from `List.Count(list)`.
+Note that `false`, `0`, and `""` (empty string) are all non-null and are counted. Only actual `null` values are excluded. To count values meeting a custom condition, use `List.Count(List.Select(list, each <condition>))` instead.
 
 ## Examples
 

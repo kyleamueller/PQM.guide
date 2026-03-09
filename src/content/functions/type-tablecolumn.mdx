@@ -31,15 +31,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.TableColumn` returns the declared type of a named column within a table type. This function operates on the **type** of a table, not the table itself. To obtain a table's type, use `Value.Type(table)`.
+`Type.TableColumn` returns the declared type of a named column within a table type. This function operates on a **table type value** — not the table itself. To obtain a table's type, call `Value.Type(table)` and pass the result to `Type.TableColumn`.
 
-If the column does not exist in the table type, an error is raised.
+If the specified column name does not exist in the table type, an error is raised. Use `Type.TableSchema` first if you need to check which columns are declared before accessing them.
 
-This is useful for generic transformations where you need to inspect or compare column types programmatically before applying operations.
+`Type.TableColumn` is useful for:
+
+- **Generic transform functions** that need to inspect or compare column types before deciding how to process data
+- **Schema validation** — verifying that a column is typed as expected before applying a transformation
+- **Nullability checks** — combining with `Type.IsNullable` to determine whether a column accepts null values
+
+Note that most tables loaded from external sources have column types inferred or declared through the connector, and those types are often `nullable` variants of the base primitive types.
 
 ## Examples
 
-### Example 1: Get the type of a column in a typed table
+### Example 1: Get the declared type of a column
 
 ```powerquery
 let
@@ -62,6 +68,20 @@ let
     ColType = Type.TableColumn(Value.Type(T), "Score")
 in
     Type.IsNullable(ColType)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 3: Compare the column type to a known type
+
+```powerquery
+let
+    T = #table(type table [OrderID = number, Product = text], {{1, "Widget A"}}),
+    ColType = Type.TableColumn(Value.Type(T), "Product")
+in
+    ColType = type text
 ```
 
 <!--output

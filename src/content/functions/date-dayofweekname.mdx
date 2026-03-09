@@ -30,9 +30,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.DayOfWeekName` returns the full, localized name of the day of the week for a given `date`, `datetime`, or `datetimezone` value. When no `culture` is provided, the function uses the current locale of the host environment.
+`Date.DayOfWeekName` returns the full, localized name of the day of the week for a given `date`, `datetime`, or `datetimezone` value. When no `culture` is provided, the function uses the current locale of the host environment. Always specify `culture` explicitly (e.g., `"en-US"`) in production queries to ensure consistent output regardless of where the query runs.
 
-To get a short name (e.g., "Mon"), use `Date.ToText` with a custom format string such as `"ddd"`. If the input is `null`, the function returns `null`.
+To get a short name (e.g., "Mon"), use `Date.ToText` with the format string `"ddd"` instead. If the input is `null`, the function returns `null`.
+
+`Date.DayOfWeekName` returns the display name only — it does not return a number. If you need the numeric day-of-week (0 = Sunday, 1 = Monday, etc.) for sorting or comparisons, use `Date.DayOfWeek` instead. You can combine both: add a sort column using `Date.DayOfWeek` and a display column using `Date.DayOfWeekName`.
 
 ## Examples
 
@@ -48,7 +50,7 @@ Table.AddColumn(
         Table.FirstN(Sales, 5),
         {"OrderID", "OrderDate"}
     ),
-    "DayName", each Date.DayOfWeekName([OrderDate]), type text
+    "DayName", each Date.DayOfWeekName([OrderDate], "en-US"), type text
 )
 ```
 
@@ -69,4 +71,24 @@ Use the culture parameter to return the day name in French.
 
 <!--output
 {"columns":[{"name":"Date","type":"date"},{"name":"DayNameFR","type":"text"}],"rows":[{"Date":"2024-03-15","DayNameFR":"vendredi"}]}
+-->
+
+### Example 3: Add both a sort key and a display name
+
+Combine `Date.DayOfWeek` (for sorting) with `Date.DayOfWeekName` (for display).
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.AddColumn(
+        Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "OrderDate"}),
+        "DayOfWeekNum", each Date.DayOfWeek([OrderDate], Day.Monday), Int64.Type
+    ),
+    "DayOfWeekName", each Date.DayOfWeekName([OrderDate], "en-US"), type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DayOfWeekNum","type":"number"},{"name":"DayOfWeekName","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DayOfWeekNum":0,"DayOfWeekName":"Monday"},{"OrderID":2,"OrderDate":"2024-01-18","DayOfWeekNum":3,"DayOfWeekName":"Thursday"},{"OrderID":3,"OrderDate":"2024-02-01","DayOfWeekNum":3,"DayOfWeekName":"Thursday"},{"OrderID":4,"OrderDate":"2024-02-10","DayOfWeekNum":5,"DayOfWeekName":"Saturday"},{"OrderID":5,"OrderDate":"2024-03-05","DayOfWeekNum":1,"DayOfWeekName":"Tuesday"}]}
 -->

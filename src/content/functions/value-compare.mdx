@@ -40,13 +40,15 @@ relatedFunctions:
 - `0` — the values are equal
 - `1` — value1 is greater than value2
 
-This function is useful for building custom sort comparers, range checks, and ordering logic. The return value is compatible with the comparer functions expected by `List.Sort` and related functions.
+This three-way comparison result is the standard convention for comparer functions in M, compatible with the `comparer` parameter of `List.Sort`, `Table.Sort`, and similar functions. You can wrap `Value.Compare` in a lambda to build a custom comparer and pass it to these functions.
 
-An optional `comparer` function can be provided for locale-aware or case-insensitive comparisons (e.g., `Comparer.OrdinalIgnoreCase`).
+The optional third parameter accepts a comparer function (such as `Comparer.OrdinalIgnoreCase` or `Comparer.FromCulture("fr-FR")`) for locale-aware or case-insensitive comparisons. Without this parameter, the default ordinal ordering is used.
+
+Note that `Value.Compare` expects values of comparable types — comparing a number to text will raise an error. For null-safe comparison, be aware that null sorts as the lowest value under the default ordering. To check equality specifically, consider `Value.Equals` or `Value.NullableEquals` instead.
 
 ## Examples
 
-### Example 1: Compare numbers
+### Example 1: Compare two numbers
 
 ```powerquery
 Value.Compare(3, 5)
@@ -66,9 +68,7 @@ Value.Compare("abc", "abc")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 3: Use as a custom comparer in List.Sort
-
-Sort a list of text values case-insensitively:
+### Example 3: Use as a custom comparer in List.Sort for case-insensitive ordering
 
 ```powerquery
 List.Sort({"banana", "Apple", "cherry"}, (a, b) => Value.Compare(a, b, Comparer.OrdinalIgnoreCase))

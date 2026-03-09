@@ -27,18 +27,26 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.TableSchema` returns a descriptive table summarizing the columns declared in a table type. The result includes these columns:
+`Type.TableSchema` returns a table that describes the columns declared in a table type. The result has four columns:
 
-- `Name` — the column name
-- `Position` — the zero-based column index
-- `TypeName` — the name of the column's type as text (e.g., `"number"`, `"text"`)
-- `Kind` — the kind of the type (e.g., `"Primitive"`, `"Nullable"`)
+- `Name` — the column name as text
+- `Position` — the zero-based column index (0 for the first column)
+- `TypeName` — the column's type as a text string (e.g., `"number"`, `"text"`, `"nullable number"`)
+- `Kind` — the kind of the type as text (e.g., `"Primitive"` for `type number`, `"Nullable"` for `type nullable number`)
 
-This function is useful for programmatically inspecting table schemas, generating documentation, or building generic data validation routines.
+This function operates on a **table type value** — not the table itself. Pass `Value.Type(table)` to obtain the table's type before calling `Type.TableSchema`.
+
+`Type.TableSchema` provides a human-readable, table-formatted alternative to `Type.TableColumn` for inspecting schemas. Common uses include:
+
+- **Programmatic schema inspection**: determining column count, order, names, and types in one call
+- **Documentation generation**: producing a schema summary that can be returned or logged
+- **Generic validation**: filtering for columns of a specific kind or type name before applying transforms
+
+For structured programmatic access to individual column types, prefer `Type.TableColumn`. For key information, use `Type.TableKeys`.
 
 ## Examples
 
-### Example 1: Get the schema of a typed table
+### Example 1: Get the full schema of a typed table
 
 ```powerquery
 let
@@ -55,7 +63,7 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"number","Kind":"Primitive"},{"Name":"Product","Position":1,"TypeName":"text","Kind":"Primitive"},{"Name":"UnitPrice","Position":2,"TypeName":"nullable number","Kind":"Nullable"}]}
 -->
 
-### Example 2: Count columns in a table type
+### Example 2: Count columns declared in the Sales table type
 
 Input: `Sales`
 
@@ -64,5 +72,23 @@ Table.RowCount(Type.TableSchema(Value.Type(Sales)))
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":7}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":8}]}
+-->
+
+### Example 3: Find all nullable columns in a table type
+
+```powerquery
+let
+    T = #table(
+        type table [OrderID = number, Product = text, Notes = nullable text],
+        {{1, "Widget A", null}}
+    ),
+    Schema = Type.TableSchema(Value.Type(T)),
+    NullableCols = Table.SelectRows(Schema, each [Kind] = "Nullable")
+in
+    NullableCols[Name]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Notes"]}]}
 -->

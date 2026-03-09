@@ -30,32 +30,41 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.FromText` parses a text value into a `date`. Without options, it attempts to parse common ISO 8601 formats (e.g., `"2024-03-15"`). Use the `options` parameter to provide a `Format` pattern or a `Culture` for locale-specific date strings. The format strings follow .NET custom date format conventions (e.g., `"dd/MM/yyyy"` for UK-style dates).
+`Date.FromText` parses a text value into a `date`. Without options, it attempts common ISO 8601 formats (e.g., `"2024-03-15"`). Use the `options` parameter — a record with `Format` and/or `Culture` fields — to handle locale-specific or non-standard date strings. Format strings follow .NET custom date format conventions (e.g., `"dd/MM/yyyy"` for UK-style dates, `"MM/dd/yyyy"` for US-style).
 
-If the text is `null`, the function returns `null`. If the text cannot be parsed, the function raises an error.
+Always specify both `Format` and `Culture` when parsing non-ISO date strings to avoid ambiguity. For example, `"03/04/2024"` could be March 4 or April 3 depending on locale. Without a `Format`, the parser may succeed but silently produce an incorrect date.
+
+If the text is `null`, the function returns `null`. If the text cannot be parsed with the given format, the function raises an error — so wrap in `try ... otherwise null` when the input may contain unparseable values. For datetime strings (including time components), use `DateTime.FromText` instead.
 
 ## Examples
 
-### Example 1: Parse ISO date strings from a text column
+### Example 1: Parse ISO 8601 date strings
 
-Convert string dates in the TextDates table to proper date values.
+Convert ISO-format date text to typed date values using `Table.TransformColumns`.
 
-Input: `TextDates`
+Input: `Sales`
 
 ```powerquery
 Table.TransformColumns(
-    TextDates,
-    {{"DateText", each Date.FromText(_), type date}}
+    Table.AddColumn(
+        Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID"}),
+        "DateText",
+        each Text.From(Date.Year([OrderDate])) & "-" &
+             Text.PadStart(Text.From(Date.Month([OrderDate])), 2, "0") & "-" &
+             Text.PadStart(Text.From(Date.Day([OrderDate])), 2, "0"),
+        type text
+    ),
+    {{"DateText", each Date.FromText(_, "en-US"), type date}}
 )
 ```
 
 <!--output
-{"columns":[{"name":"DateText","type":"date"}],"rows":[{"DateText":"2024-01-15"},{"DateText":"2024-02-10"},{"DateText":"2024-03-05"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"DateText","type":"date"}],"rows":[{"OrderID":1,"DateText":"2024-01-15"},{"OrderID":2,"DateText":"2024-01-18"},{"OrderID":3,"DateText":"2024-02-01"},{"OrderID":4,"DateText":"2024-02-10"}]}
 -->
 
 ### Example 2: Parse a locale-specific date format
 
-Parse a date string in UK format using a custom format and culture.
+Parse a date string in UK format (day/month/year) using an explicit format and culture.
 
 ```powerquery
 #table(
@@ -66,4 +75,23 @@ Parse a date string in UK format using a custom format and culture.
 
 <!--output
 {"columns":[{"name":"TextDate","type":"text"},{"name":"ParsedDate","type":"date"}],"rows":[{"TextDate":"15/03/2024","ParsedDate":"2024-03-15"}]}
+-->
+
+### Example 3: Handle unparseable values safely
+
+Use `try ... otherwise null` to avoid errors when a column contains mixed or invalid date strings.
+
+```powerquery
+#table(
+    type table [RawDate = text, ParsedDate = date],
+    {
+        {"2024-01-15", try Date.FromText("2024-01-15") otherwise null},
+        {"N/A",        try Date.FromText("N/A") otherwise null},
+        {"2024-03-05", try Date.FromText("2024-03-05") otherwise null}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"RawDate","type":"text"},{"name":"ParsedDate","type":"date"}],"rows":[{"RawDate":"2024-01-15","ParsedDate":"2024-01-15"},{"RawDate":"N/A","ParsedDate":null},{"RawDate":"2024-03-05","ParsedDate":"2024-03-05"}]}
 -->

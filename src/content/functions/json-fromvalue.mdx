@@ -29,53 +29,48 @@ relatedFunctions:
 
 ## Remarks
 
-`Json.FromValue` converts an M value into its JSON representation and returns the result as a binary value. This is the inverse of `Json.Document`, which parses JSON into M values.
+`Json.FromValue` serializes an M value to its JSON representation and returns the result as a `binary` value encoded in UTF-8 (or a specified encoding). This is the inverse of `Json.Document`, which parses JSON text or binary into M values. The primary use case is constructing JSON request bodies for REST API calls via `Web.Contents`.
 
-**Supported types**: Most M types serialize to JSON naturally:
-- `record` → JSON object `{}`
-- `list` → JSON array `[]`
-- `table` → JSON array of objects
+**Supported M types and their JSON equivalents**:
+- `record` → JSON object (`{}`)
+- `list` → JSON array (`[]`)
+- `table` → JSON array of objects (each row becomes an object, column names become keys)
 - `text` → JSON string
-- `number` → JSON number
-- `logical` → JSON boolean
+- `number` → JSON number (integer or decimal)
+- `logical` → JSON boolean (`true` / `false`)
 - `null` → JSON `null`
-- `date`, `datetime`, `datetimezone`, `duration` → JSON string (ISO 8601 format)
+- `date`, `datetime`, `datetimezone` → JSON string in ISO 8601 format
+- `duration` → JSON string in ISO 8601 duration format
 
-**Result type**: The return value is `binary`. To get the JSON as readable text, wrap the result with `Text.FromBinary`:
-```powerquery
-Text.FromBinary(Json.FromValue(myValue))
-```
+**Result type is binary**: The function returns `binary`, not `text`. When you need readable JSON text (for debugging or display), wrap the call with `Text.FromBinary`. When using the result as an HTTP request body with `Web.Contents`, pass it directly to the `Content` option — `Web.Contents` accepts `binary` for the body.
 
-**Use cases**:
-- Constructing a JSON request body for use with `Web.Contents` (POST/PUT requests to REST APIs).
-- Saving M data structures as JSON files.
-- Logging or debugging M values in a human-readable format.
+**Encoding parameter**: The default encoding is UTF-8 (`TextEncoding.Utf8`, code page 65001). Pass `TextEncoding.Utf16` (1200) as the second argument if the target system requires UTF-16 encoding.
 
-**Encoding**: The default encoding is UTF-8. Pass `TextEncoding.Utf16` (1200) if the target system requires UTF-16.
+**Unsupported types**: `binary` values, `function` values, and `type` values cannot be serialized and will raise an error. If your data contains binary columns in a table, remove or transform them before calling `Json.FromValue`.
 
-**Limitations**: Binary values, function values, and type values cannot be serialized to JSON and will raise an error.
+**Roundtrip with Json.Document**: You can round-trip a value through JSON using `Json.Document(Json.FromValue(value))`, though some M types (such as `date` without time component) may deserialize as `text` rather than the original type.
 
 ## Examples
 
-### Example 1: Serialize a record to JSON
+### Example 1: Serialize a record to JSON binary
 ```powerquery
 Json.FromValue([Name = "Alice", Age = 30, Active = true])
-// Result (binary): {"Name":"Alice","Age":30,"Active":true}
+// Returns binary: {"Name":"Alice","Age":30,"Active":true}
 ```
 
-### Example 2: Convert JSON binary to readable text
+### Example 2: Convert to readable JSON text with Text.FromBinary
 ```powerquery
 Text.FromBinary(Json.FromValue([City = "London", Country = "UK"]))
-// Result: "{""City"":""London"",""Country"":""UK""}"
+// Returns: {"City":"London","Country":"UK"}
 ```
 
-### Example 3: Serialize a list
+### Example 3: Serialize a list to a JSON array
 ```powerquery
 Text.FromBinary(Json.FromValue({1, 2, 3, "four", true, null}))
-// Result: "[1,2,3,""four"",true,null]"
+// Returns: [1,2,3,"four",true,null]
 ```
 
-### Example 4: Build a JSON POST body for a REST API call
+### Example 4: Build a JSON request body and POST to a REST API
 ```powerquery
 let
     RequestBody = Json.FromValue([
@@ -106,5 +101,5 @@ let
     JsonText = Text.FromBinary(Json.FromValue(Data))
 in
     JsonText
-// Result: [{"Product":"Widget A","Sales":1500},{"Product":"Widget B","Sales":2300}]
+// Returns: [{"Product":"Widget A","Sales":1500},{"Product":"Widget B","Sales":2300}]
 ```

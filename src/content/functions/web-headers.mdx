@@ -30,34 +30,34 @@ relatedFunctions:
 
 ## Remarks
 
-`Web.Headers` sends an HTTP HEAD request to the specified URL and returns the response headers as a record. This is useful for inspecting metadata about a resource — such as its content type, size, last modified date, or caching directives — without downloading the full response body.
+`Web.Headers` sends an HTTP HEAD request to the specified URL and returns the response headers as a Power Query record. Each field in the record is an HTTP response header name and its value as text. This is useful for inspecting metadata about a resource — its content type, size, caching policy, last modified timestamp, or any other server-provided header — without downloading the full response body.
 
-**Authentication**: The function respects the same credential settings as `Web.Contents`. If the URL requires authentication, configure it in the data source credentials dialog.
+**HTTP HEAD vs GET**: A HEAD request retrieves only the response headers, not the body. The server processes the request as if it were a GET but sends back only headers. This makes `Web.Headers` efficient for checking whether a file has changed (via `Last-Modified` or `ETag`) before deciding whether to download it with `Web.Contents`.
 
-**Query folding**: This function does not support query folding.
+**Authentication**: `Web.Headers` respects the same credential configuration as `Web.Contents`. If the URL requires authentication, configure credentials in the Power Query data source settings dialog for the corresponding URL. The function shares credential scope with `Web.Contents` calls to the same origin.
 
-**Common use cases**:
-- Checking the `Content-Type` header to determine the format of a resource before downloading it.
-- Reading the `Last-Modified` or `ETag` header to detect whether a resource has changed since a previous refresh.
-- Reading `Content-Length` to estimate download size before calling `Web.Contents`.
+**Common response headers and their uses**:
+- `Content-Type` — the MIME type of the resource (e.g., `text/csv`, `application/json`, `application/vnd.ms-excel`). Use to determine the correct parsing function.
+- `Last-Modified` — the date and time the resource was last changed, as a text value. Compare against a stored value to detect updates.
+- `ETag` — an entity tag (opaque hash) representing the resource version. Use for cache validation.
+- `Content-Length` — the size of the body in bytes, as a text value. Estimate download size before calling `Web.Contents`.
+- `Content-Disposition` — may include the suggested file name for a download.
 
-**Key options** (same as `Web.Contents`):
-- `Headers` (record) — additional HTTP request headers to include in the HEAD request.
-- `Timeout` (duration) — maximum time to wait for a response.
+**Accessing headers**: Record field names include hyphens (e.g., `Content-Type`, `Last-Modified`). Access them using the standard record field syntax: `Headers[Content-Type]`. If a header name conflicts with an M keyword or contains special characters, use `Record.Field(Headers, "Header-Name")`.
 
-Header field names in the returned record follow standard HTTP capitalization (e.g., `Content-Type`, `Last-Modified`). Access them using record field access syntax.
+**Query folding**: Not supported.
 
 ## Examples
 
-### Example 1: Get all response headers for a URL
+### Example 1: Retrieve all response headers for a URL
 ```powerquery
 Web.Headers("https://example.com/data.csv")
 ```
 
-### Example 2: Read the Content-Type header
+### Example 2: Read the Content-Type header to identify the file format
 ```powerquery
 let
-    Headers = Web.Headers("https://example.com/data.csv"),
+    Headers = Web.Headers("https://example.com/report"),
     ContentType = Headers[Content-Type]
 in
     ContentType
@@ -72,10 +72,10 @@ in
     LastModified
 ```
 
-### Example 4: Send a request with a custom header
+### Example 4: Send a HEAD request with a custom Authorization header
 ```powerquery
 Web.Headers(
-    "https://api.example.com/resource",
+    "https://api.example.com/dataset",
     [Headers = [Authorization = "Bearer mytoken123"]]
 )
 ```

@@ -38,48 +38,64 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.PositionOfAny` is like `Table.PositionOf` but accepts a list of candidate records instead of a single record. It returns the position of the first table row that matches any of the provided records. If no match is found for any candidate, it returns `-1`.
+`Table.PositionOfAny` is the multi-candidate variant of `Table.PositionOf`. Instead of searching for a single record, it accepts a list of candidate records and returns the position of the first row in the table that matches any of them. If no candidate matches any row, it returns `-1`.
 
-The `occurrence` parameter controls whether to return the first match, last match, or all matches as a list.
+The `occurrence` parameter controls the return behavior:
+- `Occurrence.First` (default): the index of the first row matching any candidate.
+- `Occurrence.Last`: the index of the last row matching any candidate.
+- `Occurrence.All`: a list of all row indices that match any candidate.
+
+The optional `equationCriteria` parameter restricts which columns are compared, enabling partial record matching across all candidates simultaneously. This function is useful when you have a set of "sentinel" or "anchor" rows whose positions you need to locate, for example to determine slice boundaries in a structured flat file.
 
 ## Examples
 
-### Example 1: Find the first position of any matching row
+### Example 1: Find the first position of any of several customers
 
 ```powerquery
-Table.PositionOfAny(
-    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Carol"}}),
-    {[Name = "Carol"], [Name = "Bob"]}
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Charlie","Widget C"},{4,"Diana","Gadget D"}}
+    ),
+    Targets = {[CustomerName = "Charlie"], [CustomerName = "Diana"]}
+in
+    Table.PositionOfAny(Sales, Targets, Occurrence.First, "CustomerName")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"1"}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
 -->
 
-### Example 2: No match returns -1
+### Example 2: No candidate matches — returns -1
 
 ```powerquery
-Table.PositionOfAny(
-    #table({"Name"}, {{"Alice"}, {"Bob"}}),
-    {[Name = "Dave"], [Name = "Eve"]}
-)
+let
+    Products = #table(
+        {"ProductName"},
+        {{"Widget A"},{"Gadget B"},{"Widget C"}}
+    ),
+    Searches = {[ProductName = "Thingamajig E"], [ProductName = "Widget Z"]}
+in
+    Table.PositionOfAny(Products, Searches, Occurrence.First, "ProductName")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"-1"}]}
 -->
 
-### Example 3: Return all matching positions
+### Example 3: Return all positions matching any of the target customers
 
 ```powerquery
-Table.PositionOfAny(
-    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Carol"}, {"Alice"}}),
-    {[Name = "Alice"], [Name = "Carol"]},
-    Occurrence.All
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Alice"},{4,"Charlie"},{5,"Diana"},{6,"Bob"},{7,"Alice"}}
+    ),
+    Targets = {[CustomerName = "Alice"], [CustomerName = "Bob"]}
+in
+    Table.PositionOfAny(Sales, Targets, Occurrence.All, "CustomerName")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 2, 3}"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 1, 2, 5, 6}"}]}
 -->

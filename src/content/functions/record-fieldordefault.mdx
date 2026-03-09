@@ -34,13 +34,24 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.FieldOrDefault` is the safe alternative to `Record.Field` and the `[FieldName]` syntax. When a field does not exist in the record, accessing it with `record[FieldName]` raises an error; `Record.FieldOrDefault` instead returns `null` (or a specified default value).
+`Record.FieldOrDefault` is the **safe alternative** to direct field access (`record[FieldName]`) and `Record.Field`. Direct field access raises an error if the field does not exist; `Record.FieldOrDefault` returns `null` by default or a custom fallback value you specify.
 
-Use this when working with semi-structured or inconsistent data where records may have varying schemas across rows.
+This is essential when working with semi-structured or inconsistent data — for example, JSON expanded into records where some rows have fields that others do not, or API responses where optional fields are absent rather than null.
+
+The comparison to related approaches:
+
+| Approach | Missing field behavior |
+|---|---|
+| `record[FieldName]` | Raises error |
+| `Record.Field(record, name)` | Raises error |
+| `Record.FieldOrDefault(record, name)` | Returns null |
+| `Record.FieldOrDefault(record, name, default)` | Returns default value |
+
+The `defaultValue` parameter accepts any type and defaults to `null` when omitted. You can use any expression as the default, including function calls.
 
 ## Examples
 
-### Example 1: Retrieve an existing field
+### Example 1: Retrieve a field that exists — returns its value
 
 ```powerquery
 Record.FieldOrDefault([Name = "Alice", Age = 30], "Name")
@@ -50,7 +61,7 @@ Record.FieldOrDefault([Name = "Alice", Age = 30], "Name")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice"}]}
 -->
 
-### Example 2: Return null when field is missing
+### Example 2: Field is absent — returns null by default
 
 ```powerquery
 Record.FieldOrDefault([Name = "Alice", Age = 30], "Email")
@@ -60,7 +71,7 @@ Record.FieldOrDefault([Name = "Alice", Age = 30], "Email")
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":null}]}
 -->
 
-### Example 3: Return a custom default when field is missing
+### Example 3: Specify a custom fallback value for missing fields
 
 ```powerquery
 Record.FieldOrDefault([Name = "Alice"], "Email", "no-email@example.com")
@@ -70,19 +81,19 @@ Record.FieldOrDefault([Name = "Alice"], "Email", "no-email@example.com")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"no-email@example.com"}]}
 -->
 
-### Example 4: Safely extract an optional field from each Sales row
+### Example 4: Safely extract an optional "Region" field from each Sales row
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
-    "Notes",
-    each Record.FieldOrDefault(_, "Notes", ""),
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName"}),
+    "Region",
+    each Record.FieldOrDefault(_, "Region", "Unknown"),
     type text
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"OrderID":1,"Notes":""},{"OrderID":2,"Notes":""},{"OrderID":3,"Notes":""}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Region":"North"}]}
 -->

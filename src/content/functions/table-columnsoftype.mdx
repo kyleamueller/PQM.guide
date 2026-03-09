@@ -31,40 +31,62 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.ColumnsOfType` inspects the type metadata of each column and returns names of columns whose type matches any type in `listOfTypes`. This is useful for dynamically targeting columns of a specific data type — for example, to transform all `text` columns or remove all `number` columns without hard-coding column names.
+`Table.ColumnsOfType` inspects each column's declared type metadata and returns a list of column names whose type matches any type in `listOfTypes`. This enables fully dynamic transformations that adapt to schema changes — for example, trimming all `text` columns, converting all `number` columns to currency format, or selecting only `date` columns for a date-range check.
 
-Type matching uses the table's declared column types. If columns have `type any`, they may not be matched by specific types like `type text`.
+Type matching compares against the column's declared type, not the inferred type of the values. Columns typed as `type any` (common in untyped `#table` literals) will not match specific types like `type text` or `type number`. To use this function reliably, ensure the table has a typed schema — either via `Table.TransformColumnTypes` or by using a typed `#table` literal with `type table [...]`.
+
+A practical pattern is to combine `Table.ColumnsOfType` with `Table.TransformColumns` to apply a function to all columns of a given type without listing them explicitly. This is more robust than hard-coding column names when working with dynamic or user-provided data.
 
 ## Examples
 
-### Example 1: Find all text columns
+### Example 1: Find all text columns in a typed Employees table
 
 ```powerquery
 let
-    Source = #table(
-        type table [Name = text, Age = number, City = text],
-        {{"Alice", 30, "NYC"}, {"Bob", 25, "LA"}}
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Title = text, HireDate = date, Salary = number],
+        {{"E001","alice smith","Sales","Sales Rep",#date(2021,3,15),55000}}
     )
 in
-    Table.ColumnsOfType(Source, {type text})
+    Table.ColumnsOfType(Employees, {type text})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Name\", \"City\"}"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"EmployeeID\", \"FullName\", \"Department\", \"Title\"}"}]}
 -->
 
-### Example 2: Find text and number columns
+### Example 2: Trim whitespace from all text columns dynamically
+
+Get the list of text columns and pass it to `Table.TransformColumns` to trim each one.
 
 ```powerquery
 let
-    Source = #table(
-        type table [Name = text, Score = number, Active = logical],
-        {{"Alice", 95, true}}
-    )
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Salary = number],
+        {{"E001"," alice smith ","Sales",55000},{"E002","BOB JONES ","Engineering",95000}}
+    ),
+    TextCols   = Table.ColumnsOfType(Employees, {type text}),
+    Trimmed    = Table.TransformColumns(Employees, List.Transform(TextCols, each {_, Text.Trim}))
 in
-    Table.ColumnsOfType(Source, {type text, type number})
+    Trimmed
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Name\", \"Score\"}"}]}
+{"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"}]}
+-->
+
+### Example 3: Find number and logical columns
+
+```powerquery
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Price = number, InStock = logical],
+        {{1,"Widget A",25.00,true},{2,"Gadget B",50.00,true}}
+    )
+in
+    Table.ColumnsOfType(Products, {type number, type logical})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"ProductID\", \"Price\", \"InStock\"}"}]}
 -->

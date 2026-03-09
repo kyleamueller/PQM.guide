@@ -28,21 +28,29 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.ToRecord` decomposes a `datetimezone` value into a record with eight fields: `Year`, `Month`, `Day`, `Hour`, `Minute`, `Second`, `ZoneHours`, and `ZoneMinutes`. This is useful when you need all components at once without calling individual accessor functions. You can expand the resulting record into table columns using `Table.ExpandRecordColumn`.
+`DateTimeZone.ToRecord` decomposes a `datetimezone` value into a record with eight numeric fields: `Year`, `Month`, `Day`, `Hour`, `Minute`, `Second`, `ZoneHours`, and `ZoneMinutes`. The `ZoneHours` and `ZoneMinutes` fields reflect the UTC offset — for example, a value with offset `+05:30` returns `ZoneHours=5` and `ZoneMinutes=30`. For a `-05:00` offset, `ZoneHours=-5` and `ZoneMinutes=0`.
+
+This function is most useful when you need to expand multiple components into separate table columns at once using `Table.ExpandRecordColumn`, instead of calling `DateTimeZone.Year`, `DateTimeZone.Month`, `DateTimeZone.Day`, `DateTimeZone.Hour`, `DateTimeZone.Minute`, `DateTimeZone.Second`, `DateTimeZone.ZoneHours`, and `DateTimeZone.ZoneMinutes` separately in eight `Table.AddColumn` calls.
+
+For selective access to just the offset components, use `DateTimeZone.ZoneHours` and `DateTimeZone.ZoneMinutes` directly rather than decomposing the entire record. For `datetime` decomposition (without zone fields), use `DateTime.ToRecord`. For `date`-only decomposition, use `Date.ToRecord`.
 
 ## Examples
 
 ### Example 1: Expand datetimezone components into columns
 
-Decompose EventTimeZone into all its component fields.
-
-Input: `Events`
+Decompose datetimezone values into all eight component fields.
 
 ```powerquery
 Table.ExpandRecordColumn(
     Table.AddColumn(
-        Table.SelectColumns(Table.FirstN(Events, 3), {"EventID", "EventTimeZone"}),
-        "Parts", each DateTimeZone.ToRecord([EventTimeZone])
+        #table(
+            type table [DTZ = datetimezone],
+            {
+                {#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0)},
+                {#datetimezone(2024, 6, 1, 14, 0, 0, 5, 30)}
+            }
+        ),
+        "Parts", each DateTimeZone.ToRecord([DTZ])
     ),
     "Parts",
     {"Year", "Month", "Day", "Hour", "Minute", "Second", "ZoneHours", "ZoneMinutes"}
@@ -50,7 +58,7 @@ Table.ExpandRecordColumn(
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"},{"name":"ZoneHours","type":"number"},{"name":"ZoneMinutes","type":"number"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","Year":2024,"Month":3,"Day":15,"Hour":8,"Minute":30,"Second":0,"ZoneHours":-5,"ZoneMinutes":0}]}
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"},{"name":"ZoneHours","type":"number"},{"name":"ZoneMinutes","type":"number"}],"rows":[{"DTZ":"2024-03-15T08:30:00-05:00","Year":2024,"Month":3,"Day":15,"Hour":8,"Minute":30,"Second":0,"ZoneHours":-5,"ZoneMinutes":0},{"DTZ":"2024-06-01T14:00:00+05:30","Year":2024,"Month":6,"Day":1,"Hour":14,"Minute":0,"Second":0,"ZoneHours":5,"ZoneMinutes":30}]}
 -->
 
 ### Example 2: Decompose a specific datetimezone value
@@ -63,4 +71,26 @@ DateTimeZone.ToRecord(#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30))
 
 <!--output
 {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Year","Value":2024},{"Field":"Month","Value":3},{"Field":"Day","Value":15},{"Field":"Hour","Value":14},{"Field":"Minute","Value":30},{"Field":"Second","Value":0},{"Field":"ZoneHours","Value":5},{"Field":"ZoneMinutes","Value":30}]}
+-->
+
+### Example 3: Use record fields inline to build an offset label
+
+Access ZoneHours and ZoneMinutes from the record to build a formatted offset string.
+
+```powerquery
+let
+    DTZ = #datetimezone(2024, 3, 15, 9, 0, 0, -5, 0),
+    R = DateTimeZone.ToRecord(DTZ),
+    OffsetLabel = (if R[ZoneHours] >= 0 then "+" else "") &
+                  Text.From(R[ZoneHours]) & ":" &
+                  Text.PadStart(Text.From(R[ZoneMinutes]), 2, "0")
+in
+    #table(
+        type table [DTZ = datetimezone, OffsetLabel = text],
+        {{DTZ, OffsetLabel}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"OffsetLabel","type":"text"}],"rows":[{"DTZ":"2024-03-15T09:00:00-05:00","OffsetLabel":"-5:00"}]}
 -->

@@ -39,37 +39,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.ReplaceRange` removes `count` characters from `text` starting at the zero-based `offset` position, then inserts `newText` at that same position. The replacement text does not need to be the same length as the removed portion.
+`Text.ReplaceRange` removes `count` characters from `text` starting at the zero-based `offset` position, then inserts `newText` at that same position. This is a single atomic operation: remove then insert. The replacement text does not need to be the same length as the removed portion — the result may be shorter or longer than the original.
 
-If `text` is `null`, the function returns `null`. The length of `newText` may differ from `count`, allowing the result to be shorter or longer than the original.
+If `text` is `null`, the function returns `null`. The `count` must be a non-negative number; using 0 for `count` makes this equivalent to `Text.Insert`.
 
 This is equivalent to: `Text.Start(text, offset) & newText & Text.End(text, Text.Length(text) - offset - count)`
 
-Use `Text.Replace` when you want to replace by value (all occurrences of a substring). Use `Text.ReplaceRange` when you want to replace by position.
+The key distinction from related functions:
+- Use `Text.Replace` to replace all occurrences of a **substring value** throughout the text
+- Use `Text.ReplaceRange` to replace characters at a specific **position and length**
+- Use `Text.RemoveRange` when you want to delete without inserting anything
+- Use `Text.Insert` when you want to insert without removing anything
 
 ## Examples
 
-### Example 1: Replace a word at a known position
-
-```powerquery
-Text.ReplaceRange("Hello World", 6, 5, "There")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello There"}]}
--->
-
-### Example 2: Replace a separator
-
-```powerquery
-Text.ReplaceRange("2024/03/15", 4, 1, "-")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024-03/15"}]}
--->
-
-### Example 3: Replace a prefix code
+### Example 1: Replace the status prefix in a formatted string
 
 ```powerquery
 Text.ReplaceRange("OLD-Report-2024", 0, 3, "NEW")
@@ -79,12 +63,34 @@ Text.ReplaceRange("OLD-Report-2024", 0, 3, "NEW")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"NEW-Report-2024"}]}
 -->
 
-### Example 4: Replace with a longer string (expansion)
+### Example 2: Fix a separator character at a known position
 
 ```powerquery
-Text.ReplaceRange("AB12", 2, 2, "9999")
+Text.ReplaceRange("2024/03/15", 4, 1, "-")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"AB9999"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024-03/15"}]}
+-->
+
+### Example 3: Expand: replace a short code with a longer value
+
+The replacement can be longer than the removed portion — the string grows accordingly.
+
+```powerquery
+Text.ReplaceRange("E001", 0, 1, "EMP")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"EMP001"}]}
+-->
+
+### Example 4: Shrink: replace a longer segment with a shorter one
+
+```powerquery
+Text.ReplaceRange("Sales Representative", 6, 14, "Rep")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Sales Rep"}]}
 -->

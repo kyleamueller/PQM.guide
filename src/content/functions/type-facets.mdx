@@ -25,15 +25,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.Facets` returns a record describing the constraint properties (facets) of a type. Facets encode additional type metadata beyond the base kind — for example, `Precision` and `Scale` for decimal types, or `MaxLength` for text types.
+`Type.Facets` returns a record describing the **facets** of a type — the additional constraints or properties associated with the type beyond its base kind. Facets are type-specific: for `number` types, relevant facets include `Precision` and `Scale`; for `text` types, `MaxLength` is a relevant facet.
 
-For most primitive types with no additional constraints, the facets record will contain null values for all facet fields. Facets are most relevant when working with types surfaced from data sources that expose schema metadata (such as SQL Server columns with explicit precision and scale).
+For most primitive M types created with literal type expressions (like `type number` or `type text`), facets are present in the record but their values are `null`, meaning no constraint has been applied. Facets become meaningful when working with types derived from data sources — for example, a SQL Server column typed as `DECIMAL(10, 2)` will expose `Precision = 10` and `Scale = 2` through its type facets.
 
-The complement of this function is `Type.ReplaceFacets`, which returns a new type with updated facets.
+`Type.Facets` is used in advanced introspection scenarios: custom connectors, schema comparison tools, or type annotation pipelines. The output of `Type.Facets` is a standard record that you can inspect with record field access or convert to a table with `Record.ToTable`. The complement function `Type.ReplaceFacets` creates a new type with modified facets.
+
+Note that `Type.Facets` operates on a **type value**, not a data value. Use `Value.Type(x)` to obtain the type of a data value before passing it to `Type.Facets`.
 
 ## Examples
 
-### Example 1: Facets of a plain number type
+### Example 1: Facets of a plain number type — all null
 
 ```powerquery
 Type.Facets(type number)
@@ -51,4 +53,17 @@ Type.Facets(type nullable text)
 
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"MaxLength","Value":null}]}
+-->
+
+### Example 3: Facets after applying precision and scale with Type.ReplaceFacets
+
+```powerquery
+let
+    Constrained = Type.ReplaceFacets(type number, [Precision = 10, Scale = 2])
+in
+    Type.Facets(Constrained)
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
 -->

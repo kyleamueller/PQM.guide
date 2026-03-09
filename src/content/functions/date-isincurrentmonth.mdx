@@ -28,13 +28,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInCurrentMonth` returns `true` if the input date falls within the same year and month as today's date (`DateTime.LocalNow()`). It matches the entire calendar month from the first to the last day, inclusive. This function is re-evaluated on each query refresh.
+`Date.IsInCurrentMonth` returns `true` if the input date falls within the same year and month as today's date (`DateTime.LocalNow()`). It matches the entire calendar month from the first to the last day, inclusive — including future dates within the current month. This function is re-evaluated on each query refresh.
+
+Note that this function includes future dates in the current month. If you need only dates up to and including today, use `Date.IsInYearToDate` restricted to the current month, or add `and [OrderDate] <= Date.From(DateTime.LocalNow())` to the filter.
+
+In Power BI Service scheduled refreshes and cloud Dataflows, the "local" time is the server's timezone (usually UTC). If your data dates are in a different timezone, the month boundary may not align with what you expect. This is the same caveat that applies to all `Date.IsIn*` functions.
 
 ## Examples
 
 ### Example 1: Filter this month's orders
 
-Keep only rows from the Sales table where OrderDate is in the current month.
+Keep only rows where OrderDate falls in the current calendar month.
 
 ```powerquery
 Table.SelectRows(
@@ -60,4 +64,22 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentMonth","type":"logical"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20","IsCurrentMonth":false},{"OrderID":40,"OrderDate":"2026-03-01","IsCurrentMonth":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentMonth":true}]}
+-->
+
+### Example 3: Filter month-to-date orders only (excluding future dates this month)
+
+Restrict current month results to dates up to and including today.
+
+```powerquery
+let
+    Today = Date.From(DateTime.LocalNow())
+in
+    Table.SelectRows(
+        Sales,
+        each Date.IsInCurrentMonth([OrderDate]) and [OrderDate] <= Today
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
 -->

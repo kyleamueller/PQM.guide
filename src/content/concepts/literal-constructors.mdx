@@ -19,15 +19,40 @@ M has a set of built-in literal constructors — keywords prefixed with `#` — 
 
 ### Available Literal Constructors
 
-| Constructor | Type | Example |
-|---|---|---|
-| `#date(y, m, d)` | `date` | `#date(2024, 3, 15)` |
-| `#time(h, min, s)` | `time` | `#time(14, 30, 0)` |
-| `#datetime(y, m, d, h, min, s)` | `datetime` | `#datetime(2024, 3, 15, 14, 30, 0)` |
-| `#datetimezone(y, m, d, h, min, s, oh, om)` | `datetimezone` | `#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0)` |
-| `#duration(d, h, min, s)` | `duration` | `#duration(1, 2, 30, 0)` |
-| `#table(cols, rows)` | `table` | `#table({"A","B"}, {{1,2}})` |
-| `#binary(bytes)` | `binary` | `#binary({72, 101, 108})` |
+**`#date(year, month, day)`** — produces a `date`
+```powerquery
+#date(2024, 3, 15)
+```
+
+**`#time(hour, minute, second)`** — produces a `time`
+```powerquery
+#time(14, 30, 0)
+```
+
+**`#datetime(year, month, day, hour, minute, second)`** — produces a `datetime`
+```powerquery
+#datetime(2024, 3, 15, 14, 30, 0)
+```
+
+**`#datetimezone(year, month, day, hour, minute, second, offsetHours, offsetMinutes)`** — produces a `datetimezone`
+```powerquery
+#datetimezone(2024, 3, 15, 14, 30, 0, -5, 0)
+```
+
+**`#duration(days, hours, minutes, seconds)`** — produces a `duration`
+```powerquery
+#duration(1, 2, 30, 0)
+```
+
+**`#table(columnNames, rows)`** — produces a `table`
+```powerquery
+#table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}})
+```
+
+**`#binary(bytes)`** — produces a `binary`
+```powerquery
+#binary({72, 101, 108, 108, 111})
+```
 
 ### Why Use Literal Constructors?
 

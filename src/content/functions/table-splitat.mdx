@@ -31,39 +31,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.SplitAt` divides a table into two disjoint sub-tables at row `count`. The function returns a record with two fields:
-- `First`: the first `count` rows
-- `Remaining`: all rows after position `count`
+`Table.SplitAt` divides a table into exactly two disjoint sub-tables at the row boundary specified by `count`. The result is a record with two fields:
+- `First`: the first `count` rows.
+- `Remaining`: all rows from position `count` onward.
 
-This is equivalent to calling `Table.FirstN(table, count)` and `Table.Skip(table, count)` separately but does so in a single pass.
+This is semantically equivalent to calling `Table.FirstN(table, count)` and `Table.Skip(table, count)` separately, but expresses the two-part split intent as a single named operation. Use `Split[First]` and `Split[Remaining]` to access each part.
+
+`Table.SplitAt` is useful when you want to process the head and tail of a table differently — for example, treating the first N rows as a header block and the remainder as data, or separating a "seed" batch from the remaining rows in an incremental load pattern. For splitting into more than two parts, use `Table.Split` with a page size.
 
 ## Examples
 
-### Example 1: Split a table at row 2
+### Example 1: Split the Sales table into first 3 rows and the rest
 
 ```powerquery
-Table.SplitAt(
-    #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
-    2
-)
+let
+    Sales = #table(
+        {"OrderID","CustomerName","Product","OrderDate"},
+        {{1,"Alice","Widget A",#date(2024,1,15)},{2,"Bob","Gadget B",#date(2024,1,18)},
+         {3,"Charlie","Widget C",#date(2024,2,1)},{4,"Alice","Gadget D",#date(2024,2,10)},
+         {5,"Diana","Widget A",#date(2024,3,5)}}
+    )
+in
+    Table.SplitAt(Sales, 3)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[First = [Table], Remaining = [Table]]"}]}
 -->
 
-### Example 2: Access the First and Remaining portions
+### Example 2: Access and count rows in both parts
 
 ```powerquery
 let
-    Source = #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
-    Split  = Table.SplitAt(Source, 2),
-    First  = Split[First],
-    Rest   = Split[Remaining]
+    Sales = #table(
+        {"OrderID","CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Charlie"},{4,"Alice"},{5,"Diana"},{6,"Bob"},{7,"Charlie"},{8,"Diana"}}
+    ),
+    Split     = Table.SplitAt(Sales, 5),
+    FirstSize = Table.RowCount(Split[First]),
+    RestSize  = Table.RowCount(Split[Remaining])
 in
-    {Table.RowCount(First), Table.RowCount(Rest)}
+    [FirstSize = FirstSize, RestSize = RestSize]
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{2, 3}"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[FirstSize = 5, RestSize = 3]"}]}
+-->
+
+### Example 3: Process the head and tail separately, then recombine
+
+Mark the first 2 rows as "priority" and the rest as "standard", then rejoin.
+
+```powerquery
+let
+    Orders = #table({"OrderID","CustomerName"},{{1,"Alice"},{2,"Bob"},{3,"Charlie"},{4,"Diana"}}),
+    Split  = Table.SplitAt(Orders, 2),
+    Head   = Table.AddColumn(Split[First],     "Priority", each "High",     type text),
+    Tail   = Table.AddColumn(Split[Remaining], "Priority", each "Standard", type text)
+in
+    Table.Combine({Head, Tail})
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Priority","type":"text"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Priority":"High"},{"OrderID":"2","CustomerName":"Bob","Priority":"High"},{"OrderID":"3","CustomerName":"Charlie","Priority":"Standard"},{"OrderID":"4","CustomerName":"Diana","Priority":"Standard"}]}
 -->

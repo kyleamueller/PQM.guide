@@ -30,13 +30,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.BitwiseShiftLeft` shifts the binary representation of `number` to the left by `shift` positions, filling the vacated low-order bits with zeros. Shifting left by `n` is equivalent to multiplying by 2^n (for values that do not overflow).
+`Number.BitwiseShiftLeft` shifts the binary representation of `number` to the left by `shift` positions, filling the vacated low-order bits with zeros. Shifting left by `n` positions is mathematically equivalent to **multiplying by 2^n** — as long as the result does not overflow the 64-bit signed integer range.
 
-This is commonly used in low-level data encoding, packing multiple values into a single integer field, or constructing bitmasks.
+This is the complement of `Number.BitwiseShiftRight`. Together, shift operations are used for:
+
+- **Constructing bitmasks**: `Number.BitwiseShiftLeft(1, n)` creates a mask with only bit n set
+- **Packing multiple values**: shifting a value into position before OR-ing it into a packed integer
+- **Fast powers of 2**: computing 2^n efficiently (though `Number.Power(2, n)` is more readable for most cases)
+
+The `shift` amount should be in the range 0–63 for 64-bit integers. Shifting by 0 returns the original value. The `number` value is treated as a 64-bit integer; any fractional part is truncated first.
 
 ## Examples
 
-### Example 1: Shift 1 left by 3 (multiply by 8)
+### Example 1: Shift 1 left by 3 positions — equivalent to 1 × 8
 
 ```powerquery
 Number.BitwiseShiftLeft(1, 3)
@@ -46,7 +52,7 @@ Number.BitwiseShiftLeft(1, 3)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":8}]}
 -->
 
-### Example 2: Shift left by 4 (equivalent to × 16)
+### Example 2: Shift 3 left by 4 positions — equivalent to 3 × 16
 
 ```powerquery
 Number.BitwiseShiftLeft(3, 4)
@@ -56,7 +62,9 @@ Number.BitwiseShiftLeft(3, 4)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":48}]}
 -->
 
-### Example 3: Build a bitmask for bit position 5
+### Example 3: Build a bitmask with only bit 5 set
+
+`1 << 5 = 32`, which is the standard way to create a bitmask for bit position 5.
 
 ```powerquery
 Number.BitwiseShiftLeft(1, 5)

@@ -28,13 +28,13 @@ relatedFunctions:
 
 ## Remarks
 
-`List.StandardDeviation` computes the **sample standard deviation** of a numeric list — that is, it divides by `n - 1` (Bessel's correction), not `n`. This is the appropriate measure when working with a sample from a larger population.
+`List.StandardDeviation` computes the **sample standard deviation** of a numeric list, dividing by `n - 1` (Bessel's correction) rather than `n`. This is the appropriate formula when the list represents a sample from a larger population, and it is the same calculation performed by Excel's `STDEV.S` function.
 
-Standard deviation measures the average spread of values around the mean. A higher value indicates greater variability.
+Standard deviation measures the average spread of values around the mean. A higher value indicates greater variability. A standard deviation of zero means all values are identical.
 
-- Returns `null` if the list is empty or contains only one element (where sample standard deviation is undefined).
-- Null values in the list are ignored.
-- To compute the population standard deviation (divide by `n`), use `List.Covariance` with a list paired with itself, or implement it manually.
+Returns `null` if the list is empty or contains only one element (sample standard deviation is undefined for fewer than two data points). Null values in the list are ignored — they are excluded from both the count and the calculation.
+
+To compute the **population** standard deviation (dividing by `n`), there is no direct built-in function. One approach is `Number.Sqrt(List.Average(List.Transform(values, each (_ - List.Average(values))^2)))`. For detecting outliers, a common heuristic is to flag values more than 2 or 3 standard deviations from the mean.
 
 ## Examples
 

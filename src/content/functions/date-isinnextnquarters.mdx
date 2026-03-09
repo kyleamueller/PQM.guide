@@ -33,36 +33,59 @@ relatedFunctions:
 
 `Date.IsInNextNQuarters` returns `true` if the input date falls within the next N complete calendar quarters after the current quarter. The current quarter itself is not included; use `Date.IsInCurrentQuarter` to also match the current quarter. The function is re-evaluated on each query refresh.
 
-For example, if today is in Q1 and `quarters = 2`, it matches any date in Q2 or Q3.
+For example, if today is in Q1 and `quarters = 2`, it matches any date in Q2 or Q3. Quarters are always standard calendar quarters (Q1: Jan–Mar, Q2: Apr–Jun, Q3: Jul–Sep, Q4: Oct–Dec) — there is no support for custom fiscal quarters.
+
+Use this function in pipeline reports to see deals closing in the next one or two quarters, or in capacity planning to highlight deliverables due within the next few quarters.
 
 ## Examples
 
-### Example 1: Find projects due in the next 2 quarters
+### Example 1: Find orders due in the next 2 quarters
 
-Keep only rows where ProjectEnd falls within the next 2 quarters.
+Keep only rows where OrderDate falls within the next 2 complete calendar quarters.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Projects,
-    each Date.IsInNextNQuarters([ProjectEnd], 2)
+    Sales,
+    each Date.IsInNextNQuarters([OrderDate], 2)
 )
 ```
 
 <!--output
-{"columns":[{"name":"ProjectID","type":"text"},{"name":"ProjectEnd","type":"date"},{"name":"ProjectName","type":"text"}],"rows":[{"ProjectID":"P001","ProjectEnd":"2026-04-30","ProjectName":"Alpha"},{"ProjectID":"P002","ProjectEnd":"2026-06-30","ProjectName":"Beta"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-04-10"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-05-18"},{"OrderID":45,"CustomerName":"Charlie","OrderDate":"2026-06-25"},{"OrderID":46,"CustomerName":"Diana","OrderDate":"2026-08-01"}]}
 -->
 
-### Example 2: Flag projects ending in the next 4 quarters
+### Example 2: Flag orders ending in the next 4 quarters
 
-Add a boolean column for projects ending within the next year (4 quarters).
+Add a boolean column for orders due within the next year (4 quarters).
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Projects,
-    "EndsNextYear", each Date.IsInNextNQuarters([ProjectEnd], 4), type logical
+    Sales,
+    "DueNextYear", each Date.IsInNextNQuarters([OrderDate], 4), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"ProjectID","type":"text"},{"name":"ProjectEnd","type":"date"},{"name":"EndsNextYear","type":"logical"}],"rows":[{"ProjectID":"P001","ProjectEnd":"2026-04-30","EndsNextYear":true},{"ProjectID":"P003","ProjectEnd":"2027-02-28","EndsNextYear":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DueNextYear","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","DueNextYear":false},{"OrderID":43,"OrderDate":"2026-04-10","DueNextYear":true},{"OrderID":50,"OrderDate":"2027-02-28","DueNextYear":false}]}
+-->
+
+### Example 3: Combine current and next quarter for a half-year view
+
+Flag rows falling in either the current quarter or the next 2 quarters.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentQuarter([OrderDate]) or Date.IsInNextNQuarters([OrderDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":42,"CustomerName":"Charlie","OrderDate":"2026-03-08"},{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-04-10"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-05-18"},{"OrderID":45,"CustomerName":"Diana","OrderDate":"2026-06-25"}]}
 -->

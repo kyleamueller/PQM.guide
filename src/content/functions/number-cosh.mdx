@@ -26,17 +26,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Cosh` returns the hyperbolic cosine, defined as:
+`Number.Cosh` returns the hyperbolic cosine, defined mathematically as:
 
 cosh(x) = (e^x + e^(−x)) / 2
 
-The hyperbolic cosine is always >= 1 and has its minimum at x = 0 where it equals 1. It is an even function: `cosh(−x) = cosh(x)`. The catenary curve — the shape of a hanging chain — is described by cosh.
+Unlike the circular cosine, which oscillates between -1 and 1, the hyperbolic cosine grows without bound. Its minimum value is 1, occurring at x = 0. It is an **even function**: `cosh(−x) = cosh(x)`, meaning it is symmetric about the y-axis. For large positive or negative x, cosh grows roughly as e^|x| / 2.
 
-The fundamental hyperbolic identity is: cosh²(x) − sinh²(x) = 1.
+Hyperbolic functions do not operate in degrees or radians — they take a real number argument directly and produce a real result. This contrasts with circular trigonometric functions like `Number.Cos`.
+
+The fundamental identity `cosh²(x) − sinh²(x) = 1` is the hyperbolic analog of the Pythagorean identity. In data transformation, hyperbolic functions appear in physics models (catenary shape of cables), certain statistical distributions (e.g., the logistic function uses tanh), and financial risk models. Most Power Query users will not encounter them in everyday work.
 
 ## Examples
 
-### Example 1: Hyperbolic cosine of 0
+### Example 1: Hyperbolic cosine of 0 — minimum value is 1
 
 ```powerquery
 Number.Cosh(0)
@@ -56,7 +58,7 @@ Number.Cosh(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.5430806348152437}]}
 -->
 
-### Example 3: Verify hyperbolic identity cosh²(x) - sinh²(x) = 1
+### Example 3: Verify the hyperbolic identity cosh²(x) − sinh²(x) = 1
 
 ```powerquery
 let

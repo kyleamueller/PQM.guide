@@ -31,18 +31,15 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Covariance` computes the **sample covariance** between two numeric lists. Covariance measures how much two variables change together — a positive covariance means they tend to increase together, while a negative covariance means one tends to increase as the other decreases.
+`List.Covariance` computes the **sample covariance** between two numeric lists. Covariance measures how much two variables change together: a positive value means they tend to increase together, while a negative value means one tends to increase as the other decreases. A covariance near zero suggests little linear relationship.
 
-The formula used is the sample covariance: the sum of `(x - mean_x) * (y - mean_y)` divided by `n - 1`, where `n` is the number of paired observations.
+The formula is the sample covariance: the sum of `(x - mean_x) * (y - mean_y)` divided by `n - 1` (Bessel's correction), where `n` is the number of paired observations. This is appropriate when the lists represent a sample from a larger population.
 
-- Both lists must have the same number of elements.
-- Returns `null` if either list is empty.
-- Null values in the lists are treated as errors; use `List.RemoveNulls` or `List.Select` to clean data first if needed.
-- This is the **sample** covariance (divides by n-1), not the population covariance (divides by n).
+Both lists must have the same number of elements; mismatched lengths will cause an error. Returns `null` if either list is empty. Null values in the lists cause errors — clean the data with `List.RemoveNulls` first if needed. To normalize covariance into a more interpretable [-1, 1] scale, divide by the product of the two standard deviations to get the Pearson correlation coefficient.
 
 ## Examples
 
-### Example 1: Covariance of two correlated lists
+### Example 1: Positive covariance — two variables move together
 
 ```powerquery
 List.Covariance({2, 4, 6, 8}, {1, 3, 5, 7})
@@ -52,9 +49,9 @@ List.Covariance({2, 4, 6, 8}, {1, 3, 5, 7})
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5.333333333}]}
 -->
 
-### Example 2: Covariance of price and sales volume
+### Example 2: Negative covariance — price increases as volume decreases
 
-Check whether price increases correlate with volume decreases.
+Check whether price increases correlate with volume decreases in a product line.
 
 ```powerquery
 let
@@ -69,7 +66,9 @@ in
 {"columns":[{"name":"Covariance","type":"number"}],"rows":[{"Covariance":-2050}]}
 -->
 
-### Example 3: Uncorrelated lists
+### Example 3: Inversely related lists
+
+When one list increases while the other decreases at the same rate, the covariance is negative.
 
 ```powerquery
 List.Covariance({1, 2, 3, 4}, {4, 3, 2, 1})

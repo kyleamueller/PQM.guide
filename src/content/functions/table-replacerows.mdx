@@ -38,36 +38,69 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.ReplaceRows` removes `count` rows starting at `offset` and inserts the new `rows` in their place. The number of replacement rows does not need to match `count` — you can replace 2 rows with 1, or 1 row with 3. Each replacement record must have fields corresponding to table column names.
+`Table.ReplaceRows` removes a block of `count` rows starting at zero-based `offset` and inserts the new `rows` list in their place. The number of replacement rows does not need to equal `count` — you can replace 2 rows with 1, or 1 row with 3. Each record in `rows` must have fields corresponding to the table's column names; missing fields default to `null`.
+
+`Table.ReplaceRows` is the combination of `Table.RemoveRows` followed by `Table.InsertRows` at the same position, performed as a single operation. It is useful for correcting known bad rows in a dataset or swapping out rows identified by position (often in combination with `Table.PositionOf`).
+
+`Table.ReplaceRows` does not fold to data sources. For large tables, prefer source-side MERGE or UPDATE operations. When replacing by matching content rather than by position, use `Table.ReplaceMatchingRows` instead.
 
 ## Examples
 
-### Example 1: Replace one row
+### Example 1: Correct a single erroneous order record
+
+Replace the second order (offset 1) with corrected data.
 
 ```powerquery
-Table.ReplaceRows(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}, {3, "Carol"}}),
-    1,
-    1,
-    {[ID = 99, Name = "Zara"]}
-)
+let
+    Sales = #table(
+        {"OrderID","CustomerName","Product","UnitPrice","Quantity"},
+        {{1,"Alice","Widget A",25.00,4},{2,"Bob","Gadgt B",50.00,2},{3,"Charlie","Widget C",15.00,10}}
+    )
+in
+    Table.ReplaceRows(
+        Sales, 1, 1,
+        {[OrderID = 2, CustomerName = "Bob", Product = "Gadget B", UnitPrice = 50.00, Quantity = 2]}
+    )
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"99","Name":"Zara"},{"ID":"3","Name":"Carol"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","Quantity":"10"}]}
 -->
 
-### Example 2: Replace two rows with one
+### Example 2: Replace two rows with a single consolidated row
 
 ```powerquery
-Table.ReplaceRows(
-    #table({"ID"}, {{1}, {2}, {3}, {4}}),
-    1,
-    2,
-    {[ID = 99]}
-)
+let
+    Summary = #table(
+        {"Region","Total"},
+        {{"East",100},{"North",150},{"West",200},{"South",50}}
+    )
+in
+    Table.ReplaceRows(Summary, 1, 2, {[Region = "North+West", Total = 350]})
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"99"},{"ID":"4"}]}
+{"columns":[{"name":"Region","type":"any"},{"name":"Total","type":"any"}],"rows":[{"Region":"East","Total":"100"},{"Region":"North+West","Total":"350"},{"Region":"South","Total":"50"}]}
+-->
+
+### Example 3: Dynamically locate a row, then replace it
+
+Use `Table.PositionOf` to find the row position and then call `Table.ReplaceRows`.
+
+```powerquery
+let
+    Products = #table(
+        {"ProductID","ProductName","Price"},
+        {{1,"Widget A",25.00},{2,"Gadget B",50.00},{3,"Widget C",15.00},{4,"Gadget D",75.00}}
+    ),
+    Pos    = Table.PositionOf(Products, [ProductID = 3], Occurrence.First, "ProductID"),
+    Result = if Pos >= 0
+             then Table.ReplaceRows(Products, Pos, 1, {[ProductID = 3, ProductName = "Widget C v2", Price = 18.00]})
+             else Products
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C v2","Price":"18"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"}]}
 -->

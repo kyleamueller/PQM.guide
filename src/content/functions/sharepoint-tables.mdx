@@ -30,29 +30,34 @@ relatedFunctions:
 
 ## Remarks
 
-`SharePoint.Tables` connects to a SharePoint site and returns a navigation table of all SharePoint lists. Each list's data (list items) is accessible via the `Data` column. This is the preferred function for reading structured data stored in SharePoint lists, as opposed to files in document libraries (use `SharePoint.Files` for those).
+`SharePoint.Tables` connects to a SharePoint site and returns a navigation table of all SharePoint lists available at that URL. Each row in the navigation table represents one list; drilling into the `Data` column returns the list's items as a Power Query table. This is the preferred function for reading structured data from SharePoint lists (custom lists, task lists, issue trackers, etc.). For files stored in document libraries, use `SharePoint.Files` instead.
 
-**Authentication**: Microsoft Account (OAuth) for SharePoint Online, or Windows/Basic credentials for SharePoint on-premises. Configure credentials using the site root URL as the credential scope.
+**Navigation table and list columns**: The top-level result contains `Name` and `Data` columns. Inside each list's `Data`, columns correspond to SharePoint list fields. SharePoint list columns have complex types that may not surface as simple scalar values:
+- **Text, Number, Date, Boolean fields** → returned as M text, number, datetime, or logical values.
+- **People or Group fields** → returned as records containing display name, email, and user ID. Expand with `Table.ExpandRecordColumn`.
+- **Lookup fields** → returned as records with `Value` and `Id` fields. Expand to get the lookup value text.
+- **Managed Metadata (Taxonomy) fields** → returned as records. Expand to get the term label.
+- **Multi-value fields** → returned as lists of records.
 
-**Query folding**: SharePoint.Tables supports partial query folding. Row filters on simple column values may be pushed to the SharePoint REST API as `$filter` parameters. However, complex transformations occur in Power Query.
+**Authentication**: Microsoft Account (OAuth 2.0) for SharePoint Online. Windows or Basic credentials for SharePoint on-premises. Configure credentials using the site root URL as the credential scope.
 
-**SharePoint list columns**: SharePoint lists can have complex column types (People, Lookup, Managed Metadata, etc.). These are returned as records or text depending on the column type. Use `Table.ExpandRecordColumn` to unpack record-type columns.
+**Query folding**: Partial. Simple row filters on list column values may fold to the SharePoint REST API as `$filter` query parameters. Complex transformations occur in Power Query after data retrieval.
 
-**Comparison with OData.Feed**: SharePoint's OData endpoint (`/_api/lists`) is also accessible via `OData.Feed`. `SharePoint.Tables` provides a more user-friendly navigation experience and handles SharePoint-specific authentication more seamlessly.
+**Pagination**: The SharePoint REST API returns up to 5,000 items per page by default. `SharePoint.Tables` automatically follows continuation links to retrieve all items from large lists.
+
+**Power BI Service**: SharePoint Online lists are supported for direct cloud refresh using Microsoft Account authentication — no gateway is required. SharePoint on-premises requires an on-premises data gateway.
 
 **Key option**:
-- `ApiVersion` (number) — the SharePoint REST API version. Defaults to 15.
-
-**Item limit**: By default, SharePoint REST API returns up to 5,000 items per request. `SharePoint.Tables` handles pagination automatically to retrieve all items.
+- `ApiVersion` (number) — SharePoint REST API version. Defaults to `15` (SharePoint 2013+). Set to `14` for SharePoint 2010.
 
 ## Examples
 
-### Example 1: List all SharePoint lists on a site
+### Example 1: Browse all SharePoint lists on a site
 ```powerquery
 SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance")
 ```
 
-### Example 2: Access a specific list by name
+### Example 2: Access a specific SharePoint list by name
 ```powerquery
 let
     Source = SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance"),
@@ -61,7 +66,7 @@ in
     BudgetList
 ```
 
-### Example 3: Read a SharePoint list and expand a lookup column
+### Example 3: Expand a Lookup column from a SharePoint list
 ```powerquery
 let
     Source = SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance"),
@@ -71,7 +76,7 @@ in
     Expanded
 ```
 
-### Example 4: Filter list items in Power Query
+### Example 4: Filter list items after retrieval
 ```powerquery
 let
     Source = SharePoint.Tables("https://contoso.sharepoint.com/sites/Finance"),
@@ -81,7 +86,7 @@ in
     OpenTasks
 ```
 
-### Example 5: Connect to SharePoint on-premises
+### Example 5: Connect to a SharePoint on-premises list
 ```powerquery
 let
     Source = SharePoint.Tables("https://sharepoint.contoso.local/sites/HR", [ApiVersion = 15]),

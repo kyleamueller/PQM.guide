@@ -25,11 +25,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Sign` returns `1` for any positive number, `-1` for any negative number, and `0` for zero. If the input is `null`, it returns `null`. This function is useful for directional classification — for example, labeling rows as gains, losses, or flat, or for applying signed operations without branching logic.
+`Number.Sign` returns a number indicating the sign of its input: `1` for any positive value, `-1` for any negative value, and `0` for zero. If the input is `null`, it returns `null`.
+
+This function is a clean alternative to branching `if` expressions when you need to classify values by direction or apply sign-based arithmetic. Common uses include:
+
+- **Directional labeling**: classifying rows as gain/loss/flat based on a change value
+- **Sign normalization**: multiplying by `Number.Sign(x)` to obtain the unit direction without the magnitude
+- **Conditional logic**: using the result in arithmetic directly (`value * Number.Sign(threshold - value)`) instead of branching
+
+Note that `Number.Sign` returns an integer -1, 0, or 1 — not a text label. If you need text labels, use an `if` expression based on the sign result. Also note that `Number.Sign(NaN)` returns `NaN`, not 0, so guard for NaN if your data may contain it.
 
 ## Examples
 
-### Example 1: Sign of a positive number
+### Example 1: Sign of a positive number returns 1
 
 ```powerquery
 Number.Sign(42)
@@ -39,7 +47,7 @@ Number.Sign(42)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 2: Sign of a negative number
+### Example 2: Sign of a negative number returns -1
 
 ```powerquery
 Number.Sign(-5)
@@ -49,7 +57,7 @@ Number.Sign(-5)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
 -->
 
-### Example 3: Sign of zero
+### Example 3: Sign of zero returns 0
 
 ```powerquery
 Number.Sign(0)
@@ -59,21 +67,22 @@ Number.Sign(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 4: Classify profit/loss rows in Sales
+### Example 4: Classify orders as Gain, Loss, or Flat based on quantity change
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Profit"}),
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "CustomerName", "Quantity"}),
     "Direction",
-    each if Number.Sign([Profit]) = 1 then "Gain"
-         else if Number.Sign([Profit]) = -1 then "Loss"
-         else "Flat",
+    each
+        if Number.Sign([Quantity] - 4) = 1 then "Above Average"
+        else if Number.Sign([Quantity] - 4) = -1 then "Below Average"
+        else "Average",
     type text
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Profit","type":"number"},{"name":"Direction","type":"text"}],"rows":[{"OrderID":1,"Profit":500,"Direction":"Gain"},{"OrderID":2,"Profit":-200,"Direction":"Loss"},{"OrderID":3,"Profit":0,"Direction":"Flat"},{"OrderID":4,"Profit":1200,"Direction":"Gain"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Quantity","type":"number"},{"name":"Direction","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Quantity":4,"Direction":"Average"},{"OrderID":2,"CustomerName":"Bob","Quantity":2,"Direction":"Below Average"},{"OrderID":3,"CustomerName":"Charlie","Quantity":10,"Direction":"Above Average"},{"OrderID":4,"CustomerName":"Alice","Quantity":1,"Direction":"Below Average"},{"OrderID":5,"CustomerName":"Diana","Quantity":6,"Direction":"Above Average"}]}
 -->

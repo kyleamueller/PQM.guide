@@ -31,54 +31,47 @@ relatedFunctions:
 
 ## Remarks
 
-`Odbc.DataSource` connects to any data source that has an ODBC driver installed on the machine and returns a navigation table of the available schemas and tables. It is a general-purpose connector that works with any ODBC-compliant database, including databases that do not have a dedicated Power Query connector.
+`Odbc.DataSource` connects to any data source that has an ODBC driver installed on the local machine and returns a navigation table of the available schemas and tables. It is a generic connector of last resort — useful for databases that do not have a dedicated Power Query connector (such as IBM DB2, Teradata, Sybase ASE, Informix, SAP Hana via ODBC, etc.) or for connecting to proprietary systems that expose an ODBC interface.
 
-**Connection string**: The `connectionString` parameter accepts:
-- A text value in standard ODBC DSN or driver format: `"DSN=MyDSN;"` or `"Driver={MyDriver};Server=host;..."`.
-- A record where field names are connection string keys: `[Driver="SQL Server", Server="myserver", Database="mydb"]`.
+**Connection string formats**: The `connectionString` parameter accepts two forms:
+- A text DSN or driver string: `"DSN=MyDSN;"` to use a pre-configured System DSN, or `"Driver={DriverName};Server=host;Database=db;"` for a driver-based connection.
+- A record of key-value pairs: `[Driver="SQL Server", Server="myserver", Database="mydb"]`. Power Query assembles these into a connection string automatically.
 
-**Authentication**: ODBC credentials (username and password for database auth) are typically included in the connection string or prompted via the Power Query credentials dialog. Configure the `UID` and `PWD` parameters in the connection string, or use Windows auth where supported.
+**Authentication**: Database credentials (`UID` and `PWD`) can be embedded in the connection string for text-format connection strings, but this is not recommended for security reasons. Prefer configuring credentials in the Power Query data source credentials dialog, which securely stores them outside the M query. For Windows authentication, use `Trusted_Connection=yes` where supported by the driver.
 
-**Query folding**: Query folding capability depends on the ODBC driver. Drivers that support the full ODBC SQL grammar and report their capabilities correctly will enable folding. Use `Odbc.Query` for guaranteed direct SQL execution.
+**Driver requirements**: The ODBC driver for the target data source must be installed on the machine running Power Query. Since Power BI Desktop is a 64-bit application, you must install the 64-bit ODBC driver. For 32-bit Excel, install the 32-bit driver. Verify driver availability in Windows' ODBC Data Source Administrator (odbcad32.exe). Power BI Service does not support ODBC without an on-premises data gateway.
 
-**Driver requirement**: The appropriate ODBC driver for the target data source must be installed on the machine running Power Query. 32-bit and 64-bit driver compatibility matters — Power BI Desktop is 64-bit.
+**Query folding**: Folding capability depends on the individual ODBC driver. Drivers that correctly report their SQL grammar support via ODBC capabilities APIs will enable folding. If folding is not working as expected, use `Odbc.Query` to execute SQL directly and control what runs on the server.
 
 **Key options**:
-- `CreateNavigationProperties` (logical) — generate navigation properties from foreign keys if the driver supports it.
-- `HierarchicalNavigation` (logical) — group navigation by schema.
-- `HideNativeQuery` (logical) — prevent native SQL queries from being passed through (security).
-- `CommandTimeout` (duration) — query execution timeout.
-- `ConnectionTimeout` (duration) — connection establishment timeout.
-
-**Use cases**: Connecting to legacy databases (IBM DB2, Teradata, Sybase, Informix, etc.), third-party SaaS platforms with ODBC drivers, or any data source not covered by a built-in Power Query connector.
+- `CreateNavigationProperties` (logical) — generate navigation properties from foreign key constraints if the driver supports metadata queries.
+- `HierarchicalNavigation` (logical) — group the navigation table by schema name.
+- `HideNativeQuery` (logical) — prevents native SQL pass-through for security hardening.
+- `CommandTimeout` (duration) — maximum time to wait for a query to complete.
+- `ConnectionTimeout` (duration) — maximum time to wait when establishing the connection.
 
 ## Examples
 
-### Example 1: Connect using a DSN
+### Example 1: Connect using a pre-configured System DSN
 ```powerquery
 Odbc.DataSource("DSN=MyDataSource;")
 ```
 
-### Example 2: Connect using a full driver connection string
+### Example 2: Connect using a driver connection string
 ```powerquery
-Odbc.DataSource("Driver={PostgreSQL Unicode};Server=myserver;Port=5432;Database=analytics;UID=myuser;PWD=mypassword;")
+Odbc.DataSource("Driver={PostgreSQL Unicode};Server=myserver;Port=5432;Database=analytics;")
 ```
 
-### Example 3: Connect using a record (key-value pairs)
+### Example 3: Connect using a record of key-value pairs
 ```powerquery
 Odbc.DataSource([
-    Driver  = "SQL Server",
-    Server  = "myserver",
+    Driver   = "SQL Server",
+    Server   = "myserver",
     Database = "Northwind"
 ])
 ```
 
-### Example 4: Connect to IBM DB2 via ODBC
-```powerquery
-Odbc.DataSource("Driver={IBM DB2 ODBC DRIVER};Database=SAMPLE;Hostname=db2server;Port=50000;Protocol=TCPIP;UID=db2user;PWD=db2pass;")
-```
-
-### Example 5: Navigate to a specific table
+### Example 4: Navigate to a specific schema and table
 ```powerquery
 let
     Source = Odbc.DataSource("DSN=MyDB;"),

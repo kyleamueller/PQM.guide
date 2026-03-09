@@ -30,34 +30,64 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.RemoveLastN` removes rows from the bottom of the table. When passed a number, it removes that many rows from the end. When passed a function, it removes rows from the end of the table while the condition is true, working backwards from the last row.
+`Table.RemoveLastN` removes rows from the bottom of the table. When `countOrCondition` is a number, it removes exactly that many trailing rows. When it is a function (predicate), it removes rows from the end while the condition returns `true`, working backwards from the last row — stopping at the first row (from the end) that fails the condition and retaining everything above it.
 
-This is the counterpart to `Table.RemoveFirstN`.
+`Table.RemoveLastN` is the counterpart of `Table.RemoveFirstN`. The condition-based form is useful for stripping trailing metadata or footer rows from flat-file imports where the footer length may vary. Like `Table.RemoveFirstN`, this function does not fold to data sources.
+
+Be aware that when using a condition function, the function is evaluated from the bottom of the table upward. This means the condition sees rows in reverse order, and only a contiguous sequence of trailing rows that satisfy the predicate will be removed — not all rows globally matching the condition.
 
 ## Examples
 
-### Example 1: Remove the last 2 rows
+### Example 1: Remove the last 3 orders from the Sales table
 
 ```powerquery
-Table.RemoveLastN(
-    #table({"ID"}, {{1}, {2}, {3}, {4}}),
-    2
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Region"},
+        {{1,"Alice","Widget A","East"},{2,"Bob","Gadget B","West"},
+         {3,"Charlie","Widget C","East"},{4,"Alice","Gadget D","North"},
+         {5,"Diana","Widget A","West"},{6,"Bob","Thingamajig E","East"}}
+    )
+in
+    Table.RemoveLastN(Sales, 3)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"2"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"}]}
 -->
 
-### Example 2: Remove trailing rows where value exceeds 2
+### Example 2: Strip trailing summary rows from a report export
+
+Remove rows at the bottom that contain "Total" in the Product column.
 
 ```powerquery
-Table.RemoveLastN(
-    #table({"ID"}, {{1}, {2}, {3}, {4}}),
-    each [ID] > 2
-)
+let
+    Raw = #table(
+        {"OrderID","CustomerName","Product","Amount"},
+        {{1,"Alice","Widget A",100},{2,"Bob","Gadget B",200},{3,"Charlie","Widget C",150},
+         {null,null,"Total",450},{null,null,"Grand Total",450}}
+    )
+in
+    Table.RemoveLastN(Raw, each [Product] = "Total" or [Product] = "Grand Total")
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"2"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"}]}
+-->
+
+### Example 3: Remove trailing employees hired in 2024
+
+```powerquery
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, HireDate = date],
+        {{"E002","BOB JONES",#date(2019,7,1)},{"E005","Eve Martinez",#date(2018,11,5)},
+         {"E003","Charlie Brown",#date(2022,1,10)},{"E006","frank lee",#date(2024,2,14)}}
+    )
+in
+    Table.RemoveLastN(Employees, each Date.Year([HireDate]) = 2024)
+```
+
+<!--output
+{"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","HireDate":"2019-07-01"},{"EmployeeID":"E005","FullName":"Eve Martinez","HireDate":"2018-11-05"},{"EmployeeID":"E003","FullName":"Charlie Brown","HireDate":"2022-01-10"}]}
 -->

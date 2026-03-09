@@ -26,38 +26,64 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.PartitionValues` retrieves metadata about the partitions of a partitioned data source. Each row in the returned table corresponds to one partition and contains the partition key column values. This function is relevant for connectors that expose partitioned data, such as certain cloud data sources or Fabric lakehouses.
+`Table.PartitionValues` returns a table describing the available partitions of a partitioned data source. Each row in the result corresponds to one partition and contains the partition key column values. This function is specific to connectors that expose partition metadata — such as Azure Data Lake Storage, Microsoft Fabric Lakehouses, or certain OData sources — and is primarily used in advanced connector development and data exploration scenarios.
 
-This function is primarily used in advanced connector development and data source exploration scenarios.
+Unlike `Table.Partition` (which programmatically divides an arbitrary table into N hash-based buckets), `Table.PartitionValues` reads existing partition structure declared by the underlying data source. This distinction matters: `Table.PartitionValues` is a metadata query about the source, not a computation on in-memory data.
+
+A common use case is to enumerate available partitions and then load each one selectively rather than pulling all data at once. This can reduce data transfer when only specific partition ranges are needed (e.g., only year 2024 partitions from a multi-year lake table).
 
 ## Examples
 
-### Example 1: List partition values for a partitioned table
+### Example 1: List partition values from an Azure Data Lake table
 
 ```powerquery
 let
-    Source = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net"),
+    Source           = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net"),
     PartitionedTable = Source{[Name = "sales"]}[Data],
-    Partitions = Table.PartitionValues(PartitionedTable)
+    Partitions       = Table.PartitionValues(PartitionedTable)
 in
     Partitions
 ```
 
 <!--output
-{"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"}]}
+{"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"},{"Year":"2024","Month":"04"}]}
 -->
 
-### Example 2: Inspect partition metadata
+### Example 2: Inspect partition metadata from a Fabric Lakehouse
 
 ```powerquery
 let
-    Source = Lakehouse.Contents(null){[workspaceId = "...", lakehouseId = "..."]}[Data],
+    Source     = Lakehouse.Contents(null){[workspaceId = "my-workspace-id", lakehouseId = "my-lakehouse-id"]}[Data],
     SalesTable = Source{[Id = "sales", ItemKind = "Table"]}[Data],
-    PartitionInfo = Table.PartitionValues(SalesTable)
+    Partitions = Table.PartitionValues(SalesTable)
 in
-    PartitionInfo
+    Partitions
 ```
 
 <!--output
-{"columns":[{"name":"PartitionKey","type":"any"}],"rows":[{"PartitionKey":"2023"},{"PartitionKey":"2024"}]}
+{"columns":[{"name":"Year","type":"any"}],"rows":[{"Year":"2022"},{"Year":"2023"},{"Year":"2024"}]}
+-->
+
+### Example 3: Filter to load only recent partitions
+
+Enumerate partitions and then load only the ones matching the target year.
+
+```powerquery
+let
+    Source           = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net"),
+    PartitionedTable = Source{[Name = "sales"]}[Data],
+    Partitions       = Table.PartitionValues(PartitionedTable),
+    RecentPartitions = Table.SelectRows(Partitions, each [Year] = "2024"),
+    Data             = Table.Combine(
+                           List.Transform(
+                               Table.ToRows(RecentPartitions),
+                               each PartitionedTable{[Year = _{0}, Month = _{1}]}[Data]
+                           )
+                       )
+in
+    Data
+```
+
+<!--output
+{"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Returns all rows from 2024 partitions only, reducing data transfer from the lake."}]}
 -->

@@ -35,29 +35,31 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.SwitchZone` converts a `datetimezone` value to a new UTC offset while preserving the absolute point in time (the underlying UTC moment). The date and time components are adjusted accordingly. For example, switching `2024-03-15T14:30:00+05:00` to UTC+0 yields `2024-03-15T09:30:00+00:00`.
+`DateTimeZone.SwitchZone` converts a `datetimezone` value to a new UTC offset while preserving the absolute point in time (the underlying UTC moment). The date and time components are adjusted accordingly. For example, switching `2024-03-15T14:30:00+05:00` to UTC+0 yields `2024-03-15T09:30:00+00:00` — the same instant expressed in a different timezone.
 
-This differs from `DateTime.AddZone`, which merely tags a datetime with a new offset without adjusting the time. Use `timezoneMinutes` for non-whole-hour offsets such as UTC+5:30 (India) or UTC+9:30 (Australia Central).
+This is the key difference from `DateTime.AddZone`, which merely annotates a `datetime` with an offset without adjusting the time. Use `DateTimeZone.SwitchZone` when you need to convert between timezones (preserving the instant), and use `DateTime.AddZone` when you need to label a `datetime` that already represents local time in the target zone.
+
+Use the optional `timezoneMinutes` parameter for non-whole-hour offsets such as UTC+5:30 (India Standard Time), UTC+9:30 (Australian Central Standard Time), or UTC+5:45 (Nepal Time). A common normalization pattern is switching all datetimezone values to `+00:00` (UTC) for consistent storage and comparison, then switching to a display timezone on demand.
 
 ## Examples
 
-### Example 1: Convert event timestamps to UTC
+### Example 1: Normalize mixed timezone timestamps to UTC
 
-Switch all event times with mixed timezone offsets to UTC (+00:00).
-
-Input: `Events`
+Convert datetimezone values with different offsets to a common UTC reference.
 
 ```powerquery
-Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
-    "EventUTC",
-    each DateTimeZone.SwitchZone([EventTimeZone], 0),
-    type datetimezone
+#table(
+    type table [Original = datetimezone, AsUTC = datetimezone],
+    {
+        {#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0),  DateTimeZone.SwitchZone(#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0), 0)},
+        {#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0),   DateTimeZone.SwitchZone(#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0), 0)},
+        {#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30),  DateTimeZone.SwitchZone(#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30), 0)}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"EventUTC","type":"datetimezone"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","EventUTC":"2024-03-15T13:30:00+00:00"},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00+01:00","EventUTC":"2024-03-15T13:00:00+00:00"},{"EventID":3,"EventTimeZone":"2024-03-16T09:15:00+05:30","EventUTC":"2024-03-16T03:45:00+00:00"}]}
+{"columns":[{"name":"Original","type":"datetimezone"},{"name":"AsUTC","type":"datetimezone"}],"rows":[{"Original":"2024-03-15T08:30:00-05:00","AsUTC":"2024-03-15T13:30:00+00:00"},{"Original":"2024-03-15T14:00:00+01:00","AsUTC":"2024-03-15T13:00:00+00:00"},{"Original":"2024-03-16T09:15:00+05:30","AsUTC":"2024-03-16T03:45:00+00:00"}]}
 -->
 
 ### Example 2: Switch to a specific offset
@@ -74,4 +76,20 @@ Convert a New York time (UTC-5) to Tokyo time (UTC+9).
 
 <!--output
 {"columns":[{"name":"NewYork","type":"datetimezone"},{"name":"Tokyo","type":"datetimezone"}],"rows":[{"NewYork":"2024-03-15T09:00:00-05:00","Tokyo":"2024-03-15T23:00:00+09:00"}]}
+-->
+
+### Example 3: Switch to a half-hour offset (India Standard Time)
+
+Convert UTC to UTC+5:30 using the timezoneMinutes parameter.
+
+```powerquery
+#table(
+    type table [UTC = datetimezone, IST = datetimezone],
+    {{#datetimezone(2024, 3, 15, 8, 0, 0, 0, 0),
+      DateTimeZone.SwitchZone(#datetimezone(2024, 3, 15, 8, 0, 0, 0, 0), 5, 30)}}
+)
+```
+
+<!--output
+{"columns":[{"name":"UTC","type":"datetimezone"},{"name":"IST","type":"datetimezone"}],"rows":[{"UTC":"2024-03-15T08:00:00+00:00","IST":"2024-03-15T13:30:00+05:30"}]}
 -->

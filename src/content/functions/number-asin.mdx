@@ -26,13 +26,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Asin` is the inverse of `Number.Sin`. Given a value in [-1, 1], it returns the angle in radians whose sine equals that value. The result is in the range [-π/2, π/2].
+`Number.Asin` is the inverse of `Number.Sin`. Given a sine value in [-1, 1], it returns the angle in **radians** whose sine equals that value. The result is in the range [-π/2, π/2] (−90 to 90 degrees). All trigonometric functions in Power Query M work in radians, not degrees.
 
-Input values outside [-1, 1] return `NaN`. To convert the result from radians to degrees, multiply by `180 / Number.PI`.
+Input values outside [-1, 1] return `NaN` rather than raising an error. Validate inputs when working with computed values that might drift slightly outside [-1, 1] due to floating-point arithmetic — for example, clamp inputs using `Number.Max(-1, Number.Min(1, value))` before calling `Number.Asin`.
+
+To convert the radian result to degrees, multiply by `180 / Number.PI`. `Number.Asin` is the principal value (restricted to [-π/2, π/2]), which means it only unambiguously recovers angles in the first and fourth quadrants. For angles in all four quadrants, use `Number.Atan2`.
 
 ## Examples
 
-### Example 1: Arcsine of 1 (90 degrees)
+### Example 1: Arcsine of 1 returns π/2 radians (90 degrees)
 
 ```powerquery
 Number.Asin(1)
@@ -42,7 +44,7 @@ Number.Asin(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.5707963267948966}]}
 -->
 
-### Example 2: Arcsine of 0.5 (30 degrees)
+### Example 2: Convert result to degrees — arcsine of 0.5 is 30 degrees
 
 ```powerquery
 Number.Asin(0.5) * 180 / Number.PI
@@ -52,7 +54,7 @@ Number.Asin(0.5) * 180 / Number.PI
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
 -->
 
-### Example 3: Arcsine of 0
+### Example 3: Arcsine of 0 returns 0 radians
 
 ```powerquery
 Number.Asin(0)

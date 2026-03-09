@@ -28,14 +28,14 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Single` asserts that a list contains exactly one element and returns it. If the list is empty or contains more than one element, an error is thrown.
+`List.Single` asserts that a list contains exactly one element and returns it as a scalar value. If the list is empty or contains more than one element, it throws an error. This makes it a strict validation tool — use it when having zero or multiple results indicates a data problem that should be surfaced immediately rather than silently ignored.
 
-This function is used when you expect exactly one result and want to fail loudly if that expectation is violated — for example, when doing a lookup that should match exactly one row.
+The typical use case is extracting a value from a lookup that is expected to match exactly one row. For example, after filtering a table by a unique key and extracting a column as a list, `List.Single` both validates the match count and returns the value in one step.
 
-- Use `List.SingleOrDefault` if you want to handle the case of an empty list without an error.
 - An empty list throws: `Expression.Error: There were too few elements in the enumeration.`
-- A list with more than one element throws: `Expression.Error: There were too many elements in the enumeration.`
-- To suppress the error for empty lists, use `List.SingleOrDefault`.
+- More than one element throws: `Expression.Error: There were too many elements in the enumeration.`
+- Use `List.SingleOrDefault` if an empty list should return `null` (or a custom default) rather than an error.
+- Use `List.First` if multiple results are acceptable and you only want the first.
 
 ## Examples
 

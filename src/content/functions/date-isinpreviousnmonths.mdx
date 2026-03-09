@@ -33,13 +33,17 @@ relatedFunctions:
 
 `Date.IsInPreviousNMonths` returns `true` if the input date falls within the N complete calendar months preceding the current month. The current month itself is not included; use `Date.IsInCurrentMonth` to also match the current month. The function is re-evaluated on each query refresh.
 
-For example, if today is in March and `months = 3`, it matches any date in December, January, or February.
+For example, if today is in March and `months = 3`, it matches any date in December, January, or February. This function counts whole calendar months — it is not a rolling 30-day window. For a rolling day-based lookback, use `Date.IsInPreviousNDays` with an appropriate number of days.
+
+Use this function for rolling period analysis in financial or sales reporting, such as comparing the trailing 3 months or trailing 12 months against a benchmark period.
 
 ## Examples
 
 ### Example 1: Filter orders from the previous 3 months
 
-Keep only rows where OrderDate falls within the previous 3 calendar months.
+Keep only rows where OrderDate falls within the previous 3 complete calendar months.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -54,7 +58,9 @@ Table.SelectRows(
 
 ### Example 2: Flag orders from the past 6 months
 
-Add a boolean column identifying orders from the previous 6 months.
+Add a boolean column identifying orders from the previous 6 calendar months.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
@@ -65,4 +71,21 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"PreviousSixMonths","type":"logical"}],"rows":[{"OrderID":30,"OrderDate":"2025-08-15","PreviousSixMonths":false},{"OrderID":35,"OrderDate":"2025-12-10","PreviousSixMonths":true},{"OrderID":42,"OrderDate":"2026-03-08","PreviousSixMonths":false}]}
+-->
+
+### Example 3: Combine prior 3 months and current month for a trailing-4-month view
+
+Include the current month plus the previous 3 months in a single filter.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentMonth([OrderDate]) or Date.IsInPreviousNMonths([OrderDate], 3)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":35,"CustomerName":"Diana","OrderDate":"2025-12-10"},{"OrderID":37,"CustomerName":"Bob","OrderDate":"2026-01-20"},{"OrderID":39,"CustomerName":"Charlie","OrderDate":"2026-02-25"},{"OrderID":42,"CustomerName":"Alice","OrderDate":"2026-03-08"}]}
 -->

@@ -30,34 +30,68 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Split` divides a table into a list of evenly sized sub-tables (pages). The last page may have fewer rows than `pageSize` if the total row count is not evenly divisible. This is useful for implementing pagination or for processing large tables in smaller chunks.
+`Table.Split` divides a table into a list of evenly sized sub-tables (pages), each containing at most `pageSize` rows. The last page may have fewer rows if the total row count is not evenly divisible by `pageSize`. Rows are assigned to pages in their original order, making this a sequential, non-overlapping split.
+
+`Table.Split` is useful for implementing pagination in API calls (e.g., splitting a large request payload into batches of 500 rows), chunking datasets for parallel processing, or breaking a large table into manageable segments for export. It differs from `Table.Partition`, which distributes rows by hashing a column value into N buckets regardless of order.
+
+Access individual pages by index: `Pages{0}` for the first page, `Pages{1}` for the second, and so on. To iterate all pages, use `List.Transform(Pages, each ...)`. To reassemble, use `Table.Combine(Pages)`.
 
 ## Examples
 
-### Example 1: Split a 6-row table into pages of 2
-
-```powerquery
-Table.Split(
-    #table({"ID"}, {{1}, {2}, {3}, {4}, {5}, {6}}),
-    2
-)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Table], [Table], [Table]}"}]}
--->
-
-### Example 2: Access the second page
+### Example 1: Split 8 Sales rows into pages of 3
 
 ```powerquery
 let
-    Source = #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
-    Pages  = Table.Split(Source, 2),
-    Page2  = Pages{1}
+    Sales = #table(
+        {"OrderID","CustomerName","Product","Region"},
+        {{1,"Alice","Widget A","East"},{2,"Bob","Gadget B","West"},{3,"Charlie","Widget C","East"},
+         {4,"Alice","Gadget D","North"},{5,"Diana","Widget A","West"},{6,"Bob","Thingamajig E","East"},
+         {7,"Charlie","Gadget B","West"},{8,"Diana","Widget C","North"}}
+    ),
+    Pages = Table.Split(Sales, 3)
 in
-    Page2
+    List.Count(Pages)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"3"},{"ID":"4"}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
+-->
+
+### Example 2: Access a specific page from the split
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID","CustomerName","Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Charlie","Widget C"},
+         {4,"Alice","Gadget D"},{5,"Diana","Widget A"},{6,"Bob","Thingamajig E"},
+         {7,"Charlie","Gadget B"},{8,"Diana","Widget C"}}
+    ),
+    Pages = Table.Split(Sales, 3)
+in
+    Pages{1}
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E"}]}
+-->
+
+### Example 3: Process each page and count rows per page
+
+Use `List.Transform` to apply an operation to each page.
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID","CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Charlie"},{4,"Alice"},{5,"Diana"},{6,"Bob"},{7,"Charlie"},{8,"Diana"}}
+    ),
+    Pages     = Table.Split(Sales, 3),
+    PageSizes = List.Transform(Pages, Table.RowCount)
+in
+    PageSizes
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{3, 3, 2}"}]}
 -->

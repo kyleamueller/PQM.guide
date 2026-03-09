@@ -26,17 +26,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Sinh` returns the hyperbolic sine, defined as:
+`Number.Sinh` returns the hyperbolic sine, defined mathematically as:
 
 sinh(x) = (e^x − e^(−x)) / 2
 
-Unlike the circular sine, hyperbolic sine is unbounded — it increases without limit as x grows. `Number.Sinh(0)` returns `0`. The function is an odd function: `sinh(−x) = −sinh(x)`.
+Unlike the circular sine function (which is bounded between -1 and 1), the hyperbolic sine is **unbounded** — it grows without limit as x increases. At x = 0, the result is 0, and for large positive x the result approaches e^x / 2.
 
-Hyperbolic functions appear in physics (catenary curves, special relativity), engineering, and certain statistical distributions.
+The function is **odd**: `sinh(−x) = −sinh(x)`, meaning it is antisymmetric about the origin. Hyperbolic functions do not take radians or degrees as input — they accept any real number.
+
+Hyperbolic sine appears in physics (catenary curves, special relativity's rapidity), certain probability distributions, and engineering calculations. Together with `Number.Cosh`, it satisfies the fundamental identity `cosh²(x) − sinh²(x) = 1`. In everyday Power Query data transformation work, `Number.Sinh` is rarely needed.
 
 ## Examples
 
-### Example 1: Hyperbolic sine of 0
+### Example 1: Hyperbolic sine of 0 returns 0
 
 ```powerquery
 Number.Sinh(0)
@@ -56,11 +58,11 @@ Number.Sinh(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.1752011936438014}]}
 -->
 
-### Example 3: Verify odd symmetry
+### Example 3: Verify odd symmetry — sinh(x) = -sinh(-x)
 
 ```powerquery
 #table(
-    {"x", "sinh(x)", "sinh(-x)", "Equal"},
+    {"x", "sinh(x)", "sinh(-x)", "IsOdd"},
     {
         {2, Number.Sinh(2), Number.Sinh(-2), Number.Sinh(2) = -Number.Sinh(-2)}
     }
@@ -68,5 +70,5 @@ Number.Sinh(1)
 ```
 
 <!--output
-{"columns":[{"name":"x","type":"number"},{"name":"sinh(x)","type":"number"},{"name":"sinh(-x)","type":"number"},{"name":"Equal","type":"logical"}],"rows":[{"x":2,"sinh(x)":3.6268604078470186,"sinh(-x)":-3.6268604078470186,"Equal":true}]}
+{"columns":[{"name":"x","type":"number"},{"name":"sinh(x)","type":"number"},{"name":"sinh(-x)","type":"number"},{"name":"IsOdd","type":"logical"}],"rows":[{"x":2,"sinh(x)":3.6268604078470186,"sinh(-x)":-3.6268604078470186,"IsOdd":true}]}
 -->

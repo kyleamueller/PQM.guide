@@ -35,12 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.DateTimeZones` generates a sequence of `datetimezone` values, which include both a datetime and a UTC offset. This is useful when working with timezone-aware time series data.
+`List.DateTimeZones` generates a sequence of `datetimezone` values — each carrying both a datetime and a UTC offset. This is the right choice when your data sources or reporting requirements are timezone-aware, such as when ingesting API data stamped with timezone offsets.
 
-- The `step` parameter uses `#duration(days, hours, minutes, seconds)` to specify the interval.
-- The timezone offset from `start` is preserved in all generated values.
-- Use `DateTimeZone.ToLocal` or `DateTimeZone.ToUtc` to convert the generated values if needed.
-- `count` must be a non-negative integer; 0 returns an empty list.
+The timezone offset from the `start` value is preserved in all generated values; the offset does not change across the sequence. Use `DateTimeZone.ToLocal` or `DateTimeZone.ToUtc` to convert individual values, or apply these functions via `List.Transform` to convert the entire sequence.
+
+The `step` parameter uses `#duration(days, hours, minutes, seconds)` syntax. A `count` of 0 returns an empty list. Prefer `List.DateTimes` if timezone information is not needed, as `datetimezone` values carry additional overhead and may require conversion before use in DAX or other downstream tools that do not support the type natively.
 
 ## Examples
 
@@ -62,4 +61,25 @@ List.DateTimeZones(#datetimezone(2024, 6, 1, 0, 0, 0, 0, 0), 5, #duration(1, 0, 
 
 <!--output
 {"columns":[{"name":"Result","type":"datetimezone"}],"rows":[{"Result":"2024-06-01 00:00:00 +00:00"},{"Result":"2024-06-02 00:00:00 +00:00"},{"Result":"2024-06-03 00:00:00 +00:00"},{"Result":"2024-06-04 00:00:00 +00:00"},{"Result":"2024-06-05 00:00:00 +00:00"}]}
+-->
+
+### Example 3: Convert a generated sequence to UTC
+
+Generate timezone-aware datetimes for US Eastern time (UTC-5) and convert each to UTC.
+
+```powerquery
+let
+    EasternTimes = List.DateTimeZones(
+        #datetimezone(2024, 3, 1, 9, 0, 0, -5, 0),
+        3,
+        #duration(1, 0, 0, 0)
+    ),
+    AsUtc = List.Transform(EasternTimes, DateTimeZone.ToUtc),
+    AsTable = Table.FromList(AsUtc, Splitter.SplitByNothing(), {"UTC Timestamp"})
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"UTC Timestamp","type":"datetimezone"}],"rows":[{"UTC Timestamp":"2024-03-01 14:00:00 +00:00"},{"UTC Timestamp":"2024-03-02 14:00:00 +00:00"},{"UTC Timestamp":"2024-03-03 14:00:00 +00:00"}]}
 -->

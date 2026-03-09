@@ -31,50 +31,55 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.Start` extracts a substring from the beginning of a text value. It returns the first `count` characters of `text`.
+`Text.Start` extracts a substring from the beginning of a text value, returning the first `count` characters. It is the left-side counterpart to `Text.End`, and together they cover the most common fixed-length extraction patterns from the edges of a string.
 
-If `text` is `null`, the function returns `null`. If `count` is greater than the length of `text`, the entire text is returned without error. If `count` is 0, an empty text string `""` is returned.
+If `text` is `null`, the function returns `null`. If `count` is greater than the length of `text`, the entire text is returned without error — there is no out-of-bounds exception. If `count` is 0, an empty string `""` is returned.
 
-This function is commonly used to extract prefixes, abbreviations, or fixed-width fields from the left side of a string.
+Use `Text.Start` when the prefix has a known, fixed length. When the prefix is delimited by a separator character at a variable position, use `Text.BeforeDelimiter` instead — it is more robust when the delimiter position changes across rows. For extracting from the middle of a string, use `Text.Middle` or `Text.Range`.
+
+`Text.Start(text, n)` is exactly equivalent to `Text.Range(text, 0, n)` and `Text.Middle(text, 0, n)`, but `Text.Start` expresses intent more clearly when extracting a prefix.
 
 ## Examples
 
-### Example 1: Get the first five characters of a string
+### Example 1: Extract a fixed-length prefix from an employee ID
 
 ```powerquery
-Text.Start("Hello World", 5)
+Text.Start("E001", 1)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"E"}]}
 -->
 
-### Example 2: Extract a country code prefix
+### Example 2: Extract the year from a hire date stored as text
 
 ```powerquery
-Text.Start("US-12345", 2)
+Text.Start("2021-03-15", 4)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2021"}]}
 -->
 
-### Example 3: Handle null input
+### Example 3: Truncate long department names to a maximum length
 
 ```powerquery
-Text.Start(null, 3)
+Table.TransformColumns(
+    #table({"Department"}, {{"Sales"}, {"Engineering"}, {"Marketing"}}),
+    {{"Department", each Text.Start(_, 7), type text}}
+)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+{"columns":[{"name":"Department","type":"text"}],"rows":[{"Department":"Sales"},{"Department":"Enginee"},{"Department":"Marketi"}]}
 -->
 
-### Example 4: Count exceeds text length
+### Example 4: Count exceeds text length — entire text returned
 
 ```powerquery
-Text.Start("Hi", 10)
+Text.Start("East", 10)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hi"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"East"}]}
 -->

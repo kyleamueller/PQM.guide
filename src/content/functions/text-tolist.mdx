@@ -29,50 +29,58 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.ToList` splits a text string into a list where each element is a single character from the original string. The order of characters is preserved.
+`Text.ToList` splits a text value into a list of single-character elements, preserving the original order. It is the standard way to perform character-level operations in Power Query — iterating over every character in a string using list functions.
 
-This is functionally equivalent to `Text.Split` with a one-character delimiter that never appears in the text, but is cleaner for character-level operations. The resulting list can be transformed using standard list functions such as `List.Select`, `List.Transform`, and `List.Accumulate`.
+The resulting list can be processed with any list function: `List.Select` to filter characters, `List.Transform` to map over them (e.g., with `Character.ToNumber`), `List.Count` to count occurrences, or `List.Accumulate` for stateful processing. To reconstruct text from the list, use `Text.Combine`.
 
-Common uses include character frequency counting, custom filtering, character-by-character transformation, or building lookup structures over individual characters.
+`Text.ToList` is more expressive than `Text.Split` for character-level work because it makes the intent clear and does not require a separator argument. It is equivalent to `Text.Split` only when using a delimiter that never appears in the string.
+
+Note that `Text.ToList` operates on Unicode code units, not grapheme clusters. Characters that consist of multiple code units (such as certain emoji or composed diacritics) may appear as multiple list entries.
 
 ## Examples
 
-### Example 1: Convert a word to a list of characters
+### Example 1: Split a string into individual characters
 
 ```powerquery
-Text.ToList("Hello")
+Text.ToList("E001")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["H","e","l","l","o"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["E","0","0","1"]}]}
 -->
 
-### Example 2: Count how many times a character appears
+### Example 2: Count occurrences of a character
+
+Count how many digits appear in a mixed alphanumeric string by converting each character to its code point.
 
 ```powerquery
-List.Count(List.Select(Text.ToList("Mississippi"), each _ = "s"))
+let
+    chars = Text.ToList("alice smith"),
+    spaces = List.Select(chars, each _ = " ")
+in
+    List.Count(spaces)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":4}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 3: Get unique characters in a string
+### Example 3: Get distinct characters in a string
 
 ```powerquery
-List.Distinct(Text.ToList("banana"))
+List.Distinct(Text.ToList("Engineering"))
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["b","a","n"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["E","n","g","i","e","r","i","n","g"]}]}
 -->
 
-### Example 4: Rebuild text after transforming characters
+### Example 4: Transform and rebuild — uppercase each character individually
 
 ```powerquery
-Text.Combine(List.Transform(Text.ToList("hello"), Text.Upper))
+Text.Combine(List.Transform(Text.ToList("alice"), Text.Upper))
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HELLO"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"ALICE"}]}
 -->

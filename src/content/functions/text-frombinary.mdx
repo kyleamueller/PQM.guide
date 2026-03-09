@@ -30,31 +30,23 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.FromBinary` decodes a binary value into a text string using the specified character encoding. This is the inverse of `Text.ToBinary`.
+`Text.FromBinary` decodes a binary value into a text string using the specified character encoding. This is the inverse of `Text.ToBinary`. If no encoding is specified, `TextEncoding.Utf8` (65001) is used by default, which is correct for most modern data sources.
 
 The `encoding` parameter accepts values from the `TextEncoding` enum:
-- `TextEncoding.Utf8` (65001) — default
-- `TextEncoding.Ascii` (20127)
-- `TextEncoding.Unicode` / `TextEncoding.Utf16` (1200)
-- `TextEncoding.Utf16BE` (1201)
+- `TextEncoding.Utf8` (65001) — default; correct for most APIs and modern files
+- `TextEncoding.Ascii` (20127) — 7-bit ASCII only; safe for codes and identifiers
+- `TextEncoding.Unicode` / `TextEncoding.Utf16` (1200) — little-endian UTF-16
+- `TextEncoding.Utf16BE` (1201) — big-endian UTF-16
 - `TextEncoding.Utf32` (12000)
-- `TextEncoding.Windows` (1252)
+- `TextEncoding.Windows` (1252) — legacy Windows Western European encoding
 
-Common uses include decoding base64-decoded binary payloads (e.g., from web APIs), reading binary file content as text, or processing encoded data returned by connectors.
+Always specify the encoding explicitly when working with binary data from legacy systems or files that may not be UTF-8. Using the wrong encoding will produce garbled output without raising an error, because the bytes are valid but misinterpreted. If you receive binary from a REST API, UTF-8 is almost always correct. For older CSV or text files from Windows systems, `TextEncoding.Windows` (1252) may be needed.
+
+`Text.FromBinary` is commonly used after `Binary.FromText` decodes a base64 payload, or when reading raw binary file content that needs to be treated as text before parsing.
 
 ## Examples
 
-### Example 1: Decode UTF-8 binary to text
-
-```powerquery
-Text.FromBinary(Text.ToBinary("Hello World", TextEncoding.Utf8), TextEncoding.Utf8)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
--->
-
-### Example 2: Decode a binary value using the default encoding
+### Example 1: Decode a base64 payload from a web API response
 
 ```powerquery
 Text.FromBinary(Binary.FromText("SGVsbG8gV29ybGQ=", BinaryEncoding.Base64))
@@ -64,12 +56,34 @@ Text.FromBinary(Binary.FromText("SGVsbG8gV29ybGQ=", BinaryEncoding.Base64))
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello World"}]}
 -->
 
-### Example 3: Decode ASCII-encoded binary
+### Example 2: Round-trip encode and decode with explicit encoding
+
+Always specify the same encoding on both sides of a round-trip to guarantee correct results.
 
 ```powerquery
-Text.FromBinary(Text.ToBinary("Power Query", TextEncoding.Ascii), TextEncoding.Ascii)
+let
+    original = "Alice Smith",
+    encoded = Text.ToBinary(original, TextEncoding.Utf8),
+    decoded = Text.FromBinary(encoded, TextEncoding.Utf8)
+in
+    decoded
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Power Query"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice Smith"}]}
+-->
+
+### Example 3: Decode a Windows-1252 encoded binary file
+
+Legacy CSV files exported from Windows applications often use Windows-1252 encoding. Specifying the wrong encoding silently corrupts special characters.
+
+```powerquery
+Text.FromBinary(
+    Text.ToBinary("Ren\u00e9e Dupont", TextEncoding.Windows),
+    TextEncoding.Windows
+)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Renée Dupont"}]}
 -->

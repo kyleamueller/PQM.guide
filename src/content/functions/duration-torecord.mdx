@@ -29,21 +29,25 @@ relatedFunctions:
 
 ## Remarks
 
-`Duration.ToRecord` decomposes a `duration` value into a record with four numeric fields: `Days`, `Hours`, `Minutes`, and `Seconds`. Each field represents the corresponding component of the duration (not cumulative totals). For example, a duration of 1 day and 2.5 hours returns `[Days=1, Hours=2, Minutes=30, Seconds=0]`. Use `Table.ExpandRecordColumn` to expand the record into separate table columns.
+`Duration.ToRecord` decomposes a `duration` value into a record with four numeric fields: `Days`, `Hours`, `Minutes`, and `Seconds`. Each field represents only its own component of the duration, not a cumulative total. For example, a duration of 1 day and 2.5 hours returns `[Days=1, Hours=2, Minutes=30, Seconds=0]`, not `[Hours=26, ...]`. Use `Table.ExpandRecordColumn` to expand the resulting record into separate table columns.
+
+This is distinct from the `Duration.Total*` functions (`Duration.TotalHours`, `Duration.TotalMinutes`, `Duration.TotalSeconds`), which return the entire duration expressed as a single fractional number in the specified unit. Use `Duration.ToRecord` when you need a breakdown of components for display or formatting; use `Duration.Total*` when you need a numeric value for arithmetic or comparison.
+
+Field names in the returned record are always `Days`, `Hours`, `Minutes`, and `Seconds` (capitalized), which you must reference exactly when expanding with `Table.ExpandRecordColumn`.
 
 ## Examples
 
 ### Example 1: Expand duration components into separate columns
 
-Decompose duration values in the Logs table into Days, Hours, Minutes, Seconds columns.
+Decompose duration values in OrderLog into Days, Hours, Minutes, Seconds columns.
 
-Input: `Logs`
+Input: `OrderLog`
 
 ```powerquery
 Table.ExpandRecordColumn(
     Table.AddColumn(
         Table.SelectColumns(
-            Table.SelectRows(Logs, each [DurationMinutes] <> null),
+            Table.SelectRows(OrderLog, each [DurationMinutes] <> null),
             {"LogID", "DurationMinutes"}
         ),
         "Parts",
@@ -55,7 +59,7 @@ Table.ExpandRecordColumn(
 ```
 
 <!--output
-{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Days","type":"number"},{"name":"Hours","type":"number"},{"name":"Minutes","type":"number"},{"name":"Seconds","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Days":1,"Hours":4,"Minutes":45,"Seconds":0},{"LogID":"L004","DurationMinutes":2745,"Days":1,"Hours":21,"Minutes":45,"Seconds":0}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"Days","type":"number"},{"name":"Hours","type":"number"},{"name":"Minutes","type":"number"},{"name":"Seconds","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"Days":1,"Hours":4,"Minutes":45,"Seconds":0},{"LogID":"L004","DurationMinutes":2745,"Days":1,"Hours":21,"Minutes":45,"Seconds":0},{"LogID":"L006","DurationMinutes":1065,"Days":0,"Hours":17,"Minutes":45,"Seconds":0},{"LogID":"L008","DurationMinutes":2670,"Days":1,"Hours":20,"Minutes":30,"Seconds":0}]}
 -->
 
 ### Example 2: Decompose a specific duration
@@ -68,4 +72,28 @@ Duration.ToRecord(#duration(3, 5, 30, 0))
 
 <!--output
 {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Days","Value":3},{"Field":"Hours","Value":5},{"Field":"Minutes","Value":30},{"Field":"Seconds","Value":0}]}
+-->
+
+### Example 3: Build a human-readable duration label from record fields
+
+Use the record inline to format a "Xd Xh Xm" display string.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.SelectRows(OrderLog, each [DurationMinutes] <> null),
+        {"LogID", "DurationMinutes"}
+    ),
+    "DurationLabel",
+    each
+        let r = Duration.ToRecord(#duration(0, 0, [DurationMinutes], 0))
+        in Text.From(r[Days]) & "d " & Text.From(r[Hours]) & "h " & Text.From(r[Minutes]) & "m",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"DurationLabel","type":"text"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"DurationLabel":"1d 4h 45m"},{"LogID":"L004","DurationMinutes":2745,"DurationLabel":"1d 21h 45m"},{"LogID":"L006","DurationMinutes":1065,"DurationLabel":"0d 17h 45m"},{"LogID":"L008","DurationMinutes":2670,"DurationLabel":"1d 20h 30m"}]}
 -->

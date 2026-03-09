@@ -30,7 +30,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.WeekOfMonth` returns the week number within the month, starting from 1. The `firstDayOfWeek` parameter controls which day starts a new week (default Sunday). Week 1 contains the first day of the month; partial weeks at month boundaries are still counted. If the input is `null`, the function returns `null`.
+`Date.WeekOfMonth` returns the week number within the calendar month, starting from 1. Week 1 is always the week that contains the first day of the month. Partial weeks at the start and end of the month count as full weeks — so the first day of the month always falls in week 1, and the last day may fall in week 4, 5, or (rarely) 6. If the input is `null`, the function returns `null`.
+
+The optional `firstDayOfWeek` parameter determines which day begins a new week. The default is `Day.Sunday` (0). Use `Day.Monday` (1) for ISO-style Monday-to-Sunday weeks. Always use the `Day.*` enum constants rather than integer literals to keep your code self-documenting.
+
+`Date.WeekOfMonth` is most useful for weekly bucketing within a month — for example, grouping orders by "Week 1 of Jan", "Week 2 of Jan", and so on. Combine with `Date.Year` and `Date.Month` to build a full weekly period label. For week numbers within the year, use `Date.WeekOfYear` instead.
 
 ## Examples
 
@@ -46,7 +50,7 @@ Table.AddColumn(
         Table.FirstN(Sales, 5),
         {"OrderID", "OrderDate"}
     ),
-    "WeekOfMonth", each Date.WeekOfMonth([OrderDate]), Int64.Type
+    "WeekOfMonth", each Date.WeekOfMonth([OrderDate], Day.Sunday), Int64.Type
 )
 ```
 
@@ -67,4 +71,26 @@ Return the week-of-month for March 15, 2024 with Monday as the first day.
 
 <!--output
 {"columns":[{"name":"Date","type":"date"},{"name":"WeekOfMonth","type":"number"}],"rows":[{"Date":"2024-03-15","WeekOfMonth":3}]}
+-->
+
+### Example 3: Build a weekly period label within the month
+
+Create a label like "2024-Jan W3" to use as a report grouping key.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "OrderDate"}),
+    "WeekLabel",
+    each
+        Text.From(Date.Year([OrderDate])) & "-"
+        & Date.ToText([OrderDate], [Format="MMM", Culture="en-US"]) & " W"
+        & Text.From(Date.WeekOfMonth([OrderDate], Day.Sunday)),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"WeekLabel","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","WeekLabel":"2024-Jan W3"},{"OrderID":2,"OrderDate":"2024-01-18","WeekLabel":"2024-Jan W3"},{"OrderID":3,"OrderDate":"2024-02-01","WeekLabel":"2024-Feb W1"},{"OrderID":4,"OrderDate":"2024-02-10","WeekLabel":"2024-Feb W2"},{"OrderID":5,"OrderDate":"2024-03-05","WeekLabel":"2024-Mar W1"}]}
 -->

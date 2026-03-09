@@ -33,7 +33,9 @@ relatedFunctions:
 
 `Date.AddQuarters` adds or subtracts a number of quarters (3-month periods) from a `date`, `datetime`, or `datetimezone` value. One quarter equals three months, so `Date.AddQuarters(d, 1)` is equivalent to `Date.AddMonths(d, 3)`. Passing a negative `numberOfQuarters` subtracts quarters. The return type matches the input type.
 
-End-of-month clamping applies: if the resulting month has fewer days than the input day, the result is clamped to the last day of that month (e.g., adding one quarter to January 31 gives April 30).
+End-of-month clamping applies: if the resulting month has fewer days than the input day, the result is clamped to the last day of that month. For example, adding one quarter to January 31 gives April 30, because April has only 30 days. This is the same behavior as `Date.AddMonths`.
+
+`Date.AddQuarters` is most useful when working with fiscal or calendar quarter logic — for example, computing quarter-end deadlines, rolling forward subscription periods by quarter, or building prior-quarter comparison columns. For shifting by individual months, use `Date.AddMonths` directly, which is slightly more explicit about the unit.
 
 ## Examples
 
@@ -70,4 +72,23 @@ Find the date two quarters before a reference date.
 
 <!--output
 {"columns":[{"name":"ReferenceDate","type":"date"},{"name":"TwoQuartersBack","type":"date"}],"rows":[{"ReferenceDate":"2024-09-30","TwoQuartersBack":"2024-03-30"}]}
+-->
+
+### Example 3: Demonstrate end-of-month clamping behavior
+
+Adding one quarter to January 31 clamps to April 30 because April has only 30 days.
+
+```powerquery
+#table(
+    type table [InputDate = date, PlusOneQuarter = date],
+    {
+        {#date(2024, 1, 31), Date.AddQuarters(#date(2024, 1, 31), 1)},
+        {#date(2024, 3, 31), Date.AddQuarters(#date(2024, 3, 31), 1)},
+        {#date(2024, 5, 31), Date.AddQuarters(#date(2024, 5, 31), 1)}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"InputDate","type":"date"},{"name":"PlusOneQuarter","type":"date"}],"rows":[{"InputDate":"2024-01-31","PlusOneQuarter":"2024-04-30"},{"InputDate":"2024-03-31","PlusOneQuarter":"2024-06-30"},{"InputDate":"2024-05-31","PlusOneQuarter":"2024-08-31"}]}
 -->

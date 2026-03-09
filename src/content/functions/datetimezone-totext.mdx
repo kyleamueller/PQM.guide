@@ -31,44 +31,66 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.ToText` formats a `datetimezone` value as a text string. Without options, it produces an ISO 8601 string including the UTC offset (e.g., `"2024-03-15T14:30:00+05:30"`). Use the `Format` field in the options record to apply a custom pattern; the format specifier `zzz` produces the offset in `±HH:mm` notation. Format strings follow .NET custom datetime format conventions.
+`DateTimeZone.ToText` formats a `datetimezone` value as a text string. Without options, it produces an ISO 8601 string including the UTC offset such as `"2024-03-15T14:30:00+05:30"`. Use the `Format` field in the options record to apply a custom pattern; the format specifier `zzz` produces the offset in `±HH:mm` notation. Format strings follow .NET custom datetime format conventions.
 
-If the input is `null`, the function returns `null`.
+Always specify `Culture` when using locale-sensitive specifiers such as `MMMM` (full month name) or `dddd` (full day name). Without an explicit `Culture`, output depends on the host machine's locale setting, which can differ between Power BI Desktop and Power BI Service cloud refresh. Use `"en-US"` as a consistent default for English output.
+
+If the input is `null`, the function returns `null`. To format a `datetime` without timezone information, use `DateTime.ToText`. To format a `date`-only value, use `Date.ToText`.
 
 ## Examples
 
 ### Example 1: Format datetimezone values as ISO 8601 strings
 
-Convert datetimezone event timestamps to text for export or display.
-
-Input: `Events`
+Convert datetimezone timestamps to ISO 8601 text including the UTC offset.
 
 ```powerquery
-Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
-    "EventText",
-    each DateTimeZone.ToText([EventTimeZone], [Format="yyyy-MM-ddTHH:mm:sszzz"]),
-    type text
+#table(
+    type table [DTZ = datetimezone, AsText = text],
+    {
+        {#datetimezone(2024, 1, 15, 9, 30, 0, -5, 0),
+         DateTimeZone.ToText(#datetimezone(2024, 1, 15, 9, 30, 0, -5, 0), [Format="yyyy-MM-ddTHH:mm:sszzz", Culture="en-US"])},
+        {#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0),
+         DateTimeZone.ToText(#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0), [Format="yyyy-MM-ddTHH:mm:sszzz", Culture="en-US"])}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"EventText","type":"text"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","EventText":"2024-03-15T08:30:00-05:00"},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00+01:00","EventText":"2024-03-15T14:00:00+01:00"}]}
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"AsText","type":"text"}],"rows":[{"DTZ":"2024-01-15T09:30:00-05:00","AsText":"2024-01-15T09:30:00-05:00"},{"DTZ":"2024-03-15T14:00:00+01:00","AsText":"2024-03-15T14:00:00+01:00"}]}
 -->
 
-### Example 2: Format a datetimezone with a custom pattern
+### Example 2: Format with a human-readable pattern including offset
 
-Format a literal datetimezone value with a human-readable pattern.
+Format a datetimezone value with full month name, 12-hour time, and timezone offset.
 
 ```powerquery
 #table(
     type table [DTZ = datetimezone, Formatted = text],
     {{#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30),
       DateTimeZone.ToText(#datetimezone(2024, 3, 15, 14, 30, 0, 5, 30),
-        [Format="MMMM d, yyyy h:mm tt (zzz)"])}}
+        [Format="MMMM d, yyyy h:mm tt (zzz)", Culture="en-US"])}}
 )
 ```
 
 <!--output
 {"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"Formatted","type":"text"}],"rows":[{"DTZ":"2024-03-15T14:30:00+05:30","Formatted":"March 15, 2024 2:30 PM (+05:30)"}]}
+-->
+
+### Example 3: Format log timestamps with short date and 24-hour time
+
+Create compact "dd-MMM HH:mm zzz" labels for log export.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "TimestampLabel",
+    each DateTime.ToText([Timestamp], [Format="dd-MMM HH:mm", Culture="en-US"]),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"TimestampLabel","type":"text"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","TimestampLabel":"15-Jan 09:30"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","TimestampLabel":"16-Jan 14:15"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","TimestampLabel":"18-Jan 11:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","TimestampLabel":"20-Jan 08:45"}]}
 -->

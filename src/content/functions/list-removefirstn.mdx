@@ -32,11 +32,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.RemoveFirstN` is equivalent to `List.Skip` — it removes the first `N` items from a list and returns the remainder. It accepts either a count or a condition function.
+`List.RemoveFirstN` removes items from the beginning of a list and returns the remainder. It is functionally identical to `List.Skip` — the two functions behave the same way. Use whichever name makes your intent clearer in context.
 
-- **Number**: Removes the first `N` items. If `N` is larger than the list, an empty list is returned.
-- **Condition function**: Removes items from the start of the list while the condition returns `true`, stopping at the first item that fails.
-- This function does not modify the original list; it returns a new list.
+When passed a number `N`, it removes the first `N` items. If `N` is larger than the list length, an empty list is returned. When passed a condition function, it removes items from the start while the condition returns `true`, stopping permanently at the first item that fails — subsequent items that would satisfy the condition are not removed.
+
+This function does not modify the original list; it returns a new list. For removing from the end, use `List.RemoveLastN`. For removing a block from the middle, use `List.RemoveRange`. For removing items by value rather than position, use `List.RemoveMatchingItems` or `List.Select` with a negated condition.
 
 ## Examples
 

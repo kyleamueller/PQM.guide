@@ -30,34 +30,71 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.TransformRows` iterates over each row of a table as a record and applies a transform function, returning the collection of results as a list. Unlike `Table.AddColumn`, which adds a computed column back into the table, `Table.TransformRows` produces a flat list of arbitrary values — records, lists, scalars, or any M value.
+`Table.TransformRows` iterates over every row of a table as a record and applies a transform function, returning the results as a flat list. Unlike `Table.AddColumn` (which adds a computed value back as a new column in a table), `Table.TransformRows` produces a list of arbitrary M values — scalars, records, lists, or any other type. The output is a list, not a table.
 
-This function is useful when you need to map rows to a different structure entirely, rather than just adding or transforming columns.
+This makes `Table.TransformRows` a more powerful but lower-level operation than `Table.AddColumn` or `Table.TransformColumns`. It is primarily used when you need to reshape entire rows into a completely different structure — for example, converting rows into JSON-like records for an API call, or building a list of custom objects from tabular data.
+
+When you want to produce a table (not a list) from a per-row transformation, wrap the result in `Table.FromRecords(Table.TransformRows(...))`. For most per-row calculations that stay within the table structure, `Table.AddColumn` is simpler and more readable.
 
 ## Examples
 
-### Example 1: Extract formatted strings from each row
+### Example 1: Build formatted label strings from each Sales row
 
 ```powerquery
-Table.TransformRows(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}}),
-    each [Name] & ": " & Text.From([Score])
-)
+let
+    Sales = #table(
+        {"OrderID","CustomerName","Product","UnitPrice","Quantity"},
+        {{1,"Alice","Widget A",25.00,4},{2,"Bob","Gadget B",50.00,2},{3,"Charlie","Widget C",15.00,10}}
+    )
+in
+    Table.TransformRows(
+        Sales,
+        each "Order #" & Text.From([OrderID]) & ": " & [CustomerName] & " — " & [Product] & " x" & Text.From([Quantity])
+    )
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Alice: 95\", \"Bob: 82\"}"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Order #1: Alice — Widget A x4\", \"Order #2: Bob — Gadget B x2\", \"Order #3: Charlie — Widget C x10\"}"}]}
 -->
 
-### Example 2: Transform rows into records with computed fields
+### Example 2: Compute derived records including Revenue per row
+
+Transform rows into enriched records and use `Table.FromRecords` to reconstruct a table.
 
 ```powerquery
-Table.TransformRows(
-    #table({"Price", "Qty"}, {{10, 5}, {20, 3}}),
-    each [Price = [Price], Qty = [Qty], Total = [Price] * [Qty]]
-)
+let
+    Sales = #table(
+        {"OrderID","CustomerName","Product","UnitPrice","Quantity"},
+        {{1,"Alice","Widget A",25.00,4},{2,"Bob","Gadget B",50.00,2},{6,"Bob","Thingamajig E",120.00,1}}
+    ),
+    Enriched = Table.TransformRows(
+        Sales,
+        each [OrderID = [OrderID], CustomerName = [CustomerName], Product = [Product],
+              UnitPrice = [UnitPrice], Quantity = [Quantity], Revenue = [UnitPrice] * [Quantity]]
+    )
+in
+    Table.FromRecords(Enriched)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Price=10, Qty=5, Total=50], [Price=20, Qty=3, Total=60]}"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"},{"name":"Revenue","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4","Revenue":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2","Revenue":"100"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1","Revenue":"120"}]}
+-->
+
+### Example 3: Extract a specific field from each row as a list
+
+A concise alternative to `Table.Column` when you need to compute the value rather than read it directly.
+
+```powerquery
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Salary = number],
+        {{"E001","alice smith","Sales",55000},{"E002","BOB JONES","Engineering",95000},
+         {"E003","Charlie Brown","Marketing",72000},{"E005","Eve Martinez","Sales",88000}}
+    )
+in
+    Table.TransformRows(Employees, each [FullName] & " (" & [Department] & ")")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"alice smith (Sales)\", \"BOB JONES (Engineering)\", \"Charlie Brown (Marketing)\", \"Eve Martinez (Sales)\"}"}]}
 -->

@@ -30,45 +30,60 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.IsDistinct` returns `true` if every row in the table is unique (no duplicate rows). When `equationCriteria` is specified, uniqueness is evaluated only across the specified column(s). This is equivalent to checking whether `Table.RowCount(table) = Table.RowCount(Table.Distinct(table))`, but may be more efficient.
+`Table.IsDistinct` returns `true` if no two rows in the table are identical. When `equationCriteria` is provided, uniqueness is evaluated only across the specified column(s), ignoring all other columns. This allows you to check whether a specific column or combination of columns is free of duplicates without requiring the full row to be unique.
 
-This function is useful for data quality checks — for example, verifying that a key column contains no duplicates before using it in a join.
+This function is semantically equivalent to `Table.RowCount(table) = Table.RowCount(Table.Distinct(table, equationCriteria))` but may be optimized by the engine. Use it as a data quality assertion before using a column as a join key — a non-distinct key will cause row fan-out in joins, producing unexpected result counts.
+
+For large tables sourced from databases, `Table.IsDistinct` may not fold, in which case it materializes the full table locally to perform the check. For fold-aware duplicate detection, prefer a native `COUNT(DISTINCT ...)` via `Table.Group` or a source-side query.
 
 ## Examples
 
-### Example 1: All rows are unique
+### Example 1: Confirm ProductID is a unique key in the Products table
 
 ```powerquery
-Table.IsDistinct(
-    #table({"ID"}, {{1}, {2}, {3}})
-)
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Price = number, InStock = logical],
+        {{1,"Widget A",25.00,true},{2,"Gadget B",50.00,true},{3,"Widget C",15.00,false},{4,"Gadget D",75.00,true},{5,"Thingamajig E",120.00,false}}
+    )
+in
+    Table.IsDistinct(Products, "ProductID")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
-### Example 2: Duplicate rows return false
+### Example 2: Detect duplicate OrderIDs before joining
 
 ```powerquery
-Table.IsDistinct(
-    #table({"ID"}, {{1}, {2}, {1}})
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{2,"Bob","Widget C"}}
+    )
+in
+    Table.IsDistinct(Sales, "OrderID")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
 
-### Example 3: Check uniqueness on a single column
+### Example 3: Check uniqueness on a composite key
+
+Both CustomerName and Product together must be unique (same customer cannot order the same product twice).
 
 ```powerquery
-Table.IsDistinct(
-    #table({"ID", "Name"}, {{1, "Alice"}, {1, "Bob"}}),
-    "ID"
-)
+let
+    Sales = #table(
+        {"CustomerName", "Product", "Quantity"},
+        {{"Alice","Widget A",4},{"Alice","Gadget D",1},{"Bob","Gadget B",2},{"Bob","Widget C",10}}
+    )
+in
+    Table.IsDistinct(Sales, {"CustomerName", "Product"})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->

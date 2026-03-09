@@ -34,28 +34,27 @@ relatedFunctions:
 
 ## Remarks
 
-`Html.Table` gives precise control over HTML extraction using CSS selectors. Unlike `Web.Page`, which automatically detects HTML `<table>` elements, `Html.Table` lets you target any HTML structure — including `<div>`-based layouts, `<ul>` lists, or custom markup — by specifying CSS selectors for each column.
+`Html.Table` extracts structured data from HTML content by evaluating CSS selectors, giving you precise control over which elements become rows and what each column contains. Unlike `Web.Page`, which automatically detects `<table>` elements, `Html.Table` can target any HTML structure — including `<div>`-based layouts, `<ul>` lists, card grids, or any other custom markup — as long as you can identify the elements with CSS selectors.
 
-**How it works**:
-1. The `RowSelector` option (defaulting to `"tr"` if not specified) defines what constitutes a "row" in the HTML.
-2. For each row element, each CSS selector in `columnNameSelectorPairs` is evaluated relative to that row to extract the cell value.
-3. The extracted text content of the matched element becomes the cell value.
+**How it works**: The `RowSelector` option defines what constitutes a "row" in the HTML document. Power Query finds all elements matching the row selector, then for each row element evaluates each CSS selector in `columnNameSelectorPairs` relative to that row element to extract the cell value. The inner text of the matched element becomes the cell value by default.
 
-**CSS selectors**: Standard CSS selector syntax is supported, including element selectors (`td`), class selectors (`.price`), ID selectors (`#total`), attribute selectors (`[data-value]`), descendant combinators (`table.results td.name`), and pseudo-classes like `:nth-child()`.
+**The columnNameSelectorPairs parameter**: Each entry is a two-element list `{columnName, cssSelector}`. The column name is a text label for the output column; the CSS selector extracts the cell value from within each row element. If no element matches the selector for a given row, the cell value is `null`.
 
-**Authentication**: `Html.Table` does not make HTTP requests. Authentication is handled by the function that fetches the HTML (e.g., `Web.Contents`).
+**CSS selector support**: Standard CSS selector syntax is supported — element selectors (`td`, `span`), class selectors (`.price`), ID selectors (`#total`), attribute selectors (`[data-id]`), descendant combinators (`div.card p.title`), sibling combinators, and pseudo-classes like `:nth-child()` and `:first-child`.
 
-**Query folding**: Not supported.
+**Attribute extraction**: To extract an HTML attribute rather than the element's text content, use an attribute selector pattern: appending `[attributeName]` to the selector returns the attribute value instead of the inner text. For example, `"a[href]"` returns the `href` value of the matched anchor element.
 
-**Attribute extraction**: By default, the inner text of the matched element is returned. To extract an attribute value (such as `href` from an anchor), append the attribute name in square brackets to the selector: `"a[href]"` returns the `href` attribute value.
+**Authentication**: `Html.Table` does not make HTTP requests — it only parses HTML that you provide. Authentication is handled by whichever function fetches the HTML (`Web.Contents`, `Web.BrowserContents`, `File.Contents`, etc.). Query folding is not supported.
+
+**Compatibility note**: `Html.Table` is not available in Power BI Service cloud refresh (it requires a gateway) or in Excel Online.
 
 ## Examples
 
-### Example 1: Extract a simple HTML table by row and column selectors
+### Example 1: Extract columns from a styled HTML table using class selectors
 ```powerquery
 let
     Html = Web.Contents("https://example.com/products"),
-    Table = Html.Table(
+    Result = Html.Table(
         Html,
         {
             {"Product", "td.product-name"},
@@ -65,10 +64,10 @@ let
         [RowSelector = "table.product-list tr"]
     )
 in
-    Table
+    Result
 ```
 
-### Example 2: Extract links from a page
+### Example 2: Extract link text and URLs from a list
 ```powerquery
 let
     Html = Web.Contents("https://example.com/resources"),
@@ -84,7 +83,7 @@ in
     Links
 ```
 
-### Example 3: Parse inline HTML text
+### Example 3: Parse a raw HTML string directly
 ```powerquery
 let
     RawHtml = "<table><tr><td>Apple</td><td>1.20</td></tr><tr><td>Banana</td><td>0.50</td></tr></table>",
@@ -100,7 +99,7 @@ in
     Result
 ```
 
-### Example 4: Combine with Web.BrowserContents for JavaScript-rendered pages
+### Example 4: Chain with Web.BrowserContents for JavaScript-rendered pages
 ```powerquery
 let
     Html = Web.BrowserContents(

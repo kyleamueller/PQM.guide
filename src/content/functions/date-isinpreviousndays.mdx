@@ -33,13 +33,17 @@ relatedFunctions:
 
 `Date.IsInPreviousNDays` returns `true` if the input date falls within the N days immediately preceding today. Today itself is not included; use `Date.IsInCurrentDay` to also match today. The function is re-evaluated on each query refresh.
 
-For example, with `days = 7`, it matches any date from 7 days ago through yesterday (a 7-day window ending yesterday).
+For example, with `days = 7`, it matches any date from 7 days ago through yesterday — a 7-day window ending yesterday. This is useful for rolling lookback windows such as "last 7 days," "last 30 days," or "last 90 days."
+
+Note that `Date.IsInPreviousNDays(d, 1)` is equivalent to `Date.IsInPreviousDay`. To include today in the window, add `or Date.IsInCurrentDay([OrderDate])`. The window is based on whole calendar days, not a 24-hour rolling period from the current time.
 
 ## Examples
 
 ### Example 1: Filter orders from the past 30 days
 
-Keep only rows where OrderDate falls within the previous 30 days.
+Keep only rows where OrderDate falls within the previous 30 days (not including today).
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -54,15 +58,34 @@ Table.SelectRows(
 
 ### Example 2: Flag rows from the past 7 days
 
-Add a boolean column identifying orders placed in the last week.
+Add a boolean column identifying orders placed within the last 7 days.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
     Sales,
-    "LastWeek", each Date.IsInPreviousNDays([OrderDate], 7), type logical
+    "Last7Days", each Date.IsInPreviousNDays([OrderDate], 7), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"LastWeek","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01","LastWeek":false},{"OrderID":41,"OrderDate":"2026-03-07","LastWeek":true},{"OrderID":42,"OrderDate":"2026-03-08","LastWeek":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Last7Days","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01","Last7Days":false},{"OrderID":41,"OrderDate":"2026-03-07","Last7Days":true},{"OrderID":42,"OrderDate":"2026-03-08","Last7Days":false}]}
+-->
+
+### Example 3: Include today in the past-7-day window
+
+Combine IsInPreviousNDays and IsInCurrentDay for a rolling window inclusive of today.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInPreviousNDays([OrderDate], 7) or Date.IsInCurrentDay([OrderDate])
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":41,"CustomerName":"Diana","OrderDate":"2026-03-07"},{"OrderID":42,"CustomerName":"Bob","OrderDate":"2026-03-08"}]}
 -->

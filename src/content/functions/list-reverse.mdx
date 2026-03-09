@@ -27,9 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Reverse` returns a new list with elements in reverse order. The original list is not modified.
+`List.Reverse` returns a new list with the elements in reversed order. The original list is not modified. The function has no parameters beyond the list itself and always reverses the entire list.
 
-This function is useful when you need to reverse the result of a sort, process items from last to first, or reorder data for display purposes.
+A common use case is reversing the result of a sort: `List.Sort` produces ascending order by default, and `List.Reverse` on the result gives descending order. However, for descending sorts it is more efficient and readable to pass `Order.Descending` directly to `List.Sort`. Use `List.Reverse` when you need to reverse for other reasons — for example, processing a timeline from newest to oldest, or displaying a ranked list in reverse order.
+
+`List.Reverse` can also be used as a building block in more complex transformations: for example, to read a list from the end without knowing its length, or to mirror a sequence.
 
 ## Examples
 

@@ -26,15 +26,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.NonNullable` returns the non-nullable form of a type. If the input type is `nullable X`, the result is `X`. If the input is already non-nullable, it is returned unchanged.
+`Type.NonNullable` strips the nullable wrapper from a type, returning the underlying non-nullable type. If the input is `type nullable X`, the result is `type X`. If the input is already non-nullable, it is returned unchanged — the function is idempotent on non-nullable types.
 
-This is useful when you need to compare or work with type values in a normalized form, stripping any nullable wrapper before inspection.
+Making a type nullable goes in the other direction using the `nullable` keyword in a type expression (e.g., `type nullable number`). There is no dedicated `Type.Nullable` function — `Type.NonNullable` is a one-way stripping operation.
 
-The inverse operation — making a type nullable — is performed with `type nullable X` syntax rather than a dedicated function.
+Common use cases for `Type.NonNullable` include:
+
+- **Type normalization**: comparing two types for equivalence after stripping nullable wrappers, since `type number` and `type nullable number` are distinct values
+- **Generic transforms**: building functions that work on the base type regardless of whether the input type is nullable
+- **Schema inspection**: reducing column types from data sources (which often return nullable types) to their base kind for comparison
+
+Use `Type.IsNullable` to check whether stripping is needed before calling `Type.NonNullable`, if you want to avoid unnecessary calls.
 
 ## Examples
 
-### Example 1: Strip nullable from nullable number
+### Example 1: Strip nullable wrapper from nullable number
 
 ```powerquery
 Type.NonNullable(type nullable number)
@@ -54,7 +60,7 @@ Type.NonNullable(type text)
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
 -->
 
-### Example 3: Verify round-trip: NonNullable of nullable equals original
+### Example 3: Verify NonNullable of nullable equals the base type
 
 ```powerquery
 Type.NonNullable(type nullable number) = type number

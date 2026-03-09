@@ -30,15 +30,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Single.From` converts a value to a single-precision (32-bit) floating-point number. Single-precision provides approximately 7 significant decimal digits of precision, less than the standard double-precision type. Values that exceed the single-precision range (~±3.4 × 10^38) will overflow to infinity.
+`Single.From` converts a value to a single-precision (32-bit) IEEE 754 floating-point number. Single-precision provides only approximately **7 significant decimal digits** of precision, compared to 15–17 for the default double-precision type. Values that exceed the single-precision range (~±3.4 × 10^38) overflow to positive or negative infinity.
 
-This type is less commonly used in Power Query than `Double.From`, but may be needed when interfacing with systems or data sources that explicitly use 32-bit floats.
+This type is rarely used in typical Power Query data transformation. It exists primarily to interface with data sources or systems that explicitly use 32-bit floats — for example, certain scientific file formats, embedded systems data, or custom connector schemas that must match a 32-bit float column type. If you need to match a source column's `REAL` or `FLOAT(4)` SQL Server type precisely, `Single.From` provides that mapping.
 
-Text values are parsed using the specified culture. `true` converts to `1.0`, `false` to `0.0`, `null` to `null`.
+A key practical concern is **precision loss**: converting a double value to single precision irreversibly truncates it to ~7 digits. For example, `1.23456789012345` becomes approximately `1.2345679`. This loss cannot be recovered later. For most data modeling work, use the default `number` type (double-precision) or `Decimal.From` for financial values. Text values are parsed using the specified culture; logical `true` converts to `1.0`, `false` to `0.0`, and `null` returns `null`.
 
 ## Examples
 
-### Example 1: Convert a number to single precision
+### Example 1: Precision truncation when converting from double to single
 
 ```powerquery
 Single.From(3.14159265358979)
@@ -48,7 +48,7 @@ Single.From(3.14159265358979)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3.1415927}]}
 -->
 
-### Example 2: Convert text
+### Example 2: Convert text to single precision
 
 ```powerquery
 Single.From("1.5")
@@ -58,16 +58,20 @@ Single.From("1.5")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.5}]}
 -->
 
-### Example 3: Precision loss from double to single
+### Example 3: Demonstrate precision loss vs. double precision
 
 ```powerquery
 let
     Original = 1.23456789012345,
-    AsSingle = Single.From(Original)
+    AsSingle = Single.From(Original),
+    AsDouble = Double.From(Original)
 in
-    AsSingle
+    #table(
+        {"Type", "Value"},
+        {{"Single", AsSingle}, {"Double", AsDouble}}
+    )
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.2345679}]}
+{"columns":[{"name":"Type","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Type":"Single","Value":1.2345679},{"Type":"Double","Value":1.23456789012345}]}
 -->

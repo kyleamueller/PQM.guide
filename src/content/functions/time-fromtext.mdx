@@ -30,32 +30,36 @@ relatedFunctions:
 
 ## Remarks
 
-`Time.FromText` parses a text value into a `time`. Without options, it attempts common formats such as `"HH:mm:ss"` or `"HH:mm"`. Use the `options` record to supply a custom `Format` pattern or a `Culture` for locale-specific strings. Format strings follow .NET custom time format conventions.
+`Time.FromText` parses a text value into a `time`. Without options, it attempts common 24-hour formats such as `"HH:mm:ss"` or `"HH:mm"`. Use the `options` record to supply a custom `Format` pattern or a `Culture` for locale-specific strings such as `"2:30 PM"`. Format strings follow .NET custom time format conventions.
 
-If the text is `null`, the function returns `null`. If parsing fails, the function raises an error.
+Always specify both `Format` and `Culture` when parsing locale-specific strings. Without `Culture`, parsing depends on the host machine's locale, which can produce different results in Power BI Desktop vs. Power BI Service. Use `"en-US"` as a consistent default for English input.
+
+If the text is `null`, the function returns `null`. If parsing fails, the function raises an error. Use `try Time.FromText(...) otherwise null` to handle malformed data rows gracefully without stopping the query.
 
 ## Examples
 
-### Example 1: Parse time strings from a schedule table
+### Example 1: Parse 24-hour time strings
 
-Convert text time values in a schedule table to typed time values.
-
-Input: `Schedule`
+Convert text time values in "HH:mm:ss" format to typed time values.
 
 ```powerquery
-Table.TransformColumns(
-    Table.SelectColumns(Table.FirstN(Schedule, 4), {"EventID", "StartTimeText"}),
-    {{"StartTimeText", each Time.FromText(_), type time}}
+#table(
+    type table [TextTime = text, Parsed = time],
+    {
+        {"09:30:00", Time.FromText("09:30:00")},
+        {"14:15:00", Time.FromText("14:15:00")},
+        {"08:45:00", Time.FromText("08:45:00")}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"StartTimeText","type":"time"}],"rows":[{"EventID":1,"StartTimeText":"08:30:00"},{"EventID":2,"StartTimeText":"14:00:00"},{"EventID":3,"StartTimeText":"09:15:00"},{"EventID":4,"StartTimeText":"17:45:00"}]}
+{"columns":[{"name":"TextTime","type":"text"},{"name":"Parsed","type":"time"}],"rows":[{"TextTime":"09:30:00","Parsed":"09:30:00"},{"TextTime":"14:15:00","Parsed":"14:15:00"},{"TextTime":"08:45:00","Parsed":"08:45:00"}]}
 -->
 
 ### Example 2: Parse a 12-hour format time string
 
-Parse a time in 12-hour AM/PM format.
+Parse a time in 12-hour AM/PM format with explicit culture.
 
 ```powerquery
 #table(
@@ -66,4 +70,23 @@ Parse a time in 12-hour AM/PM format.
 
 <!--output
 {"columns":[{"name":"TextTime","type":"text"},{"name":"Parsed","type":"time"}],"rows":[{"TextTime":"02:30:00 PM","Parsed":"14:30:00"}]}
+-->
+
+### Example 3: Safe parsing with try...otherwise for mixed data
+
+Handle rows with invalid or missing time text without erroring the query.
+
+```powerquery
+#table(
+    type table [TextTime = text, Parsed = time],
+    {
+        {"09:30:00",  try Time.FromText("09:30:00") otherwise null},
+        {"N/A",       try Time.FromText("N/A") otherwise null},
+        {"14:15:00",  try Time.FromText("14:15:00") otherwise null}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"TextTime","type":"text"},{"name":"Parsed","type":"time"}],"rows":[{"TextTime":"09:30:00","Parsed":"09:30:00"},{"TextTime":"N/A","Parsed":null},{"TextTime":"14:15:00","Parsed":"14:15:00"}]}
 -->

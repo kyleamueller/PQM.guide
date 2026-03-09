@@ -31,14 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Intersect` takes a **list of lists** as its first argument (not two separate lists) and returns a new list containing only items that are present in **every** provided list. The result contains distinct values only.
+`List.Intersect` takes a **list of lists** as its first argument — not two separate list arguments — and returns a new list containing only items that appear in every one of the provided lists. The result is automatically deduplicated (distinct values only).
 
-This function is useful for finding common values across multiple datasets — for example, customers who appear in all regions, or products available in every store.
+This function is useful for finding common values across multiple datasets: customers who appear in all sales regions, product codes active in every store, or employees on every team. The result preserves the relative order of first-appearing values from the first list.
 
-- The argument is a list of lists: `{list1, list2, list3}`.
-- The result is deduplicated (distinct values only).
-- Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` for case-insensitive matching.
-- If any list in the input is empty, the result is an empty list.
+Note the argument shape: you must wrap your lists in an outer list — `{listA, listB}` — not pass them as separate arguments. If any input list is empty, the result is immediately an empty list (nothing can be in all lists if one is empty). Comparison is case-sensitive for text by default; pass `Comparer.OrdinalIgnoreCase` as the optional second argument for case-insensitive matching.
 
 ## Examples
 

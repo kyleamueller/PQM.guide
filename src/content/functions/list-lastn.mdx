@@ -32,12 +32,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.LastN` returns a **list** of items from the end of the source list. It accepts either a number or a condition function:
+`List.LastN` is the tail counterpart to `List.FirstN`. It always returns a **list**, never a scalar, and accepts either a number or a condition function as its second argument.
 
-- **Number**: Returns the last `N` items. If `N` exceeds the list length, the entire list is returned.
-- **Condition function**: Returns all consecutive items from the **end** of the list for which the condition is `true`, scanning backward.
+When passed a number `N`, it returns the last `N` items of the list in their original order. If `N` exceeds the list length, the entire list is returned. If `N` is `0`, an empty list is returned.
 
-When using a condition, the function scans from the end and stops at the first item that fails the condition — items before that point are excluded even if they would satisfy the condition.
+When passed a condition function, the function scans from the end of the list backward, collecting items as long as the condition returns `true`. Collection stops at the first item (from the end) that fails the condition — items before that point are excluded, even if they would satisfy the condition. The returned items appear in their original list order (not reversed). Use this mode for collecting a trailing run, such as the most recent dates above a threshold. For non-contiguous filtering, use `List.Select`.
 
 ## Examples
 

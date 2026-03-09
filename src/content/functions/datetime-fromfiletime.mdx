@@ -26,32 +26,30 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.FromFileTime` converts a Windows FILETIME value — the number of 100-nanosecond intervals since 00:00:00 UTC on January 1, 1601 — into a `datetime` value in local time. This format is commonly encountered in Windows registry entries, Active Directory attributes (such as `lastLogon`), and NTFS file system metadata.
+`DateTime.FromFileTime` converts a Windows FILETIME value — the number of 100-nanosecond intervals since 00:00:00 UTC on January 1, 1601 — into a `datetime` value expressed in local time. This format appears in Windows registry entries, Active Directory attributes (such as `lastLogon` and `pwdLastSet`), NTFS file metadata, and some COM/OLE automation APIs.
 
-The result is adjusted to the local timezone of the host environment. To get the UTC datetimezone instead, use `DateTimeZone.FromFileTime`. If the input is `null`, the function returns `null`.
+The result is adjusted to the local timezone of the host environment, which means the same FILETIME value will produce different `datetime` results on machines in different timezones. To get a consistent UTC-anchored result, use `DateTimeZone.FromFileTime` instead, which returns a `datetimezone` with a `+00:00` offset. If the input is `null`, the function returns `null`.
+
+A FILETIME value of `0` represents midnight January 1, 1601 UTC. Large 64-bit integers are typical — for reference, the FILETIME for January 1, 2024 is approximately `133,478,016,000,000,000`. Verify that your source data loads these as numbers (not text) before calling this function.
 
 ## Examples
 
-### Example 1: Convert Windows file times from a data source
+### Example 1: Convert Windows FILETIME values to datetimes
 
-Convert FILETIME values in the ActiveDirectory table to readable datetimes.
-
-Input: `ActiveDirectory`
+Convert FILETIME values to readable datetimes.
 
 ```powerquery
-Table.AddColumn(
-    Table.SelectColumns(
-        Table.FirstN(ActiveDirectory, 4),
-        {"UserID", "LastLogonFileTime"}
-    ),
-    "LastLogon",
-    each DateTime.FromFileTime([LastLogonFileTime]),
-    type datetime
+#table(
+    type table [Description = text, FileTime = number, AsDateTime = datetime],
+    {
+        {"Jan 15, 2024", 133500000000000000, DateTime.FromFileTime(133500000000000000)},
+        {"Mar 6, 2024",  133550000000000000, DateTime.FromFileTime(133550000000000000)}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"UserID","type":"text"},{"name":"LastLogonFileTime","type":"number"},{"name":"LastLogon","type":"datetime"}],"rows":[{"UserID":"U001","LastLogonFileTime":133500000000000000,"LastLogon":"2024-01-15T08:20:00"},{"UserID":"U002","LastLogonFileTime":133550000000000000,"LastLogon":"2024-03-06T07:33:20"}]}
+{"columns":[{"name":"Description","type":"text"},{"name":"FileTime","type":"number"},{"name":"AsDateTime","type":"datetime"}],"rows":[{"Description":"Jan 15, 2024","FileTime":133500000000000000,"AsDateTime":"2024-01-15T08:20:00"},{"Description":"Mar 6, 2024","FileTime":133550000000000000,"AsDateTime":"2024-03-06T07:33:20"}]}
 -->
 
 ### Example 2: Convert a known file time value
@@ -67,4 +65,23 @@ Convert the FILETIME for a specific known datetime.
 
 <!--output
 {"columns":[{"name":"FileTime","type":"number"},{"name":"DateTime","type":"datetime"}],"rows":[{"FileTime":132000000000000000,"DateTime":"2019-10-26T01:46:40"}]}
+-->
+
+### Example 3: Safe conversion with null handling
+
+Convert FILETIME values, returning null for rows with no logon recorded (FILETIME = 0 or null).
+
+```powerquery
+#table(
+    type table [UserID = text, LastLogonFileTime = number, LastLogon = datetime],
+    {
+        {"U001", 133500000000000000, DateTime.FromFileTime(133500000000000000)},
+        {"U002", null,               null},
+        {"U003", 133550000000000000, DateTime.FromFileTime(133550000000000000)}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"UserID","type":"text"},{"name":"LastLogonFileTime","type":"number"},{"name":"LastLogon","type":"datetime"}],"rows":[{"UserID":"U001","LastLogonFileTime":133500000000000000,"LastLogon":"2024-01-15T08:20:00"},{"UserID":"U002","LastLogonFileTime":null,"LastLogon":null},{"UserID":"U003","LastLogonFileTime":133550000000000000,"LastLogon":"2024-03-06T07:33:20"}]}
 -->

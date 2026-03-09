@@ -39,13 +39,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.PositionOf` searches a list for a specified value and returns its zero-based index. By default, it finds the first occurrence.
+`List.PositionOf` searches a list for a value and returns its zero-based index position. By default, it finds the first occurrence. Returns `-1` if the value is not found — unlike many M functions, it does not throw an error for a missing value, making it safe to use for membership-and-position checks.
 
-- Returns `-1` if the value is not found in the list.
-- Use `Occurrence.First` (default) to find the first match.
-- Use `Occurrence.Last` to find the last match.
-- Use `Occurrence.All` to return a list of **all** positions where the value appears.
-- Comparison is exact and case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` as `equationCriteria` for case-insensitive search.
+The `occurrence` parameter controls which match to find: `Occurrence.First` (default) returns the index of the first match, `Occurrence.Last` returns the index of the last match, and `Occurrence.All` returns a **list** of all positions where the value appears. Note that the return type changes when using `Occurrence.All` — the result is a list of numbers, not a single number.
+
+Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` as the `equationCriteria` argument for case-insensitive search. For checking presence without needing the position, `List.Contains` is simpler. For finding positions of multiple target values at once, use `List.PositionOfAny`.
 
 ## Examples
 

@@ -29,11 +29,15 @@ relatedFunctions:
 
 `Date.IsInPreviousYear` returns `true` if the input date falls anywhere within the calendar year immediately before the current year (as determined by `DateTime.LocalNow()`). For example, if today is in 2026, this function returns `true` for any date in 2025. The function is re-evaluated on each query refresh.
 
+This is one of the most common `Date.IsIn*` functions for year-over-year reporting. It matches the full prior calendar year — January 1 through December 31. For multi-year historical windows, use `Date.IsInPreviousNYears`. To include the current year in the same filter, add `or Date.IsInCurrentYear([OrderDate])`.
+
 ## Examples
 
 ### Example 1: Filter last year's orders
 
 Keep only rows where OrderDate falls in the previous calendar year.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -46,9 +50,11 @@ Table.SelectRows(
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":30,"OrderDate":"2025-01-10"},{"OrderID":35,"OrderDate":"2025-10-20"},{"OrderID":37,"OrderDate":"2025-12-31"}]}
 -->
 
-### Example 2: Flag last year's rows
+### Example 2: Flag last year's orders
 
 Add a boolean column identifying rows from the previous year.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
@@ -58,5 +64,27 @@ Table.AddColumn(
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastYear","type":"logical"}],"rows":[{"OrderID":28,"OrderDate":"2024-11-15","IsLastYear":false},{"OrderID":30,"OrderDate":"2025-01-10","IsLastYear":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastYear":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsLastYear","type":"logical"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","IsLastYear":false},{"OrderID":30,"OrderDate":"2025-01-10","IsLastYear":true},{"OrderID":42,"OrderDate":"2026-03-08","IsLastYear":false}]}
+-->
+
+### Example 3: Add year-over-year period labels
+
+Tag rows as current year, last year, or other for a YoY comparison dashboard.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "YearPeriod",
+    each
+        if Date.IsInCurrentYear([OrderDate]) then "Current Year"
+        else if Date.IsInPreviousYear([OrderDate]) then "Last Year"
+        else "Other",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"YearPeriod","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","YearPeriod":"Other"},{"OrderID":30,"OrderDate":"2025-01-10","YearPeriod":"Last Year"},{"OrderID":42,"OrderDate":"2026-03-08","YearPeriod":"Current Year"}]}
 -->

@@ -27,29 +27,31 @@ relatedFunctions:
 
 ## Remarks
 
-`Web.Page` parses an HTML document and returns a navigation table of all HTML `<table>` elements found in the document. Each row in the result includes the table's `Caption`, `Source`, `ClassName`, `Id`, and `Data` columns, where `Data` contains the actual extracted table.
+`Web.Page` parses an HTML document and returns a navigation table listing every `<table>` element found in the document. It is the simplest way to extract tabular data from a web page — no CSS selectors or manual parsing required. Use `Html.Table` instead when you need to target non-table HTML structures or want column-level CSS selector control.
 
-The input is typically the binary result of `Web.Contents`, but can also be text. Power Query automatically handles the binary-to-HTML parsing.
+**Input**: The `webPage` parameter accepts the binary result of `Web.Contents` or a text string containing raw HTML. Power Query automatically handles decoding binary HTML using the encoding declared in the response headers or document.
 
-**Authentication**: Authentication for the underlying URL is handled by `Web.Contents`. `Web.Page` itself does not make HTTP requests — it only parses the HTML content you provide.
+**Navigation table columns**: Each row in the result represents one detected `<table>` element and includes:
+- `Caption` (text) — the table's `<caption>` text, or an auto-generated name like `"Table 0"` if no caption is present.
+- `Source` (text) — a representation of the HTML context surrounding the table.
+- `ClassName` (text) — the `class` attribute of the `<table>` element.
+- `Id` (text) — the `id` attribute of the `<table>` element.
+- `Data` (table) — the extracted table content. The first row is typically used as headers if the HTML uses `<th>` elements; otherwise use `Table.PromoteHeaders`.
 
-**Query folding**: `Web.Page` does not support query folding. All filtering and transformation occurs in Power Query after the HTML is fetched.
+**Authentication**: `Web.Page` does not make HTTP requests — it only parses HTML. Authentication is handled by `Web.Contents` or whichever function provides the HTML binary.
 
 **Limitations**:
-- `Web.Page` is not available in Power BI Service (cloud refreshes) because it relies on a browser-based rendering engine. Use scheduled refresh via an on-premises data gateway.
-- JavaScript-rendered content is not executed. Tables that are dynamically loaded by JavaScript will not be captured. Use `Web.BrowserContents` for those cases.
-- The function returns all tables found, including navigation tables and other incidental HTML tables on the page. You typically need to identify the correct table by index or by inspecting the `Caption` column.
+- `Web.Page` is not available in Power BI Service for direct cloud refresh. It requires an on-premises data gateway for scheduled refresh.
+- JavaScript-rendered content is not executed. Tables dynamically loaded by JavaScript will not appear. Use `Web.BrowserContents` first, then pass the result to `Web.Page`.
+- A page may contain many incidental tables (menus, footers, ad containers). Inspect the result interactively in Power Query to identify the correct table by index, `Caption`, or `Id`.
 
-The `Source` column indicates the HTML context of each extracted table (e.g., whether it was inside a `<div>`, `<section>`, etc.).
+**Query folding**: Not supported.
 
 ## Examples
 
 ### Example 1: Extract all tables from a web page
 ```powerquery
-let
-    Source = Web.Page(Web.Contents("https://en.wikipedia.org/wiki/List_of_countries_by_GDP"))
-in
-    Source
+Web.Page(Web.Contents("https://en.wikipedia.org/wiki/List_of_countries_by_GDP"))
 ```
 
 ### Example 2: Select the first table from a web page
@@ -61,21 +63,24 @@ in
     FirstTable
 ```
 
-### Example 3: Find a table by its caption
+### Example 3: Find a specific table by its Id attribute
 ```powerquery
 let
     Source = Web.Page(Web.Contents("https://example.com/data")),
-    TargetTable = Source{[Caption="Sales Data"]}[Data]
+    TargetTable = Source{[Id="sales-table"]}[Data]
 in
     TargetTable
 ```
 
-### Example 4: Parse raw HTML text
+### Example 4: Chain with Web.BrowserContents for JavaScript-rendered tables
 ```powerquery
 let
-    Html = "<table><tr><th>Name</th><th>Value</th></tr><tr><td>Alpha</td><td>1</td></tr></table>",
-    Parsed = Web.Page(Html),
-    TableData = Parsed{0}[Data]
+    Html = Web.BrowserContents(
+        "https://example.com/dynamic-page",
+        [WaitFor = [Element = "table.results"]]
+    ),
+    Tables = Web.Page(Html),
+    FirstTable = Tables{0}[Data]
 in
-    TableData
+    FirstTable
 ```

@@ -27,13 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.RemoveNulls` is a convenience function that filters out all `null` values from a list. It is equivalent to `List.Select(list, each _ <> null)`.
+`List.RemoveNulls` filters out all `null` values from a list, returning only non-null items. It is equivalent to `List.Select(list, each _ <> null)` but expresses intent more clearly.
 
-This function is commonly used to clean lists before aggregation, to prevent null propagation in calculations, or to filter results from functions that return null for unmatched items.
+This function is commonly used to clean a list before aggregating it, to prevent null propagation in calculations, or to filter the results of a lookup that returns `null` for unmatched items. For example, after using `List.Transform` to do a lookup, the resulting list may contain nulls for unmatched rows — `List.RemoveNulls` strips those out before passing to `List.Sum` or similar.
 
-- Returns an empty list if all items are null.
-- Non-null values (including `false`, `0`, and empty string `""`) are retained.
-- The original list is not modified.
+Non-null values including `false`, `0`, and `""` (empty string) are retained. Returns an empty list if all items are null. The original list is not modified. For counting how many items remain after removing nulls, use `List.NonNullCount` directly instead of removing nulls and counting.
 
 ## Examples
 

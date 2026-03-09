@@ -39,13 +39,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.AddField` adds a single new field to an existing record and returns the result as a new record. The original record is not modified (records are immutable in M). If the field name already exists, an error is raised — use `Record.RemoveFields` first if you need to replace an existing field.
+`Record.AddField` returns a new record with one additional field appended. Records in M are **immutable** — the original record is never modified; a new record is always returned. If the field name already exists in the record, an error is raised. To replace an existing field, use `Record.RemoveFields` to drop it first, then `Record.AddField`.
 
-The optional `delayed` parameter, when set to `true`, delays evaluation of `value` until the field is first accessed. This can be useful for expensive computations you only want to run when needed.
+For simple cases where you want to merge two records, the record merge operator `&` is often more concise: `[A = 1] & [B = 2]` produces `[A = 1, B = 2]`. Use `Record.AddField` when the field name or value is computed dynamically.
+
+The optional `delayed` parameter (`true`/`false`) controls whether the value expression is evaluated eagerly (default, `false`) or lazily (only when the field is first accessed, `true`). Lazy evaluation is useful for expensive computations that may not always be needed.
 
 ## Examples
 
-### Example 1: Add a new field to a record
+### Example 1: Add a new text field to a record
 
 ```powerquery
 Record.AddField([Name = "Alice", Age = 30], "City", "New York")
@@ -55,7 +57,7 @@ Record.AddField([Name = "Alice", Age = 30], "City", "New York")
 {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"New York"}]}
 -->
 
-### Example 2: Add a computed field
+### Example 2: Add a computed field from existing field values
 
 ```powerquery
 let
@@ -68,7 +70,7 @@ in
 {"columns":[{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Total","type":"number"}],"rows":[{"UnitPrice":25,"Quantity":4,"Total":100}]}
 -->
 
-### Example 3: Add a field to the first Sales row
+### Example 3: Add a "Status" field to the first row of the Sales table
 
 Input: `Sales`
 
@@ -77,9 +79,9 @@ let
     Row = Sales{0},
     WithStatus = Record.AddField(Row, "Status", "Processed")
 in
-    Record.ToTable(Record.SelectFields(WithStatus, {"OrderID", "Product", "Status"}))
+    Record.SelectFields(WithStatus, {"OrderID", "CustomerName", "Product", "Status"})
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"Status","Value":"Processed"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Status","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Status":"Processed"}]}
 -->

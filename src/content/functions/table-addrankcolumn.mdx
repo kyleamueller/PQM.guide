@@ -39,40 +39,85 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.AddRankColumn` adds a new column to the table containing a rank number for each row based on the specified comparison criteria. The default sort order is descending (highest value = rank 1).
+`Table.AddRankColumn` adds a new column to the table containing a rank number for each row based on the specified comparison criteria. By default, the rank is assigned in descending order (highest value = rank 1). To rank in ascending order, use `Order.Ascending` in the criteria list.
 
-The `options` record supports a `RankKind` field to control tie behavior:
-- `RankKind.Competition` (default): tied rows share the same rank, and the next rank skips (1, 1, 3).
-- `RankKind.Dense`: tied rows share the same rank without skipping (1, 1, 2).
-- `RankKind.Ordinal`: each row receives a unique rank, with ties broken by row order.
+The `options` record accepts a `RankKind` field that controls how ties are handled. There are three supported values:
+- `RankKind.Competition` (default): tied rows share the same rank, and the next rank after a tie skips to account for the tied positions (1, 1, 3, 4).
+- `RankKind.Dense`: tied rows share the same rank, but no ranks are skipped (1, 1, 2, 3).
+- `RankKind.Ordinal`: every row receives a unique rank regardless of ties; the tie-breaking order follows the row order in the table (1, 2, 3, 4).
+
+To rank on multiple criteria (e.g., first by Revenue descending, then by Name ascending), pass a list of `{column, Order.*}` pairs as the comparison criteria. `Table.AddRankColumn` is more convenient than combining `Table.Sort` with `Table.AddIndexColumn` when you need to preserve the original row order alongside the rank.
 
 ## Examples
 
-### Example 1: Add a rank column by score (descending)
+### Example 1: Rank customers by total order quantity (competition ranking)
 
 ```powerquery
-Table.AddRankColumn(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 95}, {"Dave", 70}}),
-    "Rank",
-    {"Score", Order.Descending}
-)
+let
+    Sales = #table(
+        {"CustomerName", "Product", "Quantity"},
+        {
+            {"Alice",   "Widget A", 4},
+            {"Bob",     "Gadget B", 2},
+            {"Charlie", "Widget C", 10},
+            {"Alice",   "Gadget D", 1},
+            {"Diana",   "Widget A", 6}
+        }
+    ),
+    Totals = Table.Group(Sales, {"CustomerName"}, {{"TotalQty", each List.Sum([Quantity]), type number}}),
+    Ranked = Table.AddRankColumn(Totals, "Rank", {"TotalQty", Order.Descending})
+in
+    Ranked
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"3"},{"Name":"Carol","Score":"95","Rank":"1"},{"Name":"Dave","Score":"70","Rank":"4"}]}
+{"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalQty","type":"number"},{"name":"Rank","type":"number"}],"rows":[{"CustomerName":"Alice","TotalQty":"5","Rank":"2"},{"CustomerName":"Bob","TotalQty":"2","Rank":"4"},{"CustomerName":"Charlie","TotalQty":"10","Rank":"1"},{"CustomerName":"Diana","TotalQty":"6","Rank":"2"}]}
 -->
 
-### Example 2: Dense ranking
+### Example 2: Dense ranking to avoid gaps in rank sequence
+
+Use `RankKind.Dense` when you want tied entries to share a rank without gaps in the sequence.
 
 ```powerquery
-Table.AddRankColumn(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 95}}),
-    "Rank",
-    {"Score", Order.Descending},
-    [RankKind = RankKind.Dense]
-)
+let
+    Source = #table(
+        {"Product", "UnitPrice"},
+        {{"Widget A", 25.00}, {"Gadget B", 50.00}, {"Widget C", 15.00}, {"Gadget D", 75.00}, {"Thingamajig E", 120.00}}
+    ),
+    Ranked = Table.AddRankColumn(
+        Source,
+        "PriceRank",
+        {"UnitPrice", Order.Descending},
+        [RankKind = RankKind.Dense]
+    )
+in
+    Ranked
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"2"},{"Name":"Carol","Score":"95","Rank":"1"}]}
+{"columns":[{"name":"Product","type":"any"},{"name":"UnitPrice","type":"number"},{"name":"PriceRank","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":"25","PriceRank":"3"},{"Product":"Gadget B","UnitPrice":"50","PriceRank":"2"},{"Product":"Widget C","UnitPrice":"15","PriceRank":"4"},{"Product":"Gadget D","UnitPrice":"75","PriceRank":"2"},{"Product":"Thingamajig E","UnitPrice":"120","PriceRank":"1"}]}
+-->
+
+### Example 3: Ordinal ranking to guarantee unique ranks
+
+Use `RankKind.Ordinal` when each row must have a distinct rank, with row order breaking ties.
+
+```powerquery
+let
+    Source = #table(
+        {"Name", "Score"},
+        {{"Alice", 95}, {"Bob", 82}, {"Carol", 95}, {"Dave", 70}}
+    ),
+    Ranked = Table.AddRankColumn(
+        Source,
+        "Rank",
+        {"Score", Order.Descending},
+        [RankKind = RankKind.Ordinal]
+    )
+in
+    Ranked
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"3"},{"Name":"Carol","Score":"95","Rank":"2"},{"Name":"Dave","Score":"70","Rank":"4"}]}
 -->

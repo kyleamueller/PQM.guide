@@ -26,7 +26,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.DayOfYear` returns an integer from 1 (January 1) to 365 or 366 (December 31, depending on leap year) for a `date`, `datetime`, or `datetimezone` value. This is useful for day-of-year calculations such as comparing progress through the year across different years. If the input is `null`, the function returns `null`.
+`Date.DayOfYear` returns an integer from 1 (January 1) to 365 or 366 (December 31, depending on leap year) for a `date`, `datetime`, or `datetimezone` value. This is useful for cross-year comparisons where you want to compare progress through the year without regard to the specific year — for example, to find the same-day-of-year sales across multiple years. If the input is `null`, the function returns `null`.
+
+Note that the maximum value is 365 in a common year and 366 in a leap year. When comparing day-of-year values across years, be aware that day 366 only exists in leap years. For these same-period comparisons, also consider using `Date.Month` + `Date.Day` directly to avoid the leap year edge case.
+
+`Date.DayOfYear` is a simple ordinal counter with no locale or timezone sensitivity. It is not related to ISO week numbering; for ISO week numbers use `Date.WeekOfYear` with `Day.Monday`.
 
 ## Examples
 
@@ -63,4 +67,21 @@ Return the day-of-year number for March 15, 2024.
 
 <!--output
 {"columns":[{"name":"Date","type":"date"},{"name":"DayOfYear","type":"number"}],"rows":[{"Date":"2024-03-15","DayOfYear":75}]}
+-->
+
+### Example 3: Filter rows to same day-of-year across all years
+
+Find orders that fall on the same day-of-year as March 5 (day 65) regardless of year.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Table.AddColumn(Sales, "DayOfYear", each Date.DayOfYear([OrderDate]), Int64.Type),
+    each [DayOfYear] = 65
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"DayOfYear","type":"number"}],"rows":[{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":6,"OrderDate":"2024-03-05","Region":"West","DayOfYear":65}]}
 -->

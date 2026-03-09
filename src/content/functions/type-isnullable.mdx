@@ -26,15 +26,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.IsNullable` returns `true` when a type is marked as nullable — meaning values of that type can be `null`. In Power Query M, nullable types are expressed using the `nullable` keyword, for example `nullable number` or `nullable text`.
+`Type.IsNullable` returns `true` when a type is a nullable type — one that permits `null` values. In Power Query M, nullable types are expressed using the `nullable` keyword: `type nullable number`, `type nullable text`, and so on.
 
-The built-in primitive types (like `type number`, `type text`) are non-nullable by default. Their nullable forms (`nullable number`) are distinct type values.
+The primitive types such as `type number` and `type text` are non-nullable by default — they are distinct type values from `type nullable number` and `type nullable text`. Most built-in Power Query M functions accept and return nullable variants of their parameter types (e.g., the `number` parameter of `Number.Round` is typed as `nullable number`), meaning they gracefully handle null inputs.
 
-Use `Type.IsNullable` when inspecting type metadata or building generic functions that must handle nullable variants of a type.
+`Type.IsNullable` is useful when:
+
+- Inspecting column types programmatically to decide whether null-handling is needed
+- Building generic transformation functions that behave differently for nullable vs non-nullable fields
+- Validating that a type annotation includes a nullable wrapper before applying `Type.NonNullable` to strip it
+
+To make a type non-nullable, use `Type.NonNullable`. To make a type nullable, use the `type nullable X` expression — there is no dedicated `Type.Nullable` function.
 
 ## Examples
 
-### Example 1: Check a nullable type
+### Example 1: A nullable type returns true
 
 ```powerquery
 Type.IsNullable(type nullable number)
@@ -44,7 +50,7 @@ Type.IsNullable(type nullable number)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: Check a non-nullable type
+### Example 2: A non-nullable primitive type returns false
 
 ```powerquery
 Type.IsNullable(type number)
@@ -54,7 +60,7 @@ Type.IsNullable(type number)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
-### Example 3: Check if the type of a column annotation is nullable
+### Example 3: Inspect the nullability of the type of a literal value
 
 ```powerquery
 let

@@ -26,13 +26,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Acos` is the inverse of `Number.Cos`. Given a value in [-1, 1], it returns the angle in radians whose cosine equals that value. The result is in the range [0, π].
+`Number.Acos` is the inverse of `Number.Cos`. Given a cosine value in the range [-1, 1], it returns the corresponding angle in **radians** in the range [0, π] (0 to 180 degrees). All trigonometric functions in Power Query M work in radians, not degrees.
 
-Input values outside [-1, 1] return `NaN`. To convert radians to degrees, multiply by `180 / Number.PI`.
+Input values outside [-1, 1] return `NaN` (Not a Number) rather than raising an error. Always validate inputs before calling `Number.Acos` on arbitrary data to avoid silently propagating NaN through downstream calculations. Use `Number.IsNaN` to detect NaN results.
+
+To convert the radian result to degrees, multiply by `180 / Number.PI`. To convert a degree angle to a cosine input, use `Number.Cos(degrees * Number.PI / 180)`. A common use case is computing angles between vectors or calculating the angular distance between geographic coordinates using the haversine formula.
 
 ## Examples
 
-### Example 1: Arccosine of 1 (0 degrees)
+### Example 1: Arccosine of 1 returns 0 radians (0 degrees)
 
 ```powerquery
 Number.Acos(1)
@@ -42,7 +44,7 @@ Number.Acos(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 2: Arccosine of -1 (180 degrees)
+### Example 2: Arccosine of -1 returns π radians (180 degrees)
 
 ```powerquery
 Number.Acos(-1)
@@ -52,7 +54,9 @@ Number.Acos(-1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3.141592653589793}]}
 -->
 
-### Example 3: Arccosine of 0.5 (60 degrees)
+### Example 3: Convert arccosine result to degrees
+
+The arccosine of 0.5 is 60 degrees (π/3 radians). Multiply by `180 / Number.PI` to convert.
 
 ```powerquery
 Number.Acos(0.5) * 180 / Number.PI

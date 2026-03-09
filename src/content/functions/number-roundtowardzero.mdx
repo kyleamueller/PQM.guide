@@ -31,15 +31,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.RoundTowardZero` truncates the fractional portion of a number, always moving the result closer to zero. For positive numbers this is equivalent to `Number.RoundDown`; for negative numbers it is equivalent to `Number.RoundUp` (toward zero, not toward negative infinity).
+`Number.RoundTowardZero` truncates the fractional part of a number, always moving the result **toward zero** (never away from zero). For positive numbers, this is equivalent to `Number.RoundDown` (floor). For negative numbers, it is equivalent to `Number.RoundUp` (ceiling) — `-3.9` truncates to `-3`, not `-4`.
 
-Unlike `Number.Round`, no tie-breaking rule applies — the fractional part is simply discarded regardless of its value.
+This contrasts with `Number.RoundDown`, which always rounds toward negative infinity: `Number.RoundDown(-3.9) = -4`, while `Number.RoundTowardZero(-3.9) = -3`.
 
-This function is useful when you want strict truncation behavior: keeping only complete units and never inflating values by rounding up.
+No tie-breaking rule applies — the fractional portion is simply discarded regardless of its magnitude (so `3.1` and `3.9` both become `3`). This makes `Number.RoundTowardZero` useful for:
+
+- **Strict truncation**: retaining only complete units (e.g., full days, full units) without ever inflating values
+- **Integer part extraction**: equivalent to `Number.IntegerDivide(x, 1)` for unit truncation
+- **Decade/bucket bucketing**: `Number.RoundTowardZero(age / 10) * 10` gives the decade bracket
+
+The optional `digits` parameter specifies how many decimal places to preserve after truncation.
 
 ## Examples
 
-### Example 1: Truncate a positive number
+### Example 1: Truncate a positive number to integer
 
 ```powerquery
 Number.RoundTowardZero(3.9)
@@ -49,7 +55,9 @@ Number.RoundTowardZero(3.9)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
 
-### Example 2: Truncate a negative number toward zero
+### Example 2: Truncate a negative number toward zero (not toward -∞)
+
+`-3.9` truncates to `-3`, not `-4`.
 
 ```powerquery
 Number.RoundTowardZero(-3.9)
@@ -69,17 +77,19 @@ Number.RoundTowardZero(1.999, 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.99}]}
 -->
 
-### Example 4: Compute floor-divided age groups
+### Example 4: Bucket salary into decade bracket for each employee
 
 Input: `Employees`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Employees, 4), {"FullName", "Age"}),
-    "Decade", each Number.RoundTowardZero([Age] / 10) * 10, type number
+    Table.SelectColumns(Table.FirstN(Employees, 3), {"FullName", "Salary"}),
+    "SalaryBracket",
+    each Number.RoundTowardZero([Salary] / 10000) * 10000,
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"FullName","type":"text"},{"name":"Age","type":"number"},{"name":"Decade","type":"number"}],"rows":[{"FullName":"alice smith","Age":29,"Decade":20},{"FullName":"BOB JONES","Age":45,"Decade":40},{"FullName":"Charlie Brown","Age":33,"Decade":30},{"FullName":"diana PRINCE","Age":51,"Decade":50}]}
+{"columns":[{"name":"FullName","type":"text"},{"name":"Salary","type":"number"},{"name":"SalaryBracket","type":"number"}],"rows":[{"FullName":"alice smith","Salary":55000,"SalaryBracket":50000},{"FullName":"BOB JONES","Salary":95000,"SalaryBracket":90000},{"FullName":"Charlie Brown","Salary":72000,"SalaryBracket":70000}]}
 -->

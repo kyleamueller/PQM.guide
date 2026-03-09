@@ -24,33 +24,29 @@ relatedFunctions:
 
 ## Remarks
 
-`Excel.CurrentWorkbook` is an Excel-only function that returns a navigation table of all named tables (`ListObject` objects) and named ranges defined in the Excel workbook that contains the current Power Query query. It is used exclusively within Excel's Power Query editor to reference data within the same workbook.
+`Excel.CurrentWorkbook` is an Excel-only function that returns a navigation table of all named tables (`ListObject` objects) and named ranges defined in the workbook that contains the current Power Query query. It provides a way for queries within an Excel workbook to read data from other tables or cells in the same file, enabling self-contained, parameter-driven workbooks.
 
-**Excel only**: This function is not available in Power BI Desktop, Power BI Service, dataflows, or any other Power Query environment. Attempting to use it outside of Excel will result in an error.
+**Excel only**: This function is not available in Power BI Desktop, Power BI Service, dataflows, Fabric Notebooks, or any other Power Query host. It is exclusive to Excel's Power Query engine. Attempting to use it outside of Excel results in a `DataSource.Error`.
 
-**What is returned**: The navigation table includes:
-- `Name` (text) — the name of the table or named range.
-- `Content` (table) — the data as a table.
-- `Kind` (text) — either `"Table"` (for Excel tables / `ListObject`) or `"DefinedName"` (for named ranges).
+**Navigation table columns**:
+- `Name` (text) — the name of the table or named range as defined in Excel.
+- `Content` (table) — the data as a Power Query table. For named ranges, each row of the range becomes a table row.
+- `Kind` (text) — either `"Table"` (for Excel structured tables / `ListObject` objects created via Insert > Table) or `"DefinedName"` (for named ranges created via Formulas > Name Manager).
 
-**Self-referencing warning**: Referencing the same table that a query is loaded into creates a circular dependency. Always reference a different named table or named range as the source.
+**Self-referencing and circular dependency**: If a query is loaded back into a named table in the workbook, referencing that same table with `Excel.CurrentWorkbook` creates a circular dependency and will fail. Always reference a different table or named range — typically a table that holds input parameters or lookup data that no query loads into.
 
-**No authentication required**: The workbook is local, so no credentials are involved.
+**Parameter table pattern**: A common and powerful pattern is to create a two-column Excel table (e.g., `Parameters`) with `Name` and `Value` columns, then read individual parameter values in M using record access. Users can update the parameter values directly in the spreadsheet without opening the Power Query editor. This technique works across multiple queries in the same workbook.
 
-**Query folding**: Not supported.
-
-**Common patterns**:
-- Use a named table (created via Insert > Table in Excel) as a parameter table that controls query behavior.
-- Use named ranges to store configuration values (e.g., a file path, a date filter) that users can update directly in the spreadsheet.
+**No authentication**: Since the data comes from the local workbook, no credentials or data source settings are involved. Query folding is not supported.
 
 ## Examples
 
-### Example 1: List all tables and named ranges in the workbook
+### Example 1: List all tables and named ranges in the current workbook
 ```powerquery
 Excel.CurrentWorkbook()
 ```
 
-### Example 2: Access a specific named table
+### Example 2: Access a specific named table by name
 ```powerquery
 let
     Source = Excel.CurrentWorkbook(),
@@ -59,17 +55,17 @@ in
     SalesTable
 ```
 
-### Example 3: Read a parameter value from a named range
+### Example 3: Read a single parameter value from a named range
 ```powerquery
 let
     Source = Excel.CurrentWorkbook(),
     ParamTable = Source{[Name="Parameters"]}[Content],
-    StartDate = ParamTable{0}[Value]
+    StartDate = ParamTable{[Name="StartDate"]}[Value]
 in
     StartDate
 ```
 
-### Example 4: Use a workbook table as a filter list
+### Example 4: Use a workbook table as a dynamic filter list for another query
 ```powerquery
 let
     AllData = Excel.CurrentWorkbook(){[Name="AllOrders"]}[Content],

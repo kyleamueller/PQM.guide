@@ -26,15 +26,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Sin` returns the trigonometric sine of an angle measured in radians. The result is always in the range [-1, 1].
+`Number.Sin` returns the trigonometric sine of an angle measured in **radians**. The result is always in the range [-1, 1]. Power Query M uses radians throughout — there is no built-in degrees mode. To convert a degree value to radians before passing it to `Number.Sin`, multiply by `Number.PI / 180`.
 
-To convert degrees to radians before calling this function, multiply by `Number.PI / 180`:
+Key reference values: `Number.Sin(0) = 0`, `Number.Sin(Number.PI / 2) = 1` (90°), `Number.Sin(Number.PI)` ≈ `1.22e-16` (should be 0 but is a tiny floating-point residual due to the irrational nature of π). Use `Number.Round` if you need clean values for display or comparison.
 
-```powerquery
-Number.Sin(degrees * Number.PI / 180)
-```
-
-`Number.Sin(0)` returns `0`, `Number.Sin(Number.PI / 2)` returns `1`, and `Number.Sin(Number.PI)` returns approximately `0` (floating-point rounding may produce a very small non-zero value).
+The sine function is odd (`sin(-x) = -sin(x)`) and periodic with period 2π. In Power Query, common uses include computing vertical components of vectors, generating wave-shaped patterns in custom data, and performing coordinate transformations.
 
 ## Examples
 
@@ -48,7 +44,7 @@ Number.Sin(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 2: Sine of 90 degrees (π/2 radians)
+### Example 2: Sine of 90 degrees (π/2 radians) — maximum value
 
 ```powerquery
 Number.Sin(Number.PI / 2)
@@ -58,7 +54,7 @@ Number.Sin(Number.PI / 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 3: Sine of 30 degrees
+### Example 3: Sine of 30 degrees — note floating-point imprecision near 0.5
 
 ```powerquery
 Number.Sin(30 * Number.PI / 180)

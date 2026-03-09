@@ -41,65 +41,75 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.PositionOf` searches for `substring` within `text` and returns the zero-based character position of the match. Returns `-1` if the substring is not found.
+`Text.PositionOf` searches for `substring` within `text` and returns the zero-based character position of the match. Returns `-1` if the substring is not found — not an error, so always check for `-1` before using the result as an offset in `Text.Middle` or similar functions.
 
 The optional `occurrence` parameter accepts values from the `Occurrence` enum:
-- `Occurrence.First` (default, value `0`) — returns the position of the first match
-- `Occurrence.Last` (value `1`) — returns the position of the last match
-- `Occurrence.All` (value `2`) — returns a list of all match positions
+- `Occurrence.First` (default) — returns the position of the first match
+- `Occurrence.Last` — returns the position of the last match
+- `Occurrence.All` — returns a list of all match positions
 
-The optional `comparer` parameter controls how character comparison is performed. By default, an ordinal (byte-by-byte) comparison is used, which is case-sensitive. Pass `Comparer.OrdinalIgnoreCase` for case-insensitive searches.
+Power Query's text functions are case-sensitive by default. Always pass `Comparer.OrdinalIgnoreCase` as the `comparer` parameter when performing case-insensitive position lookups. This is especially important in `Table.SelectRows` predicates where source data casing may be inconsistent. For checking existence alone (without needing the position), `Text.Contains` is simpler and more expressive.
 
-Use `Text.Contains` when you only need to know whether a substring exists, not its position.
+When you use `Occurrence.All`, the return type changes from `number` to `list`. If you then pass this result to another function expecting a number, add a runtime type check or use `List.First` to extract the position.
 
 ## Examples
 
 ### Example 1: Find the position of the first occurrence
 
 ```powerquery
-Text.PositionOf("Hello World Hello", "Hello")
+Text.PositionOf("alice smith", "smith")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":6}]}
 -->
 
-### Example 2: Find the position of the last occurrence
+### Example 2: Case-insensitive position lookup
+
+Power Query is case-sensitive by default — always specify `Comparer.OrdinalIgnoreCase` when casing of the source data is uncertain.
 
 ```powerquery
-Text.PositionOf("Hello World Hello", "Hello", Occurrence.Last)
+Text.PositionOf("BOB JONES", "jones", Occurrence.First, Comparer.OrdinalIgnoreCase)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":12}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":4}]}
 -->
 
-### Example 3: Return all positions
+### Example 3: Return all positions with Occurrence.All
 
 ```powerquery
-Text.PositionOf("abcabc", "a", Occurrence.All)
+Text.PositionOf("Widget A, Widget B, Widget C", "Widget", Occurrence.All)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[0,3]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[0,10,20]}]}
 -->
 
 ### Example 4: Substring not found returns -1
 
+Check for `-1` before using the result as a position offset to avoid downstream errors.
+
 ```powerquery
-Text.PositionOf("Hello World", "xyz")
+Text.PositionOf("alice smith", "manager")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
 -->
 
-### Example 5: Case-insensitive search
+### Example 5: Use position to extract a dynamic suffix
+
+Combine `Text.PositionOf` with `Text.Middle` to extract everything after the first space.
 
 ```powerquery
-Text.PositionOf("Hello World", "hello", Occurrence.First, Comparer.OrdinalIgnoreCase)
+let
+    fullName = "alice smith",
+    spacePos = Text.PositionOf(fullName, " ")
+in
+    if spacePos = -1 then fullName else Text.Middle(fullName, spacePos + 1)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"smith"}]}
 -->

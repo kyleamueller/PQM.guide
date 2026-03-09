@@ -27,19 +27,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.ToTable` converts a record into a two-column table with columns `Name` and `Value`. Each field in the record becomes one row: `Name` holds the field name as text, and `Value` holds the field's value.
+`Record.ToTable` converts a record into a two-column table with columns `Name` (text) and `Value` (any). Each field in the record becomes one row. Row order matches the field order in the record.
 
-This is the inverse of `Record.FromTable`. It is commonly used for:
+This is the inverse of `Record.FromTable`. Common uses include:
 
-- Pivoting a record into a row-based structure for display or export
-- Inspecting record contents in a tabular format
-- Applying list or table operations across all fields
+- **Inspection**: displaying all fields of a record in a structured table view
+- **Finding nulls**: filtering the resulting table for rows where `[Value] = null`
+- **Dynamic field iteration**: applying `Table.SelectRows`, `Table.AddColumn`, or other table operations across all fields without knowing them by name
 
-The order of rows in the result matches the field order in the record.
+The `Value` column has type `any` because records can contain fields of mixed types. After converting to a table, you can filter, sort, or transform by field name using standard table functions.
 
 ## Examples
 
-### Example 1: Convert a simple record to a table
+### Example 1: Convert a record to a two-column Name/Value table
 
 ```powerquery
 Record.ToTable([Name = "Alice", Age = 30, City = "New York"])
@@ -49,7 +49,7 @@ Record.ToTable([Name = "Alice", Age = 30, City = "New York"])
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":"Alice"},{"Name":"Age","Value":30},{"Name":"City","Value":"New York"}]}
 -->
 
-### Example 2: Inspect all fields of a Sales row
+### Example 2: Inspect all fields of the first Sales row
 
 Input: `Sales`
 
@@ -58,14 +58,14 @@ Record.ToTable(Sales{0})
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"Quantity","Value":2},{"Name":"UnitPrice","Value":25}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
 -->
 
-### Example 3: Find which fields contain null values
+### Example 3: Find which fields in a record contain null values
 
 ```powerquery
 let
-    Row = [OrderID = 1, CustomerID = null, Product = "Widget A", Notes = null],
+    Row = [OrderID = 1, CustomerName = null, Product = "Widget A", Notes = null],
     AsTable = Record.ToTable(Row),
     NullFields = Table.SelectRows(AsTable, each [Value] = null)
 in
@@ -73,5 +73,5 @@ in
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"CustomerID","Value":null},{"Name":"Notes","Value":null}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"CustomerName","Value":null},{"Name":"Notes","Value":null}]}
 -->

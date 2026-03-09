@@ -27,13 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.AnyTrue` returns `true` if at least one item in the list is logically true. It short-circuits and returns `true` as soon as a true value is found. Null values are treated as false.
+`List.AnyTrue` returns `true` if at least one item in the list is logically true. It short-circuits and stops evaluating as soon as the first `true` value is found. An empty list returns `false` — there are no items that could satisfy the condition.
 
-This function pairs well with `List.Transform` to check whether any item in a list satisfies a given condition.
+Null values are treated as `false`, so a list of only nulls returns `false`. Non-logical values (such as numbers or text) will cause a type error; use `List.Transform` to evaluate a condition on each item and produce a list of logical values first.
 
-- An empty list returns `false`.
-- Null values are treated as false.
-- Non-logical values may cause an error; transform the list first if needed.
+The typical pattern is `List.AnyTrue(List.Transform(someList, each <condition>))`. As a more concise alternative, `List.MatchesAny` accepts a list and a predicate function in one call. For simple membership checks, `List.Contains` is more idiomatic.
 
 ## Examples
 
@@ -57,16 +55,25 @@ List.AnyTrue({false, false, false})
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
 
-### Example 3: Check if any order exceeds a threshold
+### Example 3: Check if any order in the Sales table has a total over $200
+
+Compute the order total per row, then check if any exceed the threshold.
 
 ```powerquery
 let
-    Orders = {120, 85, 45, 200, 60},
-    AnyLarge = List.AnyTrue(List.Transform(Orders, each _ > 150))
+    Sales = #table(
+        {"CustomerName", "UnitPrice", "Quantity"},
+        {{"Alice", 25.00, 4}, {"Bob", 50.00, 2}, {"Charlie", 15.00, 10}, {"Diana", 25.00, 6}}
+    ),
+    Totals = List.Transform(
+        Table.ToRows(Sales),
+        each _{1} * _{2}
+    ),
+    AnyLarge = List.AnyTrue(List.Transform(Totals, each _ > 200))
 in
     AnyLarge
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->

@@ -35,48 +35,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Contains` checks whether a table includes at least one row that matches the provided record. By default, all fields in the record are compared against corresponding columns in the table. The optional `equationCriteria` parameter can restrict comparison to specific columns or supply a custom comparer.
+`Table.Contains` checks whether a table includes at least one row matching the provided record. By default, every field in the record is compared against the corresponding column. The optional `equationCriteria` parameter can restrict the comparison to specific columns, which is useful when you only care about partial matches (e.g., checking that a CustomerID exists regardless of other column values).
 
-This function is useful for membership tests — for example, verifying that a specific key exists in a lookup table before attempting a join.
+The `equationCriteria` parameter accepts a column name (text), a list of column names, or a comparer function. When restricting to specific columns, the record passed as `row` only needs to include fields for those columns — extra fields in the record are ignored.
+
+For checking multiple rows at once, use `Table.ContainsAll` (all must be present) or `Table.ContainsAny` (at least one must be present). For retrieving matching rows rather than a boolean result, use `Table.SelectRows`. Note that `Table.Contains` does not fold to data sources, so for large source tables prefer `Table.SelectRows` with a count check when folding matters.
 
 ## Examples
 
-### Example 1: Check if a row exists
+### Example 1: Check whether a specific customer has placed an order
 
 ```powerquery
-Table.Contains(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    [ID = 1, Name = "Alice"]
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Charlie","Widget C"}}
+    )
+in
+    Table.Contains(Sales, [CustomerName = "Bob"], "CustomerName")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
-### Example 2: Row not found returns false
+### Example 2: Check for an exact row match (all fields)
+
+Both the CustomerName and Product must match.
 
 ```powerquery
-Table.Contains(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    [ID = 3, Name = "Carol"]
-)
+let
+    Sales = #table(
+        {"CustomerName", "Product"},
+        {{"Alice","Widget A"},{"Bob","Gadget B"},{"Diana","Widget A"}}
+    )
+in
+    Table.Contains(Sales, [CustomerName = "Alice", Product = "Gadget B"])
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
 
-### Example 3: Match on a single column
+### Example 3: Guard a lookup before accessing a record
+
+Use `Table.Contains` to prevent an error when a key may not exist in the lookup table.
 
 ```powerquery
-Table.Contains(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    [ID = 2],
-    "ID"
-)
+let
+    Products = #table(
+        {"ProductID", "ProductName", "Price"},
+        {{1,"Widget A",25.00},{2,"Gadget B",50.00},{3,"Widget C",15.00}}
+    ),
+    SearchID = 99,
+    Exists   = Table.Contains(Products, [ProductID = SearchID], "ProductID"),
+    Result   = if Exists
+               then Table.First(Table.SelectRows(Products, each [ProductID] = SearchID))[ProductName]
+               else "Product not found"
+in
+    Result
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Product not found"}]}
 -->

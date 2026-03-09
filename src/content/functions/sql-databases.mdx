@@ -29,19 +29,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Sql.Databases` connects to a SQL Server instance and returns a navigation table listing all accessible databases on that server. Each row in the result represents a database, and you can drill into a database to access its tables and views — equivalent to calling `Sql.Database` for that database.
+`Sql.Databases` connects to a SQL Server instance at the server level and returns a navigation table listing all databases accessible to the authenticated user. Each row in the result represents a database and includes a `Data` column containing that database's own navigation table — equivalent to the result of calling `Sql.Database` for that database. You can drill in to access schemas, tables, views, and stored procedures.
 
-This function is most useful when you need to enumerate databases on a server programmatically, or when the target database name is not known in advance.
+**When to use Sql.Databases vs Sql.Database**: Use `Sql.Databases` when you need to enumerate all databases on a server, dynamically select a database at runtime, or build cross-database queries that start at the server level. Use `Sql.Database` when you know the target database name in advance — it is more direct and performs better for single-database queries.
 
-**Authentication**: The same authentication options as `Sql.Database` apply — Windows authentication, SQL Server authentication, or Microsoft Account for Azure SQL Database.
+**Authentication**: The same authentication options as `Sql.Database` apply — Windows authentication, SQL Server authentication (username and password), or Microsoft Account for Azure SQL. Configure authentication in the Power Query credentials dialog, not in the M query itself.
 
-**Query folding**: Operations on the resulting navigation table fold back to SQL Server.
+**Navigation structure**: The result is a two-column table with `Name` (database name as text) and `Data` (a navigation table for that database). Drilling into `Data` reveals the schemas and tables within that database, using the same `{[Schema="schemaName", Item="tableName"]}` key record syntax as `Sql.Database`.
+
+**Query folding**: Folding applies once you drill into a specific database and table. The server-level listing itself does not fold.
 
 **Key options**:
-- `ConnectionTimeout` (duration) — how long to wait when establishing the server connection.
-- `SqlCompatibleWindowsAuth` (logical) — forces SQL Server-compatible Windows authentication mode.
+- `ConnectionTimeout` (duration) — maximum time to wait when establishing the server connection.
+- `SqlCompatibleWindowsAuth` (logical) — forces SQL Server-compatible Windows authentication mode, useful for certain gateway or Kerberos configurations.
 
-The resulting table has a `Data` column where each cell contains the navigation table for that database (same structure returned by `Sql.Database`).
+**Power BI Service**: Azure SQL Database supports direct cloud refresh. On-premises SQL Server requires an on-premises data gateway.
 
 ## Examples
 
@@ -50,22 +52,22 @@ The resulting table has a `Data` column where each cell contains the navigation 
 Sql.Databases("localhost")
 ```
 
-### Example 2: List databases on Azure SQL Server
+### Example 2: List all databases on Azure SQL Server
 ```powerquery
 Sql.Databases("myserver.database.windows.net")
 ```
 
-### Example 3: Drill into a specific database from the server-level navigation
+### Example 3: Drill into a specific database and table
 ```powerquery
 let
     Server = Sql.Databases("localhost"),
     AdventureWorks = Server{[Name="AdventureWorks"]}[Data],
-    dbo_Products = AdventureWorks{[Schema="dbo", Item="Product"]}[Data]
+    Products = AdventureWorks{[Schema="Production", Item="Product"]}[Data]
 in
-    dbo_Products
+    Products
 ```
 
-### Example 4: List all database names from the server
+### Example 4: Extract just the list of accessible database names
 ```powerquery
 let
     Source = Sql.Databases("localhost"),

@@ -36,53 +36,53 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.PositionOfAny` searches `text` for any character that appears in the `characters` list and returns the position of the first such match. Returns `-1` if no character from the list is found.
+`Text.PositionOfAny` searches `text` for any character that appears in the `characters` list and returns the position of the first such match. Returns `-1` if no character from the list is found — not an error. Like `Text.PositionOf`, always check for `-1` before using the result as an offset.
 
-The `characters` parameter must be a list of single-character text values (e.g., `{"a", "b", "c"}`). Each element is treated as an individual character to match, not as a multi-character substring.
+The `characters` parameter is a list of single-character text values. Each element is matched independently as a single character, not as a substring. This is the key difference from `Text.PositionOf`, which searches for a multi-character substring. Use `Text.PositionOfAny` when you want to find the first occurrence of any one of a set of characters — for example, the first digit, the first punctuation character, or the first whitespace.
 
 The optional `occurrence` parameter accepts:
 - `Occurrence.First` (default) — position of the first matching character
 - `Occurrence.Last` — position of the last matching character
-- `Occurrence.All` — list of all positions where a matching character appears
+- `Occurrence.All` — a list of all positions where any matching character appears
 
-This function is useful for finding the first special character, digit, or punctuation mark in a string.
+Note that `Text.PositionOfAny` does not accept a `comparer` parameter — the character matching is always case-sensitive. To perform case-insensitive matching, normalize the text with `Text.Lower` or `Text.Upper` before calling this function, and also lowercase or uppercase your `characters` list accordingly.
 
 ## Examples
 
-### Example 1: Find the position of the first digit
+### Example 1: Find the position of the first digit in a string
 
 ```powerquery
-Text.PositionOfAny("ABC123", {"0","1","2","3","4","5","6","7","8","9"})
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
--->
-
-### Example 2: Find the first vowel
-
-```powerquery
-Text.PositionOfAny("Hello", {"a","e","i","o","u"})
+Text.PositionOfAny("E001", {"0","1","2","3","4","5","6","7","8","9"})
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 3: Return all positions of matching characters
+### Example 2: Find the first separator character in a phone number
 
 ```powerquery
-Text.PositionOfAny("a1b2c3", {"1","2","3"}, Occurrence.All)
+Text.PositionOfAny("(555) 123-4567", {"(",")"," ","-"})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[1,3,5]}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 3: Get all positions of punctuation in a string
+
+```powerquery
+Text.PositionOfAny("alice.smith@example.com", {".", "@"}, Occurrence.All)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[5,11,19]}]}
 -->
 
 ### Example 4: No match returns -1
 
 ```powerquery
-Text.PositionOfAny("Hello", {"x","y","z"})
+Text.PositionOfAny("AliceSmith", {"0","1","2","3","4","5","6","7","8","9"})
 ```
 
 <!--output

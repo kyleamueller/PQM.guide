@@ -28,13 +28,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.ToRecord` decomposes a `date` value into a record with three numeric fields: `Year`, `Month`, and `Day`. This is useful when you need all three components at once and want to avoid calling `Date.Year`, `Date.Month`, and `Date.Day` separately. You can expand the record into table columns using `Table.ExpandRecordColumn`.
+`Date.ToRecord` decomposes a `date` value into a record with three numeric fields: `Year`, `Month`, and `Day`. This is useful when you need all three components at once and want to avoid calling `Date.Year`, `Date.Month`, and `Date.Day` separately in three separate columns. You can expand the record into separate table columns using `Table.ExpandRecordColumn`.
+
+Note that `Date.ToRecord` requires a plain `date` input — it does not accept `datetime` or `datetimezone` values. For those types, use `DateTime.ToRecord` or `DateTimeZone.ToRecord`. The field names in the returned record are always `Year`, `Month`, and `Day` (capitalized), which you reference when expanding the record.
+
+A common alternative to `Date.ToRecord` is simply calling the individual accessor functions `Date.Year`, `Date.Month`, and `Date.Day` directly in separate `Table.AddColumn` calls. Use `Date.ToRecord` when all three columns are needed at once and a single expansion step is preferable for readability.
 
 ## Examples
 
-### Example 1: Expand date components into separate columns
+### Example 1: Expand date components into separate Year, Month, Day columns
 
-Decompose each OrderDate into Year, Month, and Day columns.
+Decompose each OrderDate into three separate numeric columns.
 
 Input: `Sales`
 
@@ -58,7 +62,7 @@ Table.ExpandRecordColumn(
 
 ### Example 2: Decompose a specific date into a record
 
-Return the Year, Month, Day record for March 15, 2024.
+Return the component record for March 15, 2024.
 
 ```powerquery
 Date.ToRecord(#date(2024, 3, 15))
@@ -66,4 +70,25 @@ Date.ToRecord(#date(2024, 3, 15))
 
 <!--output
 {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Year","Value":2024},{"Field":"Month","Value":3},{"Field":"Day","Value":15}]}
+-->
+
+### Example 3: Use record fields directly without expansion
+
+Access individual fields from the record inline without expanding into columns.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "OrderDate"}),
+    "YearMonth",
+    each
+        let r = Date.ToRecord([OrderDate])
+        in Text.From(r[Year]) & "-" & Text.PadStart(Text.From(r[Month]), 2, "0"),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"YearMonth","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","YearMonth":"2024-01"},{"OrderID":2,"OrderDate":"2024-01-18","YearMonth":"2024-01"},{"OrderID":3,"OrderDate":"2024-02-01","YearMonth":"2024-02"},{"OrderID":4,"OrderDate":"2024-02-10","YearMonth":"2024-02"}]}
 -->

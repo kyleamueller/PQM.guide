@@ -31,36 +31,61 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInNextNWeeks` returns `true` if the input date falls within the next N complete calendar weeks (Sunday–Saturday) after the current week. The current week itself is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
+`Date.IsInNextNWeeks` returns `true` if the input date falls within the next N complete Sunday–Saturday calendar weeks after the current week. The current week itself is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
+
+Weeks are always Sunday-to-Saturday boundaries — there is no parameter to use Monday-based weeks. If your organization uses Monday-based weeks, build the filter manually using `Date.StartOfWeek(Date.From(DateTime.LocalNow()), Day.Monday)`.
+
+This function counts complete weeks, not a rolling 7-day window. For a rolling N-day window from tomorrow, use `Date.IsInNextNDays(n * 7)` instead.
 
 ## Examples
 
-### Example 1: Find tasks due in the next 2 weeks
+### Example 1: Find orders due in the next 2 weeks
 
-Keep only rows where DueDate falls within the next 2 calendar weeks.
+Keep only rows where OrderDate falls within the next 2 complete Sunday–Saturday weeks.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Tasks,
-    each Date.IsInNextNWeeks([DueDate], 2)
+    Sales,
+    each Date.IsInNextNWeeks([OrderDate], 2)
 )
 ```
 
 <!--output
-{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":6,"DueDate":"2026-03-15","TaskName":"Client call"},{"TaskID":7,"DueDate":"2026-03-20","TaskName":"Review budget"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-03-15"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-03-20"}]}
 -->
 
-### Example 2: Flag deliverables due in the next 4 weeks
+### Example 2: Flag orders due in the next 4 weeks
 
-Add a boolean column for items due within the next 4 weeks.
+Add a boolean column for orders due within the next 4 complete weeks.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Deliverables,
-    "DueInNext4Weeks", each Date.IsInNextNWeeks([DueDate], 4), type logical
+    Sales,
+    "DueInNext4Weeks", each Date.IsInNextNWeeks([OrderDate], 4), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"DelivID","type":"text"},{"name":"DueDate","type":"date"},{"name":"DueInNext4Weeks","type":"logical"}],"rows":[{"DelivID":"D01","DueDate":"2026-03-20","DueInNext4Weeks":true},{"DelivID":"D02","DueDate":"2026-04-15","DueInNext4Weeks":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DueInNext4Weeks","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","DueInNext4Weeks":false},{"OrderID":43,"OrderDate":"2026-03-15","DueInNext4Weeks":true},{"OrderID":46,"OrderDate":"2026-04-15","DueInNext4Weeks":false}]}
+-->
+
+### Example 3: Combine current and next 2 weeks for a 3-week window
+
+Flag rows falling in either the current week or the next 2 weeks.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentWeek([OrderDate]) or Date.IsInNextNWeeks([OrderDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":42,"CustomerName":"Charlie","OrderDate":"2026-03-08"},{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-03-15"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-03-20"}]}
 -->

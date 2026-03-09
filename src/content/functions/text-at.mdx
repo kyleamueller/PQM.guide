@@ -33,52 +33,49 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.At` returns a single character from `text` at the specified zero-based `index`. The first character is at index 0, the second at index 1, and so on.
+`Text.At` returns a single character from `text` at the specified zero-based `index`. The first character is at index 0. It is equivalent to `Text.Middle(text, index, 1)` but expresses single-character access more clearly.
 
-If `text` is `null`, the function returns `null`. If `index` is out of range (negative or equal to or greater than the length of the text), an error is raised.
+If `text` is `null`, the function returns `null`. If `index` is out of range — negative, or equal to or greater than the text length — an error is raised. Always validate the index or text length before calling this function on variable-length data to avoid runtime errors.
 
-This function behaves similarly to accessing a list item by index. It is equivalent to `Text.Middle(text, index, 1)`.
-
-To extract multiple characters or a range, use `Text.Middle` or `Text.Range`. To get all characters as a list, use `Text.ToList`.
+Use `Text.At` when you need a specific character by position. For extracting a range of characters, use `Text.Middle` or `Text.Range`. For iterating over every character, `Text.ToList` is more efficient than calling `Text.At` in a loop. To find the position of a character rather than retrieve it, use `Text.PositionOf`.
 
 ## Examples
 
-### Example 1: Get the first character
+### Example 1: Get the first character of a string
 
 ```powerquery
-Text.At("Power Query", 0)
+Text.At("Widget A", 0)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"P"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"W"}]}
 -->
 
-### Example 2: Get the sixth character (zero-based index 5)
+### Example 2: Extract the category prefix from a product code
+
+Employee IDs like `"E001"` use a letter prefix — `Text.At` retrieves it by position.
 
 ```powerquery
-Text.At("Power Query", 6)
+Text.At("E001", 0)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Q"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"E"}]}
 -->
 
-### Example 3: Extract the separator character from a code
+### Example 3: Read the separator character in a formatted string
+
+Validate that the third character of a code string is the expected separator before parsing the rest.
 
 ```powerquery
-Text.At("US-12345", 2)
+let
+    code = "US-12345",
+    sep = Text.At(code, 2),
+    isValid = sep = "-"
+in
+    isValid
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"-"}]}
--->
-
-### Example 4: Handle null input
-
-```powerquery
-Text.At(null, 0)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->

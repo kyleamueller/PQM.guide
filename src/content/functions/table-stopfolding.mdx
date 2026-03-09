@@ -25,44 +25,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.StopFolding` breaks the query folding chain. Any transformations applied after this function are evaluated locally in the Power Query engine rather than being translated and sent to the data source (e.g., as SQL). The table's data and structure are unchanged.
+`Table.StopFolding` explicitly breaks the query folding chain at the point where it is applied. Any Power Query steps after `Table.StopFolding` are evaluated locally by the Power Query engine rather than being translated into a source-native query (such as SQL or OData `$filter`). The table's data and column structure are unchanged — only the execution model is affected.
 
-Use this function when:
-- You want to ensure predictable local evaluation of a step.
-- A downstream transformation is incompatible with folding and you want to control exactly where the data is fetched.
-- You are debugging and want to isolate which steps fold vs. which are evaluated locally.
+Use `Table.StopFolding` when:
+- A downstream step is incompatible with folding (e.g., a custom M function or a complex transformation) and the engine would otherwise generate an incorrect or overly broad native query to compensate.
+- Query folding is producing unexpected results from the data source (e.g., the source interprets a folded filter differently than M would), and you need to force local evaluation for correctness.
+- You are debugging query folding behavior and want to definitively mark where the fold boundary should be.
 
-Note that breaking folding can significantly increase query execution time for large data sources because all data must be retrieved before local operations begin.
+**Gotcha:** Breaking folding means all rows must be transferred from the data source to the Power Query engine before local operations begin. On large tables this can be extremely slow — use `Table.StopFolding` judiciously and as close to the end of the pipeline as possible. In many cases, `Table.Buffer` is a better choice when the goal is to cache a snapshot of the data rather than to control folding semantics.
 
 ## Examples
 
-### Example 1: Stop folding before a custom transformation
+### Example 1: Force local evaluation after a non-foldable step in a SQL pipeline
 
 ```powerquery
 let
-    Source  = Sql.Database("server", "db"),
-    Orders  = Source{[Schema="dbo", Item="Orders"]}[Data],
-    Stopped = Table.StopFolding(Orders),
-    Filtered = Table.SelectRows(Stopped, each [Amount] > 100)
+    Source   = Sql.Database("myserver", "SalesDB"),
+    Orders   = Source{[Schema="dbo", Item="Orders"]}[Data],
+    Stopped  = Table.StopFolding(Orders),
+    Enriched = Table.AddColumn(Stopped, "RevenueCategory",
+                   each if [Amount] > 500 then "High" else "Low", type text)
+in
+    Enriched
+```
+
+<!--output
+{"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"RevenueCategory is computed locally; no SQL translation is attempted for this column."}]}
+-->
+
+### Example 2: Prevent folding when a data source misinterprets a filter
+
+When a source applies case-sensitive filtering but M should apply case-insensitive, stop folding to ensure M's semantics apply.
+
+```powerquery
+let
+    Source   = Sql.Database("myserver", "CRM"),
+    Contacts = Source{[Schema="dbo", Item="Contacts"]}[Data],
+    Local    = Table.StopFolding(Contacts),
+    Filtered = Table.SelectRows(Local, each Text.Lower([LastName]) = "smith")
 in
     Filtered
 ```
 
 <!--output
-{"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Returns filtered rows evaluated locally after stopping fold at Stopped step."}]}
+{"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Filter is applied locally by M after all rows are fetched, ensuring case-insensitive matching."}]}
 -->
 
-### Example 2: Stop folding to ensure local evaluation
+### Example 3: Use Table.Buffer as a folding alternative when caching is the real goal
+
+If the intent is to cache data (not control folding semantics), `Table.Buffer` is usually the right choice. `Table.StopFolding` does not buffer — it simply prevents further folding without guaranteeing the data is materialized once.
 
 ```powerquery
 let
-    Source  = OData.Feed("https://services.odata.org/V4/Northwind/"),
-    Products = Source{[Name="Products"]}[Data],
-    Local    = Table.StopFolding(Products)
+    Source  = Sql.Database("myserver", "Analytics"),
+    Sales   = Source{[Schema="dbo", Item="Sales"]}[Data],
+    // Use Table.Buffer to materialize and cache, preventing repeated source queries:
+    Buffered = Table.Buffer(Sales),
+    Joined   = Table.NestedJoin(Buffered, "CustomerID", OtherTable, "ID", "Matches")
 in
-    Table.RowCount(Local)
+    Joined
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"77"}]}
+{"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Table.Buffer materializes Sales once; subsequent operations read from memory rather than re-querying the source."}]}
 -->

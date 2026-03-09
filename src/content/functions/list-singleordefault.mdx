@@ -31,13 +31,14 @@ relatedFunctions:
 
 ## Remarks
 
-`List.SingleOrDefault` is a null-safe version of `List.Single`. It returns the single element from the list if exactly one exists, returns the `default` value (or `null`) if the list is empty, and throws an error if the list has more than one element.
+`List.SingleOrDefault` is a null-safe version of `List.Single`. It returns the single element from the list if exactly one exists, or returns the `default` value (defaulting to `null` if omitted) if the list is empty. If the list has more than one element, it still throws an error — the "or default" only applies to the empty-list case.
 
-This function is commonly used for lookups where no match is acceptable (returns null or a sentinel value) but multiple matches indicate a data quality issue.
+This is the right choice for lookups where no match is valid and should return a fallback value, but multiple matches indicate a data quality issue that should surface as an error. It documents intent clearly: "I expect zero or one results; more than one is a bug."
 
-- If `default` is omitted, `null` is returned for an empty list.
-- A list with more than one element throws an error regardless of the `default` parameter.
-- To also handle the multiple-element case without errors, use `List.First` instead.
+- If `default` is omitted, an empty list returns `null`.
+- A list with more than one element throws: `Expression.Error: There were too many elements in the enumeration.`
+- To silently take the first of multiple results, use `List.First` with a `default` parameter.
+- To require exactly one result (no empty allowed), use `List.Single`.
 
 ## Examples
 

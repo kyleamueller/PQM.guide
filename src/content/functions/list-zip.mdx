@@ -27,14 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Zip` transposes a list of lists. Given `{{a1, a2, a3}, {b1, b2, b3}}`, it returns `{{a1, b1}, {a2, b2}, {a3, b3}}`. Each output inner list combines elements at the same index position from all input lists.
+`List.Zip` transposes a list of lists, combining elements at the same index position from each input list into new inner lists. Given `{{a1, a2, a3}, {b1, b2, b3}}`, it returns `{{a1, b1}, {a2, b2}, {a3, b3}}`. This is the same as a matrix transpose operation and is analogous to Python's `zip()` function.
 
-This is equivalent to a matrix transpose operation. It is commonly used to pair elements from multiple parallel lists — for example, combining a list of keys with a list of values, or pairing items with their positions from `List.Positions`.
+The output length equals the length of the **shortest** input list — extra elements from longer lists are silently dropped. If any input list is empty, the result is an empty list. Applying `List.Zip` twice on a rectangular (equal-length) list of lists returns the original arrangement.
 
-- The output length equals the length of the **shortest** input list (extra elements in longer lists are dropped).
-- If any input list is empty, the result is an empty list.
-- For two-list zipping, the output is a list of two-element lists: `{{a1, b1}, {a2, b2}, ...}`.
-- Applying `List.Zip` twice to a rectangular list of lists returns the original arrangement.
+The most common use of `List.Zip` is pairing a list of items with their index positions via `List.Positions`, enabling index-aware transformations. It is also used to combine parallel data columns from separate lists, or to build rows for `Table.FromRows` from positionally-aligned column lists.
 
 ## Examples
 

@@ -27,7 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.IsInNextHour` returns `true` if the input `datetime` or `datetimezone` value falls within the clock hour immediately following the current hour (as determined by `DateTime.LocalNow()`). For example, if it is currently 10:xx, this function returns `true` for any datetime between 11:00:00 and 11:59:59.9999999. The function is re-evaluated on each query refresh.
+`DateTime.IsInNextHour` returns `true` if the input `datetime` or `datetimezone` value falls within the clock hour immediately following the current hour, as determined by `DateTime.LocalNow()`. For example, if it is currently 10:xx, this function returns `true` for any datetime between 11:00:00 and 11:59:59.9999999. The current hour itself is not included — use `DateTime.IsInCurrentHour` to also match the current hour. The function is re-evaluated on each query refresh.
+
+Like all `DateTime.IsIn*` functions, this uses the local system clock as its reference. In Power BI Service and Dataflows, the "local" clock typically reflects UTC (the cloud region's system time), not your personal timezone. Keep this in mind when deploying solutions that use hour-level filtering in cloud-refresh scenarios.
+
+`DateTime.IsInNextHour` is most practical in near-real-time or streaming scenarios where data is loaded continuously and you want to flag upcoming events or scheduled tasks within the next clock hour. For broader lookahead windows, use `DateTime.IsInNextNHours`.
 
 ## Examples
 
@@ -37,26 +41,43 @@ Keep only rows where EventTime falls in the next clock hour.
 
 ```powerquery
 Table.SelectRows(
-    Events,
-    each DateTime.IsInNextHour([EventTime])
+    OrderLog,
+    each DateTime.IsInNextHour([Timestamp])
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventName","type":"text"}],"rows":[{"EventID":55,"EventTime":"2026-03-08T11:15:00","EventName":"Team standup"},{"EventID":56,"EventTime":"2026-03-08T11:45:00","EventName":"Code review"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[]}
 -->
 
-### Example 2: Flag next-hour events
+### Example 2: Flag next-hour log entries
 
-Add a boolean column for events in the next hour.
+Add a boolean column for log entries in the next hour.
 
 ```powerquery
 Table.AddColumn(
-    Events,
-    "IsNextHour", each DateTime.IsInNextHour([EventTime]), type logical
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "IsNextHour", each DateTime.IsInNextHour([Timestamp]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"IsNextHour","type":"logical"}],"rows":[{"EventID":54,"EventTime":"2026-03-08T10:50:00","IsNextHour":false},{"EventID":55,"EventTime":"2026-03-08T11:15:00","IsNextHour":true},{"EventID":57,"EventTime":"2026-03-08T12:00:00","IsNextHour":false}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"IsNextHour","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","IsNextHour":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","IsNextHour":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","IsNextHour":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","IsNextHour":false}]}
+-->
+
+### Example 3: Build a two-hour alert window (current + next hour)
+
+Flag events that are happening now or in the next hour for a short-horizon alert view.
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "AlertWindow",
+    each DateTime.IsInCurrentHour([Timestamp]) or DateTime.IsInNextHour([Timestamp]),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"AlertWindow","type":"logical"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","AlertWindow":false},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","AlertWindow":false},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","AlertWindow":false},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","AlertWindow":false}]}
 -->

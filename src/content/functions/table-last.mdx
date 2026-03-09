@@ -30,45 +30,64 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Last` returns the last row of a table as a record, enabling field access via `[FieldName]` syntax. If the table is empty and no `default` is provided, the function returns `null`.
+`Table.Last` returns the last row of a table as a record, enabling field access via `[FieldName]` syntax. If the table is empty and no `default` value is provided, it returns `null`. Providing a default prevents errors in pipelines where the table may occasionally be empty after filtering.
 
-This function is useful for retrieving the most recent record in a sorted or ordered dataset, such as the latest transaction date or the final entry in a log.
+`Table.Last` is the counterpart of `Table.First`. It is most useful when retrieving the most recent record in a time-ordered dataset — for example, the latest transaction after sorting by date, or the final log entry. Combine with `Table.Sort` to ensure deterministic results: `Table.Last(Table.Sort(table, {{"Date", Order.Ascending}}))` reliably returns the row with the maximum date.
+
+For cases where you need to enforce that exactly one row exists, use `Table.SingleRow`. To extract just the bottom-left scalar value without unpacking a record, chain field access: `Table.Last(table)[ColumnName]`. Note that without a prior sort, "last" refers to whatever row physically appears last in the table, which may not be deterministic for database sources.
 
 ## Examples
 
-### Example 1: Get the last row as a record
+### Example 1: Get the most recent order after sorting by date
 
 ```powerquery
-Table.Last(
-    #table({"Date", "Amount"}, {{"2024-01-01", 100}, {"2024-01-02", 200}})
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice", "OrderDate"},
+        {{1,"Alice","Widget A",25.00,#date(2024,1,15)},
+         {2,"Bob","Gadget B",50.00,#date(2024,1,18)},
+         {3,"Charlie","Widget C",15.00,#date(2024,2,1)},
+         {8,"Diana","Widget C",15.00,#date(2024,4,15)}}
+    ),
+    Sorted = Table.Sort(Sales, {{"OrderDate", Order.Ascending}})
+in
+    Table.Last(Sorted)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Date = \"2024-01-02\", Amount = 200]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 8, CustomerName = \"Diana\", Product = \"Widget C\", UnitPrice = 15, OrderDate = #date(2024,4,15)]"}]}
 -->
 
-### Example 2: Access a field from the last row
+### Example 2: Extract the latest order date as a scalar
 
 ```powerquery
-Table.Last(
-    #table({"Date", "Amount"}, {{"2024-01-01", 100}, {"2024-01-02", 200}})
-)[Amount]
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "OrderDate"},
+        {{1,"Alice",#date(2024,1,15)},{2,"Bob",#date(2024,1,18)},{8,"Diana",#date(2024,4,15)}}
+    ),
+    Sorted = Table.Sort(Sales, {{"OrderDate", Order.Ascending}})
+in
+    Table.Last(Sorted)[OrderDate]
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"200"}]}
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-04-15"}]}
 -->
 
-### Example 3: Return a default when the table is empty
+### Example 3: Return a safe default for an empty table
 
 ```powerquery
-Table.Last(
-    #table({"Date", "Amount"}, {}),
-    [Date = null, Amount = 0]
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Region"},
+        {{1,"Alice","East"},{2,"Bob","West"}}
+    ),
+    Filtered = Table.SelectRows(Sales, each [Region] = "South")
+in
+    Table.Last(Filtered, [OrderID = 0, CustomerName = "None", Region = "N/A"])
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Date = null, Amount = 0]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"None\", Region = \"N/A\"]"}]}
 -->

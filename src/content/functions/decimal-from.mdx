@@ -30,15 +30,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Decimal.From` converts a value to the decimal number type, which uses fixed-point arithmetic to avoid the binary floating-point rounding errors that can occur with `Double.From`. The decimal type in Power Query maps to the .NET `Decimal` type with 28–29 significant digits.
+`Decimal.From` converts a value to the decimal number type, which uses fixed-point arithmetic rather than binary floating-point. In Power Query M, "Decimal Number" in the UI corresponds to this type, which maps to the .NET `Decimal` type with 28–29 significant digits of precision. The default `number` type in M is a 64-bit IEEE 754 double, which cannot represent all decimal fractions exactly.
 
-This is especially important for financial and monetary values where exact decimal representation matters — for example, `0.1 + 0.2` in binary floating-point does not equal exactly `0.3`, but in decimal arithmetic it does.
+The most practical implication is that values like `0.1`, `0.2`, and `0.3` are stored exactly as `Decimal` but are approximated in binary floating-point (double). Summing thousands of currency or tax amounts using double arithmetic can introduce small cumulative rounding errors that would not occur with decimal arithmetic. For this reason, `Decimal.From` is preferred over `Double.From` in financial data modeling.
 
-Text values are parsed using the specified culture. `true` converts to `1`, `false` to `0`, `null` to `null`.
+Compared to `Currency.From`, the decimal type is more general: it is not limited to 4 decimal places and supports up to 28–29 significant digits. Use `Decimal.From` when you need high-precision fixed-point arithmetic without the 4-decimal-place constraint of the currency type. Text values are parsed using the specified culture — pass `"de-DE"` for German-format numbers, for example. Logical `true` converts to `1`, `false` to `0`, and `null` returns `null`.
 
 ## Examples
 
-### Example 1: Exact decimal representation
+### Example 1: Exact decimal arithmetic avoids floating-point drift
+
+In double precision, `0.1 + 0.2` does not equal exactly `0.3`. The decimal type eliminates this.
 
 ```powerquery
 Decimal.From(0.1) + Decimal.From(0.2)
@@ -48,7 +50,7 @@ Decimal.From(0.1) + Decimal.From(0.2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.3}]}
 -->
 
-### Example 2: Convert a text value
+### Example 2: Parse a text value with 4 decimal places
 
 ```powerquery
 Decimal.From("1234.5678")
@@ -58,17 +60,17 @@ Decimal.From("1234.5678")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.5678}]}
 -->
 
-### Example 3: Apply to a price column for exact arithmetic
+### Example 3: Apply decimal type to price column in Sales
 
 Input: `Sales`
 
 ```powerquery
 Table.TransformColumnTypes(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "UnitPrice"}),
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
     {{"UnitPrice", Decimal.Type}}
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25.99},{"OrderID":2,"UnitPrice":149.99},{"OrderID":3,"UnitPrice":74.50}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25.0},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50.0},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15.0},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75.0}]}
 -->

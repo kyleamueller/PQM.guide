@@ -35,50 +35,56 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.RemoveRange` removes `count` characters from `text` beginning at the zero-based `offset` position. The characters before `offset` and after `offset + count` are concatenated to form the result.
+`Text.RemoveRange` removes `count` characters from `text` beginning at the zero-based `offset` position. The characters before `offset` and after `offset + count` are concatenated to form the result. The original string is not modified — a new value is returned.
 
 If `text` is `null`, the function returns `null`. If `count` is omitted or `null`, all characters from `offset` to the end of the string are removed. If `count` extends beyond the length of the string, all characters from `offset` onward are removed without error.
 
 This is equivalent to: `Text.Start(text, offset) & Text.End(text, Text.Length(text) - offset - count)`
 
+Use `Text.RemoveRange` for positional removal — when you know the exact character position and length of the content to remove. If you want to remove by content (all occurrences of a substring), use `Text.Replace(text, toRemove, "")`. If you want to replace removed characters with new content rather than nothing, use `Text.ReplaceRange`.
+
 ## Examples
 
-### Example 1: Remove characters from the middle
+### Example 1: Strip a known prefix from a column
+
+Remove the `"E"` prefix from employee IDs to extract the numeric portion.
 
 ```powerquery
-Text.RemoveRange("Hello World", 5, 6)
+Text.RemoveRange("E001", 0, 1)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"001"}]}
 -->
 
-### Example 2: Remove a separator character
+### Example 2: Remove a separator character at a known position
 
 ```powerquery
-Text.RemoveRange("US-12345", 2, 1)
+Text.RemoveRange("(555) 123-4567", 0, 1)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US12345"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"555) 123-4567"}]}
 -->
 
-### Example 3: Remove everything from offset to end
+### Example 3: Remove everything from an offset to the end
+
+Omitting the `count` parameter removes all characters from `offset` onward.
 
 ```powerquery
-Text.RemoveRange("Hello World", 5)
+Text.RemoveRange("Sales Rep - East Region", 9)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Sales Rep"}]}
 -->
 
-### Example 4: Remove a prefix
+### Example 4: Remove an internal segment from a formatted string
 
 ```powerquery
-Text.RemoveRange("ID-12345", 0, 3)
+Text.RemoveRange("Widget-East-001", 6, 5)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"12345"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Widget-001"}]}
 -->

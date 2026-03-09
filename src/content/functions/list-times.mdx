@@ -35,12 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Times` generates a sequence of `time` values. Time values represent a time of day (hours, minutes, seconds) without a date component.
+`List.Times` generates a sequence of `time` values representing times of day (hours, minutes, seconds) without a date component. It is useful for building appointment slot lists, time-of-day dimension tables, or scheduling grids.
 
-- The `step` parameter uses `#duration(days, hours, minutes, seconds)` syntax.
-- If the generated time exceeds 23:59:59, it wraps around (times are cyclic within a 24-hour day).
-- `count` must be a non-negative integer; `0` returns an empty list.
-- Use `List.DateTimes` when a date component is also needed.
+The `step` parameter uses the `#duration(days, hours, minutes, seconds)` syntax. For 30-minute slots use `#duration(0, 0, 30, 0)`; for 1-hour slots use `#duration(0, 1, 0, 0)`. If the generated time exceeds `23:59:59`, it wraps around — for example, `#time(23, 0, 0)` with a 2-hour step produces `23:00:00` then `1:00:00`.
+
+A `count` of 0 returns an empty list. Use `List.DateTimes` when a full date-and-time value is needed. To convert the resulting list to a table for use as a dimension, use `Table.FromList` with `Splitter.SplitByNothing()` and a single column name.
 
 ## Examples
 

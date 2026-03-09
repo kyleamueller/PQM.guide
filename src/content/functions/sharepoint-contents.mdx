@@ -30,29 +30,29 @@ relatedFunctions:
 
 ## Remarks
 
-`SharePoint.Contents` connects to a SharePoint Online or SharePoint on-premises site and returns a navigation table of all lists, document libraries, and subsites available at that URL. It is a general-purpose SharePoint connector that exposes the full site structure.
+`SharePoint.Contents` connects to a SharePoint Online or SharePoint on-premises site and returns a navigation table of all lists, document libraries, and subsites available at that URL. It is the most general-purpose SharePoint connector, exposing the full site structure as a hierarchical navigation table. For production queries, consider using `SharePoint.Files` (for files in document libraries) or `SharePoint.Tables` (for structured SharePoint list data), which are purpose-built and simpler to navigate.
 
-**Authentication**: Microsoft Account (OAuth) for SharePoint Online, or Windows/Basic credentials for SharePoint on-premises. Configure credentials in the Power Query credentials dialog using the SharePoint site root URL as the credential scope.
+**Navigation table structure**: The result is a hierarchical table where each row represents a list, library, or subsite. Each row includes a `Name` column and a `Data` column containing a nested navigation table for that item. Document libraries show file metadata and binary content; lists show list items; subsites expose their own nested structure.
 
-**Query folding**: Limited. Some filters may fold to SharePoint REST API queries, but complex transformations are performed in Power Query.
+**Authentication**: Microsoft Account (OAuth 2.0) for SharePoint Online. Windows or Basic credentials for SharePoint on-premises. Configure credentials in the Power Query data source settings dialog using the site root URL as the credential scope. If you connect to multiple SharePoint sites in the same tenant, they typically share the same credential when the root domain matches.
 
-**Navigating the result**: The returned table has a hierarchical structure. Each row may have a `Data` column containing a nested navigation table of that list's contents or a document library's files. This is useful for browsing interactively, but for production queries, prefer `SharePoint.Files` (for files) or `SharePoint.Tables` (for list data).
+**URL format**: Use the site collection root URL (e.g., `https://contoso.sharepoint.com/sites/Finance`) rather than a subsite URL or library URL. The connector enumerates content downward from the URL you provide. Using the tenant root (`https://contoso.sharepoint.com`) will enumerate all site collections, which may be very slow.
 
-**On-premises SharePoint**: Supported with Windows authentication and an on-premises data gateway for Power BI Service refresh.
+**On-premises SharePoint**: Fully supported with Windows authentication and an on-premises data gateway for Power BI Service scheduled refresh.
 
 **Key option**:
-- `ApiVersion` (number) — the SharePoint REST API version to use. Defaults to 15 (SharePoint 2013+). Set to 14 for SharePoint 2010.
+- `ApiVersion` (number) — the SharePoint REST API version. Defaults to `15` (SharePoint 2013 and later). Set to `14` for SharePoint 2010.
 
-Use the site root URL (e.g., `https://contoso.sharepoint.com/sites/Finance`) rather than a subsite or library URL for the broadest navigation table.
+**Query folding**: Limited. Some simple row filters may fold to the SharePoint REST API, but most transformations are performed in Power Query after data retrieval.
 
 ## Examples
 
-### Example 1: Connect to a SharePoint site
+### Example 1: Browse all lists and libraries on a SharePoint site
 ```powerquery
 SharePoint.Contents("https://contoso.sharepoint.com/sites/Finance")
 ```
 
-### Example 2: Navigate to a specific document library
+### Example 2: Navigate to a specific document library by name
 ```powerquery
 let
     Site = SharePoint.Contents("https://contoso.sharepoint.com/sites/Finance"),
@@ -61,7 +61,7 @@ in
     Documents
 ```
 
-### Example 3: List all available lists and libraries on a site
+### Example 3: List the names of all lists and libraries on a site
 ```powerquery
 let
     Source = SharePoint.Contents("https://contoso.sharepoint.com/sites/Finance"),
@@ -70,7 +70,7 @@ in
     Names
 ```
 
-### Example 4: Connect to SharePoint on-premises
+### Example 4: Connect to a SharePoint on-premises site with explicit API version
 ```powerquery
 SharePoint.Contents("https://sharepoint.contoso.local/sites/HR", [ApiVersion = 15])
 ```

@@ -32,14 +32,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.MatchesAny` applies a condition function to each item in the list and returns `true` as soon as any item satisfies the condition. It is the list equivalent of the "there exists" quantifier.
+`List.MatchesAny` applies a condition (predicate) function to each item in a list and returns `true` as soon as any item satisfies the condition. It is the list equivalent of the existential quantifier — "there exists at least one item for which the condition holds."
 
-Unlike `List.AnyTrue`, which expects a pre-computed list of logical values, `List.MatchesAny` accepts any list and a predicate function.
+Unlike `List.AnyTrue`, which expects a pre-built list of logical values, `List.MatchesAny` accepts any list and evaluates the predicate inline. This makes it the cleaner choice when working directly with data: `List.MatchesAny(Products[InStock], each _ = true)` is more readable than wrapping `List.Transform`.
 
-- An empty list returns `false`.
-- The function short-circuits: evaluation stops as soon as a passing item is found.
-- Equivalent to `List.AnyTrue(List.Transform(list, condition))`, but may short-circuit earlier.
-- Use `List.Contains` for simple equality checks; `List.MatchesAny` is better for complex conditions.
+An empty list returns `false`. The function short-circuits as soon as a passing item is found, so it can be efficient on large lists when an early match is likely. For simple equality checks (does any item equal this value?), `List.Contains` is more idiomatic. Use `List.MatchesAny` for composite or calculated conditions that go beyond simple equality.
 
 ## Examples
 

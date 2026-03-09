@@ -31,32 +31,34 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.ToText` formats a `datetime` value as a text string. Without options, it produces an ISO 8601-style string (e.g., `"2024-03-15T14:30:00"`). Use the `Format` field in the options record to apply custom patterns such as `"dd/MM/yyyy HH:mm"` or `"MMMM d, yyyy h:mm tt"`. The `Culture` field controls locale-specific formatting such as localized month or day names. Format strings follow .NET custom datetime format conventions.
+`DateTime.ToText` formats a `datetime` value as a text string. Without options, it produces an ISO 8601-style string such as `"2024-03-15T14:30:00"`. Use the `Format` field in the options record to apply custom patterns such as `"dd/MM/yyyy HH:mm"` or `"MMMM d, yyyy h:mm tt"`. The `Culture` field controls locale-specific formatting such as localized month names (`MMMM`) and AM/PM designators (`tt`). Format strings follow .NET custom datetime format conventions.
 
-If the input is `null`, the function returns `null`.
+Always specify `Culture` when using locale-sensitive format specifiers such as `MMMM` (full month name) or `dddd` (full day name). Without an explicit `Culture`, the result depends on the host machine's locale, which can produce different output in Power BI Desktop vs. Power BI Service cloud refresh. Use `"en-US"` as a safe default for English output.
+
+If the input is `null`, the function returns `null`. To format `date`-only values, use `Date.ToText`. To format `datetimezone` values including the offset, use `DateTimeZone.ToText`.
 
 ## Examples
 
 ### Example 1: Format datetime values for a report label
 
-Convert EventTime to a human-readable string for display.
+Convert log Timestamps to human-readable English strings for display.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.AddColumn(
     Table.SelectColumns(
-        Table.FirstN(Events, 4),
-        {"EventID", "EventTime"}
+        Table.FirstN(OrderLog, 4),
+        {"LogID", "Timestamp"}
     ),
     "DisplayTime",
-    each DateTime.ToText([EventTime], [Format="MMMM d, yyyy h:mm tt"]),
+    each DateTime.ToText([Timestamp], [Format="MMMM d, yyyy h:mm tt", Culture="en-US"]),
     type text
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"DisplayTime","type":"text"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","DisplayTime":"March 15, 2024 8:30 AM"},{"EventID":2,"EventTime":"2024-03-15T14:00:00","DisplayTime":"March 15, 2024 2:00 PM"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","DisplayTime":"March 16, 2024 9:15 AM"},{"EventID":4,"EventTime":"2024-03-16T17:45:00","DisplayTime":"March 16, 2024 5:45 PM"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DisplayTime","type":"text"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","DisplayTime":"January 15, 2024 9:30 AM"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DisplayTime":"January 16, 2024 2:15 PM"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","DisplayTime":"January 18, 2024 11:00 AM"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DisplayTime":"January 20, 2024 8:45 AM"}]}
 -->
 
 ### Example 2: Format in 24-hour ISO style
@@ -66,10 +68,29 @@ Convert a specific datetime to a sortable ISO-format string.
 ```powerquery
 #table(
     type table [DateTime = datetime, ISO = text],
-    {{#datetime(2024, 3, 15, 14, 30, 0), DateTime.ToText(#datetime(2024, 3, 15, 14, 30, 0), [Format="yyyy-MM-dd HH:mm:ss"])}}
+    {{#datetime(2024, 3, 15, 14, 30, 0), DateTime.ToText(#datetime(2024, 3, 15, 14, 30, 0), [Format="yyyy-MM-dd HH:mm:ss", Culture="en-US"])}}
 )
 ```
 
 <!--output
 {"columns":[{"name":"DateTime","type":"datetime"},{"name":"ISO","type":"text"}],"rows":[{"DateTime":"2024-03-15T14:30:00","ISO":"2024-03-15 14:30:00"}]}
+-->
+
+### Example 3: Format with date and abbreviated time for compact display
+
+Create a short "dd-MMM HH:mm" label suitable for axis labels or tooltips.
+
+Input: `OrderLog`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "ShortLabel",
+    each DateTime.ToText([Timestamp], [Format="dd-MMM HH:mm", Culture="en-US"]),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"ShortLabel","type":"text"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","ShortLabel":"15-Jan 09:30"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","ShortLabel":"16-Jan 14:15"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","ShortLabel":"18-Jan 11:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","ShortLabel":"20-Jan 08:45"}]}
 -->

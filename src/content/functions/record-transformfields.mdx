@@ -35,18 +35,20 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.TransformFields` applies functions to specified fields within a record. Each operation in the `transformOperations` list is either:
+`Record.TransformFields` applies transformation functions to specified fields in a record and returns a new record with the results. Each item in the `transformOperations` list describes one transformation:
 
-- A two-element list `{fieldName, function}` — transforms the named field in place
-- A three-element list `{fieldName, function, newFieldName}` — transforms and renames the field
+- `{fieldName, function}` — a two-element list that applies `function` to the named field in place, keeping the same field name
+- `{fieldName, function, newFieldName}` — a three-element list that applies `function` to the named field and renames it to `newFieldName`
 
-The transform function receives the current field value and returns the new value. Fields not listed in `transformOperations` are returned unchanged.
+The transform function receives the current field value and must return the new value. Fields not listed in `transformOperations` are passed through unchanged. All transformations are applied to the original record — they are not chained sequentially — so the order of operations within the list does not matter.
 
-This function is the record-level equivalent of `Table.TransformColumns` for tables.
+`Record.TransformFields` is the record-level equivalent of `Table.TransformColumns`. Use it when you need to modify one or more field values within a record without constructing a new record literal manually. The optional `missingField` parameter controls behavior when a listed field does not exist: `MissingField.Error` (default, raises an error), `MissingField.Ignore` (skips the operation silently), or `MissingField.UseNull` (applies the function to null).
+
+A common pattern is to use this function in `Table.TransformRows` or inside `each` expressions to normalize record fields while processing rows from a table.
 
 ## Examples
 
-### Example 1: Uppercase a text field
+### Example 1: Uppercase a text field in a record
 
 ```powerquery
 Record.TransformFields(
@@ -59,31 +61,40 @@ Record.TransformFields(
 {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"}],"rows":[{"Name":"ALICE","Age":30}]}
 -->
 
-### Example 2: Transform multiple fields
+### Example 2: Transform multiple fields at once
 
 ```powerquery
 Record.TransformFields(
-    [Name = "bob", Age = 25.7],
+    [Name = "bob", Age = 25.7, City = "seattle"],
     {
         {"Name", Text.Proper},
-        {"Age", Number.RoundDown}
+        {"Age", Number.RoundDown},
+        {"City", Text.Proper}
     }
 )
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"}],"rows":[{"Name":"Bob","Age":25}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Bob","Age":25,"City":"Seattle"}]}
 -->
 
-### Example 3: Transform and rename a field
+### Example 3: Transform and rename a field using Sales data
+
+Input: `Sales`
+
+Compute line total from a Sales row and rename `UnitPrice` to `LineTotal` in a single operation:
 
 ```powerquery
-Record.TransformFields(
-    [price = 9.99, qty = 3],
-    {{"price", each _ * 1.1, "PriceWithTax"}}
-)
+let
+    Row = Sales{0},
+    Transformed = Record.TransformFields(
+        Row,
+        {{"UnitPrice", each _ * Row[Quantity], "LineTotal"}}
+    )
+in
+    Record.SelectFields(Transformed, {"OrderID", "CustomerName", "LineTotal"})
 ```
 
 <!--output
-{"columns":[{"name":"PriceWithTax","type":"number"},{"name":"qty","type":"number"}],"rows":[{"PriceWithTax":10.989000000000001,"qty":3}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"LineTotal","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","LineTotal":100}]}
 -->

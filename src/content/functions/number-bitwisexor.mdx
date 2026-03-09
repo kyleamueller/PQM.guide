@@ -30,13 +30,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.BitwiseXor` performs a bitwise exclusive OR. A bit in the result is `1` when the corresponding bits in the two operands are different — one is `0` and the other is `1`. When they are the same, the result bit is `0`.
+`Number.BitwiseXor` performs a bitwise exclusive OR (XOR). A bit in the result is `1` when the corresponding bits in the two operands **differ** — one is `0` and the other is `1`. When both bits are the same (both `0` or both `1`), the result bit is `0`.
 
-XOR has a useful property: `a XOR b XOR b = a`. This means XOR-ing a value twice with the same mask returns the original value — making it useful for simple toggling of flags or for checking whether two values differ at the bit level.
+XOR has a key algebraic property: **applying XOR twice with the same mask is self-inverse** — `a XOR b XOR b = a`. This makes it useful for:
+
+- **Toggling bits**: `Number.BitwiseXor(flags, mask)` flips the mask bits regardless of their current state (unlike OR which only sets, or AND-NOT which only clears)
+- **Comparing two values bit-by-bit**: the result bits show exactly which bits differ
+- **Simple reversible encoding**: XOR encoding and decoding with the same key
+
+XOR is the bitwise operation most sensitive to the "difference" between two integers — `Number.BitwiseXor(x, x) = 0` (a number XORed with itself is always 0), and `Number.BitwiseXor(x, 0) = x` (XOR with 0 is identity).
 
 ## Examples
 
-### Example 1: Basic bitwise XOR
+### Example 1: Basic XOR — only differing bit positions are set
 
 12 (`1100`) XOR 10 (`1010`) = `0110` = 6.
 
@@ -48,7 +54,9 @@ Number.BitwiseXor(12, 10)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":6}]}
 -->
 
-### Example 2: Toggle a bit (bit 1 = value 2)
+### Example 2: Toggle bit 1 (value 2) in a flags integer
+
+5 (`101`) XOR 2 (`010`) = `111` = 7. The bit that was 0 becomes 1.
 
 ```powerquery
 Number.BitwiseXor(5, 2)
@@ -58,7 +66,7 @@ Number.BitwiseXor(5, 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":7}]}
 -->
 
-### Example 3: XOR self-inverse — XOR twice returns the original
+### Example 3: XOR is self-inverse — encoding and decoding with the same mask
 
 ```powerquery
 let
@@ -67,9 +75,9 @@ let
     Encoded = Number.BitwiseXor(Original, Mask),
     Decoded = Number.BitwiseXor(Encoded, Mask)
 in
-    Decoded
+    #table({"Original", "Encoded", "Decoded"}, {{Original, Encoded, Decoded}})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+{"columns":[{"name":"Original","type":"number"},{"name":"Encoded","type":"number"},{"name":"Decoded","type":"number"}],"rows":[{"Original":42,"Encoded":37,"Decoded":42}]}
 -->

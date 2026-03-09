@@ -35,52 +35,59 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.PadStart` adds `character` characters to the left (start) of `text` until the total length is at least `count`. If `text` is already `count` characters or longer, it is returned unchanged.
+`Text.PadStart` adds `character` to the left (start) of `text` until the total length reaches at least `count`. If `text` is already `count` characters or longer, it is returned unchanged — no truncation occurs.
 
-If `character` is omitted or `null`, a space (`" "`) is used. The `character` argument must be exactly one character long; providing a multi-character string raises an error.
+If `character` is omitted or `null`, a space (`" "`) is used. The `character` argument must be exactly one character long; providing a multi-character string raises an error. If `text` is `null`, the function returns `null`.
 
-If `text` is `null`, the function returns `null`.
+The most common use of `Text.PadStart` is zero-padding: converting numeric text like `"7"` to a fixed-length string like `"007"`. This is essential when generating codes, invoice numbers, or IDs that must sort correctly as text. To format a number directly without converting to text first, use `Number.ToText` with a custom format string (e.g., `Number.ToText(7, "000")`).
 
-Left-padding is commonly used to zero-pad numeric strings, align fixed-width report columns, or format codes to a consistent length.
+Like `Text.PadEnd`, this function guarantees a **minimum** length, not an exact length. Inputs that are already longer than `count` are returned as-is. For right-padding, use `Text.PadEnd`.
 
 ## Examples
 
-### Example 1: Zero-pad a number to five digits
+### Example 1: Zero-pad an employee number to four digits
 
 ```powerquery
-Text.PadStart("42", 5, "0")
+Text.PadStart("7", 4, "0")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"00042"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"0007"}]}
 -->
 
-### Example 2: Pad with spaces (default)
+### Example 2: Left-pad for right-aligned column output
 
 ```powerquery
-Text.PadStart("Hello", 10)
+Text.PadStart("55000", 10)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"     Hello"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"     55000"}]}
 -->
 
-### Example 3: Text already meets minimum length — no padding added
+### Example 3: Standardize employee IDs to four-digit format
+
+Use `Text.End` to strip an existing prefix, then `Text.PadStart` to normalize the numeric portion.
 
 ```powerquery
-Text.PadStart("Hello", 3, "0")
+let
+    id = "E001",
+    numPart = Text.End(id, Text.Length(id) - 1),
+    padded = "E" & Text.PadStart(numPart, 4, "0")
+in
+    padded
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"E0001"}]}
 -->
 
-### Example 4: Pad account number to eight digits
+### Example 4: No padding when text already meets minimum length
 
 ```powerquery
-Text.PadStart("1234", 8, "0")
+Text.PadStart("12345", 3, "0")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"00001234"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"12345"}]}
 -->

@@ -31,12 +31,16 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.ForRecord` programmatically constructs a record type. The `fields` parameter is a record where each field corresponds to a column in the desired type. Each field value must be a record with two fields:
+`Type.ForRecord` programmatically constructs a record type from a descriptor record. The `fields` parameter is a record where each field name matches the desired field name in the resulting type, and each field value is itself a record with two required sub-fields:
 
-- `Type` — the type of the field (e.g., `type text`, `type number`)
-- `Optional` — a logical indicating whether the field is optional (`true`) or required (`false`)
+- `Type` — the M type value for that field (e.g., `type text`, `type nullable number`)
+- `Optional` — a logical indicating whether the field can be absent: `true` for optional, `false` for required
 
-This function is useful for dynamically constructing type annotations in generic transformations or when building custom connector schemas.
+The optional `isOpen` parameter controls whether the constructed type is an open record type (allowing extra fields beyond those declared, when `true`) or a closed record type (requiring exactly the declared fields, when `false` or omitted). The default is closed (`false`).
+
+`Type.ForRecord` is the programmatic counterpart to writing a type literal such as `type [Name = text, Age = number]`. Use it when the set of fields is determined at runtime or when building schemas dynamically — for example, in custom connector `GetSchemaTransformByName` implementations or generic transformation helpers. The inverse function is `Type.RecordFields`, which extracts the field descriptors from an existing record type.
+
+To apply a constructed record type to an actual record value, use `Value.ReplaceType(record, newType)`.
 
 ## Examples
 
@@ -72,16 +76,22 @@ Type.ForRecord(
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type [CustomerID = number, Email = (optional text), ...]"}]}
 -->
 
-### Example 3: Verify fields of the constructed type
+### Example 3: Verify the declared fields of the constructed type
 
 ```powerquery
 let
-    RT = Type.ForRecord([Name = [Type = type text, Optional = false]], false),
+    RT = Type.ForRecord(
+        [
+            Name = [Type = type text, Optional = false],
+            Age  = [Type = type number, Optional = true]
+        ],
+        false
+    ),
     Fields = Type.RecordFields(RT)
 in
-    Record.ToTable(Fields)
+    Fields[Age][Optional]
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":[Type=type text, Optional=false]}]}
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->

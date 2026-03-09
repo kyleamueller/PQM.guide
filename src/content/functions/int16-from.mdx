@@ -36,15 +36,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Int16.From` converts a value to a signed 16-bit integer (short integer), covering the range -32,768 to 32,767. Values outside this range raise an error. Fractional numbers are rounded using the specified rounding mode (default: round-toward-even).
+`Int16.From` converts a value to a signed 16-bit integer (also called a "short integer"), covering the range -32,768 to 32,767. Values outside this range cause a runtime error. Fractional numbers are rounded before conversion; the default rounding mode is round-half-to-even (banker's rounding), not the conventional "round half up." Pass `RoundingMode.AwayFromZero` to match the rounding behavior you may expect from Excel or school arithmetic.
 
-Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+In database terms, this type maps to `SMALLINT` in SQL Server and many other databases. It is more compact than `Int32` (32-bit) and substantially more compact than `Int64` (64-bit). Use `Int16.From` when your source or destination system explicitly uses a 16-bit integer type and you need to match that schema precisely.
 
-This type maps to the `smallint` type in many databases and is useful for compact integer storage where values are known to fit within 16 bits.
+For most data transformation work, prefer `Int64.From` (the Whole Number type in Power BI) unless you have a specific reason to constrain values to 16 bits. Text values are parsed numerically; logical `true` converts to `1`, `false` to `0`, and `null` returns `null`.
 
 ## Examples
 
-### Example 1: Convert a number to Int16
+### Example 1: Convert a number within range
 
 ```powerquery
 Int16.From(1000)
@@ -54,7 +54,7 @@ Int16.From(1000)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1000}]}
 -->
 
-### Example 2: Convert a text value
+### Example 2: Convert the maximum Int16 value from text
 
 ```powerquery
 Int16.From("32767")
@@ -64,12 +64,18 @@ Int16.From("32767")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":32767}]}
 -->
 
-### Example 3: Convert a decimal (rounded)
+### Example 3: Rounding — default banker's rounding vs. away-from-zero
 
 ```powerquery
-Int16.From(255.7)
+#table(
+    {"Input", "Default (Banker's)", "AwayFromZero"},
+    {
+        {100.5, Int16.From(100.5), Int16.From(100.5, null, RoundingMode.AwayFromZero)},
+        {101.5, Int16.From(101.5), Int16.From(101.5, null, RoundingMode.AwayFromZero)}
+    }
+)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":256}]}
+{"columns":[{"name":"Input","type":"number"},{"name":"Default (Banker's)","type":"number"},{"name":"AwayFromZero","type":"number"}],"rows":[{"Input":100.5,"Default (Banker's)":100,"AwayFromZero":101},{"Input":101.5,"Default (Banker's)":102,"AwayFromZero":102}]}
 -->

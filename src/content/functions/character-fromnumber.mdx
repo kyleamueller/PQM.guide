@@ -26,20 +26,22 @@ relatedFunctions:
 
 ## Remarks
 
-`Character.FromNumber` converts a Unicode code point (a non-negative integer) into the corresponding single-character text value. This is the inverse of `Character.ToNumber`.
+`Character.FromNumber` converts a Unicode code point (a non-negative integer) into the corresponding single-character text value. This is the inverse of `Character.ToNumber`. Any valid Unicode scalar value is accepted — the function is not limited to ASCII.
 
 Common code point ranges include:
-- 0–31: Control characters (tab = 9, newline = 10, carriage return = 13)
+- 0–31: Control characters (tab = 9, line feed = 10, carriage return = 13)
 - 32: Space
 - 48–57: Digits `0`–`9`
 - 65–90: Uppercase letters `A`–`Z`
 - 97–122: Lowercase letters `a`–`z`
 
-This function is useful for generating special characters programmatically, building character sequences with `List.Transform`, or inserting control characters such as line feeds or tabs into text values.
+The most practical use of this function is programmatic character generation: building separator strings, inserting control characters such as line feeds or tabs into text output, or generating sequences of characters with `List.Transform`. For example, `List.Transform({65..90}, Character.FromNumber)` produces the full uppercase alphabet as a list without hard-coding any characters.
+
+When working with control characters in text, be aware that `Text.Clean` removes non-printable characters (code points 0–31), while `Text.Trim` only removes leading and trailing whitespace. If you insert control characters using `Character.FromNumber` and later need to remove them, use `Text.Clean`.
 
 ## Examples
 
-### Example 1: Convert code point 65 to a character
+### Example 1: Convert a code point to its character
 
 ```powerquery
 Character.FromNumber(65)
@@ -49,17 +51,21 @@ Character.FromNumber(65)
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"A"}]}
 -->
 
-### Example 2: Generate the tab character
+### Example 2: Generate a line feed character for text output
+
+Use code point 10 to insert a line feed when building multi-line text values.
 
 ```powerquery
-Character.FromNumber(9)
+"Line 1" & Character.FromNumber(10) & "Line 2"
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"\t"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Line 1\nLine 2"}]}
 -->
 
-### Example 3: Build the alphabet as a list
+### Example 3: Build the full uppercase alphabet as a list
+
+`List.Transform` with `Character.FromNumber` and a number range generates character sequences without hard-coding individual letters.
 
 ```powerquery
 List.Transform({65..90}, Character.FromNumber)
@@ -67,14 +73,4 @@ List.Transform({65..90}, Character.FromNumber)
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]}]}
--->
-
-### Example 4: Round-trip with Character.ToNumber
-
-```powerquery
-Character.FromNumber(Character.ToNumber("M"))
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"M"}]}
 -->

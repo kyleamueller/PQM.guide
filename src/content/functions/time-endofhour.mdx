@@ -27,25 +27,29 @@ relatedFunctions:
 
 ## Remarks
 
-`Time.EndOfHour` returns the very last instant of the clock hour containing the input value: XX:59:59.9999999. When passed a plain `time`, it returns a `time`. When passed a `datetime` or `datetimezone`, it returns the same type with only the time component adjusted to the end of the hour. This is useful for building inclusive hourly range filters.
+`Time.EndOfHour` returns the very last instant of the clock hour containing the input value: XX:59:59.9999999. When passed a plain `time`, it returns a `time`. When passed a `datetime` or `datetimezone`, it returns the same type with only the time component adjusted to the end of the hour — the date and any timezone offset are preserved unchanged.
+
+Pair `Time.EndOfHour` with `Time.StartOfHour` using the same input to build inclusive hourly range filters. For example: `[EventTime] >= Time.StartOfHour(ref) and [EventTime] <= Time.EndOfHour(ref)` matches all records within the same clock hour as `ref`. This avoids off-by-one errors from using strictly less-than comparisons.
+
+`Time.EndOfHour` is most useful in near-real-time or streaming data scenarios where events are bucketed by hour. For day-level boundaries, use `Date.EndOfDay`/`Date.StartOfDay` instead.
 
 ## Examples
 
-### Example 1: Find the end of the hour for each event time
+### Example 1: Add end-of-hour boundaries to log timestamps
 
-Add a column showing the last instant of the hour for each event.
+Add a column showing the last instant of the hour for each log entry.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
-    "HourEnd", each Time.EndOfHour([EventTime]), type datetime
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "HourEnd", each Time.EndOfHour([Timestamp]), type datetime
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HourEnd","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","HourEnd":"2024-03-15T08:59:59.9999999"},{"EventID":2,"EventTime":"2024-03-15T14:00:00","HourEnd":"2024-03-15T14:59:59.9999999"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","HourEnd":"2024-03-16T09:59:59.9999999"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"HourEnd","type":"datetime"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","HourEnd":"2024-01-15T09:59:59.9999999"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","HourEnd":"2024-01-16T14:59:59.9999999"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","HourEnd":"2024-01-18T11:59:59.9999999"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","HourEnd":"2024-01-20T08:59:59.9999999"}]}
 -->
 
 ### Example 2: End of hour for a specific time
@@ -61,4 +65,24 @@ Return the last instant of the 14:xx hour.
 
 <!--output
 {"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"14:59:59.9999999"}]}
+-->
+
+### Example 3: Build an inclusive hourly range filter
+
+Filter log entries to a specific clock hour using StartOfHour and EndOfHour boundaries.
+
+```powerquery
+let
+    RefTime = #datetime(2024, 1, 15, 9, 0, 0),
+    HourStart = Time.StartOfHour(RefTime),
+    HourEnd = Time.EndOfHour(RefTime)
+in
+    Table.SelectRows(
+        OrderLog,
+        each [Timestamp] >= HourStart and [Timestamp] <= HourEnd
+    )
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L001","OrderID":1,"Action":"Created","Timestamp":"2024-01-15T09:30:00","DurationMinutes":null,"Notes":"New order: Widget A"}]}
 -->

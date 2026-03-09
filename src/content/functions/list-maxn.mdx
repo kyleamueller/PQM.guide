@@ -36,13 +36,13 @@ relatedFunctions:
 
 ## Remarks
 
-`List.MaxN` returns the top `N` values from a list. The result is a list (not a scalar), sorted in descending order. It is the multi-value counterpart of `List.Max`.
+`List.MaxN` returns the top `N` values from a list as a **list** sorted in descending order. It is the multi-value counterpart of `List.Max`, which returns a single scalar.
 
-- When passed a number `N`, it returns the `N` largest values.
-- When passed a condition function, it returns values sorted descending while the condition is true (applied to the sorted list from the top).
-- Null values are ignored in the comparison.
-- If `N` exceeds the list length, the entire list is returned sorted descending.
-- Duplicates are preserved — if the Nth largest value appears multiple times, all instances may be included.
+When passed a number `N`, it returns the `N` largest values from the list. If `N` exceeds the list length, the entire list is returned sorted descending. Null values are ignored. Duplicates are preserved — if the Nth-largest value occurs multiple times, all occurrences may be included (the result can have more than `N` elements in this case).
+
+When passed a condition function, the list is first sorted descending and the condition is applied to each item in that order; items are collected while the condition returns `true`. This mode is useful for "give me all values above a threshold" scenarios.
+
+For the single highest value, use `List.Max`. To get the lowest values instead, use `List.MinN`. To sort and take from a full list, combining `List.Sort` and `List.FirstN` is an equivalent and readable alternative.
 
 ## Examples
 

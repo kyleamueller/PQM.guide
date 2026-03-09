@@ -32,19 +32,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.BitwiseAnd` performs a bitwise AND between two integers. Each bit position in the result is set to `1` only when the corresponding bit is `1` in both operands. This operation is commonly used for:
+`Number.BitwiseAnd` performs a bitwise AND between two integers. Each bit position in the result is `1` only when the corresponding bit is `1` in **both** operands; otherwise it is `0`. Both inputs are treated as integers — any fractional part is truncated before the operation.
 
-- **Masking**: extracting specific bits from a value by ANDing with a bitmask
-- **Flag testing**: checking whether specific flag bits are set
-- **Permission systems**: determining whether a user has a specific permission
+The most common use of bitwise AND is **bit masking**: extracting or testing specific bits within a packed integer value. Practical scenarios in Power Query include:
 
-Both inputs are treated as integers. Floating-point values are truncated to their integer portion before the operation.
+- **Flag testing**: checking whether a specific capability or status bit is set in an integer flags column (e.g., `Number.BitwiseAnd(flags, 4) > 0` tests bit 2)
+- **Permission bitmasks**: determining whether a user's permission integer includes a specific right
+- **Extracting byte fields**: isolating the lower N bits of a packed value using a mask like `15` (0xF, lower 4 bits) or `255` (0xFF, lower 8 bits)
+
+Note that bitwise operations in Power Query M are 64-bit integer operations. Values are cast to 64-bit signed integers before the operation, which can produce unexpected results if you pass large floating-point numbers.
 
 ## Examples
 
 ### Example 1: Basic bitwise AND
 
-12 in binary is `1100`, 10 is `1010`. AND gives `1000` = 8.
+12 in binary is `1100`, 10 is `1010`. AND yields `1000` = 8.
 
 ```powerquery
 Number.BitwiseAnd(12, 10)
@@ -54,7 +56,7 @@ Number.BitwiseAnd(12, 10)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":8}]}
 -->
 
-### Example 2: Test if a value has a specific bit set (bit 2 = value 4)
+### Example 2: Test whether bit 2 (value 4) is set in a flags integer
 
 ```powerquery
 Number.BitwiseAnd(7, 4) > 0
@@ -64,10 +66,12 @@ Number.BitwiseAnd(7, 4) > 0
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 3: Extract low nibble (lower 4 bits) using mask 0xF = 15
+### Example 3: Extract the lower 4 bits (nibble) using mask 15 (0xF)
+
+181 in binary is `10110101`. ANDing with 15 (`1111`) isolates the lower 4 bits: `0101` = 5.
 
 ```powerquery
-Number.BitwiseAnd(0b10110101, 15)
+Number.BitwiseAnd(181, 15)
 ```
 
 <!--output

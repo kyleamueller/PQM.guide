@@ -35,34 +35,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.RemoveMatchingRows` removes every row from the table that matches any record in the `rows` list. Matching is based on record field equality. The optional `equationCriteria` parameter lets you restrict comparison to specific columns.
+`Table.RemoveMatchingRows` removes all rows from the table that match any record in the `rows` list. Matching uses full record equality by default — every field in each record is compared against the corresponding column. The optional `equationCriteria` parameter can restrict comparison to specific columns, enabling removal by partial key (e.g., "remove all rows where CustomerName = 'Bob' regardless of other column values").
 
-This is the inverse of filtering to keep only matching rows — use it to exclude a known set of unwanted rows.
+This function is the inverse of filtering for matches: instead of keeping rows that match, it discards them. It differs from `Table.RemoveRows` (which removes by position) and from `Table.SelectRows` (which keeps rows satisfying a predicate). Use `Table.RemoveMatchingRows` when you have an explicit exclusion list of records.
+
+For large exclusion lists, consider an anti-join via `Table.NestedJoin` + `Table.ExpandTableColumn` + filter, which may fold to the data source. `Table.RemoveMatchingRows` does not fold.
 
 ## Examples
 
-### Example 1: Remove specific rows by record match
+### Example 1: Remove discontinued products from the Products table
 
 ```powerquery
-Table.RemoveMatchingRows(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}, {3, "Carol"}}),
-    {[ID = 2, Name = "Bob"]}
-)
+let
+    Products = #table(
+        {"ProductID", "ProductName", "Category", "Price"},
+        {{1,"Widget A","Widgets",25.00},{2,"Gadget B","Gadgets",50.00},
+         {3,"Widget C","Widgets",15.00},{4,"Gadget D","Gadgets",75.00},{5,"Thingamajig E","Misc",120.00}}
+    ),
+    Discontinued = {[ProductID = 3, ProductName = "Widget C", Category = "Widgets", Price = 15.00],
+                    [ProductID = 5, ProductName = "Thingamajig E", Category = "Misc", Price = 120.00]}
+in
+    Table.RemoveMatchingRows(Products, Discontinued)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"3","Name":"Carol"}]}
+{"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50"},{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75"}]}
 -->
 
-### Example 2: Remove multiple matching rows
+### Example 2: Remove specific customers by name using equationCriteria
+
+Use `equationCriteria` to match only on CustomerName, ignoring other columns.
 
 ```powerquery
-Table.RemoveMatchingRows(
-    #table({"Code"}, {{"A"}, {"B"}, {"C"}, {"D"}}),
-    {[Code = "B"], [Code = "D"]}
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Region"},
+        {{1,"Alice","Widget A","East"},{2,"Bob","Gadget B","West"},
+         {3,"Charlie","Widget C","East"},{4,"Alice","Gadget D","North"},{5,"Diana","Widget A","West"}}
+    ),
+    Excluded = {[CustomerName = "Bob"], [CustomerName = "Charlie"]}
+in
+    Table.RemoveMatchingRows(Sales, Excluded, "CustomerName")
 ```
 
 <!--output
-{"columns":[{"name":"Code","type":"any"}],"rows":[{"Code":"A"},{"Code":"C"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Region":"West"}]}
+-->
+
+### Example 3: Remove multiple specific order IDs from the Sales table
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Charlie","Widget C"},
+         {4,"Alice","Gadget D"},{5,"Diana","Widget A"}}
+    ),
+    ToRemove = {[OrderID = 2], [OrderID = 4]}
+in
+    Table.RemoveMatchingRows(Sales, ToRemove, "OrderID")
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"}]}
 -->

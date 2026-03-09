@@ -46,38 +46,80 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.SplitColumn` uses a splitter function to divide the values in a text column into multiple output columns. The splitter functions in the `Splitter.*` namespace — such as `Splitter.SplitTextByDelimiter`, `Splitter.SplitTextByLengths`, and `Splitter.SplitTextByPositions` — are the standard choices for the `splitter` parameter.
+`Table.SplitColumn` divides the values of a text column into multiple output columns using a splitter function. The source column is replaced by the new columns in the same position. The `Splitter.*` namespace provides the standard splitter functions: `Splitter.SplitTextByDelimiter`, `Splitter.SplitTextByLengths`, `Splitter.SplitTextByPositions`, and `Splitter.SplitTextByCharacterTransition`.
 
-If `columnNamesOrNumber` is a list, those become the new column names. If it is a number, columns are named `sourceColumn.1`, `sourceColumn.2`, etc.
+The `columnNamesOrNumber` parameter controls column naming: supply a list of strings for explicit names, or a number to auto-generate names in the form `sourceColumn.1`, `sourceColumn.2`, etc. The `default` parameter fills in values for rows where the split produces fewer parts than expected columns — without a default, missing parts become `null`. The `extraColumns` parameter controls what happens when a split produces more parts than column names (e.g., `ExtraValues.Ignore` to discard extras, `ExtraValues.Error` to raise an error).
+
+As a PQLint best practice, always supply the `default` parameter when using `Splitter.SplitTextByDelimiter` on real-world data, since some rows may not contain the delimiter and will produce fewer parts than expected.
 
 ## Examples
 
-### Example 1: Split a column by delimiter
+### Example 1: Split FullName in the Employees table into first and last name
 
 ```powerquery
-Table.SplitColumn(
-    #table({"FullName"}, {{"Alice Smith"}, {"Bob Jones"}}),
-    "FullName",
-    Splitter.SplitTextByDelimiter(" "),
-    {"FirstName", "LastName"}
-)
+let
+    Employees = #table(
+        {"EmployeeID","FullName","Department","Salary"},
+        {{"E001","alice smith","Sales",55000},{"E002","BOB JONES","Engineering",95000},
+         {"E003","Charlie Brown","Marketing",72000},{"E004","diana PRINCE","Engineering",68000}}
+    )
+in
+    Table.SplitColumn(
+        Employees,
+        "FullName",
+        Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv),
+        {"FirstName","LastName"},
+        null,
+        ExtraValues.Ignore
+    )
 ```
 
 <!--output
-{"columns":[{"name":"FirstName","type":"any"},{"name":"LastName","type":"any"}],"rows":[{"FirstName":"Alice","LastName":"Smith"},{"FirstName":"Bob","LastName":"Jones"}]}
+{"columns":[{"name":"EmployeeID","type":"any"},{"name":"FirstName","type":"any"},{"name":"LastName","type":"any"},{"name":"Department","type":"any"},{"name":"Salary","type":"any"}],"rows":[{"EmployeeID":"E001","FirstName":"alice","LastName":"smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FirstName":"BOB","LastName":"JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E003","FirstName":"Charlie","LastName":"Brown","Department":"Marketing","Salary":"72000"},{"EmployeeID":"E004","FirstName":"diana","LastName":"PRINCE","Department":"Engineering","Salary":"68000"}]}
 -->
 
-### Example 2: Split a fixed-width column
+### Example 2: Split a fixed-width employee ID code into prefix and number
 
 ```powerquery
-Table.SplitColumn(
-    #table({"Code"}, {{"AB123"}, {"CD456"}}),
-    "Code",
-    Splitter.SplitTextByLengths({2, 3}),
-    {"Prefix", "Number"}
-)
+let
+    Employees = #table(
+        {"EmployeeID","FullName"},
+        {{"E001","alice smith"},{"E002","BOB JONES"},{"E003","Charlie Brown"}}
+    )
+in
+    Table.SplitColumn(
+        Employees,
+        "EmployeeID",
+        Splitter.SplitTextByLengths({1, 3}),
+        {"IDPrefix","IDNumber"}
+    )
 ```
 
 <!--output
-{"columns":[{"name":"Prefix","type":"any"},{"name":"Number","type":"any"}],"rows":[{"Prefix":"AB","Number":"123"},{"Prefix":"CD","Number":"456"}]}
+{"columns":[{"name":"IDPrefix","type":"any"},{"name":"IDNumber","type":"any"},{"name":"FullName","type":"any"}],"rows":[{"IDPrefix":"E","IDNumber":"001","FullName":"alice smith"},{"IDPrefix":"E","IDNumber":"002","FullName":"BOB JONES"},{"IDPrefix":"E","IDNumber":"003","FullName":"Charlie Brown"}]}
+-->
+
+### Example 3: Split a delimited email field and use a default for rows with no delimiter
+
+Supply a `default` value so rows missing the delimiter don't silently produce null.
+
+```powerquery
+let
+    Customers = #table(
+        {"Name","Email"},
+        {{"Alice","alice@example.com"},{"Bob","bob@example.com"},{"Charlie","charlie@example.com"}}
+    )
+in
+    Table.SplitColumn(
+        Customers,
+        "Email",
+        Splitter.SplitTextByDelimiter("@"),
+        {"LocalPart","Domain"},
+        "unknown",
+        ExtraValues.Ignore
+    )
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"any"},{"name":"LocalPart","type":"any"},{"name":"Domain","type":"any"}],"rows":[{"Name":"Alice","LocalPart":"alice","Domain":"example.com"},{"Name":"Bob","LocalPart":"bob","Domain":"example.com"},{"Name":"Charlie","LocalPart":"charlie","Domain":"example.com"}]}
 -->

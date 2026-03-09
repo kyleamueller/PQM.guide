@@ -26,32 +26,61 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.ColumnCount` returns the number of columns in a table as a number. It is equivalent to `List.Count(Table.ColumnNames(table))` but more direct. Use it to validate structure, drive dynamic logic, or guard against schema changes.
+`Table.ColumnCount` returns the number of columns in a table as a number. It is equivalent to `List.Count(Table.ColumnNames(table))` but is more direct and expressive of intent. The function is useful for structural validation — for example, asserting that a dataset has the expected number of columns after a transformation, or driving dynamic logic that depends on width rather than named columns.
+
+A common pattern is to combine `Table.ColumnCount` with `Table.ColumnNames` to detect unexpected schema changes: if the count differs from a known baseline, raise an error or add a diagnostic step. This is particularly valuable in automated pipelines where upstream sources may silently add or drop columns.
+
+Note that `Table.ColumnCount` reflects the schema as declared by the table's type, not the number of distinct non-null values in any column.
 
 ## Examples
 
-### Example 1: Count columns in a simple table
-
-```powerquery
-Table.ColumnCount(
-    #table({"A", "B", "C"}, {{1, 2, 3}})
-)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
--->
-
-### Example 2: Use column count to build dynamic column references
+### Example 1: Count columns in the Employees table
 
 ```powerquery
 let
-    Source  = #table({"Name", "Age", "City"}, {{"Alice", 30, "NYC"}}),
-    ColCount = Table.ColumnCount(Source)
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Title = text, HireDate = date, Salary = number],
+        {{"E001","alice smith","Sales","Sales Rep",#date(2021,3,15),55000}}
+    )
 in
-    ColCount
+    Table.ColumnCount(Employees)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"6"}]}
+-->
+
+### Example 2: Assert expected column count as a data quality check
+
+```powerquery
+let
+    Source      = #table({"OrderID","CustomerName","Product","Category","UnitPrice","Quantity","OrderDate","Region"}, {}),
+    ExpectedCols = 8,
+    ActualCols   = Table.ColumnCount(Source),
+    Validated    = if ActualCols = ExpectedCols
+                   then Source
+                   else error "Unexpected column count: " & Text.From(ActualCols)
+in
+    ActualCols
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"8"}]}
+-->
+
+### Example 3: Compare column counts before and after a transformation
+
+```powerquery
+let
+    Source      = #table({"A","B","C","D"}, {{1,2,3,4}}),
+    Removed     = Table.RemoveColumns(Source, {"B","D"}),
+    Before      = Table.ColumnCount(Source),
+    After       = Table.ColumnCount(Removed),
+    Dropped     = Before - After
+in
+    Dropped
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
 -->

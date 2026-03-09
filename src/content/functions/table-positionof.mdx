@@ -39,50 +39,62 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.PositionOf` returns the zero-based index of the first row that matches the given record. If no match is found, it returns `-1`. By supplying an `occurrence` value you can retrieve the last match position or all match positions as a list:
+`Table.PositionOf` returns the zero-based row index of a row matching the given record within the table. If no match is found, it returns `-1`. The optional `occurrence` parameter controls how multiple matches are handled:
 
-- `Occurrence.First` (default): first matching position
-- `Occurrence.Last`: last matching position
-- `Occurrence.All`: list of all matching positions
+- `Occurrence.First` (default): returns the index of the first match.
+- `Occurrence.Last`: returns the index of the last match.
+- `Occurrence.All`: returns a list of all matching row indices.
+
+The optional `equationCriteria` parameter restricts which columns participate in the comparison — useful when you only care about matching on a subset of fields.
+
+`Table.PositionOf` is useful when you need to locate rows by content in order to perform positional operations such as `Table.RemoveRows`, `Table.InsertRows`, or `Table.ReplaceRows`. For simply checking whether a row exists (without needing its position), `Table.Contains` is more concise. This function does not fold to data sources.
 
 ## Examples
 
-### Example 1: Find the position of a row
+### Example 1: Find the position of a specific order
 
 ```powerquery
-Table.PositionOf(
-    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Carol"}}),
-    [Name = "Bob"]
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Charlie","Widget C"},{4,"Diana","Gadget D"}}
+    )
+in
+    Table.PositionOf(Sales, [OrderID = 3, CustomerName = "Charlie", Product = "Widget C"])
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"1"}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
 -->
 
 ### Example 2: Row not found returns -1
 
 ```powerquery
-Table.PositionOf(
-    #table({"Name"}, {{"Alice"}, {"Bob"}}),
-    [Name = "Dave"]
-)
+let
+    Products = #table(
+        {"ProductID", "ProductName"},
+        {{1,"Widget A"},{2,"Gadget B"},{3,"Widget C"}}
+    )
+in
+    Table.PositionOf(Products, [ProductID = 99, ProductName = "Unknown"])
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"-1"}]}
 -->
 
-### Example 3: Find all positions of a matching row
+### Example 3: Find all positions where a customer appears
 
 ```powerquery
-Table.PositionOf(
-    #table({"Name"}, {{"Alice"}, {"Bob"}, {"Alice"}}),
-    [Name = "Alice"],
-    Occurrence.All
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Alice"},{4,"Charlie"},{5,"Alice"}}
+    )
+in
+    Table.PositionOf(Sales, [CustomerName = "Alice"], Occurrence.All, "CustomerName")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 2}"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 2, 4}"}]}
 -->

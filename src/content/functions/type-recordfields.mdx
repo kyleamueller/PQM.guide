@@ -27,12 +27,18 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.RecordFields` inspects a record type and returns a metadata record describing its declared fields. Each field in the result record has the same name as the field in the type, and its value is a record with two properties:
+`Type.RecordFields` returns a record describing the field declarations of a record type. For each declared field in the type, the result contains a field with the same name whose value is a descriptor record with two properties:
 
-- `Type` — the type of the field
-- `Optional` — `true` if the field is optional, `false` if required
+- `Type` — the M type value for that field (e.g., `type text`, `type nullable number`)
+- `Optional` — `true` if the field may be absent, `false` if it is required
 
-This function is the inverse of `Type.ForRecord`. Use it to programmatically inspect type schemas, particularly in custom connectors or generic transformation functions.
+`Type.RecordFields` is the inverse of `Type.ForRecord`. Together they allow round-tripping between a record type and its programmatic descriptor representation. Use `Type.RecordFields` to:
+
+- Inspect which fields a record type declares and what their types are
+- Extract field type information from a connector-provided schema
+- Build generic functions that adapt behavior based on a record's declared structure
+
+Note that this function operates on a **type value** — not a record value. To get the type of an existing record, use `Value.Type(record)` first, then pass the result to `Type.RecordFields`. Also note that `Type.RecordFields` only returns **declared** fields; for open record types with extra undeclared fields, those extra fields are not visible in the output.
 
 ## Examples
 
@@ -55,7 +61,7 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":[Type=type text, Optional=false]},{"Name":"Age","Value":[Type=type number, Optional=true]}]}
 -->
 
-### Example 2: Check the type of the Name field
+### Example 2: Access the type of a specific declared field
 
 ```powerquery
 let
@@ -67,4 +73,24 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+-->
+
+### Example 3: Check whether the Age field is declared optional
+
+```powerquery
+let
+    RT = Type.ForRecord(
+        [
+            Name = [Type = type text, Optional = false],
+            Age  = [Type = type number, Optional = true]
+        ],
+        false
+    ),
+    Fields = Type.RecordFields(RT)
+in
+    Fields[Age][Optional]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->

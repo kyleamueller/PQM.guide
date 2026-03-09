@@ -25,15 +25,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Value.Optimize` is an engine hint function. When called, it signals to the Power Query evaluation engine that the given value should be evaluated in an optimized fashion. The function returns the same value semantically — the output is equivalent to the input — but the engine may use different evaluation strategies such as caching, folding, or parallel execution.
+`Value.Optimize` is an **engine hint function** — it signals to the Power Query evaluation engine that the given value should be evaluated using optimized strategies. The function returns a value that is semantically identical to the input, but the engine may use different internal evaluation paths such as query caching, enhanced query folding, or parallel execution.
 
-In practice, `Value.Optimize` is rarely called directly by end users. It is used primarily in custom connector development and advanced scenarios where the developer wants to explicitly trigger optimization passes on a query result.
+For end users, `Value.Optimize` has no observable effect on the data returned. It is primarily used in **custom connector development** as an explicit performance hint — for example, to encourage the engine to cache or fold an intermediate result before additional operations are applied. Microsoft's official connector development SDK documentation discusses scenarios where `Value.Optimize` is appropriate.
 
-Calling `Value.Optimize` on a table or other complex value does not change the data; it only affects how the engine processes it internally.
+In practice, calling `Value.Optimize` in user-written M queries is rarely beneficial and can safely be omitted. The Power Query engine applies its own optimization passes automatically. Treat this function as an advanced tool for connector authors rather than a general-purpose performance knob.
 
 ## Examples
 
-### Example 1: Optimize a simple number (no visible change)
+### Example 1: Optimizing a primitive value returns the same value
 
 ```powerquery
 Value.Optimize(42)
@@ -43,18 +43,28 @@ Value.Optimize(42)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
 -->
 
-### Example 2: Optimize a table value
+### Example 2: Optimizing a filtered table — data is unchanged
 
 Input: `Sales`
 
 ```powerquery
 let
-    Filtered = Table.SelectRows(Sales, each [Quantity] > 1),
+    Filtered = Table.SelectRows(Sales, each [Quantity] > 2),
     Optimized = Value.Optimize(Filtered)
 in
     Table.RowCount(Optimized)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":72}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+-->
+
+### Example 3: Optimizing text — returns the same text
+
+```powerquery
+Value.Optimize("hello") = "hello"
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->

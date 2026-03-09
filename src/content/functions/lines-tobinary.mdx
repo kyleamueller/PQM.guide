@@ -39,39 +39,43 @@ relatedFunctions:
 
 ## Remarks
 
-`Lines.ToBinary` is the inverse of splitting binary text content into lines. It takes a list of text lines and produces a binary value by joining the lines with the platform line separator (`#(lf)` or `#(cr,lf)`) and encoding the result.
+`Lines.ToBinary` converts a list of text lines into a binary value by joining the lines with a line feed separator (`#(lf)`) and encoding the result using the specified character encoding. It is the binary-output counterpart to `Lines.ToText`, and the inverse of reading a binary file and splitting it into lines.
 
-This function is primarily used when writing text-based file content (such as CSV or log files) to binary, for example when using `Binary.Buffer` or passing to a web service.
+This function is primarily used when you need to produce binary file content from structured line data — for example, writing a CSV or log file to a data store, passing line-based content to a web API, or buffering the result with `Binary.Buffer` for repeated use. The `encoding` parameter defaults to `TextEncoding.Utf8` (65001), which is appropriate for the vast majority of modern use cases.
 
-The `encoding` parameter accepts `TextEncoding` values. The most common choice is `TextEncoding.Utf8` (the default). Set `includeByteOrderMark` to `true` when the consuming system requires a UTF-8 BOM (e.g., Excel CSV imports).
+Set `includeByteOrderMark` to `true` when the consuming system requires a UTF-8 BOM. This is most commonly needed for CSV files opened in Excel, which uses the BOM to detect UTF-8 encoding and correctly render non-ASCII characters. Without the BOM, Excel may misinterpret the encoding and display garbled text.
+
+When you only need text output (not binary), use `Lines.ToText` instead — it is simpler and does not require specifying encoding parameters.
 
 ## Examples
 
-### Example 1: Convert a list of lines to binary
+### Example 1: Convert a list of lines to UTF-8 binary
 
 ```powerquery
-Lines.ToBinary({"Line one", "Line two", "Line three"})
+Lines.ToBinary({"CustomerName,Product", "Alice,Widget A", "Bob,Gadget B"})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"TGluZSBvbmUKTGluZSB0d28KTGluZSB0aHJlZQ=="}]}
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"Q3VzdG9tZXJOYW1lLFByb2R1Y3QKQWxpY2UsV2lkZ2V0IEEKQm9iLEdhZGdldCBC"}]}
 -->
 
-### Example 2: Include a UTF-8 byte order mark
+### Example 2: Include a UTF-8 byte order mark for Excel compatibility
+
+Add a BOM when the binary output will be opened as a CSV in Excel to ensure correct character encoding detection.
 
 ```powerquery
-Lines.ToBinary({"Header", "Data row"}, null, true, TextEncoding.Utf8)
+Lines.ToBinary({"Name,Salary", "Alice,55000", "Bob,95000"}, null, true, TextEncoding.Utf8)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"77u/SGVhZGVyCkRhdGEgcm93"}]}
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"77u/TmFtZSxTYWxhcnkKQWxpY2UsNTUwMDAKQm9iLDk1MDAw"}]}
 -->
 
-### Example 3: Round-trip lines through binary
+### Example 3: Round-trip lines through binary and back
 
 ```powerquery
 let
-    original = {"apple", "banana", "cherry"},
+    original = {"Alice,Widget A", "Bob,Gadget B", "Charlie,Widget C"},
     asBinary = Lines.ToBinary(original),
     asText = Text.FromBinary(asBinary),
     backToLines = Lines.FromText(asText)
@@ -80,5 +84,5 @@ in
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["apple","banana","cherry"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Alice,Widget A","Bob,Gadget B","Charlie,Widget C"]}]}
 -->

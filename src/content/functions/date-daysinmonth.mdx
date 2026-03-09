@@ -26,7 +26,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.DaysInMonth` returns the number of days in the month containing the given `date`, `datetime`, or `datetimezone` value. February returns 28 in common years and 29 in leap years. This is useful for computing month-end dates, prorating amounts, or building dynamic calendars. If the input is `null`, the function returns `null`.
+`Date.DaysInMonth` returns the number of days in the month containing the given `date`, `datetime`, or `datetimezone` value. Possible return values are 28, 29, 30, or 31. February returns 28 in common years and 29 in leap years. This is useful for computing month-end dates, prorating amounts, or building dynamic date calendars. If the input is `null`, the function returns `null`.
+
+A common use case is computing what fraction of a month an event covers (e.g., for proration). You can divide the number of active days by `Date.DaysInMonth` to get the fractional month weight. Another use case is constructing the last day of a month: `#date(Date.Year(d), Date.Month(d), Date.DaysInMonth(d))`, though `Date.EndOfMonth` is more concise for that purpose.
+
+Note that `Date.DaysInMonth` requires any date within the target month — it does not matter if you pass the 1st, 15th, or last day; the result is the same for all dates in that month.
 
 ## Examples
 
@@ -66,4 +70,29 @@ Compare February day counts across years.
 
 <!--output
 {"columns":[{"name":"Year","type":"number"},{"name":"Date","type":"date"},{"name":"DaysInFeb","type":"number"}],"rows":[{"Year":2024,"Date":"2024-02-01","DaysInFeb":29},{"Year":2023,"Date":"2023-02-01","DaysInFeb":28}]}
+-->
+
+### Example 3: Prorate a monthly amount by days active
+
+Calculate a prorated price based on how many days of the month remain after the order date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "OrderDate", "UnitPrice"}),
+    "ProratedPrice",
+    each
+        let
+            daysInMonth = Date.DaysInMonth([OrderDate]),
+            dayOfMonth = Date.Day([OrderDate]),
+            remainingDays = daysInMonth - dayOfMonth + 1
+        in
+            Number.Round([UnitPrice] * remainingDays / daysInMonth, 2),
+    type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"UnitPrice","type":"number"},{"name":"ProratedPrice","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","UnitPrice":25,"ProratedPrice":13.71},{"OrderID":2,"OrderDate":"2024-01-18","UnitPrice":50,"ProratedPrice":22.58},{"OrderID":3,"OrderDate":"2024-02-01","UnitPrice":15,"ProratedPrice":15},{"OrderID":4,"OrderDate":"2024-02-10","UnitPrice":75,"ProratedPrice":55.17},{"OrderID":5,"OrderDate":"2024-03-05","UnitPrice":25,"ProratedPrice":21.77}]}
 -->

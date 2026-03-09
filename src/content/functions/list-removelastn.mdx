@@ -31,11 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.RemoveLastN` removes the last `N` items from a list and returns the remaining items. It accepts either a count or a condition function.
+`List.RemoveLastN` removes items from the end of a list and returns the remaining items. It is the tail counterpart to `List.RemoveFirstN`.
 
-- **Number**: Removes the last `N` items. If `N` is larger than the list, an empty list is returned.
-- **Condition function**: Removes items from the **end** of the list while the condition returns `true`, scanning backward.
-- The original list is not modified; a new list is returned.
+When passed a number `N`, it removes the last `N` items. If `N` is larger than the list length, an empty list is returned. When passed a condition function, it scans from the end of the list backward, removing items while the condition returns `true`. Removal stops at the first item (from the end) that fails the condition — items before that point are kept even if they would satisfy the condition.
+
+The original list is not modified; a new list is returned. A common use case is stripping trailing "footer" or summary rows from a list before processing. For removing from the beginning, use `List.RemoveFirstN`. For removing a block in the middle, use `List.RemoveRange`.
 
 ## Examples
 

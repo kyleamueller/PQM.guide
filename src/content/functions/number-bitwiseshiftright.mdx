@@ -30,13 +30,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.BitwiseShiftRight` shifts the binary representation of `number` to the right by `shift` positions. High-order bits are filled based on the sign of the original value (arithmetic right shift). Shifting right by `n` is equivalent to integer division by 2^n.
+`Number.BitwiseShiftRight` shifts the binary representation of `number` to the right by `shift` positions. It performs an **arithmetic right shift**: the high-order bits are filled with the sign bit of the original value (0 for positive numbers, 1 for negative numbers). This means shifting a non-negative integer right by `n` is equivalent to **integer division by 2^n** (truncating toward zero).
 
-This is useful for extracting packed fields from integer values, scaling down bit-encoded data, or working with binary-encoded flags.
+This is the complement of `Number.BitwiseShiftLeft`. Common uses include:
+
+- **Extracting packed bit fields**: shift a packed integer right to bring the desired field to the low-order bits, then AND with a mask
+- **Efficient powers-of-2 division**: `Number.BitwiseShiftRight(x, n)` is a fast alternative to `Number.IntegerDivide(x, Number.Power(2, n))`
+- **Undoing a left shift**: recover the original value that was shifted left
+
+Note that for negative numbers, the sign-extension fill means right-shifting produces increasingly negative values (not unsigned logical shift). Power Query M uses arithmetic (signed) right shift for all `Number.BitwiseShiftRight` operations.
 
 ## Examples
 
-### Example 1: Shift 16 right by 2 (divide by 4)
+### Example 1: Shift 16 right by 2 positions — equivalent to 16 ÷ 4
 
 ```powerquery
 Number.BitwiseShiftRight(16, 2)
@@ -46,17 +52,19 @@ Number.BitwiseShiftRight(16, 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":4}]}
 -->
 
-### Example 2: Extract high nibble (upper 4 bits) from a byte
+### Example 2: Extract the upper nibble (bits 4–7) from a byte value
+
+181 in binary is `10110101`. Shifting right by 4 gives `00001011` = 11.
 
 ```powerquery
-Number.BitwiseShiftRight(0b10110101, 4)
+Number.BitwiseShiftRight(181, 4)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":11}]}
 -->
 
-### Example 3: Undo a left shift
+### Example 3: Round-trip through shift left and shift right
 
 ```powerquery
 let

@@ -31,34 +31,61 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.RemoveFirstN` removes rows from the top of the table. When passed a number, it removes that many rows. When passed a function, it removes rows from the top as long as the condition is satisfied — once a row fails the condition, removal stops and the remaining rows are returned.
+`Table.RemoveFirstN` removes rows from the top of the table. When `countOrCondition` is a number, it removes exactly that many leading rows. When it is a function (predicate), it removes rows from the top while the condition returns `true` — stopping as soon as the first row that fails the condition is reached, and retaining all rows from that point forward.
 
-This function is equivalent to `Table.Skip` when given a number.
+This function is equivalent to `Table.Skip` when given a number. The condition-based form is particularly useful for stripping leading metadata rows from flat files — for example, removing header comment lines that appear before the actual data header, where the number of such lines may vary.
+
+`Table.RemoveFirstN` does not fold to data sources. For large tables, it materializes the leading rows locally to evaluate the condition. If the leading rows to remove are identifiable at query design time, prefer `Table.Skip(n)` for slightly clearer intent.
 
 ## Examples
 
-### Example 1: Remove the first 2 rows
+### Example 1: Remove the first 2 orders from the Sales table
 
 ```powerquery
-Table.RemoveFirstN(
-    #table({"ID"}, {{1}, {2}, {3}, {4}}),
-    2
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Region"},
+        {{1,"Alice","Widget A","East"},{2,"Bob","Gadget B","West"},
+         {3,"Charlie","Widget C","East"},{4,"Diana","Widget A","North"}}
+    )
+in
+    Table.RemoveFirstN(Sales, 2)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"3"},{"ID":"4"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Region":"North"}]}
 -->
 
-### Example 2: Remove rows while value is less than 3
+### Example 2: Remove leading rows where the order date is in January
+
+Remove rows while OrderDate is in January 2024, keeping rows from February onwards.
 
 ```powerquery
-Table.RemoveFirstN(
-    #table({"ID"}, {{1}, {2}, {3}, {4}}),
-    each [ID] < 3
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "OrderDate"},
+        {{1,"Alice",#date(2024,1,15)},{2,"Bob",#date(2024,1,18)},{3,"Charlie",#date(2024,2,1)},{8,"Diana",#date(2024,4,15)}}
+    )
+in
+    Table.RemoveFirstN(Sales, each Date.Month([OrderDate]) = 1)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"3"},{"ID":"4"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","OrderDate":"2024-02-01"},{"OrderID":"8","CustomerName":"Diana","OrderDate":"2024-04-15"}]}
+-->
+
+### Example 3: Strip leading comment rows from a flat-file import
+
+```powerquery
+let
+    Raw = #table(
+        {"Content"},
+        {{"# Generated: 2024-01-01"},{"# Version: 2.0"},{"OrderID,Customer,Amount"},{"1,Alice,100"},{"2,Bob,200"}}
+    )
+in
+    Table.RemoveFirstN(Raw, each Text.StartsWith([Content], "#"))
+```
+
+<!--output
+{"columns":[{"name":"Content","type":"any"}],"rows":[{"Content":"OrderID,Customer,Amount"},{"Content":"1,Alice,100"},{"Content":"2,Bob,200"}]}
 -->

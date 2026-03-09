@@ -27,15 +27,22 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.Union` computes the union type of a list of types — that is, the least specific type to which all provided types are assignable. If the types are not compatible, the result is `type any`.
+`Type.Union` computes the **least upper bound** of a list of types — the most specific type that is a supertype of all types in the list. In simpler terms, it returns the most general type to which all provided types are assignable.
 
-For example, `Type.Union({type number, type nullable number})` returns `type nullable number`, since it can hold values of either type. `Type.Union({type number, type text})` returns `type any`, as no more specific common type exists.
+Key behaviors:
 
-This function is useful in generic transformations where you need to infer a compatible type for a set of values with potentially varying types.
+- `Type.Union({type number, type nullable number})` returns `type nullable number` — the nullable form is a supertype of the non-nullable form
+- `Type.Union({type number, type text})` returns `type any` — since `number` and `text` share no common supertype more specific than `any`
+- `Type.Union({type text, type text})` returns `type text` — identical types produce that type unchanged
+- `Type.Union({})` with an empty list returns `type none` — the bottom type (a type with no inhabitants)
+
+`Type.Union` is used in generic transformation functions that need to determine a compatible output type when merging values from multiple sources that may have different types. It is also useful in custom connector schema inference — when building a schema from heterogeneous fields, the union type gives the most specific annotation that fits all observed types.
+
+Note that `type any` in the result means the engine found no shared structure. In practice, a result of `type any` means the column or value will not have useful type annotations and operations on it may be slower or require explicit type casts.
 
 ## Examples
 
-### Example 1: Union of compatible numeric types
+### Example 1: Union of a type with its nullable variant
 
 ```powerquery
 Type.Union({type number, type nullable number})
@@ -45,7 +52,7 @@ Type.Union({type number, type nullable number})
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type nullable number"}]}
 -->
 
-### Example 2: Union of incompatible types produces any
+### Example 2: Union of incompatible types produces type any
 
 ```powerquery
 Type.Union({type number, type text})
@@ -55,7 +62,7 @@ Type.Union({type number, type text})
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type any"}]}
 -->
 
-### Example 3: Union of identical types returns that type
+### Example 3: Union of identical types returns that type unchanged
 
 ```powerquery
 Type.Union({type text, type text})

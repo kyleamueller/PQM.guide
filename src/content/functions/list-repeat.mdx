@@ -30,12 +30,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Repeat` concatenates the input list with itself `count` times, producing a longer list. This is useful for creating repeated patterns, padding lists, or generating cyclic sequences.
+`List.Repeat` concatenates the input list with itself `count` times, producing a longer list of repeated elements. The result has `List.Count(list) * count` elements, in the same order as the original repeated `count` times.
 
-- `count` must be a non-negative integer.
-- If `count` is `0`, an empty list is returned.
-- If `count` is `1`, a copy of the original list is returned.
-- The result has `List.Count(list) * count` elements.
+This function is useful for creating repeating label patterns (e.g., Q1, Q2, Q3, Q4 repeating across years), generating cyclic sequences, or padding a structure to a required length. For adding a single repeated value `n` times, pass a single-element list: `List.Repeat({value}, n)`.
+
+`count` must be a non-negative integer. Passing `0` returns an empty list; passing `1` returns a copy of the original list. For combining two different lists into one, use `List.Combine` instead.
 
 ## Examples
 

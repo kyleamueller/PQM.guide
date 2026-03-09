@@ -35,9 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.AddZone` annotates a `datetime` value with a UTC offset, producing a `datetimezone`. The time value itself is not adjusted — it is simply tagged with the given offset. To convert a `datetimezone` to a different offset while preserving the instant in time, use `DateTimeZone.SwitchZone`. To strip the timezone back off, use `DateTimeZone.RemoveZone`.
+`DateTime.AddZone` annotates a `datetime` value with a UTC offset, producing a `datetimezone`. The time value itself is not adjusted — it is simply tagged with the given offset. This is distinct from `DateTimeZone.SwitchZone`, which converts a `datetimezone` to a different offset while preserving the underlying instant in time. Use `DateTime.AddZone` only when the `datetime` value already represents the correct local time for the target timezone and you simply need to add the offset annotation.
 
-Use `timezoneMinutes` for non-whole-hour offsets, such as UTC+5:30 (India) or UTC+9:30 (Australia Central).
+Use the optional `timezoneMinutes` parameter for non-whole-hour offsets such as UTC+5:30 (India Standard Time), UTC+9:30 (Australian Central Standard Time), or UTC+5:45 (Nepal Time). For offsets that are purely whole hours, omit `timezoneMinutes` or pass `0`.
+
+A common pattern is combining `DateTime.AddZone` with `DateTimeZone.SwitchZone` to normalize timestamps from multiple sources to a single reference timezone. First tag each value with its source timezone using `DateTime.AddZone`, then convert all values to UTC or your target timezone with `DateTimeZone.SwitchZone`.
 
 ## Examples
 
@@ -45,22 +47,22 @@ Use `timezoneMinutes` for non-whole-hour offsets, such as UTC+5:30 (India) or UT
 
 Add UTC-5 to each datetime to represent EST.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.AddColumn(
     Table.SelectColumns(
-        Table.FirstN(Events, 4),
-        {"EventID", "EventTime"}
+        Table.FirstN(OrderLog, 4),
+        {"LogID", "Timestamp"}
     ),
-    "EventTimeEST",
-    each DateTime.AddZone([EventTime], -5),
+    "TimestampEST",
+    each DateTime.AddZone([Timestamp], -5),
     type datetimezone
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"EventTimeEST","type":"datetimezone"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","EventTimeEST":"2024-03-15T08:30:00-05:00"},{"EventID":2,"EventTime":"2024-03-15T14:00:00","EventTimeEST":"2024-03-15T14:00:00-05:00"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","EventTimeEST":"2024-03-16T09:15:00-05:00"},{"EventID":4,"EventTime":"2024-03-16T17:45:00","EventTimeEST":"2024-03-16T17:45:00-05:00"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"TimestampEST","type":"datetimezone"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","TimestampEST":"2024-01-15T09:30:00-05:00"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","TimestampEST":"2024-01-16T14:15:00-05:00"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","TimestampEST":"2024-01-18T11:00:00-05:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","TimestampEST":"2024-01-20T08:45:00-05:00"}]}
 -->
 
 ### Example 2: Apply a half-hour offset (UTC+5:30 for India)
@@ -76,4 +78,24 @@ Tag a datetime with the India Standard Time offset.
 
 <!--output
 {"columns":[{"name":"LocalTime","type":"datetime"},{"name":"IST","type":"datetimezone"}],"rows":[{"LocalTime":"2024-03-15T12:00:00","IST":"2024-03-15T12:00:00+05:30"}]}
+-->
+
+### Example 3: Tag and then convert to UTC
+
+Annotate a local timestamp with its source timezone, then normalize to UTC using SwitchZone.
+
+```powerquery
+let
+    LocalTime = #datetime(2024, 3, 15, 9, 0, 0),
+    WithZone = DateTime.AddZone(LocalTime, -5),
+    AsUTC = DateTimeZone.SwitchZone(WithZone, 0)
+in
+    #table(
+        type table [LocalEST = datetimezone, UTC = datetimezone],
+        {{WithZone, AsUTC}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"LocalEST","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"LocalEST":"2024-03-15T09:00:00-05:00","UTC":"2024-03-15T14:00:00+00:00"}]}
 -->

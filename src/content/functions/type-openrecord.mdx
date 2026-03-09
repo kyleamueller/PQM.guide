@@ -27,15 +27,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.OpenRecord` converts a closed record type into an open record type. An open record type allows values to carry extra fields not declared in the type definition.
+`Type.OpenRecord` converts a closed record type into an **open** record type, allowing values typed with it to have additional fields beyond those explicitly declared. If the input type is already open, it is returned unchanged. The complement function is `Type.ClosedRecord`.
 
-If the input is already an open record type, it is returned unchanged. This is the complement of `Type.ClosedRecord`.
+In Power Query M's type system, the distinction between open and closed record types matters when annotating values with `Value.ReplaceType` or building custom connector schemas. An open record type signals that a value may carry extra fields — this is the default behavior of most records in M since the base `type record` is open. A closed type enforces that only the declared fields exist.
 
-Open record types are useful when you want to declare required fields for validation or type-checking while still permitting additional data to flow through without raising type errors.
+A common use case for `Type.OpenRecord` is to loosen a previously closed schema. For example, if a custom connector returns a typed record with a closed schema but you want to allow downstream steps to add fields without type errors, you can open the type before applying it.
+
+Use `Type.IsOpenRecord` to test the current state, and `Type.ClosedRecord` to restrict a type back to closed.
 
 ## Examples
 
-### Example 1: Open a closed record type
+### Example 1: Open a closed record type and verify
 
 ```powerquery
 let
@@ -49,7 +51,7 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: Open a typed record type with declared fields
+### Example 2: Open a typed record type built with Type.ForRecord
 
 ```powerquery
 let
@@ -57,6 +59,20 @@ let
     Opened = Type.OpenRecord(Closed)
 in
     Type.IsOpenRecord(Opened)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+### Example 3: Opening an already-open type returns it unchanged
+
+```powerquery
+let
+    AlreadyOpen = type record,
+    StillOpen = Type.OpenRecord(AlreadyOpen)
+in
+    Type.IsOpenRecord(StillOpen)
 ```
 
 <!--output

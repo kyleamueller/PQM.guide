@@ -30,45 +30,57 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.MatchesAllRows` applies a predicate function to each row (supplied as a record) and returns `true` only if every row passes. The function short-circuits and returns `false` as soon as any row fails the condition. An empty table returns `true` (vacuous truth).
+`Table.MatchesAllRows` applies a predicate function to every row of a table and returns `true` only if every row satisfies the condition. The function short-circuits — it returns `false` as soon as the first non-matching row is found, without evaluating remaining rows. An empty table returns `true` by vacuous truth.
 
-This is useful for data quality assertions — for example, ensuring that all values in a column meet a minimum threshold, or that no row contains a null key.
+This function is ideal for data quality gate checks embedded in a query pipeline. Common uses include asserting that all key columns are non-null before a join, that all numeric values fall within an expected range, or that all required fields are populated. It reads more clearly than `List.AllTrue(List.Transform(Table.ToRows(t), each condition))` and is more efficient due to short-circuiting.
+
+`Table.MatchesAllRows` does not fold to data sources. For large database tables, validate constraints at the source using aggregations (e.g., `MIN`, `COUNT WHERE ... IS NULL`) rather than pulling all rows locally.
 
 ## Examples
 
-### Example 1: All rows have positive amounts
+### Example 1: Confirm all products have a positive price
 
 ```powerquery
-Table.MatchesAllRows(
-    #table({"Amount"}, {{10}, {25}, {7}}),
-    each [Amount] > 0
-)
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Price = number, InStock = logical],
+        {{1,"Widget A",25.00,true},{2,"Gadget B",50.00,true},{3,"Widget C",15.00,false},{4,"Gadget D",75.00,true},{5,"Thingamajig E",120.00,false}}
+    )
+in
+    Table.MatchesAllRows(Products, each [Price] > 0)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
-### Example 2: Condition fails on one row
+### Example 2: Detect rows with a null or missing customer name
 
 ```powerquery
-Table.MatchesAllRows(
-    #table({"Amount"}, {{10}, {-5}, {7}}),
-    each [Amount] > 0
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,null,"Gadget B"},{3,"Charlie","Widget C"}}
+    )
+in
+    Table.MatchesAllRows(Sales, each [CustomerName] <> null)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
 
-### Example 3: Validate no null keys
+### Example 3: Assert all salaries are within an acceptable range
 
 ```powerquery
-Table.MatchesAllRows(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    each [ID] <> null
-)
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Salary = number],
+        {{"E001","alice smith","Sales",55000},{"E002","BOB JONES","Engineering",95000},
+         {"E003","Charlie Brown","Marketing",72000},{"E005","Eve Martinez","Sales",88000}}
+    )
+in
+    Table.MatchesAllRows(Employees, each [Salary] >= 30000 and [Salary] <= 200000)
 ```
 
 <!--output

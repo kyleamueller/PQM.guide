@@ -31,13 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.MatchesAll` applies a condition function to every item in the list and returns `true` only if every item satisfies the condition. It is the list equivalent of the "for all" quantifier.
+`List.MatchesAll` applies a condition (predicate) function to every item in a list and returns `true` only if every item satisfies the condition. It is the list equivalent of the universal quantifier — "for all items, the condition holds."
 
-Unlike `List.AllTrue`, which expects a pre-computed list of logical values, `List.MatchesAll` accepts any list and a predicate function applied on the fly.
+Unlike `List.AllTrue`, which expects a pre-built list of logical values, `List.MatchesAll` accepts any list and evaluates the predicate on each item inline. This makes it the more idiomatic choice when working directly with a data list: `List.MatchesAll(Sales[UnitPrice], each _ > 0)` is cleaner than wrapping a `List.Transform` call.
 
-- An empty list returns `true` (vacuous truth).
-- The function short-circuits: evaluation stops as soon as a failing item is found.
-- Equivalent to `List.AllTrue(List.Transform(list, condition))`, but may short-circuit earlier.
+An empty list returns `true` (vacuous truth). The function short-circuits as soon as a failing item is found. For the "at least one" check, use `List.MatchesAny`. For simple equality membership, `List.Contains` and `List.ContainsAll` are more appropriate.
 
 ## Examples
 

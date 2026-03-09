@@ -35,36 +35,61 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.MinN` returns the `N` rows with the lowest values for the specified comparison criteria, in ascending order. If `countOrCondition` is a function, rows are returned from the bottom of the sorted table while the function returns true.
+`Table.MinN` returns the bottom N rows by the specified comparison criteria, ordered from lowest to highest. When `countOrCondition` is a number, it returns exactly that many rows. When it is a function (predicate), it returns rows from the bottom of the sorted order (ascending) while the predicate remains true — stopping at the first row that fails the condition.
 
-This is the counterpart to `Table.MaxN` and is useful for bottom-N analysis.
+`Table.MinN` is the counterpart of `Table.MaxN` and is useful for bottom-N analysis — finding the N lowest salaries, the cheapest products, the earliest orders, or all values below a threshold. It is equivalent to `Table.FirstN(Table.Sort(table, {criteria, Order.Ascending}), N)`.
+
+When using a condition function, the condition is applied in ascending sort order. The function returns rows from the lowest value upward and stops at the first row that fails the predicate. This is a leading contiguous behavior — rows are not filtered globally; scanning stops at the first non-matching row.
 
 ## Examples
 
-### Example 1: Get the bottom 2 rows by score
+### Example 1: Bottom 3 products by price
 
 ```powerquery
-Table.MinN(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}, {"Dave", 70}}),
-    "Score",
-    2
-)
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Category = text, Price = number, InStock = logical],
+        {{1,"Widget A","Widgets",25.00,true},{2,"Gadget B","Gadgets",50.00,true},
+         {3,"Widget C","Widgets",15.00,false},{4,"Gadget D","Gadgets",75.00,true},{5,"Thingamajig E","Misc",120.00,false}}
+    )
+in
+    Table.MinN(Products, "Price", 3)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Dave","Score":"70"},{"Name":"Bob","Score":"82"}]}
+{"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"3","ProductName":"Widget C","Category":"Widgets","Price":"15","InStock":"false"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25","InStock":"true"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50","InStock":"true"}]}
 -->
 
-### Example 2: Get all rows with score below 85
+### Example 2: All orders with unit price below 30 (using a condition)
 
 ```powerquery
-Table.MinN(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}, {"Dave", 70}}),
-    "Score",
-    each [Score] < 85
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice"},
+        {{1,"Alice","Widget A",25.00},{3,"Charlie","Widget C",15.00},
+         {2,"Bob","Gadget B",50.00},{4,"Alice","Gadget D",75.00}}
+    )
+in
+    Table.MinN(Sales, "UnitPrice", each [UnitPrice] < 30)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Dave","Score":"70"},{"Name":"Bob","Score":"82"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15"},{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25"}]}
+-->
+
+### Example 3: Identify the 2 lowest-paid employees
+
+```powerquery
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Department = text, Salary = number],
+        {{"E001","alice smith","Sales",55000},{"E002","BOB JONES","Engineering",95000},
+         {"E006","frank lee","Marketing",52000},{"E003","Charlie Brown","Marketing",72000}}
+    )
+in
+    Table.MinN(Employees, "Salary", 2)
+```
+
+<!--output
+{"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E006","FullName":"frank lee","Department":"Marketing","Salary":"52000"},{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"}]}
 -->

@@ -29,34 +29,64 @@ relatedFunctions:
 
 `Date.IsInNextYear` returns `true` if the input date falls anywhere within the calendar year immediately following the current year (as determined by `DateTime.LocalNow()`). For example, if today is in 2026, this function returns `true` for any date in 2027. The function is re-evaluated on each query refresh.
 
+This function matches exactly one year: the next calendar year from January 1 to December 31. For a broader multi-year window, use `Date.IsInNextNYears`. To include the current year as well, combine with `or Date.IsInCurrentYear([OrderDate])`.
+
+Use this function for annual planning and budgeting scenarios where you need to identify items that fall in the upcoming fiscal or calendar year.
+
 ## Examples
 
-### Example 1: Filter contracts expiring next year
+### Example 1: Filter orders scheduled for next year
 
-Keep only rows where ExpiryDate is in the next calendar year.
+Keep only rows where OrderDate falls in the next calendar year.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Contracts,
-    each Date.IsInNextYear([ExpiryDate])
+    Sales,
+    each Date.IsInNextYear([OrderDate])
 )
 ```
 
 <!--output
-{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-03-31","Customer":"Contoso"},{"ContractID":"C002","ExpiryDate":"2027-09-30","Customer":"Fabrikam"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":50,"CustomerName":"Alice","OrderDate":"2027-03-15"},{"OrderID":51,"CustomerName":"Bob","OrderDate":"2027-09-22"}]}
 -->
 
-### Example 2: Flag next-year renewals
+### Example 2: Flag next-year orders
 
-Add a boolean column for items expiring next year.
+Add a boolean column identifying orders in the next calendar year.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Contracts,
-    "ExpiresNextYear", each Date.IsInNextYear([ExpiryDate]), type logical
+    Sales,
+    "IsNextYear", each Date.IsInNextYear([OrderDate]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"ExpiresNextYear","type":"logical"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-03-31","ExpiresNextYear":true},{"ContractID":"C002","ExpiryDate":"2026-06-30","ExpiresNextYear":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsNextYear","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","IsNextYear":false},{"OrderID":50,"OrderDate":"2027-03-15","IsNextYear":true},{"OrderID":55,"OrderDate":"2028-01-01","IsNextYear":false}]}
+-->
+
+### Example 3: Summarize orders by whether they are in the current or next year
+
+Tag each order with a period label for year-over-year planning.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "Period",
+    each
+        if Date.IsInCurrentYear([OrderDate]) then "Current Year"
+        else if Date.IsInNextYear([OrderDate]) then "Next Year"
+        else "Other",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Period","type":"text"}],"rows":[{"OrderID":35,"OrderDate":"2025-10-10","Period":"Other"},{"OrderID":42,"OrderDate":"2026-03-08","Period":"Current Year"},{"OrderID":50,"OrderDate":"2027-03-15","Period":"Next Year"}]}
 -->

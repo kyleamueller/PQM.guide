@@ -32,19 +32,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.FirstN` is the flexible counterpart to `List.First`. It returns a **list** (not a scalar) of either:
+`List.FirstN` is the flexible counterpart to `List.First`. While `List.First` returns a single scalar value, `List.FirstN` always returns a **list**. It accepts either a number or a condition function as its second argument.
 
-- The first `N` items when passed a number.
-- Items from the start of the list as long as a condition function returns `true`, stopping at the first item that fails the condition.
+When passed a number `N`, it returns a list of the first `N` items. If `N` exceeds the list length, the entire list is returned. If `N` is `0`, an empty list is returned.
 
-When passed a number:
-- If `N` is greater than the list length, the entire list is returned.
-- If `N` is 0, an empty list is returned.
-
-When passed a condition function:
-- The function is applied to each item in order, starting from the first.
-- Items are collected while the function returns `true`.
-- Collection stops as soon as the function returns `false` — remaining items (even if they'd pass the condition) are not included.
+When passed a condition function, items are collected from the start of the list while the function returns `true`. Collection stops permanently at the first item that fails — remaining items are excluded even if they would have satisfied the condition. This makes the condition mode useful for collecting a leading run (e.g., values below a threshold, or dates before a cutoff), but not for general filtering. Use `List.Select` for non-contiguous filtering based on a predicate.
 
 ## Examples
 

@@ -31,12 +31,13 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Union` takes a **list of lists** as its argument and returns a single list containing all distinct values from all the input lists combined. It is equivalent to combining all lists with `List.Combine` and then deduplicating with `List.Distinct`.
+`List.Union` takes a **list of lists** as its argument and returns a single list containing all distinct values from all the input lists combined. It is equivalent to `List.Distinct(List.Combine({list1, list2, list3}))` but expresses the intent more cleanly.
 
-- The argument is a list of lists: `{list1, list2, list3}`.
-- The result contains only distinct values — duplicates across or within input lists are removed.
-- Order of items in the result follows first appearance across the input lists in order.
-- Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` for case-insensitive deduplication.
+Note the argument shape: you must wrap your input lists in an outer list — `{listA, listB}` — not pass them as separate arguments. This is the same convention used by `List.Intersect`.
+
+The result contains only distinct values. Duplicates within a single input list and duplicates across input lists are all deduplicated. The order of items in the result follows their first appearance, scanning the input lists from left to right. Comparison is case-sensitive for text by default; pass `Comparer.OrdinalIgnoreCase` as the optional second argument for case-insensitive deduplication.
+
+For combining lists without deduplication, use `List.Combine`. For finding items common to all lists, use `List.Intersect`.
 
 ## Examples
 

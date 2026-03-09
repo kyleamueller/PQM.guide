@@ -36,15 +36,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Byte.From` converts a value to a byte — an 8-bit unsigned integer in the range 0 to 255. Values outside this range raise an error. Fractional numbers are rounded according to the optional `roundingMode` parameter (defaulting to round-toward-even).
+`Byte.From` converts a value to a byte — an 8-bit **unsigned** integer spanning the range 0 to 255. This is distinct from `Int8.From`, which produces a signed 8-bit integer covering -128 to 127. Values outside the 0–255 range raise an error at runtime, so validate or clamp inputs before calling this function when working with untrusted data.
 
-Text values are parsed as numbers before conversion. A logical `true` converts to `1`, `false` to `0`. `null` returns `null`.
+Fractional numbers are rounded before conversion. By default the function uses round-half-to-even (banker's rounding), which differs from the conventional "round half up" behavior. If you need traditional rounding — for example, `2.5 → 3` — pass `RoundingMode.AwayFromZero` as the third argument. Text values are parsed as decimal numbers first. A logical `true` converts to `1`, `false` to `0`, and `null` returns `null`.
 
-This type is useful when working with binary data, raw byte buffers, or systems that require small fixed-range integer fields.
+The byte type is most commonly encountered when working with binary data streams, raw byte buffers, or low-level protocol fields. In most Power Query data transformation work you will use `Int64.From` (Whole Number) or `Decimal.From` instead. Use `Byte.From` explicitly when a downstream system requires values annotated with the 8-bit unsigned type — for example, when building typed table schemas for custom connectors that interface with byte-array columns.
+
+To apply the byte type across an entire table column, use `Table.TransformColumnTypes` with `Byte.Type`.
 
 ## Examples
 
-### Example 1: Convert a number to a byte
+### Example 1: Convert an integer within range
 
 ```powerquery
 Byte.From(200)
@@ -54,7 +56,7 @@ Byte.From(200)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":200}]}
 -->
 
-### Example 2: Convert a text value
+### Example 2: Parse a text string as a byte
 
 ```powerquery
 Byte.From("128")
@@ -64,12 +66,20 @@ Byte.From("128")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":128}]}
 -->
 
-### Example 3: Convert a decimal with default rounding
+### Example 3: Rounding behavior — default vs. away-from-zero
+
+The default mode uses banker's rounding (round half to even). Use `RoundingMode.AwayFromZero` for conventional rounding.
 
 ```powerquery
-Byte.From(10.6)
+#table(
+    {"Input", "Default (Banker's)", "AwayFromZero"},
+    {
+        {10.5, Byte.From(10.5), Byte.From(10.5, null, RoundingMode.AwayFromZero)},
+        {11.5, Byte.From(11.5), Byte.From(11.5, null, RoundingMode.AwayFromZero)}
+    }
+)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":11}]}
+{"columns":[{"name":"Input","type":"number"},{"name":"Default (Banker's)","type":"number"},{"name":"AwayFromZero","type":"number"}],"rows":[{"Input":10.5,"Default (Banker's)":10,"AwayFromZero":11},{"Input":11.5,"Default (Banker's)":12,"AwayFromZero":12}]}
 -->

@@ -30,15 +30,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Currency.From` converts a value to the currency data type, which is a fixed-decimal number with exactly 4 decimal places. The underlying representation is a scaled 64-bit integer (value × 10,000), giving exact arithmetic for monetary amounts up to ±922,337,203,685,477.5807.
+`Currency.From` converts a value to the currency data type — a **fixed-decimal** number that always stores exactly 4 decimal places. Under the hood, the value is represented as a scaled 64-bit integer (the value multiplied by 10,000), which gives it exact decimal arithmetic for monetary amounts up to ±922,337,203,685,477.5807. This is the type labeled "Fixed Decimal Number" in the Power Query UI and "Currency" in Power BI Desktop's data type menu.
 
-The currency type prevents floating-point rounding errors that plague financial calculations when using double-precision arithmetic. It maps to the `Currency` type in Power BI Desktop and `Fixed Decimal Number` in the UI.
+The primary reason to use currency type instead of the default double-precision number is to avoid IEEE 754 floating-point rounding errors. For example, `0.1 + 0.2` in double-precision does not equal exactly `0.3`, but in fixed-decimal arithmetic it does. This matters when summing large numbers of monetary amounts where accumulated rounding errors could affect financial reports. However, note that currency type has a fixed precision of 4 decimal places — it cannot represent values like `0.123456`. For higher-precision decimal work, use `Decimal.From` instead.
 
-Text values are parsed using the specified culture. `true` converts to `1.0000`, `false` to `0.0000`, `null` to `null`.
+Text values are parsed using the specified culture — important when your source data uses locale-specific decimal separators (e.g., a comma in French or German). Logical `true` converts to `1.0000`, `false` to `0.0000`, and `null` returns `null`. To apply the currency type to a whole column in a table, use `Table.TransformColumnTypes` with `Currency.Type`.
 
 ## Examples
 
-### Example 1: Convert a number to currency
+### Example 1: Convert a decimal number to currency type
 
 ```powerquery
 Currency.From(19.99)
@@ -48,7 +48,7 @@ Currency.From(19.99)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":19.99}]}
 -->
 
-### Example 2: Convert text to currency
+### Example 2: Parse a currency value from text
 
 ```powerquery
 Currency.From("1234.5678")
@@ -58,17 +58,19 @@ Currency.From("1234.5678")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.5678}]}
 -->
 
-### Example 3: Apply currency type to a revenue column
+### Example 3: Apply currency type to price columns in Sales
+
+Setting the currency type on a UnitPrice column ensures exact fixed-decimal arithmetic when calculating line totals.
 
 Input: `Sales`
 
 ```powerquery
 Table.TransformColumnTypes(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Revenue"}),
-    {{"Revenue", Currency.Type}}
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    {{"UnitPrice", Currency.Type}}
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"}],"rows":[{"OrderID":1,"Revenue":1250.0000},{"OrderID":2,"Revenue":8750.0000},{"OrderID":3,"Revenue":3400.0000}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25.0},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50.0},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15.0},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75.0}]}
 -->

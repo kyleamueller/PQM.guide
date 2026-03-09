@@ -187,6 +187,27 @@ export default function ResourcesPage() {
         <div className="resource-card">
           <h3>
             <a
+              href="https://blog.crossjoin.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Chris Webb&apos;s BI Blog
+            </a>
+          </h3>
+          <p>
+            One of the most technically deep Power Query blogs in the
+            community. Chris Webb has been writing about Power Query since its
+            earliest days and covers query folding behavior, M language
+            internals, performance gotchas, and advanced connector patterns in
+            detail that you won&apos;t find anywhere else. An essential
+            reference for understanding <em>why</em> things work the way they
+            do in Power Query.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
               href="https://gorilla.bi"
               target="_blank"
               rel="noopener noreferrer"

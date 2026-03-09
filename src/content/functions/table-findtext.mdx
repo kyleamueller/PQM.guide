@@ -29,34 +29,65 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.FindText` scans every cell in the table and returns rows where at least one cell contains `text` as a substring. The search is case-insensitive. Non-text values in columns are converted to text before comparison.
+`Table.FindText` scans every cell in the table and returns rows where at least one cell contains `text` as a case-insensitive substring. Non-text values (numbers, dates, logical) are converted to their text representations before comparison, so a search for `"2024"` will match a date column displaying `2024-01-15` as well as a text column containing `"2024"`.
 
-This function is a broad search tool. For more targeted filtering, prefer `Table.SelectRows` with an explicit condition. `Table.FindText` does not typically fold to the data source, so it may be slow on large datasets.
+Because `Table.FindText` searches all columns simultaneously, it is a blunt instrument suited for exploratory work or admin-style queries rather than production logic. For targeted filtering, prefer `Table.SelectRows` with an explicit per-column condition — it is more readable, faster, and more likely to fold to the data source. `Table.FindText` does not fold.
+
+A key gotcha: because numeric values are text-converted before matching, searching for `"1"` will match any number whose text representation contains a `"1"` (e.g., 1, 10, 21, 100). Design searches accordingly and prefer `Table.SelectRows` when precision matters.
 
 ## Examples
 
-### Example 1: Find rows containing a keyword
+### Example 1: Find all orders mentioning "Widget"
+
+Searches across all columns, including Product, Category, and any other text cell.
 
 ```powerquery
-Table.FindText(
-    #table({"Product", "Category"}, {{"Apple iPhone", "Electronics"}, {"Banana", "Groceries"}, {"Apple Watch", "Electronics"}}),
-    "Apple"
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Category", "UnitPrice", "Quantity"},
+        {{1,"Alice","Widget A","Widgets",25.00,4},
+         {2,"Bob","Gadget B","Gadgets",50.00,2},
+         {3,"Charlie","Widget C","Widgets",15.00,10},
+         {6,"Bob","Thingamajig E","Misc",120.00,1}}
+    )
+in
+    Table.FindText(Sales, "Widget")
 ```
 
 <!--output
-{"columns":[{"name":"Product","type":"any"},{"name":"Category","type":"any"}],"rows":[{"Product":"Apple iPhone","Category":"Electronics"},{"Product":"Apple Watch","Category":"Electronics"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10"}]}
 -->
 
-### Example 2: Search is case-insensitive
+### Example 2: Case-insensitive search matches upper and lower case
 
 ```powerquery
-Table.FindText(
-    #table({"Notes"}, {{"urgent task"}, {"Normal entry"}, {"URGENT follow-up"}}),
-    "urgent"
-)
+let
+    Employees = #table(
+        {"EmployeeID", "FullName", "Department"},
+        {{"E001","alice smith","Sales"},{"E002","BOB JONES","Engineering"},{"E003","Charlie Brown","Marketing"}}
+    )
+in
+    Table.FindText(Employees, "alice")
 ```
 
 <!--output
-{"columns":[{"name":"Notes","type":"any"}],"rows":[{"Notes":"urgent task"},{"Notes":"URGENT follow-up"}]}
+{"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales"}]}
+-->
+
+### Example 3: Numeric values are matched as text — search across all column types
+
+Searching for "East" matches the Region text column even when the table contains numeric columns.
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Region", "UnitPrice"},
+        {{1,"Alice","East",25.00},{2,"Bob","West",50.00},{6,"Bob","East",120.00}}
+    )
+in
+    Table.FindText(Sales, "East")
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East","UnitPrice":"25"},{"OrderID":"6","CustomerName":"Bob","Region":"East","UnitPrice":"120"}]}
 -->

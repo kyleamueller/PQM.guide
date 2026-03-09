@@ -26,19 +26,24 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Keys` returns metadata about keys declared on a table's type. Each element in the returned list is a record with the following fields:
-- `Columns`: a list of column names that form the key
-- `Primary`: a logical indicating whether the key is a primary key
+`Table.Keys` returns a list of records describing the key declarations on a table's type metadata. Each element has two fields:
+- `Columns`: a list of column names forming the key.
+- `Primary`: `true` if the key is a primary key, `false` for candidate (non-primary) keys.
 
-Keys are typically declared using `Table.AddKey` or are inherited from the underlying data source (e.g., SQL Server primary key information). If no keys are defined, an empty list is returned.
+Keys are typically declared using `Table.AddKey` or inherited from a data source that exposes primary key metadata (such as SQL Server or certain OData sources). If no keys are declared, `Table.Keys` returns an empty list `{}`.
+
+This function is useful for introspection — for example, confirming that `Table.AddKey` registered correctly, or inspecting which columns a connector has identified as primary keys. The returned list can be traversed programmatically to extract column names or filter for primary keys only.
 
 ## Examples
 
-### Example 1: Inspect keys on a table without any defined keys
+### Example 1: Inspect keys on a table with no keys declared
+
+A plain `#table` literal carries no key metadata.
 
 ```powerquery
 Table.Keys(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}})
+    #table({"CustomerID", "Name", "City"},
+           {{1,"Alice","New York"},{2,"Bob","Chicago"}})
 )
 ```
 
@@ -46,16 +51,37 @@ Table.Keys(
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{}"}]}
 -->
 
-### Example 2: Inspect keys after adding one
+### Example 2: Inspect keys after declaring a primary key
 
 ```powerquery
 let
-    Source  = #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    WithKey = Table.AddKey(Source, {"ID"}, true)
+    Customers = #table(
+        {"CustomerID", "Name", "Email"},
+        {{1,"Alice","alice@example.com"},{2,"Bob","bob@example.com"}}
+    ),
+    WithKey = Table.AddKey(Customers, {"CustomerID"}, true)
 in
     Table.Keys(WithKey)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ID\"}, Primary = true]}"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"CustomerID\"}, Primary = true]}"}]}
+-->
+
+### Example 3: Declare both a primary and a non-primary key, then inspect
+
+```powerquery
+let
+    Products = #table(
+        {"ProductID","ProductName","Category"},
+        {{1,"Widget A","Widgets"},{2,"Gadget B","Gadgets"}}
+    ),
+    Step1 = Table.AddKey(Products, {"ProductID"}, true),
+    Step2 = Table.AddKey(Step1, {"ProductName"}, false)
+in
+    Table.Keys(Step2)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ProductID\"}, Primary = true], [Columns = {\"ProductName\"}, Primary = false]}"}]}
 -->
