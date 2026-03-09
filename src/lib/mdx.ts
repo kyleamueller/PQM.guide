@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { FunctionFrontmatter, FunctionIndexEntry, ConceptFrontmatter, PatternFrontmatter } from "./types";
+import { functionSynonyms } from "@/data/search-synonyms";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/functions");
 const CONCEPTS_DIR = path.join(process.cwd(), "src/content/concepts");
@@ -50,6 +51,7 @@ export function buildSearchIndex(): FunctionIndexEntry[] {
     slug: f.slug,
     category: f.category,
     description: f.description,
+    keywords: functionSynonyms[f.slug],
   }));
 }
 

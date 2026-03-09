@@ -56,4 +56,20 @@ describe("createSearchIndex", () => {
     expect(slugs).toContain("list-accumulate");
     expect(slugs).toContain("list-sum");
   });
+
+  it("keyword synonyms surface results for non-M vocabulary", () => {
+    const withKeywords: FunctionIndexEntry[] = [
+      ...DATA,
+      {
+        title: "Table.SelectRows",
+        slug: "table-selectrows",
+        category: "Table",
+        description: "Filters rows using a condition.",
+        keywords: "filter where sql where clause",
+      },
+    ];
+    const results = createSearchIndex(withKeywords).search("sql where");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].item.slug).toBe("table-selectrows");
+  });
 });

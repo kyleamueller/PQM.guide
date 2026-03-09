@@ -38,11 +38,11 @@ const TOOLS = [
   {
     name: "search_functions",
     description:
-      "Fuzzy-search Power Query M functions by keyword. Returns up to 10 matching functions with their descriptions.",
+      "Fuzzy-search Power Query M functions by name, description, or common synonyms (including Excel, SQL, and DAX equivalents). For example, 'vlookup' finds join functions, 'concatenate' finds Text.Combine, 'missing value' finds null-handling functions. If no results are found, try search_concepts or search_patterns for broader topic coverage.",
     inputSchema: {
       type: "object",
       properties: {
-        query: { type: "string", description: "Search query" },
+        query: { type: "string", description: "Search query — accepts M function names, plain English descriptions, or Excel/SQL/DAX equivalents (e.g. 'vlookup', 'concatenate', 'group by', 'null coalesce')" },
         limit: {
           type: "number",
           description: "Maximum number of results to return (default 10)",
@@ -243,7 +243,7 @@ async function callTool(
         const limit = Math.min(Number(args.limit ?? 10), 20);
         const index = createSearchIndex(buildSearchIndex());
         const results = index.search(query, { limit });
-        if (results.length === 0) return `No functions found matching "${query}".`;
+        if (results.length === 0) return `No functions found matching "${query}". Try rephrasing with M function name fragments (e.g. "Table", "List", "Text"), or use search_concepts or search_patterns to find topic guides instead.`;
         return results
           .map(
             (r) =>
