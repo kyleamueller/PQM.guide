@@ -27,7 +27,7 @@ const TOOLS = [
   {
     name: "list_categories",
     args: `{}`,
-    description: "All 23 function categories with descriptions and counts.",
+    description: "All 24 function categories with descriptions and counts.",
   },
   {
     name: "get_concept",
@@ -63,6 +63,11 @@ const TOOLS = [
     name: "get_sample_table",
     args: `{ "name": "Sales" }`,
     description: "Sample data table used in examples (Sales, Customers, Products, Employees, OrderLog).",
+  },
+  {
+    name: "list_functions_by_category",
+    args: `{ "category": "list" }`,
+    description: "All functions in a given category. Use list_categories first to get valid category slugs.",
   },
 ];
 
