@@ -1,6 +1,8 @@
 import Link from "next/link";
+import path from "path";
+import { execSync } from "child_process";
 import { categories } from "@/data/categories";
-import { getAllFunctions } from "@/lib/mdx";
+import { getAllFunctions, getFunctionBySlug } from "@/lib/mdx";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,8 +18,35 @@ export const metadata: Metadata = {
   },
 };
 
+function getRecentlyAdded(limit = 6) {
+  try {
+    const output = execSync(
+      "git log --format=\"\" --diff-filter=A --name-only -- src/content/functions/",
+      { cwd: process.cwd() }
+    ).toString().trim();
+
+    const slugs = output
+      .split("\n")
+      .filter((f) => f.endsWith(".mdx"))
+      .slice(0, limit)
+      .map((f) => path.basename(f, ".mdx"));
+
+    return slugs.flatMap((slug) => {
+      try {
+        const { frontmatter } = getFunctionBySlug(slug);
+        return [{ slug, title: frontmatter.title, category: frontmatter.category, description: frontmatter.description }];
+      } catch {
+        return [];
+      }
+    });
+  } catch {
+    return [];
+  }
+}
+
 export default function Home() {
   const allFunctions = getAllFunctions();
+  const recentlyAdded = getRecentlyAdded();
 
   const categoryCounts = categories.map((cat) => ({
     ...cat,
@@ -71,6 +100,37 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {recentlyAdded.length > 0 && (
+        <div style={{ marginBottom: 40 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Recently Added
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
+            {recentlyAdded.map((fn) => (
+              <Link
+                key={fn.slug}
+                href={`/functions/${fn.slug}`}
+                style={{
+                  display: "block",
+                  background: "var(--bg-secondary)",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: 6,
+                  padding: "10px 14px",
+                  textDecoration: "none",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginBottom: 2, fontFamily: "var(--font-mono)" }}>
+                  {fn.title}
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {fn.description}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="category-grid">
         {categoryCounts.map((cat) => (
