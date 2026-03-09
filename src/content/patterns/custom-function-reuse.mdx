@@ -1,0 +1,243 @@
+---
+title: "Custom Function Reuse"
+slug: "custom-function-reuse"
+description: "Define M functions once and call them across multiple queries — eliminating copy-paste logic, improving maintainability, and applying consistent transformations at scale."
+difficulty: "intermediate"
+relatedFunctions:
+  - "function-isbuiltin"
+  - "list-accumulate"
+  - "list-generate"
+relatedConcepts:
+  - "custom-functions"
+  - "m-paradigm"
+  - "lazy-evaluation"
+  - "identifiers-and-scoping"
+---
+
+### The Problem
+
+When the same transformation logic appears in multiple queries — cleaning text, deriving a fiscal year, normalising a category code — each copy must be updated independently when requirements change. One missed copy means inconsistent data. The fix is to define the logic once as a function and call it everywhere that logic is needed.
+
+### Defining a Function Inline Within a Let Expression
+
+The simplest form of a custom function is a helper defined inside a single `let` expression and used only within that query. This is useful when a transformation is complex enough to name but not needed outside this query:
+
+```powerquery
+let
+    Source = RawOrders,
+
+    // Inline function: defined once, used in two column transforms below
+    ToFiscalYear = (d as date) as number =>
+        if Date.Month(d) >= 7
+        then Date.Year(d) + 1
+        else Date.Year(d),
+
+    WithFY = Table.AddColumn(Source, "FiscalYear",
+        each ToFiscalYear([OrderDate]),
+        Int64.Type),
+
+    WithShipFY = Table.AddColumn(WithFY, "ShipFiscalYear",
+        each ToFiscalYear([ShipDate]),
+        Int64.Type)
+in
+    WithShipFY
+```
+
+The function `ToFiscalYear` is scoped to this `let` block. Any step after its definition can reference it by name.
+
+### Creating a Standalone Function Query
+
+To share a function across multiple queries, create a query whose entire result is the function itself. In Power BI and Power Query, this appears as a function query in the query list and can be called by name from any other query.
+
+A standalone function query is just a `let` expression whose final step evaluates to a function value — or, for simple cases, a bare function literal with no `let` at all:
+
+```powerquery
+// Simplest form: the entire query is a function literal
+(text_value as nullable text) as nullable text =>
+    if text_value = null then null
+    else Text.Trim(Text.Clean(Text.Lower(text_value)))
+```
+
+For more complex logic, use a `let` expression that returns a function:
+
+```powerquery
+// Query named: fxCleanText
+let
+    CleanText = (text_value as nullable text) as nullable text =>
+        let
+            Trimmed  = if text_value = null then null else Text.Trim(text_value),
+            Cleaned  = if Trimmed = null then null else Text.Clean(Trimmed),
+            Lowered  = if Cleaned = null then null else Text.Lower(Cleaned)
+        in
+            Lowered
+in
+    CleanText
+```
+
+Name the query with a prefix that signals it is a function — `fx` or `fn` are the PQLint-recommended conventions (e.g. `fxCleanText`, `fnGetFiscalYear`). This makes function queries immediately distinguishable from data queries in the query list.
+
+### Calling a Function Query from Another Query
+
+Once a function query exists, reference it by its query name inside any other query as if it were a built-in function:
+
+```powerquery
+// Query named: CleanedContacts
+let
+    Source = RawContacts,
+
+    // fxCleanText is a function query defined elsewhere in this file
+    CleanedFirstName = Table.TransformColumns(Source, {
+        {"FirstName", fxCleanText, type nullable text}
+    }),
+    CleanedLastName = Table.TransformColumns(CleanedFirstName, {
+        {"LastName", fxCleanText, type nullable text}
+    }),
+    CleanedEmail = Table.TransformColumns(CleanedLastName, {
+        {"Email", fxCleanText, type nullable text}
+    })
+in
+    CleanedEmail
+```
+
+Or apply it across multiple columns in one step using `Table.TransformColumns` with a list of column-function pairs:
+
+```powerquery
+let
+    Source = RawContacts,
+    TextColumns = {"FirstName", "LastName", "Email", "Company"},
+
+    // Apply fxCleanText to all text columns in one step
+    Cleaned = Table.TransformColumns(Source,
+        List.Transform(TextColumns, each {_, fxCleanText, type nullable text})
+    )
+in
+    Cleaned
+```
+
+### Optional Parameters with Default Values
+
+Use the `optional` keyword to declare a parameter that the caller may omit. Inside the function body, use the `??` null-coalescing operator to substitute the default value when the argument is not supplied:
+
+```powerquery
+// Query named: fxCleanText
+// optional second parameter controls whether to lowercase the result
+(text_value as nullable text, optional lowercase as nullable logical) as nullable text =>
+    let
+        ApplyLower = lowercase ?? true,
+        Trimmed    = if text_value = null then null else Text.Trim(text_value),
+        Cleaned    = if Trimmed = null then null else Text.Clean(Trimmed),
+        Result     = if Cleaned = null then null
+                     else if ApplyLower then Text.Lower(Cleaned)
+                     else Cleaned
+    in
+        Result
+```
+
+Callers that omit the second argument get the default behaviour (lowercase = true). Callers that need to preserve case pass `false` explicitly:
+
+```powerquery
+fxCleanText([Name])           // uses default: lowercase = true
+fxCleanText([Name], false)    // preserves original casing
+```
+
+### Type Annotations on Parameters and Return Type
+
+Always annotate parameter types and the return type. Type annotations serve as documentation, catch type mismatches early, and allow the engine to skip runtime type inference:
+
+```powerquery
+// Fully annotated signature
+(
+    start_date as date,
+    end_date   as date,
+    optional fiscal_year_start_month as nullable number
+) as number =>
+    let
+        FYMonth = fiscal_year_start_month ?? 7,
+        // ...
+        Result  = 0   // placeholder
+    in
+        Result
+```
+
+For parameter names: use only letters, numbers, and underscores. Do not use spaces (names with spaces require `#"quoted identifier"` syntax and are cumbersome to call). Prefer `snake_case` or `camelCase` consistently within a project.
+
+### Recursive Functions
+
+M functions can call themselves by name, enabling recursive definitions. This is useful for tree traversal, nested structure flattening, or any algorithm naturally expressed as recursion:
+
+```powerquery
+// Query named: fxFactorial
+(n as number) as number =>
+    if n <= 1 then 1 else n * fxFactorial(n - 1)
+```
+
+M does not perform tail-call optimisation. Deep recursion (thousands of levels) will exhaust stack space. For iterative work — processing a list of values, accumulating state over rows — prefer `List.Accumulate` or `List.Generate`, which are implemented as loops in the engine and do not consume stack:
+
+```powerquery
+// Prefer List.Accumulate for iteration over recursion
+let
+    Numbers = {1..10},
+    Factorial10 = List.Accumulate(Numbers, 1, (state, current) => state * current)
+in
+    Factorial10
+// Result: 3628800
+```
+
+Reserve recursive functions for cases where the structure is genuinely recursive (e.g. navigating a nested record tree) and the depth is bounded and small.
+
+### Practical Example: fxCleanText Applied Across Multiple Columns
+
+The following shows the complete pattern end to end: a standalone function query and a consuming query that applies it across multiple columns in a single step.
+
+Function query named `fxCleanText`:
+
+```powerquery
+(text_value as nullable text, optional lowercase as nullable logical) as nullable text =>
+    let
+        ApplyLower = lowercase ?? true,
+        // Text.Clean removes non-printable control characters (ASCII 0-31)
+        // Text.Trim removes leading and trailing whitespace
+        Cleaned = if text_value = null
+                  then null
+                  else Text.Trim(Text.Clean(text_value)),
+        Result  = if Cleaned = null
+                  then null
+                  else if ApplyLower then Text.Lower(Cleaned) else Cleaned
+    in
+        Result
+```
+
+Consuming query that applies `fxCleanText` to every text column in a contact table:
+
+```powerquery
+// Query named: CleanedContacts
+let
+    Source = RawContacts,
+
+    // Columns to clean — centralised list makes it easy to add or remove columns
+    TextColumns = {"FirstName", "LastName", "Email", "JobTitle", "Company"},
+
+    // Apply fxCleanText to each column; preserve case for Email
+    Step1 = Table.TransformColumns(Source,
+        List.Transform(
+            {"FirstName", "LastName", "JobTitle", "Company"},
+            each {_, fxCleanText, type nullable text}   // lowercase = default (true)
+        )
+    ),
+
+    // Email: clean but preserve original casing
+    Step2 = Table.TransformColumns(Step1, {
+        {"Email", each fxCleanText(_, false), type nullable text}
+    }),
+
+    // Drop rows where all cleaned text columns are null or empty
+    Result = Table.SelectRows(Step2, each
+        List.AnyTrue(List.Transform(TextColumns, (col) =>
+            Record.Field(_, col) <> null and Record.Field(_, col) <> ""
+        ))
+    )
+in
+    Result
+```
+
+When `fxCleanText` needs to change — say, to also collapse internal runs of whitespace — you update one query and every downstream query immediately reflects the change.

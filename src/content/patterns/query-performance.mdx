@@ -1,0 +1,265 @@
+---
+title: "Query Performance Optimization"
+slug: "query-performance"
+description: "Diagnose and fix slow Power Query M queries by preserving query folding, buffering intermediate results, consolidating transform steps, and knowing when to push work back to the source system."
+difficulty: "intermediate"
+relatedFunctions:
+  - "table-buffer"
+  - "list-buffer"
+  - "table-transformcolumntypes"
+  - "table-sort"
+  - "table-addcolumn"
+relatedConcepts:
+  - "query-folding"
+  - "lazy-evaluation"
+  - "m-paradigm"
+---
+
+### The Problem
+
+Slow Power Query refreshes almost always have one of four root causes: query folding broke silently, the M engine is re-evaluating the same data multiple times, you have O(n²) list operations inside a row-by-row loop, or intermediate results are being recomputed on every downstream reference. Understanding which cause is at play tells you exactly which fix to apply.
+
+### Query Folding: What Breaks It and What Preserves It
+
+Query folding means the M engine translates your transformation steps into a native query (SQL, OData, etc.) that runs on the source system. When folding breaks, M must download the full dataset and process it locally in memory.
+
+The most common way to silently break folding is applying `Table.TransformColumnTypes` after a database source. The type conversion step cannot be translated to SQL and forces everything that follows to run in M:
+
+```powerquery
+// Bad: Table.TransformColumnTypes breaks folding for all steps that follow
+let
+    Source = Sql.Database("server", "db"),
+    Data = Source{[Schema="dbo", Item="Orders"]}[Data],
+    // This step cannot fold — SQL has no equivalent for M's type coercion rules
+    Typed = Table.TransformColumnTypes(Data, {{"OrderDate", type date}, {"Amount", type number}}),
+    // All steps after Typed now run locally in M, not on the server
+    Filtered = Table.SelectRows(Typed, each [Amount] > 100)
+in
+    Filtered
+```
+
+To keep folding alive through a type change, use `Table.TransformColumns` with explicit conversion functions — these can often still fold because they map cleanly to SQL CAST expressions:
+
+```powerquery
+// Better: explicit conversions that the connector can translate to SQL
+let
+    Source = Sql.Database("server", "db"),
+    Data = Source{[Schema="dbo", Item="Orders"]}[Data],
+    Filtered = Table.SelectRows(Data, each [Amount] > 100),
+    Converted = Table.TransformColumns(Filtered, {
+        {"OrderDate", Date.From, type date},
+        {"Amount", Number.From, type number}
+    })
+in
+    Converted
+```
+
+Apply filters, row selections, and column removals before any step that breaks folding. To check whether a step folds, right-click it in Power Query Editor and look for "View Native Query" — if the option is greyed out, that step does not fold.
+
+### Table.Buffer: Preventing Repeated Evaluation
+
+M is lazily evaluated — expressions are computed on demand, and the same table expression can be evaluated multiple times if referenced in multiple places or used as input to operations that scan it repeatedly. `Table.Buffer` forces the table to be fully evaluated once and held in memory.
+
+Buffer before `Table.Sort` + `Table.Group`. Without a buffer, the engine may scan the source table multiple times during the sort and grouping operation:
+
+```powerquery
+let
+    Source = LargeTable,
+    // Buffer forces a single evaluation before the expensive sort + group
+    Buffered = Table.Buffer(Source),
+    Sorted = Table.Sort(Buffered, {{"Category", Order.Ascending}, {"Date", Order.Ascending}}),
+    Grouped = Table.Group(Sorted, {"Category"}, {
+        {"RowCount", each Table.RowCount(_), Int64.Type},
+        {"TotalAmount", each List.Sum([Amount]), type number}
+    })
+in
+    Grouped
+```
+
+Buffer before `Table.Sort` + `Table.RemoveDuplicates` for the same reason — deduplication requires multiple passes over the sorted output:
+
+```powerquery
+let
+    Source = RawData,
+    Buffered = Table.Buffer(Source),
+    Sorted = Table.Sort(Buffered, {{"ID", Order.Ascending}, {"Timestamp", Order.Descending}}),
+    Deduped = Table.RemoveDuplicates(Sorted, {"ID"})
+in
+    Deduped
+```
+
+Buffer a small lookup table that will be joined many times. When the lookup is referenced inside a `Table.AddColumn` row expression, M may re-read it for every row of the fact table:
+
+```powerquery
+let
+    // Buffer the lookup once so the row-by-row join doesn't re-read it each iteration
+    LookupBuffered = Table.Buffer(CountryCodes),
+    LookupKeys   = Table.Column(LookupBuffered, "Code"),
+    LookupValues = Table.Column(LookupBuffered, "CountryName"),
+
+    Result = Table.AddColumn(Orders, "CountryName",
+        each
+            let idx = List.PositionOf(LookupKeys, [CountryCode])
+            in if idx = -1 then null else LookupValues{idx},
+        type nullable text)
+in
+    Result
+```
+
+For large datasets where the buffer itself is expensive to build, pass `BufferMode.Delayed` as the second argument. The buffer is still populated lazily on first access, but once populated it is retained — avoiding repeated re-reads without paying upfront cost:
+
+```powerquery
+Buffered = Table.Buffer(Source, BufferMode.Delayed)
+```
+
+### List.Buffer: Fixing O(n²) List Lookups
+
+Every call to `List.Contains` scans the entire list from the beginning. Inside a `Table.SelectRows` filter that runs once per row, this creates O(n × m) work — quadratic growth that becomes catastrophic on large tables.
+
+Wrap the lookup list in `List.Buffer` before the filter. This materialises the list in memory and allows the engine to use a more efficient membership test:
+
+```powerquery
+// Bad: List.Contains scans FilterList on every row of Source
+let
+    Source = Transactions,
+    FilterList = ActiveCustomerIDs[CustomerID],
+    Filtered = Table.SelectRows(Source, each List.Contains(FilterList, [CustomerID]))
+in
+    Filtered
+```
+
+```powerquery
+// Good: buffer the list once, then filter
+let
+    Source = Transactions,
+    FilterList = List.Buffer(ActiveCustomerIDs[CustomerID]),
+    Filtered = Table.SelectRows(Source, each List.Contains(FilterList, [CustomerID]))
+in
+    Filtered
+```
+
+The buffer converts the lookup from O(n) per row to a significantly faster operation, turning the overall filter from O(n²) towards O(n).
+
+### Consolidating Transform Steps
+
+Each step in a query is a node in the evaluation graph. Many small steps of the same type can be collapsed into one, reducing overhead and improving readability.
+
+Multiple `Table.RenameColumns` calls should be one call:
+
+```powerquery
+// Bad: three separate rename steps
+Renamed1 = Table.RenameColumns(Source, {{"col_a", "ProductID"}}),
+Renamed2 = Table.RenameColumns(Renamed1, {{"col_b", "ProductName"}}),
+Renamed3 = Table.RenameColumns(Renamed2, {{"col_c", "UnitPrice"}}),
+```
+
+```powerquery
+// Good: one rename step
+Renamed = Table.RenameColumns(Source, {
+    {"col_a", "ProductID"},
+    {"col_b", "ProductName"},
+    {"col_c", "UnitPrice"}
+}),
+```
+
+Multiple `Table.TransformColumnTypes` calls are even more important to consolidate — each one can independently break query folding. Use one call with all column-type pairs:
+
+```powerquery
+// Bad: two type steps, each potentially breaking folding
+Typed1 = Table.TransformColumnTypes(Source, {{"OrderDate", type date}}),
+Typed2 = Table.TransformColumnTypes(Typed1, {{"Amount", type number}, {"Qty", Int64.Type}}),
+```
+
+```powerquery
+// Good: one type step
+Typed = Table.TransformColumnTypes(Source, {
+    {"OrderDate", type date},
+    {"Amount", type number},
+    {"Qty", Int64.Type}
+}),
+```
+
+Multiple `Table.ReplaceValue` calls on the same column should be replaced with a single pass using a translation table and a lookup function:
+
+```powerquery
+// Bad: chained replacements, one per value
+Step1 = Table.ReplaceValue(Source, "NY", "New York", Replacer.ReplaceText, {"State"}),
+Step2 = Table.ReplaceValue(Step1, "CA", "California", Replacer.ReplaceText, {"State"}),
+Step3 = Table.ReplaceValue(Step2, "TX", "Texas", Replacer.ReplaceText, {"State"}),
+```
+
+```powerquery
+// Good: translation table applied in one pass
+let
+    Source = RawData,
+    Translations = #table(
+        {"From", "To"},
+        {{"NY", "New York"}, {"CA", "California"}, {"TX", "Texas"}}
+    ),
+    TranslationRecord = Record.FromList(
+        Table.Column(Translations, "To"),
+        Table.Column(Translations, "From")
+    ),
+    Result = Table.TransformColumns(Source, {
+        {"State", each Record.FieldOrDefault(TranslationRecord, _, _), type text}
+    })
+in
+    Result
+```
+
+### Always Provide the Type Argument to Table.AddColumn
+
+`Table.AddColumn` accepts a fourth argument specifying the output column type. When you omit it, M infers the type by scanning the entire output column after the fact — an extra pass over all rows. Always provide the type:
+
+```powerquery
+// Bad: M must infer the type by scanning every output value
+WithFullName = Table.AddColumn(Source, "FullName",
+    each [FirstName] & " " & [LastName])
+
+// Good: type declared upfront, no inference pass needed
+WithFullName = Table.AddColumn(Source, "FullName",
+    each [FirstName] & " " & [LastName],
+    type text)
+```
+
+This applies even when the type is `nullable text` or `type any` — being explicit is always faster than forcing inference.
+
+### Avoiding Re-Evaluation: Reference Steps Once
+
+M's lazy evaluation model means that if you reference the same query step from two different places in the same query, the engine may evaluate that step twice. Always assign a result to a named step and reference that name:
+
+```powerquery
+// Bad: Source is referenced twice — M may read the file twice
+let
+    Source = Csv.Document(File.Contents("data.csv")),
+    RowCount = Table.RowCount(Source),
+    // Source is referenced again here — potentially a second evaluation
+    Filtered = Table.SelectRows(Source, each [Amount] > 0)
+in
+    {RowCount, Filtered}
+```
+
+```powerquery
+// Good: evaluate once, reuse the named step
+let
+    Source = Csv.Document(File.Contents("data.csv")),
+    Buffered = Table.Buffer(Source),   // one evaluation, held in memory
+    RowCount = Table.RowCount(Buffered),
+    Filtered = Table.SelectRows(Buffered, each [Amount] > 0)
+in
+    {RowCount, Filtered}
+```
+
+The same applies to functions defined inline — if a helper computation is used in multiple column transforms, assign it to a `let` binding first rather than recalculating it inside each `each` expression.
+
+### When to Push Work to the Source System
+
+The fastest M code is M code that never runs. Before optimising in M, ask whether the source system can do the work instead:
+
+- **Aggregations**: if you are grouping and summing millions of rows, a SQL view or stored procedure that pre-aggregates is almost always faster than `Table.Group` in M.
+- **Joins**: if both tables live in the same SQL database, let the query fold to a SQL JOIN rather than joining in M.
+- **Filtering**: push `Table.SelectRows` steps as early as possible, before any step that breaks folding, so the WHERE clause is sent to the database.
+- **Date ranges**: parameterize date filters (see the parameterized queries pattern) so the source system only returns the rows you need.
+- **Column pruning**: call `Table.SelectColumns` early to reduce the number of columns the engine must carry through each subsequent step.
+
+When query folding is not available (flat files, unsupported connectors), stage your data into a database that supports folding and query from there.

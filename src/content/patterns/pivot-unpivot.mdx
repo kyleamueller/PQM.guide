@@ -1,0 +1,243 @@
+---
+title: "Pivot and Unpivot"
+slug: "pivot-unpivot"
+description: "Reshape tables between wide and long format using Table.Unpivot, Table.UnpivotOtherColumns, and Table.Pivot — including null handling, aggregation, and dynamic column lists."
+difficulty: "intermediate"
+relatedFunctions:
+  - "table-unpivot"
+  - "table-unpivotothercolumns"
+  - "table-pivot"
+  - "table-filldown"
+relatedConcepts:
+  - "structured-data"
+  - "null-handling"
+---
+
+### The Problem
+
+Data often arrives in the wrong shape for analysis. A wide table has one column per category (one column per product, one column per month) — good for humans to read, hard for Power Query to aggregate. A long table has one row per observation with an attribute column and a value column — easier to filter, group, and join.
+
+Pivot transforms long to wide; unpivot transforms wide to long. Choosing the right direction (and handling the edge cases in each) is what this pattern covers.
+
+### Basic Unpivot with Table.Unpivot
+
+`Table.Unpivot` takes a list of column names to fold down. The remaining columns are preserved as-is on every output row. You specify exactly which columns become rows.
+
+Suppose a Products table has been extended with monthly sales quantities as wide columns:
+
+```powerquery
+let
+    // Wide source: one column per month
+    WideSource = Table.FromRows(
+        {
+            {"P001", "Widget", 120, 135, 98},
+            {"P002", "Gadget", 200, 185, 210}
+        },
+        {"ProductID", "Name", "Jan", "Feb", "Mar"}
+    ),
+
+    // Fold Jan, Feb, Mar into Attribute / Value pairs
+    Unpivoted = Table.Unpivot(
+        WideSource,
+        {"Jan", "Feb", "Mar"},   // columns to unpivot
+        "Month",                  // new attribute column name
+        "Quantity"                // new value column name
+    )
+in
+    Unpivoted
+// Result columns: ProductID, Name, Month, Quantity
+// One row per ProductID + Month combination
+```
+
+The columns you list in the second argument are unpivoted. Every other column (`ProductID`, `Name`) repeats on each output row.
+
+### Table.UnpivotOtherColumns — Safer for Dynamic Schemas
+
+`Table.Unpivot` requires you to name every column to fold. If the source schema changes (a new month column appears), the query breaks. `Table.UnpivotOtherColumns` inverts the logic: you name the columns to keep, and everything else is unpivoted automatically.
+
+```powerquery
+let
+    WideSource = Table.FromRows(
+        {
+            {"P001", "Widget", 120, 135, 98, 105},
+            {"P002", "Gadget", 200, 185, 210, 190}
+        },
+        {"ProductID", "Name", "Jan", "Feb", "Mar", "Apr"}
+    ),
+
+    // Keep ProductID and Name; unpivot every other column
+    Unpivoted = Table.UnpivotOtherColumns(
+        WideSource,
+        {"ProductID", "Name"},   // columns to keep
+        "Month",
+        "Quantity"
+    )
+in
+    Unpivoted
+```
+
+When a new month column appears in the source, this query automatically includes it. Prefer `Table.UnpivotOtherColumns` whenever the set of value columns can change.
+
+### Critical Gotcha: Nulls Are Silently Dropped
+
+Both `Table.Unpivot` and `Table.UnpivotOtherColumns` silently drop any row where the value is `null`. This is the most common source of unexpected row count mismatches after an unpivot.
+
+```powerquery
+let
+    WideSource = Table.FromRows(
+        {
+            {"P001", "Widget", 120, null, 98},
+            {"P002", "Gadget", null, 185, 210}
+        },
+        {"ProductID", "Name", "Jan", "Feb", "Mar"}
+    ),
+
+    // WRONG: null entries disappear — P001/Feb and P002/Jan are lost
+    Unpivoted = Table.UnpivotOtherColumns(WideSource, {"ProductID", "Name"}, "Month", "Quantity")
+    // Only 4 rows instead of 6
+in
+    Unpivoted
+```
+
+Fix this by replacing nulls with a placeholder before unpivoting, then replacing the placeholder back after:
+
+```powerquery
+let
+    WideSource = Table.FromRows(
+        {
+            {"P001", "Widget", 120, null, 98},
+            {"P002", "Gadget", null, 185, 210}
+        },
+        {"ProductID", "Name", "Jan", "Feb", "Mar"}
+    ),
+
+    // Step 1: replace nulls with a sentinel value in the value columns
+    NullsReplaced = Table.ReplaceValue(
+        WideSource,
+        null,
+        "N/A",
+        Replacer.ReplaceValue,
+        {"Jan", "Feb", "Mar"}
+    ),
+
+    // Step 2: unpivot — no rows are dropped because there are no nulls
+    Unpivoted = Table.UnpivotOtherColumns(
+        NullsReplaced,
+        {"ProductID", "Name"},
+        "Month",
+        "Quantity"
+    ),
+
+    // Step 3: restore nulls from the sentinel
+    NullsRestored = Table.ReplaceValue(
+        Unpivoted,
+        "N/A",
+        null,
+        Replacer.ReplaceValue,
+        {"Quantity"}
+    )
+in
+    NullsRestored
+// All 6 rows are present; P001/Feb and P002/Jan have null Quantity
+```
+
+Choose a sentinel value that cannot appear legitimately in your data. `"N/A"` works for numeric columns; for text columns, use something more exotic or encode nulls as a numeric flag before unpivoting.
+
+### Pivot with Table.Pivot
+
+`Table.Pivot` transforms long format back to wide. It needs three things: the column whose distinct values become new column headers, the column whose values fill those cells, and an aggregation function for the case where multiple rows map to the same cell.
+
+```powerquery
+let
+    // Long format: one row per OrderID + product category
+    LongSource = Sales,
+
+    // Bring in product category from Products
+    WithCategory = Table.NestedJoin(
+        LongSource, {"ProductID"},
+        Products, {"ProductID"},
+        "ProductData",
+        JoinKind.LeftOuter
+    ),
+    Expanded = Table.ExpandTableColumn(
+        WithCategory, "ProductData", {"Category"}, {"Category"}
+    ),
+
+    // Pivot: one column per Category, summing Amount
+    Pivoted = Table.Pivot(
+        Expanded,
+        List.Distinct(Expanded[Category]),   // distinct values → column headers
+        "Category",                           // attribute column
+        "Amount",                             // value column
+        List.Sum                              // aggregation function
+    )
+in
+    Pivoted
+// Result: one row per OrderID, one column per product category
+```
+
+The second argument must be a list of the exact values that will become headers. `List.Distinct` on the column extracts them dynamically.
+
+### Pivot Aggregation for Multiple Values per Cell
+
+When more than one row maps to the same cell (same key + same attribute), the aggregation function resolves them. Without an aggregation function, `Table.Pivot` errors if it encounters duplicates.
+
+Common aggregation options:
+
+```powerquery
+// Sum of amounts per customer per region
+Table.Pivot(Source, List.Distinct(Source[Region]), "Region", "Amount", List.Sum),
+
+// Maximum order value per customer per status
+Table.Pivot(Source, List.Distinct(Source[Status]), "Status", "Amount", List.Max),
+
+// Count of orders per customer per region
+Table.Pivot(Source, List.Distinct(Source[Region]), "Region", "OrderID", List.Count)
+```
+
+All three follow the same pattern — only the aggregation function changes.
+
+### Handling Unknown Column Names After Pivot
+
+After pivoting, Power Query does not know the output column names at query-design time if the attribute values come from data. This makes downstream steps that reference specific column names fragile.
+
+One approach is to capture the column list before pivoting and use it to drive any subsequent transformation:
+
+```powerquery
+let
+    Source = Sales,
+
+    WithCategory = Table.NestedJoin(
+        Source, {"ProductID"},
+        Products, {"ProductID"},
+        "ProductData",
+        JoinKind.LeftOuter
+    ),
+    Expanded = Table.ExpandTableColumn(
+        WithCategory, "ProductData", {"Category"}, {"Category"}
+    ),
+
+    // Capture distinct categories before pivoting
+    Categories = List.Sort(List.Distinct(Expanded[Category])),
+
+    Pivoted = Table.Pivot(
+        Expanded,
+        Categories,
+        "Category",
+        "Amount",
+        List.Sum
+    ),
+
+    // Replace nulls (categories with no sales) with 0 using the captured list
+    NullsToZero = Table.ReplaceValue(
+        Pivoted,
+        null,
+        0,
+        Replacer.ReplaceValue,
+        Categories   // apply only to the dynamically created columns
+    )
+in
+    NullsToZero
+```
+
+Storing the column list in a variable (`Categories`) lets you reuse it for null replacement, reordering, or any other operation that needs to reference the new columns by name — without hard-coding names that may change when the data changes.
