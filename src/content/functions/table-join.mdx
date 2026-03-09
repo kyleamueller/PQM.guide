@@ -49,27 +49,42 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Join` is a flat join — it returns a single table with all columns from both inputs side by side, similar to a SQL `JOIN`. If both tables share a column name (other than the key), the duplicate is renamed with a suffix.
+`Table.Join` is a flat join — it returns a single table with all columns from both inputs side by side, similar to a SQL `JOIN`. If both tables share a column name (other than the key), the duplicate is renamed with a suffix (e.g. `CustomerID.1`).
 
-For most Power Query workflows, `Table.NestedJoin` followed by `Table.ExpandTableColumn` is preferred because it gives finer control over which columns to expand and avoids automatic column renaming. Use `Table.Join` when you want a flat result immediately.
+For most Power Query workflows, `Table.NestedJoin` followed by `Table.ExpandTableColumn` is preferred because it gives finer control over which columns to expand and avoids automatic column renaming. Use `Table.Join` when you want a flat result immediately and don't mind resolving column name collisions manually.
+
+When both key columns have the same name, M retains the left table's key and renames the right table's key with `.1`. Rename or drop the duplicate before exposing the result downstream.
 
 ## Examples
 
-### Example 1: Inner join on a shared key
+### Example 1: Inner join Sales to Customers
 
-Join Sales to a Products lookup table.
+Join Sales to Customers on CustomerID to add customer name and country to each order row.
 
 Input: `Sales`
 
 ```powerquery
 let
-    Products = #table(
-        {"Category", "CategoryLabel"},
-        {{"Electronics", "Consumer Electronics"},
-         {"Clothing", "Apparel & Fashion"},
-         {"Books", "Books & Media"}}
-    ),
-    Joined = Table.Join(Sales, "Category", Products, "Category", JoinKind.LeftOuter)
+    Joined = Table.Join(Sales, "CustomerID", Customers, "CustomerID", JoinKind.Inner),
+    Result = Table.SelectColumns(Joined, {"OrderID", "CustomerID", "Amount", "Name", "Country"})
 in
-    Joined
+    Result
 ```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Name","type":"text"},{"name":"Country","type":"text"}],"rows":[{"OrderID":1,"CustomerID":"C001","Amount":250.00,"Name":"Alice Johnson","Country":"USA"},{"OrderID":2,"CustomerID":"C002","Amount":120.00,"Name":"Bob Smith","Country":"Canada"},{"OrderID":3,"CustomerID":"C001","Amount":75.00,"Name":"Alice Johnson","Country":"USA"},{"OrderID":4,"CustomerID":"C003","Amount":500.00,"Name":"Carol Davis","Country":"USA"},{"OrderID":5,"CustomerID":"C002","Amount":90.00,"Name":"Bob Smith","Country":"Canada"},{"OrderID":6,"CustomerID":"C004","Amount":200.00,"Name":"David Lee","Country":"UK"},{"OrderID":7,"CustomerID":"C001","Amount":350.00,"Name":"Alice Johnson","Country":"USA"},{"OrderID":8,"CustomerID":"C003","Amount":160.00,"Name":"Carol Davis","Country":"USA"}]}
+-->
+
+### Example 2: Left anti-join to find unmatched rows
+
+Return Sales rows with no matching CustomerID in the Customers table.
+
+Input: `Sales`
+
+```powerquery
+Table.Join(Sales, "CustomerID", Customers, "CustomerID", JoinKind.LeftAnti)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Region","type":"text"},{"name":"Status","type":"text"}],"rows":[]}
+-->
