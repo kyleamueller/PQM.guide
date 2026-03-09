@@ -58,6 +58,28 @@ in
 {"columns":[{"name":"QueryString","type":"text"}],"rows":[{"QueryString":"category=Electronics&sort=price&order=asc"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Params",
+      "description": "Defines a record with three query parameters: category, sort, and order.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"category","Value":"Electronics"},{"Field":"sort","Value":"price"},{"Field":"order","Value":"asc"}]}
+    },
+    {
+      "name": "QueryString",
+      "description": "Converts the parameters record into a URL-encoded query string.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"category=Electronics&sort=price&order=asc"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table displaying the assembled query string.",
+      "output": {"columns":[{"name":"QueryString","type":"text"}],"rows":[{"QueryString":"category=Electronics&sort=price&order=asc"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Handle special characters
 
 Build a query string with values that need encoding.
@@ -72,4 +94,26 @@ in
 
 <!--output
 {"columns":[{"name":"QueryString","type":"text"}],"rows":[{"QueryString":"search=hello+world&tag=A%26B"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Params",
+      "description": "Defines a record with two query parameters whose values contain characters that need URL encoding: a space in \"hello world\" and an ampersand in \"A&B\".",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"search","Value":"hello world"},{"Field":"tag","Value":"A&B"}]}
+    },
+    {
+      "name": "QueryString",
+      "description": "Converts the record into a URL-encoded query string, encoding the space as + and the ampersand as %26.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"search=hello+world&tag=A%26B"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table displaying the percent-encoded query string.",
+      "output": {"columns":[{"name":"QueryString","type":"text"}],"rows":[{"QueryString":"search=hello+world&tag=A%26B"}]}
+    }
+  ]
+}
 -->

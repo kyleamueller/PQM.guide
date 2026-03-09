@@ -71,3 +71,24 @@ in
 <!--output
 {"columns":[{"name":"ZScore","type":"number"},{"name":"Tanh","type":"number"}],"rows":[{"ZScore":-3,"Tanh":-0.9950547536867305},{"ZScore":-1,"Tanh":-0.7615941559557649},{"ZScore":0,"Tanh":0},{"ZScore":1,"Tanh":0.7615941559557649},{"ZScore":3,"Tanh":0.9950547536867305}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Scores",
+      "description": "Defines a list of five z-score values spanning from -3 to 3 to demonstrate the tanh normalization range.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":-3},{"Value":-1},{"Value":0},{"Value":1},{"Value":3}]}
+    },
+    {
+      "name": "Normalized",
+      "description": "Applies Number.Tanh to every element of the Scores list, transforming each z-score into a value in the open interval (-1, 1).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":-0.9950547536867305},{"Value":-0.7615941559557649},{"Value":0},{"Value":0.7615941559557649},{"Value":0.9950547536867305}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-column table pairing each original z-score with its tanh-normalized equivalent.",
+      "output": {"columns":[{"name":"ZScore","type":"number"},{"name":"Tanh","type":"number"}],"rows":[{"ZScore":-3,"Tanh":-0.9950547536867305},{"ZScore":-1,"Tanh":-0.7615941559557649},{"ZScore":0,"Tanh":0},{"ZScore":1,"Tanh":0.7615941559557649},{"ZScore":3,"Tanh":0.9950547536867305}]}
+    }
+  ]
+}
+-->

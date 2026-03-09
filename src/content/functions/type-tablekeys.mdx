@@ -54,6 +54,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a typed table with ID and Name columns containing one row.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[{"ID":1,"Name":"Alice"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Retrieves the list of key definitions from the table's type — since no keys were declared, this returns an empty list.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — counts the keys in the list, returning 0 because no keys are defined.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Inspect key details after adding a primary key
 
 ```powerquery
@@ -67,6 +89,33 @@ in
 
 <!--output
 {"columns":[{"name":"Columns","type":"any"},{"name":"Primary","type":"logical"}],"rows":[{"Columns":["ID"],"Primary":true}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a typed table with ID and Name columns containing one row.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[{"ID":1,"Name":"Alice"}]}
+    },
+    {
+      "name": "TWithKey",
+      "description": "Adds a primary key on the ID column to the table.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[{"ID":1,"Name":"Alice"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Retrieves the list of key definitions from the table's type — returns one key record describing the primary key.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[Columns={\"ID\"}, Primary=true]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — accesses the first key record, showing its Columns list and Primary flag.",
+      "output": {"columns":[{"name":"Columns","type":"any"},{"name":"Primary","type":"logical"}],"rows":[{"Columns":["ID"],"Primary":true}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Check whether a table has a primary key declared
@@ -83,4 +132,36 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a typed table with OrderID and Product columns containing one row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A"}]}
+    },
+    {
+      "name": "TWithKey",
+      "description": "Adds a primary key on the OrderID column to the table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Retrieves the list of key definitions from the table's type — returns one key record.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[Columns={\"OrderID\"}, Primary=true]"}]}
+    },
+    {
+      "name": "HasPrimary",
+      "description": "Transforms the key list to extract each Primary field value, then checks if any are true — confirming a primary key exists.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns true because the table has a primary key declared.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
 -->

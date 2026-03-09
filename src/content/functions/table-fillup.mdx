@@ -52,3 +52,24 @@ in
 <!--output
 {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"West"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"North"},{"CustomerName":"Alice","Region":"North"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Takes the first 4 rows of Sales and selects only CustomerName and Region, producing a 4-row table with the original region values.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"East"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"East"},{"CustomerName":"Alice","Region":"North"}]}
+    },
+    {
+      "name": "WithNulls",
+      "description": "Replaces every occurrence of \"East\" in the Region column with null, so East rows become blank and are ready to be filled from below.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":null},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":null},{"CustomerName":"Alice","Region":"North"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — applies Table.FillUp on Region, propagating the next non-null value upward so each null inherits the region of the row beneath it.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"West"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"North"},{"CustomerName":"Alice","Region":"North"}]}
+    }
+  ]
+}
+-->

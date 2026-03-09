@@ -80,6 +80,28 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"},{"name":"Revenue","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4","Revenue":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2","Revenue":"100"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1","Revenue":"120"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a five-column inline table with OrderID, CustomerName, Product, UnitPrice, and Quantity for three orders.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25,"Quantity":4},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50,"Quantity":2},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":120,"Quantity":1}]}
+    },
+    {
+      "name": "Enriched",
+      "description": "Applies Table.TransformRows to convert each row into a new record that includes all original fields plus a computed Revenue field (UnitPrice × Quantity), returning a list of enriched records.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[OrderID=1, CustomerName=Alice, ..., Revenue=100]"},{"Value":"[OrderID=2, ..., Revenue=100]"},{"Value":"[OrderID=6, ..., Revenue=120]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — reconstructs a table from the list of enriched records using Table.FromRecords, producing a six-column table that includes the new Revenue column.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"},{"name":"Revenue","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4","Revenue":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2","Revenue":"100"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1","Revenue":"120"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Extract a specific field from each row as a list
 
 A concise alternative to `Table.Column` when you need to compute the value rather than read it directly.

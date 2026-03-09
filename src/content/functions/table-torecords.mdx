@@ -48,6 +48,23 @@ in
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Region","type":"text"},{"name":"OrderDate","type":"date"},{"name":"Category","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"OrderID":1001,"CustomerID":"C001","Amount":250.0,"Region":"East","OrderDate":"2024-01-15","Category":"Electronics","Quantity":5}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Records",
+      "description": "Converts every row of the Sales table into a record with field names matching the column headers, producing a list of records — one per row.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[OrderID=1001, CustomerID=C001, ...]"},{"Value":"[OrderID=...]"},{"Value":"..."}]}
+    },
+    {
+      "name": "First",
+      "description": "The final output — retrieves the first record from the list (zero-based index 0), exposing the first Sales row as a record with all its field values.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Region","type":"text"},{"name":"OrderDate","type":"date"},{"name":"Category","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"OrderID":1001,"CustomerID":"C001","Amount":250.0,"Region":"East","OrderDate":"2024-01-15","Category":"Electronics","Quantity":5}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Round-trip via records
 
 Convert a table to records and back, preserving structure.

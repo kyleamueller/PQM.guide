@@ -98,3 +98,25 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"LineTotal","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","LineTotal":100}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Row",
+      "description": "Retrieves the first row of the Sales table as a record containing all eight fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "Transformed",
+      "description": "Transforms the UnitPrice field by multiplying it by Quantity to compute the line total, and renames the field to LineTotal in one operation.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"LineTotal","Value":100},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — selects only OrderID, CustomerName, and LineTotal from the transformed record.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"LineTotal","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","LineTotal":100}]}
+    }
+  ]
+}
+-->

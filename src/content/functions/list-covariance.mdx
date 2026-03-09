@@ -66,6 +66,33 @@ in
 {"columns":[{"name":"Covariance","type":"number"}],"rows":[{"Covariance":-2050}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Defines a list of five price points increasing from 10 to 50.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":10},{"Value":20},{"Value":30},{"Value":40},{"Value":50}]}
+    },
+    {
+      "name": "Volumes",
+      "description": "Defines a corresponding list of sales volumes that decrease as price increases.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":500},{"Value":420},{"Value":350},{"Value":260},{"Value":180}]}
+    },
+    {
+      "name": "Cov",
+      "description": "Computes the sample covariance between Prices and Volumes; the large negative value confirms that volume falls as price rises.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":-2050}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents the covariance value in a single-row table labeled Covariance.",
+      "output": {"columns":[{"name":"Covariance","type":"number"}],"rows":[{"Covariance":-2050}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Inversely related lists
 
 When one list increases while the other decreases at the same rate, the covariance is negative.

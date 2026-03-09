@@ -73,6 +73,28 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice Smith"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "original",
+      "description": "Stores the source text \"Alice Smith\" as the value to be round-tripped through binary encoding and decoding.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice Smith"}]}
+    },
+    {
+      "name": "encoded",
+      "description": "Converts the text to a UTF-8 binary value using Text.ToBinary, producing the raw bytes that represent \"Alice Smith\" in UTF-8 encoding.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Binary (UTF-8 bytes for \"Alice Smith\")"}]}
+    },
+    {
+      "name": "decoded",
+      "description": "The final output — decodes the UTF-8 binary back to text using Text.FromBinary with the same encoding, recovering the original string exactly.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice Smith"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Decode a Windows-1252 encoded binary file
 
 Legacy CSV files exported from Windows applications often use Windows-1252 encoding. Specifying the wrong encoding silently corrupts special characters.

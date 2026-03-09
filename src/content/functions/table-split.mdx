@@ -57,6 +57,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 8 orders containing OrderID, CustomerName, Product, and Region columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Region":"West"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","Region":"East"},{"OrderID":"7","CustomerName":"Charlie","Product":"Gadget B","Region":"West"},{"OrderID":"8","CustomerName":"Diana","Product":"Widget C","Region":"North"}]}
+    },
+    {
+      "name": "Pages",
+      "description": "Splits the Sales table into sequential pages of 3 rows each, producing a list of 3 sub-tables (pages of 3, 3, and 2 rows).",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Table 1 (3 rows)"},{"Value":"Table 2 (3 rows)"},{"Value":"Table 3 (2 rows)"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — counts the number of pages in the list, confirming that 3 sub-tables were created.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Access a specific page from the split
 
 ```powerquery
@@ -74,6 +96,28 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 8 orders containing OrderID, CustomerName, and Product columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E"},{"OrderID":"7","CustomerName":"Charlie","Product":"Gadget B"},{"OrderID":"8","CustomerName":"Diana","Product":"Widget C"}]}
+    },
+    {
+      "name": "Pages",
+      "description": "Splits the Sales table into pages of 3 rows each, producing a list of 3 sub-tables (rows 1-3, 4-6, 7-8).",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Table 1 (3 rows)"},{"Value":"Table 2 (3 rows)"},{"Value":"Table 3 (2 rows)"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — accesses the second page (index 1) of the split, returning rows 4 through 6 of the original table.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Process each page and count rows per page
@@ -94,4 +138,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{3, 3, 2}"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 8 orders containing OrderID and CustomerName columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"3","CustomerName":"Charlie"},{"OrderID":"4","CustomerName":"Alice"},{"OrderID":"5","CustomerName":"Diana"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Charlie"},{"OrderID":"8","CustomerName":"Diana"}]}
+    },
+    {
+      "name": "Pages",
+      "description": "Splits the Sales table into pages of 3 rows each, producing a list of 3 sub-tables — two pages of 3 rows and one final page of 2 rows.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Table 1 (3 rows)"},{"Value":"Table 2 (3 rows)"},{"Value":"Table 3 (2 rows)"}]}
+    },
+    {
+      "name": "PageSizes",
+      "description": "The final output — applies Table.RowCount to each page, returning a list of row counts confirming the page sizes are {3, 3, 2}.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{3, 3, 2}"}]}
+    }
+  ]
+}
 -->

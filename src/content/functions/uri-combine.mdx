@@ -97,3 +97,30 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/data/records?page=2"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "baseUrl",
+      "description": "Defines the stable base URL with a trailing slash, pointing to the data directory.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"https://api.example.com/data/"}]}
+    },
+    {
+      "name": "page",
+      "description": "Defines the current page number as a number value.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":2}]}
+    },
+    {
+      "name": "url",
+      "description": "Combines the base URL with a relative path segment that includes the page number converted to text, producing the full paginated URL.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"https://api.example.com/data/records?page=2"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the fully resolved paginated API URL for page 2.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/data/records?page=2"}]}
+    }
+  ]
+}
+-->

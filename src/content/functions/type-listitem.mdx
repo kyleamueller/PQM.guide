@@ -49,3 +49,30 @@ in
 <!--output
 {"columns":[{"name":"ListType","type":"text"},{"name":"ItemType IsText","type":"logical"}],"rows":[{"ListType":"type {text}","ItemType IsText":true}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "ListType",
+      "description": "Defines a list type for lists of text values using the M type literal syntax.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type {text}"}]}
+    },
+    {
+      "name": "ItemType",
+      "description": "Extracts the item type from the list type using Type.ListItem, returning type text.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type text"}]}
+    },
+    {
+      "name": "IsText",
+      "description": "Checks whether the extracted item type is compatible with type text using Type.Is, returning true.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents a table with the list type description and the IsText confirmation.",
+      "output": {"columns":[{"name":"ListType","type":"text"},{"name":"ItemType IsText","type":"logical"}],"rows":[{"ListType":"type {text}","ItemType IsText":true}]}
+    }
+  ]
+}
+-->

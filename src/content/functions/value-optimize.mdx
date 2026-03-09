@@ -59,6 +59,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Filtered",
+      "description": "Filters the Sales table to keep only rows where Quantity is greater than 2.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"}]}
+    },
+    {
+      "name": "Optimized",
+      "description": "Passes the filtered table through Value.Optimize as a performance hint to the engine — the data is unchanged.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — counts the rows in the optimized table, confirming there are 3 rows with Quantity greater than 2.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Optimizing text — returns the same text
 
 ```powerquery

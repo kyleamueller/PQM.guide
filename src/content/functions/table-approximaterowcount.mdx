@@ -55,3 +55,24 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"5432100"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to a SQL Server database named 'db' on 'server' and returns the root navigation record for all available schemas and tables.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[SQL Server database connection]"}]}
+    },
+    {
+      "name": "Orders",
+      "description": "Navigates the database connection to retrieve the dbo.Orders table as a Power Query table.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[dbo.Orders table with many rows]"}]}
+    },
+    {
+      "name": "ApproxCount",
+      "description": "The final output — returns an approximate row count for the Orders table, potentially using a fast server-side statistics estimate instead of a full COUNT(*).",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"5432100"}]}
+    }
+  ]
+}
+-->

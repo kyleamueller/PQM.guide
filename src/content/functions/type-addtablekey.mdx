@@ -59,6 +59,33 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a two-row table with ID (number) and Name (text) columns using #table.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[{"ID":1,"Name":"Alice"},{"ID":2,"Name":"Bob"}]}
+    },
+    {
+      "name": "NewType",
+      "description": "Adds a primary key on the ID column to the table's type using Type.AddTableKey, returning a new type value.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [ID = number, Name = text]"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Retrieves the list of key definitions from the new type using Type.TableKeys.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"[Columns={\"ID\"}, Primary=true]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — reads the Primary field of the first key to confirm it is true.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Add a composite primary key and inspect its columns
 
 ```powerquery
@@ -72,6 +99,33 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Year","Month"]}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates an empty table with Year, Month, and Value columns using #table.",
+      "output": {"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Value","type":"number"}],"rows":[]}
+    },
+    {
+      "name": "NewType",
+      "description": "Adds a composite primary key on both Year and Month columns to the table's type using Type.AddTableKey.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [Year = number, Month = number, Value = number]"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Retrieves the list of key definitions from the new type using Type.TableKeys.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"[Columns={\"Year\",\"Month\"}, Primary=true]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — reads the Columns field of the first key to confirm it contains both Year and Month.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Year","Month"]}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Apply a primary key to a table using Value.ReplaceType
@@ -88,4 +142,36 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["OrderID"]}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a two-row table with OrderID (number) and Product (text) columns using #table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A"},{"OrderID":2,"Product":"Widget B"}]}
+    },
+    {
+      "name": "TypeWithKey",
+      "description": "Adds a primary key on the OrderID column to the table's type using Type.AddTableKey, returning a new type value.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [OrderID = number, Product = text]"}]}
+    },
+    {
+      "name": "TWithKey",
+      "description": "Applies the new type (with key) to the actual table using Value.ReplaceType, producing an annotated table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A"},{"OrderID":2,"Product":"Widget B"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Reads the key definitions from the annotated table's type using Type.TableKeys.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"[Columns={\"OrderID\"}, Primary=true]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — reads the Columns field of the first key to confirm it contains OrderID.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["OrderID"]}]}
+    }
+  ]
+}
 -->

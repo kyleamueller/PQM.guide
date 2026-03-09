@@ -73,3 +73,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Rows",
+      "description": "Defines a list of 6 strings representing a raw data list with 3 header-like rows followed by 3 data rows.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Header"},{"Value":"Subtitle"},{"Value":"---"},{"Value":"Data1"},{"Value":"Data2"},{"Value":"Data3"}]}
+    },
+    {
+      "name": "DataOnly",
+      "description": "Removes the first 3 items from Rows, leaving only the data rows starting at index 3.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the list with the 3 header rows stripped away, containing only the data entries.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
+    }
+  ]
+}
+-->

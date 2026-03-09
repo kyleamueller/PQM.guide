@@ -44,6 +44,22 @@ in
 <!--output
 {"columns":[{"name":"Column1","type":"text"},{"name":"Column2","type":"text"},{"name":"Column3","type":"text"}],"rows":[{"Column1":"Name","Column2":"Q1","Column3":"Q2"},{"Column1":"Alice","Column2":"100","Column3":"200"},{"Column1":"Bob","Column2":"150","Column3":"250"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates an inline table with Name, Q1, and Q2 columns for two people with quarterly values.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"Q1","type":"any"},{"name":"Q2","type":"any"}],"rows":[{"Name":"Alice","Q1":"100","Q2":"200"},{"Name":"Bob","Q1":"150","Q2":"250"}]}
+    },
+    {
+      "name": "Demoted",
+      "description": "The final output — moves the column headers (Name, Q1, Q2) into the first data row and renames all columns to Column1, Column2, Column3.",
+      "output": {"columns":[{"name":"Column1","type":"text"},{"name":"Column2","type":"text"},{"name":"Column3","type":"text"}],"rows":[{"Column1":"Name","Column2":"Q1","Column3":"Q2"},{"Column1":"Alice","Column2":"100","Column3":"200"},{"Column1":"Bob","Column2":"150","Column3":"250"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Round-trip — demote then re-promote
 

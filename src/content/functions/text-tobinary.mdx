@@ -80,3 +80,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"charlie smith"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "original",
+      "description": "Stores the source text value that will be encoded and then decoded.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"charlie smith"}]}
+    },
+    {
+      "name": "encoded",
+      "description": "Encodes the original text into a UTF-8 binary value using Text.ToBinary.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Y2hhcmxpZSBzbWl0aA=="}]}
+    },
+    {
+      "name": "decoded",
+      "description": "The final output — decodes the binary back to text using Text.FromBinary, confirming the round-trip produces the original string.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"charlie smith"}]}
+    }
+  ]
+}
+-->

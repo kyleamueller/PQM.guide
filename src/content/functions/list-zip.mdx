@@ -58,6 +58,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Items",
+      "description": "Defines a list of three text strings: {\"Alpha\", \"Beta\", \"Gamma\"}.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alpha"},{"Value":"Beta"},{"Value":"Gamma"}]}
+    },
+    {
+      "name": "Indexed",
+      "description": "Zips the zero-based position indices (from List.Positions) with the Items list, pairing each item with its index position to produce a list of {index, item} pairs.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"{0, Alpha}"},{"Value":"{1, Beta}"},{"Value":"{2, Gamma}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list of three pairs, each containing an index and its corresponding item.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Zip three lists (transpose a matrix)
 
@@ -83,4 +104,35 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"Seattle"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Keys",
+      "description": "Defines a list of three column name strings: {\"Name\", \"Age\", \"City\"}.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Name"},{"Value":"Age"},{"Value":"City"}]}
+    },
+    {
+      "name": "Values",
+      "description": "Defines a list of three corresponding data values: {\"Alice\", 30, \"Seattle\"}.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"Alice"},{"Value":30},{"Value":"Seattle"}]}
+    },
+    {
+      "name": "Zipped",
+      "description": "Zips the Keys and Values lists together, producing a list of {key, value} pairs: {{\"Name\",\"Alice\"}, {\"Age\",30}, {\"City\",\"Seattle\"}}.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"{Name, Alice}"},{"Value":"{Age, 30}"},{"Value":"{City, Seattle}"}]}
+    },
+    {
+      "name": "AsTable",
+      "description": "Creates a single-row table from the Values list using Keys as column headers via Table.FromRows.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"Seattle"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table with columns Name, Age, and City populated from the Values list.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"Seattle"}]}
+    }
+  ]
+}
 -->

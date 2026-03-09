@@ -62,6 +62,33 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"hello"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Defines a literal record with three fields: A (number), B (text), and C (logical).",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"A","Value":1},{"Field":"B","Value":"hello"},{"Field":"C","Value":true}]}
+    },
+    {
+      "name": "AsTable",
+      "description": "Converts the record to a two-column Name/Value table using Record.ToTable.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"A","Value":1},{"Name":"B","Value":"hello"},{"Name":"C","Value":true}]}
+    },
+    {
+      "name": "BackToRecord",
+      "description": "Converts the Name/Value table back into a record using Record.FromTable, restoring the original structure.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"A","Value":1},{"Field":"B","Value":"hello"},{"Field":"C","Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — accesses the B field of the restored record, returning the text value \"hello\".",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"hello"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Build a summary record from Sales table statistics
 
 Input: `Sales`
@@ -80,4 +107,26 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"TotalOrders","Value":5},{"Name":"FirstOrderID","Value":1},{"Name":"LastOrderID","Value":5}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Pairs",
+      "description": "Creates a two-column Name/Value table with three rows summarizing key statistics from the Sales table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"TotalOrders","Value":5},{"Name":"FirstOrderID","Value":1},{"Name":"LastOrderID","Value":5}]}
+    },
+    {
+      "name": "Summary",
+      "description": "Converts the Name/Value pairs table into a record where each row becomes a named field.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"TotalOrders","Value":5},{"Field":"FirstOrderID","Value":1},{"Field":"LastOrderID","Value":5}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the summary record back to a two-column Name/Value table for display.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"TotalOrders","Value":5},{"Name":"FirstOrderID","Value":1},{"Name":"LastOrderID","Value":5}]}
+    }
+  ]
+}
 -->

@@ -73,3 +73,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"en"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Annotated",
+      "description": "Creates the text value \"hello\" with a metadata record attached containing Language and Source fields.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"hello"}]}
+    },
+    {
+      "name": "Meta",
+      "description": "Retrieves the metadata record from the annotated value, returning a record with Language = \"en\" and Source = \"Config\".",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"Language","Value":"en"},{"Field":"Source","Value":"Config"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — accesses the Language field from the metadata record, returning \"en\".",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"en"}]}
+    }
+  ]
+}
+-->

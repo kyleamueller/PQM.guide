@@ -51,3 +51,24 @@ in
 <!--output
 {"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":50},{"Price":75},{"Price":120}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Extracts the Price column from the Products table as a flat list of numbers.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":25},{"Value":50},{"Value":15},{"Value":75},{"Value":120}]}
+    },
+    {
+      "name": "HighPrices",
+      "description": "Filters the Prices list to keep only values greater than 30, returning a shorter list.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":50},{"Value":75},{"Value":120}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table showing the three product prices that exceed 30.",
+      "output": {"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":50},{"Price":75},{"Price":120}]}
+    }
+  ]
+}
+-->

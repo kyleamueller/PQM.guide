@@ -70,6 +70,23 @@ in
 {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Establishes a connection to the AdventureWorks database on the specified SQL Server.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[SQL Server connection: myserver/AdventureWorks]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — executes the native SQL query against the database and returns the top 10 products ordered by ListPrice descending.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Parameterized query — safe way to include dynamic values
 
 ```powerquery
@@ -87,6 +104,28 @@ in
 
 <!--output
 {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Establishes a connection to the AdventureWorks database on the specified SQL Server.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[SQL Server connection: myserver/AdventureWorks]"}]}
+    },
+    {
+      "name": "MinPrice",
+      "description": "Defines the minimum price threshold as a number value to be passed safely as a query parameter.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1000}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — executes the parameterized SQL query with @MinPrice bound to 1000, returning products with ListPrice at or above that threshold.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Enable folding on the native query result
@@ -109,4 +148,26 @@ in
 
 <!--output
 {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Establishes a connection to the AdventureWorks database on the specified SQL Server.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[SQL Server connection: myserver/AdventureWorks]"}]}
+    },
+    {
+      "name": "NativeResult",
+      "description": "Executes the native SQL query to retrieve all products with EnableFolding = true, allowing M to push additional operations back to the database.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "The final output — applies a row filter in M to keep only products with ListPrice above 500; because folding is enabled, this filter may be pushed to the SQL source.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+    }
+  ]
+}
 -->

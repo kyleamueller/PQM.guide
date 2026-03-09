@@ -73,6 +73,27 @@ in
 <!--output
 {"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalQty","type":"number"},{"name":"Rank","type":"number"}],"rows":[{"CustomerName":"Alice","TotalQty":"5","Rank":"2"},{"CustomerName":"Bob","TotalQty":"2","Rank":"4"},{"CustomerName":"Charlie","TotalQty":"10","Rank":"1"},{"CustomerName":"Diana","TotalQty":"6","Rank":"2"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline table with CustomerName, Product, and Quantity columns for five orders.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Quantity":"4"},{"CustomerName":"Bob","Product":"Gadget B","Quantity":"2"},{"CustomerName":"Charlie","Product":"Widget C","Quantity":"10"},{"CustomerName":"Alice","Product":"Gadget D","Quantity":"1"},{"CustomerName":"Diana","Product":"Widget A","Quantity":"6"}]}
+    },
+    {
+      "name": "Totals",
+      "description": "Groups Sales by CustomerName and sums the Quantity for each customer into TotalQty.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalQty","type":"number"}],"rows":[{"CustomerName":"Alice","TotalQty":"5"},{"CustomerName":"Bob","TotalQty":"2"},{"CustomerName":"Charlie","TotalQty":"10"},{"CustomerName":"Diana","TotalQty":"6"}]}
+    },
+    {
+      "name": "Ranked",
+      "description": "The final output — adds a Rank column to the totals table using competition ranking by TotalQty descending, so Alice and Diana tie at rank 2.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalQty","type":"number"},{"name":"Rank","type":"number"}],"rows":[{"CustomerName":"Alice","TotalQty":"5","Rank":"2"},{"CustomerName":"Bob","TotalQty":"2","Rank":"4"},{"CustomerName":"Charlie","TotalQty":"10","Rank":"1"},{"CustomerName":"Diana","TotalQty":"6","Rank":"2"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Dense ranking to avoid gaps in rank sequence
 
@@ -97,6 +118,22 @@ in
 <!--output
 {"columns":[{"name":"Product","type":"any"},{"name":"UnitPrice","type":"number"},{"name":"PriceRank","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":"25","PriceRank":"3"},{"Product":"Gadget B","UnitPrice":"50","PriceRank":"2"},{"Product":"Widget C","UnitPrice":"15","PriceRank":"4"},{"Product":"Gadget D","UnitPrice":"75","PriceRank":"2"},{"Product":"Thingamajig E","UnitPrice":"120","PriceRank":"1"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines an inline table with Product and UnitPrice columns for five products.",
+      "output": {"columns":[{"name":"Product","type":"any"},{"name":"UnitPrice","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":"25"},{"Product":"Gadget B","UnitPrice":"50"},{"Product":"Widget C","UnitPrice":"15"},{"Product":"Gadget D","UnitPrice":"75"},{"Product":"Thingamajig E","UnitPrice":"120"}]}
+    },
+    {
+      "name": "Ranked",
+      "description": "The final output — adds a PriceRank column using dense ranking by UnitPrice descending, so tied prices share the same rank with no gaps in the sequence.",
+      "output": {"columns":[{"name":"Product","type":"any"},{"name":"UnitPrice","type":"number"},{"name":"PriceRank","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":"25","PriceRank":"3"},{"Product":"Gadget B","UnitPrice":"50","PriceRank":"2"},{"Product":"Widget C","UnitPrice":"15","PriceRank":"4"},{"Product":"Gadget D","UnitPrice":"75","PriceRank":"2"},{"Product":"Thingamajig E","UnitPrice":"120","PriceRank":"1"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Ordinal ranking to guarantee unique ranks
 
@@ -120,4 +157,20 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"3"},{"Name":"Carol","Score":"95","Rank":"2"},{"Name":"Dave","Score":"70","Rank":"4"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines an inline table with Name and Score columns for four people, where Alice and Carol share a score of 95.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Alice","Score":"95"},{"Name":"Bob","Score":"82"},{"Name":"Carol","Score":"95"},{"Name":"Dave","Score":"70"}]}
+    },
+    {
+      "name": "Ranked",
+      "description": "The final output — adds a Rank column using ordinal ranking by Score descending, giving every row a unique rank so Alice (row 1) gets rank 1 and Carol (row 3) gets rank 2 despite the same score.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"},{"name":"Rank","type":"number"}],"rows":[{"Name":"Alice","Score":"95","Rank":"1"},{"Name":"Bob","Score":"82","Rank":"3"},{"Name":"Carol","Score":"95","Rank":"2"},{"Name":"Dave","Score":"70","Rank":"4"}]}
+    }
+  ]
+}
 -->

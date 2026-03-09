@@ -72,3 +72,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Rows",
+      "description": "Defines a list of 6 strings representing data rows followed by 3 footer-like rows at the end.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Data1"},{"Value":"Data2"},{"Value":"Data3"},{"Value":"---"},{"Value":"Footer"},{"Value":"Total"}]}
+    },
+    {
+      "name": "DataOnly",
+      "description": "Removes the last 3 items from Rows, stripping away the footer rows and leaving only the data rows.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the list with the 3 trailing footer rows removed, containing only the data entries.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Data1, Data2, Data3}"}]}
+    }
+  ]
+}
+-->

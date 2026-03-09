@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PQTableData } from "@/lib/types";
+import { PQTableData, ExampleStep } from "@/lib/types";
 import { sampleTables } from "@/data/sample-tables";
 import PQTable from "@/components/pq-table/PQTable";
 import SyntaxBlock from "./SyntaxBlock";
@@ -13,6 +13,7 @@ interface ExampleSectionProps {
   inputTableRef?: string;
   inputTable?: PQTableData;
   outputTable?: PQTableData;
+  steps?: ExampleStep[];
   index: number;
 }
 
@@ -23,12 +24,18 @@ export default function ExampleSection({
   inputTableRef,
   inputTable,
   outputTable,
+  steps,
   index,
 }: ExampleSectionProps) {
   const [showInput, setShowInput] = useState(false);
+  const [activeStep, setActiveStep] = useState<number>(() =>
+    steps ? steps.length - 1 : 0
+  );
 
   const resolvedInput = inputTable || (inputTableRef && sampleTables[inputTableRef]?.data) || null;
   const inputLabel = inputTableRef || "Input";
+
+  const currentStep = steps ? steps[activeStep] : null;
 
   return (
     <div className="example-section">
@@ -70,14 +77,41 @@ export default function ExampleSection({
         </div>
       )}
 
-      {outputTable && (
+      {steps && steps.length > 0 ? (
+        <div className="example-steps">
+          <div className="steps-label">Applied Steps</div>
+          <div className="steps-nav" role="tablist" aria-label="Query steps">
+            {steps.map((step, i) => (
+              <button
+                key={step.name}
+                role="tab"
+                aria-selected={i === activeStep}
+                className={`step-btn${i === activeStep ? " step-btn--active" : ""}`}
+                onClick={() => setActiveStep(i)}
+              >
+                {step.name}
+              </button>
+            ))}
+          </div>
+          {currentStep && (
+            <div className="step-output">
+              {currentStep.description && (
+                <p className="step-description">{currentStep.description}</p>
+              )}
+              <div className="example-table">
+                <PQTable data={currentStep.output} />
+              </div>
+            </div>
+          )}
+        </div>
+      ) : outputTable ? (
         <div className="example-output">
           <div className="result-label">Result</div>
           <div className="example-table">
             <PQTable data={outputTable} />
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

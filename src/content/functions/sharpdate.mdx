@@ -68,6 +68,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":365}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "start",
+      "description": "Constructs the date literal January 1, 2024 using #date.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-01"}]}
+    },
+    {
+      "name": "end",
+      "description": "Constructs the date literal December 31, 2024 using #date.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-12-31"}]}
+    },
+    {
+      "name": "days",
+      "description": "Subtracts start from end to get a duration, then extracts the number of whole days using Duration.Days.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":365}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the number of days between January 1 and December 31, 2024.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":365}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Add days to a date literal
 

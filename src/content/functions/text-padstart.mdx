@@ -82,6 +82,28 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"E0001"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "id",
+      "description": "Stores the employee ID string \"E001\" as the input value to normalize.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"E001"}]}
+    },
+    {
+      "name": "numPart",
+      "description": "Strips the leading \"E\" prefix by extracting all characters after the first one using Text.End, producing just the numeric portion \"001\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"001"}]}
+    },
+    {
+      "name": "padded",
+      "description": "The final output — zero-pads the numeric portion to four digits with Text.PadStart and prepends the \"E\" prefix, producing the standardized ID \"E0001\".",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"E0001"}]}
+    }
+  ]
+}
+-->
+
 ### Example 4: No padding when text already meets minimum length
 
 ```powerquery

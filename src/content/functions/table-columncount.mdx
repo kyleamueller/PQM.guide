@@ -67,6 +67,37 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"8"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates an empty table with 8 named columns (OrderID through Region) to represent the expected schema.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"},{"name":"OrderDate","type":"any"},{"name":"Region","type":"any"}],"rows":[]}
+    },
+    {
+      "name": "ExpectedCols",
+      "description": "Stores the expected column count of 8 as a number for comparison.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"8"}]}
+    },
+    {
+      "name": "ActualCols",
+      "description": "Counts the actual number of columns in Source, returning 8.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"8"}]}
+    },
+    {
+      "name": "Validated",
+      "description": "Returns Source unchanged if the actual column count matches the expected count of 8, or raises an error describing the mismatch.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"},{"name":"OrderDate","type":"any"},{"name":"Region","type":"any"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns ActualCols, the verified column count of 8.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"8"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Compare column counts before and after a transformation
 
@@ -83,4 +114,35 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a one-row table with four columns: A, B, C, and D.",
+      "output": {"columns":[{"name":"A","type":"any"},{"name":"B","type":"any"},{"name":"C","type":"any"},{"name":"D","type":"any"}],"rows":[{"A":"1","B":"2","C":"3","D":"4"}]}
+    },
+    {
+      "name": "Removed",
+      "description": "Removes columns B and D from Source, leaving only A and C.",
+      "output": {"columns":[{"name":"A","type":"any"},{"name":"C","type":"any"}],"rows":[{"A":"1","C":"3"}]}
+    },
+    {
+      "name": "Before",
+      "description": "Counts the columns in Source, returning 4.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"4"}]}
+    },
+    {
+      "name": "After",
+      "description": "Counts the columns in Removed, returning 2.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"2"}]}
+    },
+    {
+      "name": "Dropped",
+      "description": "The final output — subtracts After from Before to compute the number of columns that were removed.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
+    }
+  ]
+}
 -->

@@ -69,6 +69,28 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, I, P, A, I}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Status",
+      "description": "Defines a list of 5 status labels using full words, with \"Active\" and \"Inactive\" each appearing twice.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Active"},{"Value":"Inactive"},{"Value":"Pending"},{"Value":"Active"},{"Value":"Inactive"}]}
+    },
+    {
+      "name": "Recoded",
+      "description": "Replaces each full status label in Status with its single-letter code: \"Active\" → \"A\", \"Inactive\" → \"I\", \"Pending\" → \"P\".",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, I, P, A, I}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the status list with all full labels replaced by abbreviated single-letter codes.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, I, P, A, I}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Replace null values with a default
 
 ```powerquery

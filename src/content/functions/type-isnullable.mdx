@@ -73,3 +73,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "ColType",
+      "description": "Retrieves the type of the literal value 42 using Value.Type, which returns type number (a non-nullable primitive type).",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
+    },
+    {
+      "name": "IsNullable",
+      "description": "The final output — checks whether the type of 42 is nullable using Type.IsNullable, returning false because type number does not allow null.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+    }
+  ]
+}
+-->

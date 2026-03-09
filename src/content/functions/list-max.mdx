@@ -69,3 +69,25 @@ in
 <!--output
 {"columns":[{"name":"LatestOrder","type":"date"}],"rows":[{"LatestOrder":"2024-12-30"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Dates",
+      "description": "Extracts the OrderDate column from the Sales table as a list of date values.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-15"},{"Value":"2024-01-18"},{"Value":"2024-02-01"},{"Value":"2024-02-10"},{"Value":"2024-03-05"},{"Value":"2024-03-12"},{"Value":"2024-04-01"},{"Value":"2024-04-15"}]}
+    },
+    {
+      "name": "Latest",
+      "description": "Finds the maximum (most recent) date from the Dates list.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-12-30"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the latest date into a single-row table with a \"LatestOrder\" column header.",
+      "output": {"columns":[{"name":"LatestOrder","type":"date"}],"rows":[{"LatestOrder":"2024-12-30"}]}
+    }
+  ]
+}
+-->

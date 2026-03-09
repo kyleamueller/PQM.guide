@@ -91,3 +91,29 @@ in
 <!--output
 {"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Now",
+      "description": "Calls DateTime.FixedLocalNow() to capture a stable current datetime as the reference point for the lookahead threshold.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2026-03-08T10:00:00"}]}
+    },
+    {
+      "name": "LookAheadSeconds",
+      "description": "Defines the number of seconds to look ahead as a scalar value of 5.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5}]}
+    },
+    {
+      "name": "Threshold",
+      "description": "Adds a 5-second duration to Now using #duration(0, 0, 0, 5) to compute the upper bound of the lookahead window.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2026-03-08T10:00:05"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — filters the OrderLog table to rows where Timestamp falls strictly between Now and the Threshold, returning an empty table because no historical rows fall in the next 5 seconds.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[]}
+    }
+  ]
+}
+-->

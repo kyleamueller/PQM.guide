@@ -69,6 +69,32 @@ in
 <!--output
 {"columns":[{"name":"Weeks","type":"number"},{"name":"RemainderDays","type":"number"}],"rows":[{"Weeks":2,"RemainderDays":3}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TotalDays",
+      "description": "Assigns the total number of days to be split (17 days).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":17}]}
+    },
+    {
+      "name": "Weeks",
+      "description": "Divides 17 by 7 using integer division, returning 2 — the number of complete weeks.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":2}]}
+    },
+    {
+      "name": "Remaining",
+      "description": "Computes the remainder of 17 ÷ 7 using Number.Mod, returning 3 — the leftover days after removing complete weeks.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing Weeks = 2 and RemainderDays = 3.",
+      "output": {"columns":[{"name":"Weeks","type":"number"},{"name":"RemainderDays","type":"number"}],"rows":[{"Weeks":2,"RemainderDays":3}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Bucket order quantities into groups of 5
 

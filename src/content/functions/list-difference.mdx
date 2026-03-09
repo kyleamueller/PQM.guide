@@ -69,6 +69,28 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Widget B, Widget D}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "LastMonth",
+      "description": "Defines a list of product names that were available last month.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget A"},{"Value":"Widget B"},{"Value":"Widget C"},{"Value":"Widget D"}]}
+    },
+    {
+      "name": "ThisMonth",
+      "description": "Defines a list of product names that are available this month.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget A"},{"Value":"Widget C"}]}
+    },
+    {
+      "name": "Discontinued",
+      "description": "The final output — uses List.Difference to return products from last month that do not appear this month, identifying discontinued items.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Widget B, Widget D}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Case-insensitive difference
 
 ```powerquery

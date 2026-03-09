@@ -80,6 +80,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{2024-03-15, 14:30:00}"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "dt",
+      "description": "Constructs the datetime literal March 15, 2024 at 14:30:00 using #datetime.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-03-15T14:30:00"}]}
+    },
+    {
+      "name": "d",
+      "description": "Extracts the date component from the datetime value using DateTime.Date.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-03-15"}]}
+    },
+    {
+      "name": "t",
+      "description": "Extracts the time component from the datetime value using DateTime.Time.",
+      "output": {"columns":[{"name":"Value","type":"time"}],"rows":[{"Value":"14:30:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list containing the extracted date and time values.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{2024-03-15, 14:30:00}"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Subtract two datetimes to get a duration
 
@@ -94,4 +120,30 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"PT8H30M"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "start",
+      "description": "Constructs the datetime literal March 15, 2024 at 09:00:00 using #datetime.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-03-15T09:00:00"}]}
+    },
+    {
+      "name": "finish",
+      "description": "Constructs the datetime literal March 15, 2024 at 17:30:00 using #datetime.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-03-15T17:30:00"}]}
+    },
+    {
+      "name": "elapsed",
+      "description": "Subtracts start from finish to produce a duration value representing the elapsed time.",
+      "output": {"columns":[{"name":"Value","type":"duration"}],"rows":[{"Value":"PT8H30M"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the duration between 9:00 AM and 5:30 PM, which is 8 hours and 30 minutes.",
+      "output": {"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"PT8H30M"}]}
+    }
+  ]
+}
 -->

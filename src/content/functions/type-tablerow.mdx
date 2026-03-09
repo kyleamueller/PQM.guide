@@ -56,3 +56,30 @@ in
 <!--output
 {"columns":[{"name":"TableType","type":"text"},{"name":"RowType IsRecord","type":"logical"}],"rows":[{"TableType":"type table [Name, Score]","RowType IsRecord":true}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "MyTableType",
+      "description": "Defines a table type with a Name (text) column and a Score (number) column.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"type table [Name = text, Score = number]"}]}
+    },
+    {
+      "name": "RowType",
+      "description": "Extracts the row type from the table type — returns the record type describing a single row's field structure.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"type [Name = text, Score = number]"}]}
+    },
+    {
+      "name": "IsRecord",
+      "description": "Checks whether the extracted row type is a record type — returns true.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table showing the original table type description and confirmation that its row type is a record type.",
+      "output": {"columns":[{"name":"TableType","type":"text"},{"name":"RowType IsRecord","type":"logical"}],"rows":[{"TableType":"type table [Name, Score]","RowType IsRecord":true}]}
+    }
+  ]
+}
+-->

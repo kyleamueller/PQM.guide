@@ -90,3 +90,40 @@ in
 <!--output
 {"columns":[{"name":"Q1","type":"number"},{"name":"Median","type":"number"},{"name":"Q3","type":"number"}],"rows":[{"Q1":962.5,"Median":1425,"Q3":2275}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a list of 8 sales figures to analyze.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1200},{"Value":850},{"Value":3400},{"Value":450},{"Value":2100},{"Value":975},{"Value":1650},{"Value":2800}]}
+    },
+    {
+      "name": "Quartiles",
+      "description": "Computes the 25th, 50th, and 75th percentiles of Sales in one call, returning a list of three values.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":962.5},{"Value":1425},{"Value":2275}]}
+    },
+    {
+      "name": "Q1",
+      "description": "Extracts the first percentile value (25th percentile) from the Quartiles list.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":962.5}]}
+    },
+    {
+      "name": "Median",
+      "description": "Extracts the second percentile value (50th percentile / median) from the Quartiles list.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1425}]}
+    },
+    {
+      "name": "Q3",
+      "description": "Extracts the third percentile value (75th percentile) from the Quartiles list.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":2275}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing Q1, Median, and Q3 for the sales data.",
+      "output": {"columns":[{"name":"Q1","type":"number"},{"name":"Median","type":"number"},{"name":"Q3","type":"number"}],"rows":[{"Q1":962.5,"Median":1425,"Q3":2275}]}
+    }
+  ]
+}
+-->

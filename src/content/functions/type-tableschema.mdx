@@ -63,6 +63,28 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"number","Kind":"Primitive"},{"Name":"Product","Position":1,"TypeName":"text","Kind":"Primitive"},{"Name":"UnitPrice","Position":2,"TypeName":"nullable number","Kind":"Nullable"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a typed table with three columns — OrderID (number), Product (text), and UnitPrice (nullable number) — containing one data row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","UnitPrice":25}]}
+    },
+    {
+      "name": "Schema",
+      "description": "Extracts the table's type and passes it to Type.TableSchema, returning a table describing each column's name, position, type name, and kind.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"number","Kind":"Primitive"},{"Name":"Product","Position":1,"TypeName":"text","Kind":"Primitive"},{"Name":"UnitPrice","Position":2,"TypeName":"nullable number","Kind":"Nullable"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the schema table showing all three columns with their positions, type names, and kinds.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"number","Kind":"Primitive"},{"Name":"Product","Position":1,"TypeName":"text","Kind":"Primitive"},{"Name":"UnitPrice","Position":2,"TypeName":"nullable number","Kind":"Nullable"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Count columns declared in the Sales table type
 
 Input: `Sales`
@@ -91,4 +113,31 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Notes"]}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a typed table with three columns — OrderID (number), Product (text), and Notes (nullable text) — containing one data row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"Notes","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A","Notes":null}]}
+    },
+    {
+      "name": "Schema",
+      "description": "Extracts the table's type and passes it to Type.TableSchema, returning a table describing each column's name, position, type name, and kind.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"OrderID","Position":0,"TypeName":"number","Kind":"Primitive"},{"Name":"Product","Position":1,"TypeName":"text","Kind":"Primitive"},{"Name":"Notes","Position":2,"TypeName":"nullable text","Kind":"Nullable"}]}
+    },
+    {
+      "name": "NullableCols",
+      "description": "Filters the schema table to only rows where Kind equals \"Nullable\", returning only the Notes column entry.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Position","type":"number"},{"name":"TypeName","type":"text"},{"name":"Kind","type":"text"}],"rows":[{"Name":"Notes","Position":2,"TypeName":"nullable text","Kind":"Nullable"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — extracts the Name column from the filtered schema table, returning a list of nullable column names.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Notes"]}]}
+    }
+  ]
+}
 -->

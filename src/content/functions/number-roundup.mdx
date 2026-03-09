@@ -52,6 +52,27 @@ in
 <!--output
 {"columns":[{"name":"AvgUnitPrice","type":"number"},{"name":"RoundedUp","type":"number"}],"rows":[{"AvgUnitPrice":46.875,"RoundedUp":47}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AvgPrice",
+      "description": "Computes the average of the UnitPrice column across all rows in the Sales table: (25+50+15+75+25+120+50+15) / 8 = 375 / 8 = 46.875.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":46.875}]}
+    },
+    {
+      "name": "Rounded",
+      "description": "Applies Number.RoundUp to 46.875 with no digits argument, rounding up to the nearest whole integer: 47.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":47}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the raw average price (46.875) alongside its ceiling value (47).",
+      "output": {"columns":[{"name":"AvgUnitPrice","type":"number"},{"name":"RoundedUp","type":"number"}],"rows":[{"AvgUnitPrice":46.875,"RoundedUp":47}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Round up quantities to the nearest five
 

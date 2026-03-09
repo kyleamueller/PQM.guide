@@ -49,3 +49,30 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"UnitPrice","Value":25},{"Name":"CustomerID","Value":1},{"Name":"Name","Value":"Alice"},{"Name":"City","Value":"New York"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "SalesRow",
+      "description": "Selects OrderID, Product, and UnitPrice from the first row of the Sales table as a record.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"Product","Value":"Widget A"},{"Field":"UnitPrice","Value":25}]}
+    },
+    {
+      "name": "CustomerRow",
+      "description": "Selects CustomerID, Name, and City from the first row of the Customers table as a record.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"CustomerID","Value":1},{"Field":"Name","Value":"Alice"},{"Field":"City","Value":"New York"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Merges the SalesRow and CustomerRow records into a single record containing all six fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"Product","Value":"Widget A"},{"Field":"UnitPrice","Value":25},{"Field":"CustomerID","Value":1},{"Field":"Name","Value":"Alice"},{"Field":"City","Value":"New York"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the combined record to a two-column Name/Value table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"UnitPrice","Value":25},{"Name":"CustomerID","Value":1},{"Name":"Name","Value":"Alice"},{"Name":"City","Value":"New York"}]}
+    }
+  ]
+}
+-->

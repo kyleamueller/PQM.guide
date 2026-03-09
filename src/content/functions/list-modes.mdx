@@ -72,3 +72,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, B}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Categories",
+      "description": "Defines a list of category labels, where \"A\" and \"B\" each appear twice and \"C\" appears once.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"A"},{"Value":"B"},{"Value":"A"},{"Value":"B"},{"Value":"C"}]}
+    },
+    {
+      "name": "AllModes",
+      "description": "Finds all values tied for the highest frequency in Categories — both \"A\" and \"B\" appear twice, so both are returned.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, B}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list of all tied mode values from the Categories list.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, B}"}]}
+    }
+  ]
+}
+-->

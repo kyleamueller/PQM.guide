@@ -76,3 +76,34 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Cust-01, Cust-02, Cust-03, Cust-04, Cust-05}"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RegionA",
+      "description": "Defines a list of three customer IDs belonging to Region A.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-01"},{"Value":"Cust-02"},{"Value":"Cust-03"}]}
+    },
+    {
+      "name": "RegionB",
+      "description": "Defines a list of two customer IDs belonging to Region B, one of which (Cust-02) overlaps with Region A.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-02"},{"Value":"Cust-04"}]}
+    },
+    {
+      "name": "RegionC",
+      "description": "Defines a list of two customer IDs belonging to Region C, one of which (Cust-03) overlaps with Region A.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-03"},{"Value":"Cust-05"}]}
+    },
+    {
+      "name": "AllCustomers",
+      "description": "Computes the union of all three region lists, returning only distinct customer IDs in order of first appearance across the lists.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-01"},{"Value":"Cust-02"},{"Value":"Cust-03"},{"Value":"Cust-04"},{"Value":"Cust-05"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a deduplicated list of all 5 unique customer IDs across all three regions.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Cust-01, Cust-02, Cust-03, Cust-04, Cust-05}"}]}
+    }
+  ]
+}
+-->

@@ -61,3 +61,24 @@ in
 <!--output
 {"columns":[{"name":"Column","type":"text"},{"name":"Value","type":"text"},{"name":"Type","type":"text"}],"rows":[{"Column":"OrderID","Value":"1","Type":"number"},{"Column":"CustomerName","Value":"Alice","Type":"text"},{"Column":"UnitPrice","Value":"25","Type":"number"},{"Column":"OrderDate","Value":"1/15/2024","Type":"date"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstRow",
+      "description": "Retrieves the first row of the Sales table as a record, giving access to individual field values by name.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"OrderID","Value":"1"},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":"25"},{"Field":"Quantity","Value":"4"},{"Field":"OrderDate","Value":"1/15/2024"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "TypeName",
+      "description": "Defines a helper function that inspects a value using Value.Is and returns its type as a text label: \"number\", \"text\", \"date\", or \"other\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table listing four columns from the first Sales row, showing each column's raw value and its detected M type.",
+      "output": {"columns":[{"name":"Column","type":"text"},{"name":"Value","type":"text"},{"name":"Type","type":"text"}],"rows":[{"Column":"OrderID","Value":"1","Type":"number"},{"Column":"CustomerName","Value":"Alice","Type":"text"},{"Column":"UnitPrice","Value":"25","Type":"number"},{"Column":"OrderDate","Value":"1/15/2024","Type":"date"}]}
+    }
+  ]
+}
+-->

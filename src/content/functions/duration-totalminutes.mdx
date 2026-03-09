@@ -91,3 +91,25 @@ in
 <!--output
 {"columns":[{"name":"Created","type":"datetime"},{"name":"Shipped","type":"datetime"},{"name":"ElapsedMinutes","type":"number"}],"rows":[{"Created":"2024-01-15T09:30:00","Shipped":"2024-01-16T14:15:00","ElapsedMinutes":1725}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Created",
+      "description": "Defines the Created datetime literal representing the order creation timestamp from OrderLog row L001.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-15T09:30:00"}]}
+    },
+    {
+      "name": "Shipped",
+      "description": "Defines the Shipped datetime literal representing the shipment timestamp from OrderLog row L002.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-16T14:15:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the Created datetime, Shipped datetime, and the elapsed time between them expressed as total minutes.",
+      "output": {"columns":[{"name":"Created","type":"datetime"},{"name":"Shipped","type":"datetime"},{"name":"ElapsedMinutes","type":"number"}],"rows":[{"Created":"2024-01-15T09:30:00","Shipped":"2024-01-16T14:15:00","ElapsedMinutes":1725}]}
+    }
+  ]
+}
+-->

@@ -97,6 +97,27 @@ in
 <!--output
 {"columns":[{"name":"Vendor","type":"any"},{"name":"TotalSpend","type":"number"}],"rows":[{"Vendor":"Microsoft","TotalSpend":"700"},{"Vendor":"Google","TotalSpend":"450"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines an inline Orders table with Vendor and Spend columns, containing four rows with both canonical and alias vendor names.",
+      "output": {"columns":[{"name":"Vendor","type":"any"},{"name":"Spend","type":"any"}],"rows":[{"Vendor":"Microsoft","Spend":"500"},{"Vendor":"MS Corp","Spend":"200"},{"Vendor":"Google","Spend":"300"},{"Vendor":"Alphabet","Spend":"150"}]}
+    },
+    {
+      "name": "Mapping",
+      "description": "Defines a TransformationTable with From and To columns that maps known aliases (\"MS Corp\" → \"Microsoft\", \"Alphabet\" → \"Google\") before fuzzy scoring.",
+      "output": {"columns":[{"name":"From","type":"any"},{"name":"To","type":"any"}],"rows":[{"From":"MS Corp","To":"Microsoft"},{"From":"Alphabet","To":"Google"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FuzzyGroup applies the TransformationTable mappings first, then groups remaining similar vendors together, producing two canonical groups with summed spend.",
+      "output": {"columns":[{"name":"Vendor","type":"any"},{"name":"TotalSpend","type":"number"}],"rows":[{"Vendor":"Microsoft","TotalSpend":"700"},{"Vendor":"Google","TotalSpend":"450"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Lower the threshold to catch more aggressive variations
 

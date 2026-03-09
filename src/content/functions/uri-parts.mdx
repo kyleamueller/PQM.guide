@@ -64,6 +64,28 @@ in
 {"columns":[{"name":"Component","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Component":"Scheme","Value":"https"},{"Component":"Host","Value":"api.example.com"},{"Component":"Port","Value":"8080"},{"Component":"Path","Value":"/data/items"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Url",
+      "description": "Defines the full URL string to parse, including scheme, host, custom port, path, and two query parameters.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"https://api.example.com:8080/data/items?category=electronics&page=2"}]}
+    },
+    {
+      "name": "Parts",
+      "description": "Parses the URL into a record containing its component parts: Scheme, Host, Port, Path, Query, and Fragment.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"Scheme","Value":"https"},{"Field":"Host","Value":"api.example.com"},{"Field":"Port","Value":8080},{"Field":"Path","Value":"/data/items"},{"Field":"Query","Value":"[category=\"electronics\", page=\"2\"]"},{"Field":"Fragment","Value":""}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table showing four selected URI components (Scheme, Host, Port, Path) extracted from the parsed record.",
+      "output": {"columns":[{"name":"Component","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Component":"Scheme","Value":"https"},{"Component":"Host","Value":"api.example.com"},{"Component":"Port","Value":"8080"},{"Component":"Path","Value":"/data/items"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Extract domain from URLs in a table
 
 Parse URLs and extract just the host.
@@ -78,4 +100,26 @@ in
 
 <!--output
 {"columns":[{"name":"Page","type":"text"},{"name":"Domain","type":"text"}],"rows":[{"Page":"https://shop.example.com/products/123","Domain":"shop.example.com"},{"Page":"https://blog.example.com/posts/hello","Domain":"blog.example.com"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a table with a single Page column containing two full URLs.",
+      "output": {"columns":[{"name":"Page","type":"text"}],"rows":[{"Page":"https://shop.example.com/products/123"},{"Page":"https://blog.example.com/posts/hello"}]}
+    },
+    {
+      "name": "Added",
+      "description": "Adds a Domain column by parsing each URL with Uri.Parts and extracting the Host component from the resulting record.",
+      "output": {"columns":[{"name":"Page","type":"text"},{"name":"Domain","type":"text"}],"rows":[{"Page":"https://shop.example.com/products/123","Domain":"shop.example.com"},{"Page":"https://blog.example.com/posts/hello","Domain":"blog.example.com"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the table with the original Page URLs and their extracted Domain host names.",
+      "output": {"columns":[{"name":"Page","type":"text"},{"name":"Domain","type":"text"}],"rows":[{"Page":"https://shop.example.com/products/123","Domain":"shop.example.com"},{"Page":"https://blog.example.com/posts/hello","Domain":"blog.example.com"}]}
+    }
+  ]
+}
 -->

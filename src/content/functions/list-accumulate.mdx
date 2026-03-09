@@ -57,3 +57,25 @@ in
 <!--output
 {"columns":[{"name":"TotalQuantity","type":"number"}],"rows":[{"TotalQuantity":35}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Quantities",
+      "description": "Extracts the Quantity column from the Sales table as a list of numbers.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":4},{"Value":2},{"Value":10},{"Value":1},{"Value":6},{"Value":1},{"Value":3},{"Value":8}]}
+    },
+    {
+      "name": "Total",
+      "description": "Accumulates a running sum over the quantities list starting from 0, producing the grand total of 35.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":35}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the total in a single-row, single-column table labeled TotalQuantity.",
+      "output": {"columns":[{"name":"TotalQuantity","type":"number"}],"rows":[{"TotalQuantity":35}]}
+    }
+  ]
+}
+-->

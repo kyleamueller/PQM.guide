@@ -57,3 +57,24 @@ in
 <!--output
 {"columns":[{"name":"Category","type":"text"},{"name":"CheapestProduct","type":"text"},{"name":"LowestPrice","type":"number"}],"rows":[{"Category":"Widgets","CheapestProduct":"Widget C","LowestPrice":15.00},{"Category":"Gadgets","CheapestProduct":"Gadget B","LowestPrice":50.00},{"Category":"Misc","CheapestProduct":"Thingamajig E","LowestPrice":120.00}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sorted",
+      "description": "Sorts the Sales table by UnitPrice ascending so the cheapest item in each category appears first.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10","OrderDate":"2024-02-01","Region":"East"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"8","OrderDate":"2024-04-15","Region":"North"},{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4","OrderDate":"2024-01-15","Region":"East"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"6","OrderDate":"2024-03-05","Region":"West"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"2","OrderDate":"2024-01-18","Region":"West"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"3","OrderDate":"2024-04-01","Region":"West"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":"75","Quantity":"1","OrderDate":"2024-02-10","Region":"North"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":"120","Quantity":"1","OrderDate":"2024-03-12","Region":"East"}]}
+    },
+    {
+      "name": "Buffered",
+      "description": "Loads the sorted table fully into memory, locking in the sort order so that the subsequent grouping step sees rows in the correct ascending price sequence.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10","OrderDate":"2024-02-01","Region":"East"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"8","OrderDate":"2024-04-15","Region":"North"},{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4","OrderDate":"2024-01-15","Region":"East"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"6","OrderDate":"2024-03-05","Region":"West"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"2","OrderDate":"2024-01-18","Region":"West"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"3","OrderDate":"2024-04-01","Region":"West"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":"75","Quantity":"1","OrderDate":"2024-02-10","Region":"North"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":"120","Quantity":"1","OrderDate":"2024-03-12","Region":"East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — groups the buffered table by Category and picks the first Product (cheapest by the preserved sort) and minimum UnitPrice per category.",
+      "output": {"columns":[{"name":"Category","type":"text"},{"name":"CheapestProduct","type":"text"},{"name":"LowestPrice","type":"number"}],"rows":[{"Category":"Widgets","CheapestProduct":"Widget C","LowestPrice":15.00},{"Category":"Gadgets","CheapestProduct":"Gadget B","LowestPrice":50.00},{"Category":"Misc","CheapestProduct":"Thingamajig E","LowestPrice":120.00}]}
+    }
+  ]
+}
+-->

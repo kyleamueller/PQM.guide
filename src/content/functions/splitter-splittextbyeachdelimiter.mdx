@@ -65,3 +65,24 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"Name":"Alice","Product":"Widget A","Region":"East"},{"Name":"Bob","Product":"Gadget B","Region":"West"},{"Name":"Charlie","Product":"Widget C","Region":"East"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Takes the first 3 rows of Sales and adds a \"Combo\" column combining CustomerName, Product, and Region with \" - \" and \" / \" separators.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"Combo","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","Combo":"Alice - Widget A / East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","Combo":"Bob - Gadget B / West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","Combo":"Charlie - Widget C / East"}]}
+    },
+    {
+      "name": "SplitFn",
+      "description": "Creates a splitter function that uses \" - \" for the first split and \" / \" for the second, producing three parts per value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the Combo column split into Name, Product, and Region columns using the sequential delimiters.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"Name":"Alice","Product":"Widget A","Region":"East"},{"Name":"Bob","Product":"Gadget B","Region":"West"},{"Name":"Charlie","Product":"Widget C","Region":"East"}]}
+    }
+  ]
+}
+-->

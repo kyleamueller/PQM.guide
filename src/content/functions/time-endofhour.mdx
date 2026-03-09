@@ -86,3 +86,30 @@ in
 <!--output
 {"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L001","OrderID":1,"Action":"Created","Timestamp":"2024-01-15T09:30:00","DurationMinutes":null,"Notes":"New order: Widget A"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RefTime",
+      "description": "Defines the reference datetime (January 15, 2024 at 09:00:00) used to determine the target clock hour.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-15T09:00:00"}]}
+    },
+    {
+      "name": "HourStart",
+      "description": "Computes the first instant of the 9 AM hour (09:00:00.0000000) using Time.StartOfHour.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-15T09:00:00.0000000"}]}
+    },
+    {
+      "name": "HourEnd",
+      "description": "Computes the last instant of the 9 AM hour (09:59:59.9999999) using Time.EndOfHour.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-15T09:59:59.9999999"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — filters OrderLog rows to those whose Timestamp falls within the inclusive 9 AM hour range.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L001","OrderID":1,"Action":"Created","Timestamp":"2024-01-15T09:30:00","DurationMinutes":null,"Notes":"New order: Widget A"}]}
+    }
+  ]
+}
+-->

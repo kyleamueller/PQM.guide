@@ -60,6 +60,28 @@ in
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a one-row table with Name (text) and Age (number) columns using #table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"}],"rows":[{"Name":"Alice","Age":30}]}
+    },
+    {
+      "name": "TType",
+      "description": "Retrieves the table's type value using Value.Type.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [Name = text, Age = number]"}]}
+    },
+    {
+      "name": "ColType",
+      "description": "The final output — extracts the declared type of the Age column from the table type using Type.TableColumn, returning type number.",
+      "output": {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Check if a column type is nullable
 
 ```powerquery
@@ -74,6 +96,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a one-row table with a Score column typed as nullable number, containing a null value.",
+      "output": {"columns":[{"name":"Score","type":"number"}],"rows":[{"Score":null}]}
+    },
+    {
+      "name": "ColType",
+      "description": "The final output — extracts the declared type of the Score column using Type.TableColumn, then checks Type.IsNullable to confirm it is nullable, returning true.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Compare the column type to a known type
 
 ```powerquery
@@ -86,4 +125,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates a one-row table with OrderID (number) and Product (text) columns using #table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"Product":"Widget A"}]}
+    },
+    {
+      "name": "ColType",
+      "description": "The final output — extracts the declared type of the Product column using Type.TableColumn, then compares it to type text to confirm they are equal, returning true.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
 -->

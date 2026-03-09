@@ -78,6 +78,38 @@ in
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[FirstSize = 5, RestSize = 3]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 8 orders containing OrderID and CustomerName columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"3","CustomerName":"Charlie"},{"OrderID":"4","CustomerName":"Alice"},{"OrderID":"5","CustomerName":"Diana"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Charlie"},{"OrderID":"8","CustomerName":"Diana"}]}
+    },
+    {
+      "name": "Split",
+      "description": "Splits the Sales table at row 5, producing a record with First (rows 1-5) and Remaining (rows 6-8) table fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"First","Value":"[Table with 5 rows]"},{"Field":"Remaining","Value":"[Table with 3 rows]"}]}
+    },
+    {
+      "name": "FirstSize",
+      "description": "Counts the rows in the First partition, returning 5.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"5"}]}
+    },
+    {
+      "name": "RestSize",
+      "description": "Counts the rows in the Remaining partition, returning 3.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"3"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns a record combining both counts, showing FirstSize = 5 and RestSize = 3.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[FirstSize = 5, RestSize = 3]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Process the head and tail separately, then recombine
 
 Mark the first 2 rows as "priority" and the rest as "standard", then rejoin.
@@ -94,4 +126,36 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Priority","type":"text"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Priority":"High"},{"OrderID":"2","CustomerName":"Bob","Priority":"High"},{"OrderID":"3","CustomerName":"Charlie","Priority":"Standard"},{"OrderID":"4","CustomerName":"Diana","Priority":"Standard"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines a table with 4 orders containing OrderID and CustomerName columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"3","CustomerName":"Charlie"},{"OrderID":"4","CustomerName":"Diana"}]}
+    },
+    {
+      "name": "Split",
+      "description": "Splits the Orders table at row 2, producing a record with First (rows 1-2) and Remaining (rows 3-4) table fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"First","Value":"[Table with 2 rows]"},{"Field":"Remaining","Value":"[Table with 2 rows]"}]}
+    },
+    {
+      "name": "Head",
+      "description": "Adds a Priority column with value \"High\" to the first 2 rows (Alice and Bob) from Split[First].",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Priority","type":"text"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Priority":"High"},{"OrderID":"2","CustomerName":"Bob","Priority":"High"}]}
+    },
+    {
+      "name": "Tail",
+      "description": "Adds a Priority column with value \"Standard\" to the remaining 2 rows (Charlie and Diana) from Split[Remaining].",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Priority","type":"text"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Priority":"Standard"},{"OrderID":"4","CustomerName":"Diana","Priority":"Standard"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — combines Head and Tail into one table with all 4 orders and their assigned priority labels.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Priority","type":"text"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Priority":"High"},{"OrderID":"2","CustomerName":"Bob","Priority":"High"},{"OrderID":"3","CustomerName":"Charlie","Priority":"Standard"},{"OrderID":"4","CustomerName":"Diana","Priority":"Standard"}]}
+    }
+  ]
+}
 -->

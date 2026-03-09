@@ -79,3 +79,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3400},{"Result":2100},{"Result":1200}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a list of sales amounts to find the top values from.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1200},{"Value":850},{"Value":3400},{"Value":450},{"Value":2100},{"Value":975}]}
+    },
+    {
+      "name": "TopThree",
+      "description": "The final output — returns the 3 largest sales amounts from the list, sorted in descending order.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3400},{"Result":2100},{"Result":1200}]}
+    }
+  ]
+}
+-->

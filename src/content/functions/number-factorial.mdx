@@ -72,3 +72,29 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "N",
+      "description": "Assigns the total number of items to choose from (n = 5).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5}]}
+    },
+    {
+      "name": "K",
+      "description": "Assigns the number of items to select (k = 2).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":2}]}
+    },
+    {
+      "name": "Computed",
+      "description": "Evaluates the combinations formula: Number.Factorial(5) / (Number.Factorial(2) × Number.Factorial(3)) = 120 / (2 × 6) = 10.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":10}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — C(5,2) = 10, confirming there are 10 ways to choose 2 items from 5.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
+    }
+  ]
+}
+-->

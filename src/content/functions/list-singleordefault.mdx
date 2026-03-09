@@ -89,3 +89,29 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Creates an inline two-column table with Product and Price entries for Widget and Gadget.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"Price","type":"number"}],"rows":[{"Product":"Widget","Price":9.99},{"Product":"Gadget","Price":24.99}]}
+    },
+    {
+      "name": "LookupProduct",
+      "description": "Stores the text value \"Thingamajig\" as the product name to look up — a product that does not exist in the table.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Thingamajig"}]}
+    },
+    {
+      "name": "MatchedPrice",
+      "description": "Filters Prices for rows matching LookupProduct, extracts the Price column, and calls List.SingleOrDefault with a fallback of 0 — returning 0 because no rows matched.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the fallback value 0, returned because \"Thingamajig\" was not found in the Prices table.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+    }
+  ]
+}
+-->

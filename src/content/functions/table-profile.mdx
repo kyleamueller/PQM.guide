@@ -53,3 +53,25 @@ in
 <!--output
 {"columns":[{"name":"Column","type":"text"},{"name":"Min","type":"any"},{"name":"Max","type":"any"},{"name":"Average","type":"number"},{"name":"Count","type":"number"},{"name":"DistinctCount","type":"number"}],"rows":[{"Column":"UnitPrice","Min":15,"Max":120,"Average":46.875,"Count":8,"DistinctCount":5},{"Column":"Quantity","Min":1,"Max":10,"Average":4.875,"Count":8,"DistinctCount":7},{"Column":"Region","Min":"East","Max":"West","Average":null,"Count":8,"DistinctCount":3}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Selects only the UnitPrice, Quantity, and Region columns from the Sales table, narrowing the dataset to 3 columns and 8 rows.",
+      "output": {"columns":[{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Region","type":"text"}],"rows":[{"UnitPrice":"25","Quantity":"4","Region":"East"},{"UnitPrice":"50","Quantity":"2","Region":"West"},{"UnitPrice":"15","Quantity":"10","Region":"East"},{"UnitPrice":"75","Quantity":"1","Region":"North"},{"UnitPrice":"25","Quantity":"6","Region":"West"},{"UnitPrice":"120","Quantity":"1","Region":"East"},{"UnitPrice":"50","Quantity":"3","Region":"West"},{"UnitPrice":"15","Quantity":"8","Region":"North"}]}
+    },
+    {
+      "name": "Profiled",
+      "description": "Runs Table.Profile on the 3-column table, producing one statistics row per column with metrics like Min, Max, Average, Count, NullCount, DistinctCount, and StandardDeviation.",
+      "output": {"columns":[{"name":"Column","type":"text"},{"name":"Min","type":"any"},{"name":"Max","type":"any"},{"name":"Average","type":"number"},{"name":"StandardDeviation","type":"number"},{"name":"Count","type":"number"},{"name":"NullCount","type":"number"},{"name":"DistinctCount","type":"number"}],"rows":[{"Column":"UnitPrice","Min":"15","Max":"120","Average":"46.875","StandardDeviation":"35.09","Count":"8","NullCount":"0","DistinctCount":"5"},{"Column":"Quantity","Min":"1","Max":"10","Average":"4.875","StandardDeviation":"3.27","Count":"8","NullCount":"0","DistinctCount":"7"},{"Column":"Region","Min":"East","Max":"West","Average":null,"StandardDeviation":null,"Count":"8","NullCount":"0","DistinctCount":"3"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — selects only the Column, Min, Max, Average, Count, and DistinctCount columns from the profile table for a concise summary.",
+      "output": {"columns":[{"name":"Column","type":"text"},{"name":"Min","type":"any"},{"name":"Max","type":"any"},{"name":"Average","type":"number"},{"name":"Count","type":"number"},{"name":"DistinctCount","type":"number"}],"rows":[{"Column":"UnitPrice","Min":15,"Max":120,"Average":46.875,"Count":8,"DistinctCount":5},{"Column":"Quantity","Min":1,"Max":10,"Average":4.875,"Count":8,"DistinctCount":7},{"Column":"Region","Min":"East","Max":"West","Average":null,"Count":8,"DistinctCount":3}]}
+    }
+  ]
+}
+-->

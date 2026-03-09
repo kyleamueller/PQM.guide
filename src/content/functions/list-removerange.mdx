@@ -77,3 +77,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Jan, Feb, Mar}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Months",
+      "description": "Defines a list of the first 6 month abbreviations, covering Q1 and Q2.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Jan"},{"Value":"Feb"},{"Value":"Mar"},{"Value":"Apr"},{"Value":"May"},{"Value":"Jun"}]}
+    },
+    {
+      "name": "WithoutQ2",
+      "description": "Removes 3 items starting at index 3 (Apr, May, Jun) from Months, leaving only the Q1 months.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Jan, Feb, Mar}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the list with Q2 months removed, containing only Jan, Feb, and Mar.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Jan, Feb, Mar}"}]}
+    }
+  ]
+}
+-->

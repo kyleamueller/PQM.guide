@@ -63,3 +63,24 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Total","type":"number"},{"name":"DoubleQty","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4,"Total":100,"DoubleQty":8},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2,"Total":100,"DoubleQty":4},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10,"Total":150,"DoubleQty":20}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Selects OrderID, CustomerName, UnitPrice, and Quantity from the first 3 rows of Sales.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10}]}
+    },
+    {
+      "name": "WithCalc",
+      "description": "Adds a Calc column where each cell is a record containing Total (UnitPrice × Quantity) and DoubleQty (Quantity × 2) computed for that row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Calc","type":"record"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4,"Calc":"[Total = 100, DoubleQty = 8]"},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2,"Calc":"[Total = 100, DoubleQty = 4]"},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10,"Calc":"[Total = 150, DoubleQty = 20]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — expands the Calc record column into separate Total and DoubleQty columns, replacing the record column with individual numeric columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Total","type":"number"},{"name":"DoubleQty","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4,"Total":100,"DoubleQty":8},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2,"Total":100,"DoubleQty":4},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10,"Total":150,"DoubleQty":20}]}
+    }
+  ]
+}
+-->

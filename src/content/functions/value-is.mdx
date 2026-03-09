@@ -60,3 +60,30 @@ in
 <!--output
 {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"},{"name":"IsNumber","type":"text"}],"rows":[{"Field":"OrderID","Value":"1","IsNumber":"true"},{"Field":"CustomerName","Value":"Alice","IsNumber":"false"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstRow",
+      "description": "Retrieves the first row of the Sales table as a record, giving access to all its field values.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "CheckOrderID",
+      "description": "Checks whether the OrderID field value is of type number — returns true because OrderID is 1 (a number).",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "CheckName",
+      "description": "Checks whether the CustomerName field value is of type number — returns false because \"Alice\" is text, not a number.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table comparing two fields from the first Sales row, showing their values and whether each is a number.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"},{"name":"IsNumber","type":"text"}],"rows":[{"Field":"OrderID","Value":"1","IsNumber":"true"},{"Field":"CustomerName","Value":"Alice","IsNumber":"false"}]}
+    }
+  ]
+}
+-->

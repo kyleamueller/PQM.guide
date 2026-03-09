@@ -52,3 +52,24 @@ in
 <!--output
 {"columns":[{"name":"TextPart","type":"text"},{"name":"NumberPart","type":"text"}],"rows":[{"TextPart":"WidgetA","NumberPart":"100"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "SplitFn",
+      "description": "Creates a splitter function that splits text at the boundary where letters transition to digits using Splitter.SplitTextByCharacterTransition.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Parts",
+      "description": "Applies the splitter to \"WidgetA100\", splitting at the letter-to-digit boundary to produce a two-element list: [\"WidgetA\", \"100\"].",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"WidgetA"},{"Value":"100"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table with the alphabetic prefix in TextPart and the numeric suffix in NumberPart.",
+      "output": {"columns":[{"name":"TextPart","type":"text"},{"name":"NumberPart","type":"text"}],"rows":[{"TextPart":"WidgetA","NumberPart":"100"}]}
+    }
+  ]
+}
+-->

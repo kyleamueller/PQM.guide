@@ -73,3 +73,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "StockLevels",
+      "description": "Defines a list of inventory stock quantities for each product.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":100},{"Value":0},{"Value":45},{"Value":230},{"Value":0}]}
+    },
+    {
+      "name": "HasOutOfStock",
+      "description": "The final output — checks whether any stock level equals zero, returning true because two products have no stock.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->

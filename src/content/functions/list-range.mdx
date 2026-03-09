@@ -55,3 +55,25 @@ in
 <!--output
 {"columns":[{"name":"ProductName","type":"text"}],"rows":[{"ProductName":"Gadget B"},{"ProductName":"Widget C"},{"ProductName":"Gadget D"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Names",
+      "description": "Extracts the ProductName column from the Products table as a list of all product name strings.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget A"},{"Value":"Gadget B"},{"Value":"Widget C"},{"Value":"Gadget D"},{"Value":"Thingamajig E"}]}
+    },
+    {
+      "name": "Subset",
+      "description": "Takes 3 items from Names starting at offset 1 (zero-based), returning the 2nd, 3rd, and 4th product names.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Gadget B"},{"Value":"Widget C"},{"Value":"Gadget D"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table of the 3 product names starting from offset 1.",
+      "output": {"columns":[{"name":"ProductName","type":"text"}],"rows":[{"ProductName":"Gadget B"},{"ProductName":"Widget C"},{"ProductName":"Gadget D"}]}
+    }
+  ]
+}
+-->

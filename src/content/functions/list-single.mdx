@@ -74,3 +74,24 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":9.99}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Creates an inline table with two columns (Product and Price) containing Widget and Gadget entries.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"Price","type":"number"}],"rows":[{"Product":"Widget","Price":9.99},{"Product":"Gadget","Price":24.99}]}
+    },
+    {
+      "name": "WidgetPrice",
+      "description": "Filters the Prices table to rows where Product equals \"Widget\", extracts the Price column as a list, and uses List.Single to assert exactly one match and return its scalar value.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":9.99}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the scalar price of the Widget product.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":9.99}]}
+    }
+  ]
+}
+-->

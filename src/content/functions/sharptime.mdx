@@ -69,6 +69,37 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{14, 30, 45}"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "t",
+      "description": "Constructs the time literal 14:30:45 using #time.",
+      "output": {"columns":[{"name":"Value","type":"time"}],"rows":[{"Value":"14:30:45"}]}
+    },
+    {
+      "name": "h",
+      "description": "Extracts the hour component from the time value using Time.Hour, returning 14.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":14}]}
+    },
+    {
+      "name": "m",
+      "description": "Extracts the minute component from the time value using Time.Minute, returning 30.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":30}]}
+    },
+    {
+      "name": "s",
+      "description": "Extracts the second component from the time value using Time.Second, returning 45.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":45}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list containing the hour, minute, and second values extracted from the time literal.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{14, 30, 45}"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Combine date and time into a datetime
 

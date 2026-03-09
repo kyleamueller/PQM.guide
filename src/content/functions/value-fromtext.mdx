@@ -62,3 +62,30 @@ in
 <!--output
 {"columns":[{"name":"InputText","type":"text"},{"name":"ParsedValue","type":"text"},{"name":"DetectedType","type":"text"}],"rows":[{"InputText":"42","ParsedValue":"42","DetectedType":"number"},{"InputText":"true","ParsedValue":"true","DetectedType":"logical"},{"InputText":"3.14","ParsedValue":"3.14","DetectedType":"number"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TextValues",
+      "description": "Defines a list of three text strings representing different value types: an integer, a boolean, and a decimal number.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"42"},{"Value":"true"},{"Value":"3.14"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Transforms each text string using Value.FromText, which automatically detects and converts each to its appropriate typed value (number, logical, number).",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":42},{"Value":true},{"Value":3.14}]}
+    },
+    {
+      "name": "TypeNames",
+      "description": "Inspects each parsed value using Value.Is checks to determine its detected type name as a text string.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"number"},{"Value":"logical"},{"Value":"number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table showing each input text string, its parsed value, and the detected type name.",
+      "output": {"columns":[{"name":"InputText","type":"text"},{"name":"ParsedValue","type":"text"},{"name":"DetectedType","type":"text"}],"rows":[{"InputText":"42","ParsedValue":"42","DetectedType":"number"},{"InputText":"true","ParsedValue":"true","DetectedType":"logical"},{"InputText":"3.14","ParsedValue":"3.14","DetectedType":"number"}]}
+    }
+  ]
+}
+-->

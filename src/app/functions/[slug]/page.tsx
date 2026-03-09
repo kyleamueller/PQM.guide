@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { getFunctionBySlug, getAllFunctionSlugs, buildSearchIndex } from "@/lib/mdx";
-import { PQTableData } from "@/lib/types";
+import { PQTableData, ExampleStep } from "@/lib/types";
 import FunctionHeader from "@/components/function-page/FunctionHeader";
 import SyntaxBlock from "@/components/function-page/SyntaxBlock";
 import ParametersTable from "@/components/function-page/ParametersTable";
@@ -46,6 +46,7 @@ function parseExamples(content: string) {
     code: string;
     inputTableRef?: string;
     outputTable?: PQTableData;
+    steps?: ExampleStep[];
   }> = [];
 
   const exampleRegex = /### Example \d+:\s*(.+?)(?:\n|\r\n)([\s\S]*?)(?=### Example \d+:|## |$)/g;
@@ -74,8 +75,19 @@ function parseExamples(content: string) {
       }
     }
 
+    const stepsMatch = body.match(/<!--steps\n([\s\S]*?)-->/);
+    let steps: ExampleStep[] | undefined;
+    if (stepsMatch) {
+      try {
+        const parsed = JSON.parse(stepsMatch[1]) as { steps: ExampleStep[] };
+        steps = parsed.steps;
+      } catch {
+        // skip malformed JSON
+      }
+    }
+
     if (code) {
-      examples.push({ title, description, code, inputTableRef, outputTable });
+      examples.push({ title, description, code, inputTableRef, outputTable, steps });
     }
   }
 
@@ -158,6 +170,7 @@ export default async function FunctionPage({ params }: PageProps) {
               code={ex.code}
               inputTableRef={ex.inputTableRef}
               outputTable={ex.outputTable}
+              steps={ex.steps}
             />
           ))}
         </section>

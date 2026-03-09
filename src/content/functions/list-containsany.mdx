@@ -54,3 +54,20 @@ in
 <!--output
 {"columns":[{"name":"HasGadgets","type":"logical"}],"rows":[{"HasGadgets":true}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Categories",
+      "description": "Extracts the distinct category values from the Sales table's Category column.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widgets"},{"Value":"Gadgets"},{"Value":"Misc"}]}
+    },
+    {
+      "name": "HasGadgets",
+      "description": "The final output — checks whether Categories contains either \"Gadgets\" or \"Electronics\"; returns true because \"Gadgets\" is present.",
+      "output": {"columns":[{"name":"HasGadgets","type":"logical"}],"rows":[{"HasGadgets":true}]}
+    }
+  ]
+}
+-->

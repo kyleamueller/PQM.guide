@@ -70,6 +70,28 @@ in
 {"columns":[{"name":"Region","type":"any"},{"name":"Cycle","type":"number"}],"rows":[{"Region":"East","Cycle":"0"},{"Region":"West","Cycle":"1"},{"Region":"North","Cycle":"2"},{"Region":"East","Cycle":"3"},{"Region":"West","Cycle":"4"},{"Region":"North","Cycle":"5"},{"Region":"East","Cycle":"6"},{"Region":"West","Cycle":"7"},{"Region":"North","Cycle":"8"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Regions",
+      "description": "Defines a table with 3 rows containing a single Region column with values East, West, and North.",
+      "output": {"columns":[{"name":"Region","type":"any"}],"rows":[{"Region":"East"},{"Region":"West"},{"Region":"North"}]}
+    },
+    {
+      "name": "Repeated",
+      "description": "Repeats the Regions table 3 times in sequence, producing a 9-row table with the original rows in block order.",
+      "output": {"columns":[{"name":"Region","type":"any"}],"rows":[{"Region":"East"},{"Region":"West"},{"Region":"North"},{"Region":"East"},{"Region":"West"},{"Region":"North"},{"Region":"East"},{"Region":"West"},{"Region":"North"}]}
+    },
+    {
+      "name": "WithIndex",
+      "description": "The final output — adds a zero-based integer Cycle index column to the repeated table, numbering each row from 0 to 8.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Cycle","type":"number"}],"rows":[{"Region":"East","Cycle":"0"},{"Region":"West","Cycle":"1"},{"Region":"North","Cycle":"2"},{"Region":"East","Cycle":"3"},{"Region":"West","Cycle":"4"},{"Region":"North","Cycle":"5"},{"Region":"East","Cycle":"6"},{"Region":"West","Cycle":"7"},{"Region":"North","Cycle":"8"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Confirm row count after repetition
 
 ```powerquery
@@ -85,4 +107,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"20"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Defines a table with 4 customer rows containing CustomerID and Name columns.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice"},{"CustomerID":"2","Name":"Bob"},{"CustomerID":"3","Name":"Charlie"},{"CustomerID":"4","Name":"Diana"}]}
+    },
+    {
+      "name": "Repeated",
+      "description": "Repeats the Customers table 5 times in sequence, producing a table with 20 rows (4 rows × 5 repetitions).",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice"},{"CustomerID":"2","Name":"Bob"},{"CustomerID":"3","Name":"Charlie"},{"CustomerID":"4","Name":"Diana"},{"CustomerID":"1","Name":"Alice"},{"CustomerID":"2","Name":"Bob"},{"CustomerID":"3","Name":"Charlie"},{"CustomerID":"4","Name":"Diana"},{"CustomerID":"1","Name":"Alice"},{"CustomerID":"2","Name":"Bob"},{"CustomerID":"3","Name":"Charlie"},{"CustomerID":"4","Name":"Diana"},{"CustomerID":"1","Name":"Alice"},{"CustomerID":"2","Name":"Bob"},{"CustomerID":"3","Name":"Charlie"},{"CustomerID":"4","Name":"Diana"},{"CustomerID":"1","Name":"Alice"},{"CustomerID":"2","Name":"Bob"},{"CustomerID":"3","Name":"Charlie"},{"CustomerID":"4","Name":"Diana"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns the total row count of the repeated table, confirming 20 rows (4 × 5).",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"20"}]}
+    }
+  ]
+}
 -->

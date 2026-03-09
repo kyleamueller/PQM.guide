@@ -79,3 +79,25 @@ in
 <!--output
 {"columns":[{"name":"A","type":"number"},{"name":"B","type":"number"},{"name":"C","type":"number"},{"name":"D","type":"number"},{"name":"FieldCount","type":"number"}],"rows":[{"A":1,"B":2,"C":3,"D":null,"FieldCount":3},{"A":1,"B":2,"C":3,"D":4,"FieldCount":4},{"A":1,"B":2,"C":null,"D":null,"FieldCount":2}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Data",
+      "description": "Creates a table from three records with varying numbers of fields; columns not present in a given record are filled with null.",
+      "output": {"columns":[{"name":"A","type":"number"},{"name":"B","type":"number"},{"name":"C","type":"number"},{"name":"D","type":"number"}],"rows":[{"A":1,"B":2,"C":3,"D":null},{"A":1,"B":2,"C":3,"D":4},{"A":1,"B":2,"C":null,"D":null}]}
+    },
+    {
+      "name": "WithCount",
+      "description": "Adds a FieldCount column to each row by counting the non-null fields in the original source record using Record.FieldCount.",
+      "output": {"columns":[{"name":"A","type":"number"},{"name":"B","type":"number"},{"name":"C","type":"number"},{"name":"D","type":"number"},{"name":"FieldCount","type":"number"}],"rows":[{"A":1,"B":2,"C":3,"D":null,"FieldCount":3},{"A":1,"B":2,"C":3,"D":4,"FieldCount":4},{"A":1,"B":2,"C":null,"D":null,"FieldCount":2}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table showing each row with its corresponding field count.",
+      "output": {"columns":[{"name":"A","type":"number"},{"name":"B","type":"number"},{"name":"C","type":"number"},{"name":"D","type":"number"},{"name":"FieldCount","type":"number"}],"rows":[{"A":1,"B":2,"C":3,"D":null,"FieldCount":3},{"A":1,"B":2,"C":3,"D":4,"FieldCount":4},{"A":1,"B":2,"C":null,"D":null,"FieldCount":2}]}
+    }
+  ]
+}
+-->

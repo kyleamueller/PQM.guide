@@ -71,6 +71,33 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice,Widget A\nBob,Gadget B\nCharlie,Widget C"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "source",
+      "description": "Defines a multi-line text string that contains empty lines between the data lines.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,Widget A\n\nBob,Gadget B\n\nCharlie,Widget C"}]}
+    },
+    {
+      "name": "lines",
+      "description": "Splits the source text into a list of individual lines, including the empty ones.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,Widget A"},{"Value":""},{"Value":"Bob,Gadget B"},{"Value":""},{"Value":"Charlie,Widget C"}]}
+    },
+    {
+      "name": "nonEmpty",
+      "description": "Filters out blank lines, keeping only lines that contain text.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,Widget A"},{"Value":"Bob,Gadget B"},{"Value":"Charlie,Widget C"}]}
+    },
+    {
+      "name": "result",
+      "description": "The final output — rejoins the non-empty lines into a clean multi-line text value.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice,Widget A\nBob,Gadget B\nCharlie,Widget C"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Reconstruct a modified text file
 
 Transform each line individually then reassemble — here, uppercasing the product name in each row.
@@ -88,4 +115,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice,WIDGET A\nBob,GADGET B\nCharlie,WIDGET C"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "lines",
+      "description": "Defines the starting list of three comma-separated lines with mixed-case product names.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,Widget A"},{"Value":"Bob,Gadget B"},{"Value":"Charlie,Widget C"}]}
+    },
+    {
+      "name": "transformed",
+      "description": "Transforms each line by keeping the name before the comma and uppercasing the product name after the comma.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,WIDGET A"},{"Value":"Bob,GADGET B"},{"Value":"Charlie,WIDGET C"}]}
+    },
+    {
+      "name": "result",
+      "description": "The final output — joins the transformed lines into a single multi-line text value.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice,WIDGET A\nBob,GADGET B\nCharlie,WIDGET C"}]}
+    }
+  ]
+}
 -->

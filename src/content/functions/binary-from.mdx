@@ -52,3 +52,29 @@ in
 <!--output
 {"columns":[{"name":"Input","type":"text"},{"name":"Base64","type":"text"}],"rows":[{"Input":"Hello, World!","Base64":"SGVsbG8sIFdvcmxkIQ=="}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TextValue",
+      "description": "Defines the literal text string \"Hello, World!\" as the input value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello, World!"}]}
+    },
+    {
+      "name": "AsBinary",
+      "description": "Converts the text string to its binary (UTF-8) representation using Binary.From.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsBase64",
+      "description": "Encodes the binary value as a Base64 text string using Binary.ToText with BinaryEncoding.Base64.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"SGVsbG8sIFdvcmxkIQ=="}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original text alongside its Base64-encoded form.",
+      "output": {"columns":[{"name":"Input","type":"text"},{"name":"Base64","type":"text"}],"rows":[{"Input":"Hello, World!","Base64":"SGVsbG8sIFdvcmxkIQ=="}]}
+    }
+  ]
+}
+-->

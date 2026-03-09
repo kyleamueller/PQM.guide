@@ -79,3 +79,30 @@ in
 <!--output
 {"columns":[{"name":"Description","type":"text"},{"name":"IsFunction","type":"logical"}],"rows":[{"Description":"type function (a as number, b as number) as number","IsFunction":true}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Signature",
+      "description": "Defines a function signature record with a number return type and two number parameters named a and b.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"ReturnType","Value":"type number"},{"Field":"Parameters","Value":"[{Name=\"a\", Type=type number}, {Name=\"b\", Type=type number}]"}]}
+    },
+    {
+      "name": "FnType",
+      "description": "Creates a function type from the signature with both parameters required (min = 2) using Type.ForFunction.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (a as number, b as number) as number"}]}
+    },
+    {
+      "name": "IsFunction",
+      "description": "Checks whether the constructed type is a function type using Type.Is, returning true.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents a table with a description of the function type and the IsFunction logical confirmation.",
+      "output": {"columns":[{"name":"Description","type":"text"},{"name":"IsFunction","type":"logical"}],"rows":[{"Description":"type function (a as number, b as number) as number","IsFunction":true}]}
+    }
+  ]
+}
+-->

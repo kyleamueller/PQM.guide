@@ -54,3 +54,29 @@ in
 <!--output
 {"columns":[{"name":"CombinedText","type":"text"}],"rows":[{"CombinedText":"Alice, Widget A, East"},{"CombinedText":"Bob, Gadget B, West"},{"CombinedText":"Charlie, Widget C, East"},{"CombinedText":"Alice, Gadget D, North"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Subset",
+      "description": "Selects the CustomerName, Product, and Region columns from the first 4 rows of the Sales table using Table.SelectColumns and Table.FirstN.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"East"},{"CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"CustomerName":"Alice","Product":"Gadget D","Region":"North"}]}
+    },
+    {
+      "name": "CombinerFn",
+      "description": "Creates a combiner function that joins list values with \", \" as the delimiter using Combiner.CombineTextByDelimiter.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"function"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Applies the combiner function to each row of the subset table using Table.ToList, producing a list of comma-separated strings.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice, Widget A, East"},{"Value":"Bob, Gadget B, West"},{"Value":"Charlie, Widget C, East"},{"Value":"Alice, Gadget D, North"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table where each row contains the combined comma-separated text for one Sales row.",
+      "output": {"columns":[{"name":"CombinedText","type":"text"}],"rows":[{"CombinedText":"Alice, Widget A, East"},{"CombinedText":"Bob, Gadget B, West"},{"CombinedText":"Charlie, Widget C, East"},{"CombinedText":"Alice, Gadget D, North"}]}
+    }
+  ]
+}
+-->

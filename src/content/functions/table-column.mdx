@@ -76,6 +76,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"16"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline table with OrderID, CustomerName, Product, Category, UnitPrice, Quantity, OrderDate, and Region columns for three orders.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"},{"name":"OrderDate","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4","OrderDate":"2024-01-15","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"2","OrderDate":"2024-01-18","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10","OrderDate":"2024-02-01","Region":"East"}]}
+    },
+    {
+      "name": "Quantities",
+      "description": "Extracts all values from the Quantity column of Sales as a list: {4, 2, 10}.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"4"},{"Value":"2"},{"Value":"10"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — sums the Quantities list to produce the total number of units ordered.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"16"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Get distinct customer names
 
@@ -92,4 +113,25 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Alice\", \"Bob\"}"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline table with OrderID, CustomerName, and Product columns for four orders, where Alice and Bob each appear twice.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Alice","Product":"Widget C"},{"OrderID":"4","CustomerName":"Bob","Product":"Gadget D"}]}
+    },
+    {
+      "name": "Names",
+      "description": "Extracts all values from the CustomerName column as a list, including duplicates: {\"Alice\", \"Bob\", \"Alice\", \"Bob\"}.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"Alice"},{"Value":"Bob"},{"Value":"Alice"},{"Value":"Bob"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes duplicates from the Names list, returning only the unique customer names.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Alice\", \"Bob\"}"}]}
+    }
+  ]
+}
 -->

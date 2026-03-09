@@ -53,3 +53,30 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Names",
+      "description": "Retrieves the column names of the Sales table as a list of text values.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"OrderID"},{"Value":"CustomerName"},{"Value":"Product"},{"Value":"Category"},{"Value":"UnitPrice"},{"Value":"Quantity"},{"Value":"OrderDate"},{"Value":"Region"}]}
+    },
+    {
+      "name": "Values",
+      "description": "Extracts the field values from the first row of the Sales table as a list.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":1},{"Value":"Alice"},{"Value":"Widget A"},{"Value":"Widgets"},{"Value":25},{"Value":4},{"Value":"2024-01-15"},{"Value":"East"}]}
+    },
+    {
+      "name": "NewRecord",
+      "description": "Constructs a record by pairing each value from the Values list with the corresponding name from the Names list.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the new record to a two-column Name/Value table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
+    }
+  ]
+}
+-->

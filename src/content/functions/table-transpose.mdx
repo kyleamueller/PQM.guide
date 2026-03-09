@@ -57,6 +57,28 @@ in
 {"columns":[{"name":"Metric","type":"any"},{"name":"Revenue","type":"any"},{"name":"Cost","type":"any"}],"rows":[{"Metric":"Jan","Revenue":"100","Cost":"50"},{"Metric":"Feb","Revenue":"200","Cost":"80"},{"Metric":"Mar","Revenue":"150","Cost":"60"},{"Metric":"Apr","Revenue":"300","Cost":"120"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a five-column table with a Metric column and one column per month (Jan–Apr), containing Revenue and Cost rows.",
+      "output": {"columns":[{"name":"Metric","type":"any"},{"name":"Jan","type":"any"},{"name":"Feb","type":"any"},{"name":"Mar","type":"any"},{"name":"Apr","type":"any"}],"rows":[{"Metric":"Revenue","Jan":100,"Feb":200,"Mar":150,"Apr":300},{"Metric":"Cost","Jan":50,"Feb":80,"Mar":60,"Apr":120}]}
+    },
+    {
+      "name": "Transposed",
+      "description": "Rotates the table 90 degrees so that original rows become columns and original columns become rows; column names become Column1–Column5 and the original header row is now the first data row.",
+      "output": {"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"},{"name":"Column3","type":"any"}],"rows":[{"Column1":"Metric","Column2":"Revenue","Column3":"Cost"},{"Column1":"Jan","Column2":100,"Column3":50},{"Column1":"Feb","Column2":200,"Column3":80},{"Column1":"Mar","Column2":150,"Column3":60},{"Column1":"Apr","Column2":300,"Column3":120}]}
+    },
+    {
+      "name": "Promoted",
+      "description": "The final output — promotes the first row (containing Metric, Revenue, Cost) to become the column headers, yielding a row-per-month layout.",
+      "output": {"columns":[{"name":"Metric","type":"any"},{"name":"Revenue","type":"any"},{"name":"Cost","type":"any"}],"rows":[{"Metric":"Jan","Revenue":"100","Cost":"50"},{"Metric":"Feb","Revenue":"200","Cost":"80"},{"Metric":"Mar","Revenue":"150","Cost":"60"},{"Metric":"Apr","Revenue":"300","Cost":"120"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Transpose Employees table and supply column names directly
 
 Provide the `columns` argument to name the output columns without needing `Table.PromoteHeaders`.
@@ -76,6 +98,23 @@ in
 {"columns":[{"name":"Field","type":"any"},{"name":"Employee1","type":"any"},{"name":"Employee2","type":"any"}],"rows":[{"Field":"EmployeeID","Employee1":"E001","Employee2":"E002"},{"Field":"FullName","Employee1":"alice smith","Employee2":"BOB JONES"},{"Field":"Department","Employee1":"Sales","Employee2":"Engineering"},{"Field":"Salary","Employee1":"55000","Employee2":"95000"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Subset",
+      "description": "Creates a four-column table with EmployeeID, FullName, Department, and Salary for two employees.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"},{"name":"Salary","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":55000},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":95000}]}
+    },
+    {
+      "name": "Transposed",
+      "description": "The final output — rotates the table and immediately names the output columns Field, Employee1, and Employee2 using the supplied columns argument, so no PromoteHeaders step is needed.",
+      "output": {"columns":[{"name":"Field","type":"any"},{"name":"Employee1","type":"any"},{"name":"Employee2","type":"any"}],"rows":[{"Field":"EmployeeID","Employee1":"E001","Employee2":"E002"},{"Field":"FullName","Employee1":"alice smith","Employee2":"BOB JONES"},{"Field":"Department","Employee1":"Sales","Employee2":"Engineering"},{"Field":"Salary","Employee1":"55000","Employee2":"95000"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Round-trip: demote headers, transpose, and promote to reshape a wide table
 
 ```powerquery
@@ -93,4 +132,31 @@ in
 
 <!--output
 {"columns":[{"name":"CustomerName","type":"any"},{"name":"Alice","type":"any"},{"name":"Bob","type":"any"}],"rows":[{"CustomerName":"Q1","Alice":"100","Bob":"80"},{"CustomerName":"Q2","Alice":"200","Bob":"120"},{"CustomerName":"Q3","Alice":"150","Bob":"90"},{"CustomerName":"Q4","Alice":"300","Bob":"160"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Wide",
+      "description": "Creates a five-column wide table with CustomerName and quarterly columns Q1–Q4 containing sales figures for Alice and Bob.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Q1","type":"any"},{"name":"Q2","type":"any"},{"name":"Q3","type":"any"},{"name":"Q4","type":"any"}],"rows":[{"CustomerName":"Alice","Q1":100,"Q2":200,"Q3":150,"Q4":300},{"CustomerName":"Bob","Q1":80,"Q2":120,"Q3":90,"Q4":160}]}
+    },
+    {
+      "name": "Demoted",
+      "description": "Moves the column headers (CustomerName, Q1–Q4) into the first data row, replacing them with generic names Column1–Column5, preparing the table for transposition.",
+      "output": {"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"},{"name":"Column3","type":"any"},{"name":"Column4","type":"any"},{"name":"Column5","type":"any"}],"rows":[{"Column1":"CustomerName","Column2":"Q1","Column3":"Q2","Column4":"Q3","Column5":"Q4"},{"Column1":"Alice","Column2":100,"Column3":200,"Column4":150,"Column5":300},{"Column1":"Bob","Column2":80,"Column3":120,"Column4":90,"Column5":160}]}
+    },
+    {
+      "name": "Transposed",
+      "description": "Rotates the demoted table so that the original rows (including the former header row) become columns, reshaping the wide format into a tall format.",
+      "output": {"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"},{"name":"Column3","type":"any"}],"rows":[{"Column1":"CustomerName","Column2":"Alice","Column3":"Bob"},{"Column1":"Q1","Column2":100,"Column3":80},{"Column1":"Q2","Column2":200,"Column3":120},{"Column1":"Q3","Column2":150,"Column3":90},{"Column1":"Q4","Column2":300,"Column3":160}]}
+    },
+    {
+      "name": "Promoted",
+      "description": "The final output — promotes the first row (CustomerName, Alice, Bob) into column headers, producing a table with one row per quarter and one column per customer.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Alice","type":"any"},{"name":"Bob","type":"any"}],"rows":[{"CustomerName":"Q1","Alice":"100","Bob":"80"},{"CustomerName":"Q2","Alice":"200","Bob":"120"},{"CustomerName":"Q3","Alice":"150","Bob":"90"},{"CustomerName":"Q4","Alice":"300","Bob":"160"}]}
+    }
+  ]
+}
 -->

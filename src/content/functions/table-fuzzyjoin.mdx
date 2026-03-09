@@ -87,6 +87,27 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","Name":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","Name":"Bob","City":"Chicago","State":"IL"},{"OrderID":"3","CustomerName":"Charlie","Amount":"300","Name":"Charlie","City":"Houston","State":"TX"},{"OrderID":"4","CustomerName":"Dianah","Amount":"150","Name":"Diana","City":"Seattle","State":"WA"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "SalesWithTypos",
+      "description": "Defines an inline orders table with four rows where customer names contain typos (Alise, Bobb, Dianah) alongside their order amounts.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180"},{"OrderID":"3","CustomerName":"Charlie","Amount":"300"},{"OrderID":"4","CustomerName":"Dianah","Amount":"150"}]}
+    },
+    {
+      "name": "Customers",
+      "description": "Defines a canonical Customers lookup table with correctly spelled names, cities, and states.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"Name":"Alice","City":"New York","State":"NY"},{"Name":"Bob","City":"Chicago","State":"IL"},{"Name":"Charlie","City":"Houston","State":"TX"},{"Name":"Diana","City":"Seattle","State":"WA"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FuzzyJoin matches each misspelled CustomerName to the closest canonical Name using a 0.75 similarity threshold, producing a flat joined table with city and state resolved.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","Name":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","Name":"Bob","City":"Chicago","State":"IL"},{"OrderID":"3","CustomerName":"Charlie","Amount":"300","Name":"Charlie","City":"Houston","State":"TX"},{"OrderID":"4","CustomerName":"Dianah","Amount":"150","Name":"Diana","City":"Seattle","State":"WA"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Use a TransformationTable to handle known aliases
 
@@ -108,6 +129,32 @@ in
 
 <!--output
 {"columns":[{"name":"CustomerRef","type":"any"},{"name":"Total","type":"any"},{"name":"Name","type":"any"}],"rows":[{"CustomerRef":"Al","Total":"500","Name":"Alice"},{"CustomerRef":"Robbie","Total":"200","Name":"Bob"},{"CustomerRef":"Diane","Total":"350","Name":"Diana"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines an inline Orders table with three rows using informal customer reference names (Al, Robbie, Diane) and their totals.",
+      "output": {"columns":[{"name":"CustomerRef","type":"any"},{"name":"Total","type":"any"}],"rows":[{"CustomerRef":"Al","Total":"500"},{"CustomerRef":"Robbie","Total":"200"},{"CustomerRef":"Diane","Total":"350"}]}
+    },
+    {
+      "name": "Customers",
+      "description": "Defines a canonical Customers lookup table with three canonical names: Alice, Bob, Diana.",
+      "output": {"columns":[{"name":"Name","type":"any"}],"rows":[{"Name":"Alice"},{"Name":"Bob"},{"Name":"Diana"}]}
+    },
+    {
+      "name": "Mapping",
+      "description": "Defines a TransformationTable that explicitly maps each informal alias to its canonical name before fuzzy scoring is applied.",
+      "output": {"columns":[{"name":"From","type":"any"},{"name":"To","type":"any"}],"rows":[{"From":"Al","To":"Alice"},{"From":"Robbie","To":"Bob"},{"From":"Diane","To":"Diana"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FuzzyJoin applies the TransformationTable mappings first, then resolves each CustomerRef to a canonical Name with a left outer join.",
+      "output": {"columns":[{"name":"CustomerRef","type":"any"},{"name":"Total","type":"any"},{"name":"Name","type":"any"}],"rows":[{"CustomerRef":"Al","Total":"500","Name":"Alice"},{"CustomerRef":"Robbie","Total":"200","Name":"Bob"},{"CustomerRef":"Diane","Total":"350","Name":"Diana"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Limit to one match per left row with NumberOfMatches

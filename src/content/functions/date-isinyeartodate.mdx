@@ -91,3 +91,24 @@ in
 <!--output
 {"columns":[{"name":"Metric","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Metric":"YTD Revenue","Value":100}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "YTDSales",
+      "description": "Filters the Sales table using Table.SelectRows to keep only rows where OrderDate passes Date.IsInYearToDate, producing a table of year-to-date orders.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10"},{"OrderID":40,"OrderDate":"2026-02-20"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+    },
+    {
+      "name": "TotalRevenue",
+      "description": "Adds a Revenue column (UnitPrice * Quantity) to YTDSales using Table.AddColumn, then sums it with List.Sum to produce a single total revenue number.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":100}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table labeling the YTD revenue total.",
+      "output": {"columns":[{"name":"Metric","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Metric":"YTD Revenue","Value":100}]}
+    }
+  ]
+}
+-->

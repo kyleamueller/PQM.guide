@@ -69,3 +69,30 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":750}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Lookups",
+      "description": "Defines a list of 5 lookup results containing 3 numeric values and 2 nulls representing unmatched rows.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":100},{"Value":null},{"Value":250},{"Value":null},{"Value":400}]}
+    },
+    {
+      "name": "CleanValues",
+      "description": "Removes the 2 null values from Lookups, leaving only the 3 valid numbers: 100, 250, and 400.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":100},{"Value":250},{"Value":400}]}
+    },
+    {
+      "name": "Total",
+      "description": "Sums all values in CleanValues, returning 750 (100 + 250 + 400).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":750}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the sum of the non-null lookup values.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":750}]}
+    }
+  ]
+}
+-->

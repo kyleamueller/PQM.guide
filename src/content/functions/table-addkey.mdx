@@ -58,6 +58,22 @@ in
 <!--output
 {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Constructs a 4-row table with CustomerID, Name, and City columns using #table.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":1,"Name":"Alice","City":"New York"},{"CustomerID":2,"Name":"Bob","City":"Chicago"},{"CustomerID":3,"Name":"Charlie","City":"Houston"},{"CustomerID":4,"Name":"Diana","City":"Seattle"}]}
+    },
+    {
+      "name": "WithKey",
+      "description": "The final output — the same table with CustomerID declared as a primary key in its type metadata using Table.AddKey.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Declare a composite primary key on a fact table
 
@@ -77,6 +93,22 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Quantity":"10"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Constructs a 3-row fact table with OrderID, CustomerName, Product, and Quantity columns using #table.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Quantity":4},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Quantity":2},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Quantity":10}]}
+    },
+    {
+      "name": "WithKey",
+      "description": "The final output — the same table with OrderID declared as a primary key in its type metadata using Table.AddKey.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Quantity":"10"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Verify key metadata with Table.Keys
 
@@ -92,4 +124,25 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ProductID\"}, Primary = true]}"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Constructs a 2-row table with ProductID and ProductName columns using #table.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"}],"rows":[{"ProductID":1,"ProductName":"Widget A"},{"ProductID":2,"ProductName":"Gadget B"}]}
+    },
+    {
+      "name": "WithKey",
+      "description": "Annotates the table with ProductID declared as a primary key in its type metadata using Table.AddKey.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"}],"rows":[{"ProductID":1,"ProductName":"Widget A"},{"ProductID":2,"ProductName":"Gadget B"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — reads back the key definitions from WithKey using Table.Keys, returning a list showing the declared primary key on ProductID.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ProductID\"}, Primary = true]}"}]}
+    }
+  ]
+}
 -->

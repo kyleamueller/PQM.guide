@@ -46,6 +46,27 @@ in
 <!--output
 {"columns":[{"name":"IsEmpty","type":"logical"}],"rows":[{"IsEmpty":true}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Filtered",
+      "description": "Filters the Sales table to rows where Region equals \"South\", which matches no rows in the sample data, producing an empty table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "IsEmpty",
+      "description": "Calls Table.IsEmpty on the filtered table, returning true because the table contains zero rows.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the IsEmpty logical value in a single-row table for display, showing true to confirm no South-region orders exist.",
+      "output": {"columns":[{"name":"IsEmpty","type":"logical"}],"rows":[{"IsEmpty":true}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Check a non-empty table
 

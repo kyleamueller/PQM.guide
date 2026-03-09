@@ -75,6 +75,23 @@ in
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RT",
+      "description": "Constructs a closed record type with a required Name (text) field using Type.ForRecord.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [Name = text]"}]}
+    },
+    {
+      "name": "Fields",
+      "description": "The final output — retrieves the field descriptors from the record type using Type.RecordFields, then reads the Type property of the Name field to confirm it is type text.",
+      "output": {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Check whether the Age field is declared optional
 
 ```powerquery
@@ -93,4 +110,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RT",
+      "description": "Constructs a closed record type with a required Name (text) field and an optional Age (number) field using Type.ForRecord.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [Name = text, Age = (optional number)]"}]}
+    },
+    {
+      "name": "Fields",
+      "description": "The final output — retrieves the field descriptors from the record type using Type.RecordFields, then reads the Optional flag of the Age field to confirm it is true.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
 -->

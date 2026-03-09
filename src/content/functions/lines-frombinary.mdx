@@ -66,3 +66,25 @@ in
 <!--output
 {"columns":[{"name":"LineNumber","type":"number"},{"name":"Text","type":"text"}],"rows":[{"LineNumber":1,"Text":"Line 1"},{"LineNumber":2,"Text":"Line 2"},{"LineNumber":3,"Text":"Line 3"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Converts the text string \"Line 1\\nLine 2\\nLine 3\" into a binary value using Binary.From, simulating file content read from disk.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Binary]"}]}
+    },
+    {
+      "name": "Lines",
+      "description": "Splits the binary content into a list of three text values by breaking on the line-feed characters using Lines.FromBinary.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Line 1"},{"Value":"Line 2"},{"Value":"Line 3"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a three-row table with a LineNumber column (1-based index) and a Text column containing each line's content.",
+      "output": {"columns":[{"name":"LineNumber","type":"number"},{"name":"Text","type":"text"}],"rows":[{"LineNumber":1,"Text":"Line 1"},{"LineNumber":2,"Text":"Line 2"},{"LineNumber":3,"Text":"Line 3"}]}
+    }
+  ]
+}
+-->

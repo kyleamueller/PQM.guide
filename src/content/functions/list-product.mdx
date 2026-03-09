@@ -65,6 +65,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.1940588}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "GrowthRates",
+      "description": "Defines a list of four annual growth factors representing 5%, 3%, 8%, and 2% growth respectively.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1.05},{"Value":1.03},{"Value":1.08},{"Value":1.02}]}
+    },
+    {
+      "name": "CumulativeGrowth",
+      "description": "Multiplies all growth factors together to compute the total compounded growth over 4 years (1.05 × 1.03 × 1.08 × 1.02 ≈ 1.1940588).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1.1940588}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the cumulative growth factor after applying all four annual rates.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.1940588}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Product with a zero
 
 ```powerquery

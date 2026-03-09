@@ -92,3 +92,24 @@ in
 <!--output
 {"columns":[{"name":"ProductName","type":"any"},{"name":"Price","type":"any"},{"name":"PriceWithTax","type":"any"}],"rows":[{"ProductName":"Widget A","Price":"25","PriceWithTax":"27.5"},{"ProductName":"Gadget B","Price":"50","PriceWithTax":"55"},{"ProductName":"Widget C","Price":"15","PriceWithTax":"16.5"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines an inline Products table with ProductName and Price columns for three products.",
+      "output": {"columns":[{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductName":"Widget A","Price":"25"},{"ProductName":"Gadget B","Price":"50"},{"ProductName":"Widget C","Price":"15"}]}
+    },
+    {
+      "name": "Rows",
+      "description": "Uses List.Transform to iterate over each row of Products and produce a new three-element list per row: the product name, the original price, and the price multiplied by 1.1 for tax.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"{\"Widget A\", 25, 27.5}"},{"Value":"{\"Gadget B\", 50, 55}"},{"Value":"{\"Widget C\", 15, 16.5}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FromRows converts the list of row lists into a three-column table with ProductName, Price, and PriceWithTax columns.",
+      "output": {"columns":[{"name":"ProductName","type":"any"},{"name":"Price","type":"any"},{"name":"PriceWithTax","type":"any"}],"rows":[{"ProductName":"Widget A","Price":"25","PriceWithTax":"27.5"},{"ProductName":"Gadget B","Price":"50","PriceWithTax":"55"},{"ProductName":"Widget C","Price":"15","PriceWithTax":"16.5"}]}
+    }
+  ]
+}
+-->

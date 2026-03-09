@@ -73,3 +73,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Electronics"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Categories",
+      "description": "Defines a list of category strings, with \"Electronics\" appearing three times, \"Clothing\" twice, and \"Books\" once.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Electronics"},{"Value":"Clothing"},{"Value":"Electronics"},{"Value":"Books"},{"Value":"Clothing"},{"Value":"Electronics"}]}
+    },
+    {
+      "name": "MostCommon",
+      "description": "The final output — returns the most frequently occurring value in the Categories list, which is \"Electronics\" with 3 occurrences.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Electronics"}]}
+    }
+  ]
+}
+-->

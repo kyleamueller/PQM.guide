@@ -56,6 +56,28 @@ in
 {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Salary":"0"},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":"72000"},{"EmployeeID":"E006","FullName":"frank lee","Salary":"0"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Defines a table with 4 employees where the Salary column contains text values including non-numeric strings \"N/A\" and \"unknown\".",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"text"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Salary":"N/A"},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":"72000"},{"EmployeeID":"E006","FullName":"frank lee","Salary":"unknown"}]}
+    },
+    {
+      "name": "Typed",
+      "description": "Attempts to convert the Salary column to type number — rows with non-numeric values (\"N/A\" and \"unknown\") produce error values in that column.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Salary":"[Error]"},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":"72000"},{"EmployeeID":"E006","FullName":"frank lee","Salary":"[Error]"}]}
+    },
+    {
+      "name": "Cleaned",
+      "description": "The final output — replaces all error values in the Salary column with 0, producing a clean numeric column with no errors.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Salary":"0"},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":"72000"},{"EmployeeID":"E006","FullName":"frank lee","Salary":"0"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Replace errors across multiple columns simultaneously
 
 ```powerquery

@@ -51,3 +51,29 @@ in
 <!--output
 {"columns":[{"name":"Formatted","type":"text"}],"rows":[{"Formatted":"Widget A | Widgets -> East"},{"Formatted":"Gadget B | Gadgets -> West"},{"Formatted":"Widget C | Widgets -> East"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Subset",
+      "description": "Selects the Product, Category, and Region columns from the first 3 rows of the Sales table using Table.SelectColumns and Table.FirstN.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"Region","type":"text"}],"rows":[{"Product":"Widget A","Category":"Widgets","Region":"East"},{"Product":"Gadget B","Category":"Gadgets","Region":"West"},{"Product":"Widget C","Category":"Widgets","Region":"East"}]}
+    },
+    {
+      "name": "CombinerFn",
+      "description": "Creates a combiner function using Combiner.CombineTextByEachDelimiter with \" | \" between positions 1–2 and \" -> \" between positions 2–3.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"function"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Applies the positional combiner to each row using Table.ToList, producing a list of formatted strings with different delimiters at each join.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget A | Widgets -> East"},{"Value":"Gadget B | Gadgets -> West"},{"Value":"Widget C | Widgets -> East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table of formatted strings combining Product, Category, and Region with positional delimiters.",
+      "output": {"columns":[{"name":"Formatted","type":"text"}],"rows":[{"Formatted":"Widget A | Widgets -> East"},{"Formatted":"Gadget B | Gadgets -> West"},{"Formatted":"Widget C | Widgets -> East"}]}
+    }
+  ]
+}
+-->

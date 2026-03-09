@@ -54,3 +54,24 @@ in
 <!--output
 {"columns":[{"name":"Part1","type":"text"},{"name":"Part2","type":"text"},{"name":"Part3","type":"text"}],"rows":[{"Part1":"555","Part2":"867","Part3":"5309"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "SplitFn",
+      "description": "Creates a splitter function that splits text at any occurrence of \"-\" or \".\" using Splitter.SplitTextByAnyDelimiter.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "PhoneParts",
+      "description": "Applies the splitter to \"555-867-5309\", splitting on each dash to produce a three-element list of phone segments.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"555"},{"Value":"867"},{"Value":"5309"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table with the three phone segments placed into Part1, Part2, and Part3 columns.",
+      "output": {"columns":[{"name":"Part1","type":"text"},{"name":"Part2","type":"text"},{"name":"Part3","type":"text"}],"rows":[{"Part1":"555","Part2":"867","Part3":"5309"}]}
+    }
+  ]
+}
+-->

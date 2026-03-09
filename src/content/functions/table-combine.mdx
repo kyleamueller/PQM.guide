@@ -54,3 +54,24 @@ in
 <!--output
 {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A"},{"CustomerName":"Bob","Product":"Gadget B"},{"CustomerName":"Charlie","Product":"Widget C"},{"CustomerName":"Bob","Product":"Thingamajig E"},{"CustomerName":"Charlie","Product":"Gadget B"},{"CustomerName":"Diana","Product":"Widget C"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstPart",
+      "description": "Takes the first 3 rows of Sales and keeps only CustomerName and Product columns.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A"},{"CustomerName":"Bob","Product":"Gadget B"},{"CustomerName":"Charlie","Product":"Widget C"}]}
+    },
+    {
+      "name": "LastPart",
+      "description": "Takes the last 3 rows of Sales and keeps only CustomerName and Product columns.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"CustomerName":"Bob","Product":"Thingamajig E"},{"CustomerName":"Charlie","Product":"Gadget B"},{"CustomerName":"Diana","Product":"Widget C"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — stacks FirstPart and LastPart into a single table with all 6 rows.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A"},{"CustomerName":"Bob","Product":"Gadget B"},{"CustomerName":"Charlie","Product":"Widget C"},{"CustomerName":"Bob","Product":"Thingamajig E"},{"CustomerName":"Charlie","Product":"Gadget B"},{"CustomerName":"Diana","Product":"Widget C"}]}
+    }
+  ]
+}
+-->

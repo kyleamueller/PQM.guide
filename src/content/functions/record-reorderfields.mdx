@@ -88,3 +88,25 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Row",
+      "description": "Retrieves the first row of the Sales table as a record with all eight fields in their original order.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "Reordered",
+      "description": "Reorders the record so that OrderID, CustomerName, and Product appear first, with all remaining fields following in their original order.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the reordered record to a two-column Name/Value table showing the new field order.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
+    }
+  ]
+}
+-->

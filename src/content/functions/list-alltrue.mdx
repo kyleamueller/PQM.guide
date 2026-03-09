@@ -74,3 +74,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline table with OrderID and UnitPrice columns for four orders.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25},{"OrderID":2,"UnitPrice":50},{"OrderID":3,"UnitPrice":15},{"OrderID":4,"UnitPrice":75}]}
+    },
+    {
+      "name": "Prices",
+      "description": "Extracts the UnitPrice column as a list of numeric values.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":25},{"Value":50},{"Value":15},{"Value":75}]}
+    },
+    {
+      "name": "AllPositive",
+      "description": "The final output — transforms each price into a true/false check for being greater than zero, then confirms all results are true.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->

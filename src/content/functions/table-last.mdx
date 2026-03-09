@@ -58,6 +58,28 @@ in
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 8, CustomerName = \"Diana\", Product = \"Widget C\", UnitPrice = 15, OrderDate = #date(2024,4,15)]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 4 orders including OrderID, CustomerName, Product, UnitPrice, and OrderDate columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","OrderDate":"2024-01-15"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","OrderDate":"2024-01-18"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","OrderDate":"2024-02-01"},{"OrderID":"8","CustomerName":"Diana","Product":"Widget C","UnitPrice":"15","OrderDate":"2024-04-15"}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the Sales table by OrderDate in ascending order, placing the most recent order last.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","OrderDate":"2024-01-15"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","OrderDate":"2024-01-18"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","OrderDate":"2024-02-01"},{"OrderID":"8","CustomerName":"Diana","Product":"Widget C","UnitPrice":"15","OrderDate":"2024-04-15"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns the last row of the sorted table as a record, which is the most recent order (Diana, 2024-04-15).",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 8, CustomerName = \"Diana\", Product = \"Widget C\", UnitPrice = 15, OrderDate = #date(2024,4,15)]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Extract the latest order date as a scalar
 
 ```powerquery
@@ -75,6 +97,28 @@ in
 {"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-04-15"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 3 orders including OrderID, CustomerName, and OrderDate columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","OrderDate":"2024-01-15"},{"OrderID":"2","CustomerName":"Bob","OrderDate":"2024-01-18"},{"OrderID":"8","CustomerName":"Diana","OrderDate":"2024-04-15"}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the Sales table by OrderDate in ascending order, placing the most recent order last.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","OrderDate":"2024-01-15"},{"OrderID":"2","CustomerName":"Bob","OrderDate":"2024-01-18"},{"OrderID":"8","CustomerName":"Diana","OrderDate":"2024-04-15"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns the OrderDate field from the last row of the sorted table, yielding the latest order date as a scalar.",
+      "output": {"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-04-15"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Return a safe default for an empty table
 
 ```powerquery
@@ -90,4 +134,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"None\", Region = \"N/A\"]"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 2 orders including OrderID, CustomerName, and Region columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Region":"West"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters Sales to keep only rows where Region equals \"South\", producing an empty table since no South orders exist.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — since the filtered table is empty, Table.Last returns the provided default record instead of null.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"None\", Region = \"N/A\"]"}]}
+    }
+  ]
+}
 -->

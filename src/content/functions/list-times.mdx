@@ -76,3 +76,24 @@ in
 <!--output
 {"columns":[{"name":"Hour","type":"time"}],"rows":[{"Hour":"0:00:00"},{"Hour":"1:00:00"},{"Hour":"2:00:00"},{"Hour":"..."}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Times",
+      "description": "Generates a list of 24 time values starting at midnight (0:00:00) and incrementing by 1 hour, covering every hour of the day.",
+      "output": {"columns":[{"name":"Value","type":"time"}],"rows":[{"Value":"0:00:00"},{"Value":"1:00:00"},{"Value":"2:00:00"},{"Value":"..."},{"Value":"23:00:00"}]}
+    },
+    {
+      "name": "TimeTable",
+      "description": "Converts the Times list into a single-column table named \"Hour\" using Table.FromList with no splitting, making it suitable for use as a dimension table.",
+      "output": {"columns":[{"name":"Hour","type":"time"}],"rows":[{"Hour":"0:00:00"},{"Hour":"1:00:00"},{"Hour":"2:00:00"},{"Hour":"..."}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a 24-row table with one Hour column listing each hour of the day from 0:00:00 to 23:00:00.",
+      "output": {"columns":[{"name":"Hour","type":"time"}],"rows":[{"Hour":"0:00:00"},{"Hour":"1:00:00"},{"Hour":"2:00:00"},{"Hour":"..."}]}
+    }
+  ]
+}
+-->

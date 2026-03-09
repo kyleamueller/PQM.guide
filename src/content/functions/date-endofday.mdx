@@ -89,3 +89,29 @@ in
 <!--output
 {"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L002","OrderID":1,"Action":"Shipped","Timestamp":"2024-01-16T14:15:00","DurationMinutes":1725,"Notes":"Shipped via express"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TargetDate",
+      "description": "Defines the target date as January 16, 2024 using a date literal.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-16"}]}
+    },
+    {
+      "name": "RangeStart",
+      "description": "Calls Date.StartOfDay on TargetDate to produce the lower bound datetime of midnight on January 16, 2024.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-16T00:00:00"}]}
+    },
+    {
+      "name": "RangeEnd",
+      "description": "Calls Date.EndOfDay on TargetDate to produce the upper bound datetime of 23:59:59.9999999 on January 16, 2024.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-16T23:59:59.9999999"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — filters the OrderLog table to rows whose Timestamp falls on January 16, 2024.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L002","OrderID":1,"Action":"Shipped","Timestamp":"2024-01-16T14:15:00","DurationMinutes":1725,"Notes":"Shipped via express"}]}
+    }
+  ]
+}
+-->

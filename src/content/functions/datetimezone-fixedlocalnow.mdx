@@ -47,6 +47,32 @@ in
 <!--output
 {"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HoursSince","type":"number"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00","HoursSince":18805.5},{"EventID":2,"EventTime":"2024-03-01T14:00:00","HoursSince":17694.0}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Now",
+      "description": "Calls DateTimeZone.FixedLocalNow() once to capture a stable timezone-aware timestamp for the entire query evaluation.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2026-03-08T10:00:00-06:00"}]}
+    },
+    {
+      "name": "Source",
+      "description": "Selects the EventID and EventTime columns from the first 4 rows of the Events table using Table.SelectColumns and Table.FirstN.",
+      "output": {"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00"},{"EventID":2,"EventTime":"2024-03-01T14:00:00"}]}
+    },
+    {
+      "name": "WithElapsed",
+      "description": "Adds a HoursSince column to Source by stripping the zone from Now with DateTimeZone.RemoveZone and computing Duration.TotalHours against each EventTime.",
+      "output": {"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HoursSince","type":"number"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00","HoursSince":18805.5},{"EventID":2,"EventTime":"2024-03-01T14:00:00","HoursSince":17694.0}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the WithElapsed table showing each event's elapsed hours since occurrence, computed from a single fixed local timestamp.",
+      "output": {"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HoursSince","type":"number"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00","HoursSince":18805.5},{"EventID":2,"EventTime":"2024-03-01T14:00:00","HoursSince":17694.0}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Return the fixed local now with timezone
 

@@ -62,6 +62,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "ch",
+      "description": "Defines the single character \"7\" as the input to classify.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"7"}]}
+    },
+    {
+      "name": "code",
+      "description": "Gets the Unicode code point for \"7\" using Character.ToNumber, which returns 55.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":55}]}
+    },
+    {
+      "name": "isDigit",
+      "description": "Tests whether the code point (55) falls within the digit range 48–57, returning true.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a logical true, confirming that \"7\" is a digit character.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Get code points for each character in a string
 
