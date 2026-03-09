@@ -1,0 +1,236 @@
+---
+title: "Null-Safe Operations"
+slug: "null-safe-operations"
+description: "Understand how null propagates silently through M expressions and learn the standard patterns for defaulting, filtering, and intentionally preserving null values."
+difficulty: "beginner"
+relatedFunctions:
+  - "table-filldown"
+  - "table-fillup"
+  - "list-removenulls"
+  - "record-fieldordefault"
+  - "table-selectrows"
+relatedConcepts:
+  - "null-handling"
+  - "error-handling"
+  - "m-paradigm"
+---
+
+### The Problem
+
+In most languages a null value causes a visible crash. In M it causes something subtler: null propagates silently through most operations without raising an error. The result is that a single unexpected null early in a calculation can silently poison every downstream value, producing a column of nulls that is easy to overlook until the report reaches a stakeholder.
+
+```powerquery
+// None of these raise an error — they all return null
+1 + null,           // null
+"hello" & null,     // null
+Text.Upper(null),   // null
+Number.Round(null, 2)  // null
+```
+
+Understanding when M propagates null, when it errors, and how to handle each case is one of the most practically useful skills in Power Query authoring.
+
+### Null Coalescing with ??
+
+The `??` operator returns the left operand if it is not null, and the right operand otherwise. It is the primary tool for replacing null with a safe default.
+
+```powerquery
+let
+    MaybeNull = null,
+    Safe = MaybeNull ?? 0        // returns 0
+in
+    Safe
+```
+
+`??` short-circuits: the right side is only evaluated if the left side is null. This makes it safe to put a function call on the right without worrying about unnecessary computation.
+
+```powerquery
+// Only calls the expensive function when Value is null
+Value ?? SomeExpensiveDefault()
+```
+
+You can chain `??` for multiple fallbacks:
+
+```powerquery
+FirstChoice ?? SecondChoice ?? "final fallback"
+```
+
+### Null-Safe Arithmetic
+
+Any arithmetic expression involving null returns null. This is the most common source of silent data loss in calculated columns.
+
+```powerquery
+// All return null, not an error
+null + 5,
+null * 100,
+10 / null
+```
+
+Apply `?? 0` before arithmetic when null should be treated as zero:
+
+```powerquery
+let
+    Source = #table({"Revenue", "Cost"}, {{1000, null}, {800, 200}, {null, 150}}),
+    WithMargin = Table.AddColumn(Source, "Margin",
+        each ([Revenue] ?? 0) - ([Cost] ?? 0),
+        type number
+    )
+in
+    WithMargin
+```
+
+Be deliberate about the default. `?? 0` is right for additive quantities like revenue. For a ratio it may be wrong — dividing by zero is still an error in M, and null in a denominator might warrant a separate guard:
+
+```powerquery
+each if [Units] = null or [Units] = 0
+     then null
+     else [Revenue] / [Units]
+```
+
+### Null-Safe Text Operations
+
+Text functions follow the same propagation rule: a null input returns null output with no error.
+
+```powerquery
+Text.Upper(null),       // null
+Text.Trim(null),        // null
+Text.Length(null)       // null
+```
+
+Guard with `?? ""` when you need to treat null as an empty string:
+
+```powerquery
+let
+    Source = #table({"FirstName", "LastName"}, {{"Anna", null}, {null, "Smith"}}),
+    WithFullName = Table.AddColumn(Source, "FullName",
+        each Text.Trim(([FirstName] ?? "") & " " & ([LastName] ?? "")),
+        type text
+    )
+in
+    WithFullName
+```
+
+Note that `Text.Trim` on the outside cleans up the extra space that appears when one side is null and produces an empty string.
+
+### Null-Safe Record Access
+
+Accessing a field that does not exist in a record with `record[FieldName]` raises an error — it does not return null. This is different from a field that exists with a null value, which returns null normally.
+
+```powerquery
+let
+    R = [name = "Contoso"],
+    Safe   = Record.FieldOrDefault(R, "region", "Unknown"),  // "Unknown"
+    Exists = Record.FieldOrDefault(R, "name", "Unknown")     // "Contoso"
+in
+    Safe
+```
+
+`Record.FieldOrDefault` always succeeds: if the field is present it returns its value (including null if that is the stored value); if the field is absent it returns the supplied default.
+
+Use this pattern when processing records from JSON APIs where schema is inconsistent across rows:
+
+```powerquery
+Table.AddColumn(Source, "Region",
+    each Record.FieldOrDefault([APIRecord], "region", "Unknown"),
+    type text
+)
+```
+
+### Filtering Out Nulls
+
+**From a list**, use `List.RemoveNulls`:
+
+```powerquery
+List.RemoveNulls({1, null, 3, null, 5})   // {1, 3, 5}
+```
+
+This is useful before aggregation functions that include null in their output when the list is entirely null, and before `List.Distinct` or sorting operations where null can produce unexpected ordering.
+
+**From a table**, use `Table.SelectRows` with an explicit null check:
+
+```powerquery
+Table.SelectRows(Source, each [Revenue] <> null)
+```
+
+Note that `[Revenue] <> null` evaluates to `true` when Revenue has a non-null value. In M, `null <> null` returns `null` (not `true` or `false`), which `Table.SelectRows` treats as a non-match, effectively filtering that row out. This is correct behaviour for filtering, but it means you cannot test null equality with `=` — always use `<> null` or `= null` with awareness that the result is itself nullable.
+
+A safer idiom when you want to be explicit:
+
+```powerquery
+Table.SelectRows(Source, each [Revenue] <> null and [Revenue] > 0)
+```
+
+### Null vs. Missing: Two Different Error Modes
+
+A common point of confusion is the difference between a field whose value is null and a field that does not exist at all.
+
+```powerquery
+let
+    R = [name = "Contoso", region = null]
+in
+    // Field exists, value is null — returns null, no error
+    R[region],
+
+    // Field does not exist — raises Expression.Error
+    R[country]
+```
+
+This distinction matters most when working with JSON from APIs. A response might omit a key entirely for some records while including it with a null value for others. Both look the same in a Power Query column, but they have different origins and may need different handling:
+
+- **Field present, value null**: the API knows about the field and explicitly says "no value"
+- **Field absent**: the API does not include the field for this record at all (often because the feature does not apply)
+
+Use `Record.HasFields` to distinguish them when the difference is meaningful:
+
+```powerquery
+each if Record.HasFields([RawRecord], "discountCode")
+     then [RawRecord][discountCode]    // might still be null
+     else "not applicable"
+```
+
+### Forward-Filling Nulls in Sorted Data
+
+A common data cleaning problem is a column where a value is only written in the first row of each group, leaving nulls in subsequent rows. `Table.FillDown` propagates the last non-null value downward.
+
+```powerquery
+let
+    Source = #table(
+        {"Category", "Product"},
+        {{"Beverages", "Coffee"}, {null, "Tea"}, {null, "Juice"}, {"Snacks", "Chips"}, {null, "Nuts"}}
+    ),
+    Filled = Table.FillDown(Source, {"Category"})
+in
+    Filled
+```
+
+Result:
+
+| Category | Product |
+|---|---|
+| Beverages | Coffee |
+| Beverages | Tea |
+| Beverages | Juice |
+| Snacks | Chips |
+| Snacks | Nuts |
+
+`Table.FillUp` works in the opposite direction — it propagates upward — which is useful when the label appears in the last row of each group rather than the first.
+
+Both functions leave a null in place if there is no preceding (or following) non-null value to propagate from. For `Table.FillDown` this means the first rows of the table remain null if the column starts with nulls.
+
+### When Null Is the Right Answer
+
+Not every null should be replaced. In many cases null is the correct representation of missing or inapplicable information, and replacing it with a default can introduce false precision or incorrect aggregations.
+
+```powerquery
+// Do NOT default to 0 if null means "not yet measured"
+// A null temperature reading and a 0-degree reading are different facts
+AverageTemp = List.Average({null, null, null})  // null — correct, no data
+AverageTemp = List.Average({0, 0, 0})           // 0 — wrong if those are defaults
+```
+
+Ask these questions before replacing a null:
+
+1. Does null mean "unknown" or "not applicable"? If so, preserve it.
+2. Does downstream code aggregate this value? Null is excluded from `List.Sum`, `List.Average`, etc., which is usually the right behaviour for missing data.
+3. Is the null caused by a schema inconsistency (field sometimes missing) vs. a genuine absence of data? If it is purely a schema issue, defaulting is safe.
+
+The goal of null-safe operations is not to eliminate nulls — it is to handle them consciously rather than letting them silently corrupt results.

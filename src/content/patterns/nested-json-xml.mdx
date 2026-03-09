@@ -1,0 +1,234 @@
+---
+title: "Expanding Nested JSON and XML"
+slug: "nested-json-xml"
+description: "Parse and flatten nested JSON objects, arrays, and XML structures returned by APIs using iterative expansion with Table.ExpandRecordColumn, Table.ExpandListColumn, and Xml.Document."
+difficulty: "intermediate"
+relatedFunctions:
+  - "json-document"
+  - "xml-document"
+  - "table-expandrecordcolumn"
+  - "table-expandlistcolumn"
+  - "table-expandtablecolumn"
+  - "web-contents"
+relatedConcepts:
+  - "structured-data"
+  - "lazy-evaluation"
+  - "null-handling"
+---
+
+### The Problem
+
+APIs rarely return flat data. A typical REST response looks something like this:
+
+```json
+{
+  "orders": [
+    {
+      "orderId": 1001,
+      "customer": { "id": 42, "name": "Contoso", "region": "West" },
+      "lineItems": [
+        { "sku": "A1", "qty": 3, "price": 9.99 },
+        { "sku": "B2", "qty": 1, "price": 49.00 }
+      ]
+    }
+  ]
+}
+```
+
+Power Query's `Json.Document` turns this into a nested structure of records and lists. To get to a flat, analysis-ready table you have to expand each layer one step at a time. Trying to skip a level causes errors — M requires you to work outward from the root.
+
+### Step 1: Fetch and Parse a Flat JSON Object
+
+The starting point is always `Web.Contents` combined with `Json.Document`. If the top-level response is a record (object), you can immediately project its fields.
+
+```powerquery
+let
+    Raw = Web.Contents("https://api.example.com/orders"),
+    Json = Json.Document(Raw),
+    // Json is a record here; grab the list under the "orders" key
+    OrderList = Json[orders],
+    // Convert the list of records to a table
+    Source = Table.FromList(OrderList, Splitter.SplitByNothing(), {"OrderData"}),
+    // At this point each row has a single column "OrderData" containing a record
+    Expanded = Table.ExpandRecordColumn(Source, "OrderData", {"orderId", "customer", "lineItems"})
+in
+    Expanded
+```
+
+After this step the table has three columns: `orderId` (a number), `customer` (still a record), and `lineItems` (still a list). Each nested column needs its own expansion pass.
+
+### Step 2: Expanding a Nested Record Field
+
+`customer` is a record column — each cell holds a Power Query record with its own fields. Use `Table.ExpandRecordColumn` and name the output columns explicitly.
+
+```powerquery
+let
+    // ... continuing from Step 1
+    WithCustomer = Table.ExpandRecordColumn(
+        Expanded,
+        "customer",
+        {"id", "name", "region"},          // fields to pull out
+        {"customer.id", "customer.name", "customer.region"}  // output column names
+    )
+in
+    WithCustomer
+```
+
+The optional fourth argument renames the output columns as they are created, which prevents name collisions when the source record has fields like `id` that already exist in the table.
+
+### Step 3: Expanding a Nested List (One-to-Many)
+
+`lineItems` is a list column — each cell holds a list of records. Expanding this increases the row count because each item in the list becomes its own row.
+
+First, expand the list column itself with `Table.ExpandListColumn`. This creates one row per list element while repeating all other column values.
+
+```powerquery
+let
+    // ... continuing from Step 2
+    // Each "lineItems" cell is a list; expand to one row per item
+    ExpandedList = Table.ExpandListColumn(WithCustomer, "lineItems"),
+    // Now "lineItems" contains a record in each row; expand that record
+    ExpandedItems = Table.ExpandRecordColumn(
+        ExpandedList,
+        "lineItems",
+        {"sku", "qty", "price"},
+        {"item.sku", "item.qty", "item.price"}
+    )
+in
+    ExpandedItems
+```
+
+After these two steps, an order with two line items produces two rows, each carrying the parent `orderId` and customer fields.
+
+### Step 4: Multiple Levels of Nesting
+
+Some APIs nest data three or four levels deep. The pattern is the same at every level: identify the column type (record vs. list vs. table), apply the matching expand function, repeat.
+
+```powerquery
+let
+    Raw = Web.Contents("https://api.example.com/invoices"),
+    Json = Json.Document(Raw),
+    Source = Table.FromList(Json[invoices], Splitter.SplitByNothing(), {"Data"}),
+
+    // Level 1: invoice record
+    L1 = Table.ExpandRecordColumn(Source, "Data",
+        {"invoiceId", "vendor", "lines"}),
+
+    // Level 2: vendor record inside each invoice
+    L2 = Table.ExpandRecordColumn(L1, "vendor",
+        {"id", "name"}, {"vendor.id", "vendor.name"}),
+
+    // Level 3: lines is a list of records
+    L3 = Table.ExpandListColumn(L2, "lines"),
+
+    // Level 4: each line record contains an "item" sub-record
+    L4 = Table.ExpandRecordColumn(L3, "lines",
+        {"lineId", "item", "amount"}, {"lineId", "item", "amount"}),
+
+    // Level 5: item record inside each line
+    L5 = Table.ExpandRecordColumn(L4, "item",
+        {"sku", "description"}, {"item.sku", "item.description"})
+in
+    L5
+```
+
+Each step is cheap individually. Power Query's lazy evaluation means the expansion chain is compiled into a single pass over the data at refresh time, so adding intermediate steps does not add redundant fetches.
+
+### Handling Inconsistent Schemas: Nullable Nested Fields
+
+Real-world APIs often omit optional fields entirely when they have no value — the `customer` field might be `null` for guest orders, or it might be absent from the record altogether. Passing a `null` record or a missing field to `Table.ExpandRecordColumn` causes an error.
+
+Use `Record.FieldOrDefault` inside `Table.TransformColumns` to normalise each row to a safe default before expanding:
+
+```powerquery
+let
+    // Normalise: if "customer" is null or the field is missing, substitute an
+    // empty record so the downstream expansion always sees a record
+    Normalised = Table.TransformColumns(
+        Expanded,
+        {
+            "customer",
+            each if _ = null
+                 then [id = null, name = null, region = null]
+                 else Record.FieldOrDefault(_, "customer", [id = null, name = null, region = null])
+        }
+    ),
+
+    // Now safe to expand — null fields produce null cells, not errors
+    WithCustomer = Table.ExpandRecordColumn(
+        Normalised, "customer",
+        {"id", "name", "region"},
+        {"customer.id", "customer.name", "customer.region"}
+    )
+in
+    WithCustomer
+```
+
+For list columns, a `null` value where a list is expected also breaks `Table.ExpandListColumn`. Replace nulls with empty lists first:
+
+```powerquery
+Normalised = Table.TransformColumns(
+    Source,
+    {"lineItems", each if _ = null then {} else _}
+),
+ExpandedList = Table.ExpandListColumn(Normalised, "lineItems")
+```
+
+### Parsing XML: Xml.Document and {0} Indexing
+
+`Xml.Document` returns a deeply nested structure of tables and records that mirrors the XML hierarchy. The root element becomes a table with a `Value` column whose cells are themselves tables or records.
+
+```powerquery
+let
+    Raw = Web.Contents("https://api.example.com/products.xml"),
+    // Xml.Document returns a table representing the root element
+    XmlDoc = Xml.Document(Raw),
+
+    // The root table's Value column holds the child elements as a table
+    // Use {0} to get the first row (the root element record)
+    Root = XmlDoc{0}[Value],
+
+    // Root is now a table of child elements; navigate to the target element
+    // Assumes structure: <Products><Product>...</Product></Products>
+    ProductsTable = Root{[Name = "Products"]}[Value],
+
+    // ProductsTable is a table of <Product> rows; expand from here
+    Expanded = Table.ExpandTableColumn(
+        Table.FromRecords({[Value = ProductsTable]}),
+        "Value",
+        {"id", "name", "price"}
+    )
+in
+    Expanded
+```
+
+Because XML attributes and text content are stored differently from child elements, you often need to check whether a column holds a primitive value or another nested table before expanding. Step through the structure in small increments using the Power Query editor's preview to see what each level contains.
+
+A simpler approach when the schema is known:
+
+```powerquery
+let
+    Raw = Web.Contents("https://api.example.com/products.xml"),
+    XmlDoc = Xml.Document(Raw),
+    // Drill straight to the data table using {0} indexing
+    DataRows = XmlDoc{0}[Value]{0}[Value],
+    Result = Table.ExpandTableColumn(
+        Table.FromRecords({[Value = DataRows]}),
+        "Value",
+        Table.ColumnNames(DataRows)
+    )
+in
+    Result
+```
+
+### Quick Decision Guide: Which Expand Function?
+
+| Column content | Function to use |
+|---|---|
+| Each cell is a **record** (JSON object) | `Table.ExpandRecordColumn` |
+| Each cell is a **list** (JSON array) | `Table.ExpandListColumn`, then expand the resulting record column |
+| Each cell is a **table** (nested table, or XML child element table) | `Table.ExpandTableColumn` |
+
+When you are unsure, click a cell in Power Query's preview. The status bar shows the type: `Record`, `List`, or `Table`. That type determines which function to use.
+
+Avoid expanding all columns at once with the auto-generated expand button in the UI when the schema varies across rows — it reads the first N rows to infer column names and silently drops fields that only appear later. Specify column names explicitly in all three functions to guarantee consistent output.

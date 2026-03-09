@@ -1,0 +1,200 @@
+---
+title: "Table Joins"
+slug: "table-joins"
+description: "Combine tables on shared keys using Table.NestedJoin and Table.ExpandTableColumn — covering left outer, inner, right outer, full outer, anti-join, and multi-column joins."
+difficulty: "intermediate"
+relatedFunctions:
+  - "table-nestedjoin"
+  - "table-expandtablecolumn"
+  - "table-join"
+  - "table-removematches"
+relatedConcepts:
+  - "query-folding"
+  - "structured-data"
+---
+
+### The Problem
+
+M has no SQL `JOIN` keyword. Instead, joins are a two-step operation: `Table.NestedJoin` matches rows between two tables and nests the right-side matches as a new column of tables, then `Table.ExpandTableColumn` flattens those nested tables to produce the final result.
+
+Understanding this two-step model makes every join type easy — you always start with `Table.NestedJoin`, then control what you expand (or whether you expand at all).
+
+### Basic Left Outer Join
+
+A left outer join keeps every row from the left table and brings in matching columns from the right table. Rows with no match get `null` for the right-side columns.
+
+Here, every Sales row is kept and matched Customer name and tier are brought in:
+
+```powerquery
+let
+    Source = Sales,
+
+    // Step 1: nest matching Customers rows into a new column
+    Joined = Table.NestedJoin(
+        Source, {"CustomerID"},
+        Customers, {"CustomerID"},
+        "CustomerData",
+        JoinKind.LeftOuter
+    ),
+
+    // Step 2: expand only the columns you need; rename in the same step
+    Expanded = Table.ExpandTableColumn(
+        Joined,
+        "CustomerData",
+        {"Name", "Tier"},
+        {"CustomerName", "CustomerTier"}
+    )
+in
+    Expanded
+```
+
+Renaming inside `Table.ExpandTableColumn` (the fourth argument) avoids a separate `Table.RenameColumns` step and keeps the query leaner. If a `CustomerID` in Sales has no match in Customers, `CustomerName` and `CustomerTier` will be `null` for that row.
+
+### Inner Join
+
+An inner join returns only rows that have a match in both tables. Unmatched rows are dropped from both sides.
+
+```powerquery
+let
+    Source = Sales,
+
+    Joined = Table.NestedJoin(
+        Source, {"CustomerID"},
+        Customers, {"CustomerID"},
+        "CustomerData",
+        JoinKind.Inner
+    ),
+
+    Expanded = Table.ExpandTableColumn(
+        Joined,
+        "CustomerData",
+        {"Name", "Country"},
+        {"CustomerName", "Country"}
+    )
+in
+    Expanded
+```
+
+### Right Outer Join and Full Outer Join
+
+Right outer joins keep every row from the right table; full outer joins keep every row from both. The syntax is identical — only the `JoinKind` changes.
+
+```powerquery
+// Right outer: every Customer row is kept, even with no Sales
+RightJoined = Table.NestedJoin(
+    Sales, {"CustomerID"},
+    Customers, {"CustomerID"},
+    "CustomerData",
+    JoinKind.RightOuter
+),
+
+// Full outer: all rows from both tables are kept
+FullJoined = Table.NestedJoin(
+    Sales, {"CustomerID"},
+    Customers, {"CustomerID"},
+    "CustomerData",
+    JoinKind.FullOuter
+)
+```
+
+After either join, expand with `Table.ExpandTableColumn` as usual. Columns from the side with no match will be `null`.
+
+### Anti-Join — Rows With No Match
+
+A left anti-join returns rows from the left table that have no match in the right table. This is the M equivalent of `WHERE NOT EXISTS`. Use it to find orphaned records, missing lookups, or rows that failed to join.
+
+```powerquery
+let
+    // Find Sales rows whose CustomerID does not exist in Customers
+    Joined = Table.NestedJoin(
+        Sales, {"CustomerID"},
+        Customers, {"CustomerID"},
+        "CustomerData",
+        JoinKind.LeftAnti
+    ),
+
+    // The nested column contains empty tables for every row (no matches)
+    // You only need to remove it — do not expand
+    Result = Table.RemoveColumns(Joined, {"CustomerData"})
+in
+    Result
+```
+
+`JoinKind.RightAnti` finds rows in the right table with no match on the left — for example, Customers who have never placed an order:
+
+```powerquery
+let
+    Joined = Table.NestedJoin(
+        Sales, {"CustomerID"},
+        Customers, {"CustomerID"},
+        "SalesData",
+        JoinKind.RightAnti
+    ),
+
+    // Expand to get Customer columns; Sales columns will all be null
+    Result = Table.ExpandTableColumn(
+        Joined,
+        "SalesData",
+        {},
+        {}
+    )
+in
+    Table.RemoveColumns(Result, {"SalesData"})
+```
+
+A simpler approach for anti-joins on well-understood tables is `Table.RemoveMatchingRows`, but `JoinKind.LeftAnti` generalises to any column set.
+
+### Multi-Column Join
+
+Pass lists of key columns to join on multiple keys simultaneously. The lists must be the same length and are matched positionally.
+
+```powerquery
+let
+    // Hypothetical scenario: join Sales to Products on both ProductID and Region
+    // (e.g., a region-specific product pricing table)
+    Joined = Table.NestedJoin(
+        Sales,    {"ProductID", "Region"},
+        Products, {"ProductID", "Category"},   // positional match: ProductID=ProductID, Region=Category
+        "ProductData",
+        JoinKind.LeftOuter
+    ),
+
+    Expanded = Table.ExpandTableColumn(
+        Joined,
+        "ProductData",
+        {"Name", "Price"},
+        {"ProductName", "UnitPrice"}
+    )
+in
+    Expanded
+```
+
+When the key column names are the same in both tables you can omit specifying them twice — pass the same list for both table arguments. When column names differ, list them explicitly as shown above.
+
+### Performance Tip: Buffer the Smaller Table
+
+`Table.NestedJoin` is lazy — it re-evaluates the right-side table for every probe. When the right table comes from a slow source (a second query, a web call, a large file) or when query folding cannot push the join to the source, materialise the smaller table into memory first with `Table.Buffer`:
+
+```powerquery
+let
+    // Buffer Customers once so it is not re-fetched per join probe
+    BufferedCustomers = Table.Buffer(Customers),
+
+    Joined = Table.NestedJoin(
+        Sales, {"CustomerID"},
+        BufferedCustomers, {"CustomerID"},
+        "CustomerData",
+        JoinKind.LeftOuter
+    ),
+
+    Expanded = Table.ExpandTableColumn(
+        Joined,
+        "CustomerData",
+        {"Name", "Tier"},
+        {"CustomerName", "CustomerTier"}
+    )
+in
+    Expanded
+```
+
+Only buffer what is necessary. Buffering a very large table consumes memory and prevents query folding on that table. Profile first — if both sources fold to a database, the join may already run efficiently server-side without buffering.
