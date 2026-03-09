@@ -66,6 +66,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ALICE","03","0F"]}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "record",
+      "description": "Stores the fixed-width text string \"ALICE030F\" representing a name, age, and a code field.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"ALICE030F"}]}
+    },
+    {
+      "name": "splitter",
+      "description": "Creates a splitter function that extracts segments of 5, 2, and 1 characters in order using Splitter.SplitTextByLengths.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "parts",
+      "description": "Applies the splitter to the record string, producing a list of three substrings: \"ALICE\", \"03\", and \"0F\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"ALICE"},{"Value":"03"},{"Value":"0F"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list of the three fixed-width segments extracted from the input string.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ALICE","03","0F"]}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Split from the end
 

@@ -74,3 +74,30 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Cust-02, Cust-03}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RegionA",
+      "description": "Defines the list of customer IDs active in Region A.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-01"},{"Value":"Cust-02"},{"Value":"Cust-03"}]}
+    },
+    {
+      "name": "RegionB",
+      "description": "Defines the list of customer IDs active in Region B.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-02"},{"Value":"Cust-03"},{"Value":"Cust-04"}]}
+    },
+    {
+      "name": "RegionC",
+      "description": "Defines the list of customer IDs active in Region C.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Cust-02"},{"Value":"Cust-05"},{"Value":"Cust-03"}]}
+    },
+    {
+      "name": "CommonCustomers",
+      "description": "The final output — intersects all three region lists to return only the customer IDs that appear in every region.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{Cust-02, Cust-03}"}]}
+    }
+  ]
+}
+-->

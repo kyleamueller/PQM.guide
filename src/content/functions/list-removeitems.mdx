@@ -51,3 +51,25 @@ in
 <!--output
 {"columns":[{"name":"ColumnName","type":"text"}],"rows":[{"ColumnName":"OrderID"},{"ColumnName":"CustomerName"},{"ColumnName":"Product"},{"ColumnName":"Category"},{"ColumnName":"UnitPrice"},{"ColumnName":"Quantity"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AllCols",
+      "description": "Retrieves all column names from the Sales table as a list of 8 strings.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"OrderID"},{"Value":"CustomerName"},{"Value":"Product"},{"Value":"Category"},{"Value":"UnitPrice"},{"Value":"Quantity"},{"Value":"OrderDate"},{"Value":"Region"}]}
+    },
+    {
+      "name": "Excluded",
+      "description": "Removes \"OrderDate\" and \"Region\" from AllCols, returning the remaining 6 column names.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"OrderID"},{"Value":"CustomerName"},{"Value":"Product"},{"Value":"Category"},{"Value":"UnitPrice"},{"Value":"Quantity"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table listing all Sales column names except OrderDate and Region.",
+      "output": {"columns":[{"name":"ColumnName","type":"text"}],"rows":[{"ColumnName":"OrderID"},{"ColumnName":"CustomerName"},{"ColumnName":"Product"},{"ColumnName":"Category"},{"ColumnName":"UnitPrice"},{"ColumnName":"Quantity"}]}
+    }
+  ]
+}
+-->

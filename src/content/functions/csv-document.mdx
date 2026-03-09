@@ -76,6 +76,32 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"text"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":"30","City":"Seattle"},{"Name":"Bob","Age":"25","City":"Portland"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "CsvText",
+      "description": "Defines an inline CSV string containing a header row and two data rows, using #(lf) for newlines.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Name,Age,City#(lf)Alice,30,Seattle#(lf)Bob,25,Portland"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Parses the CSV text into a table using Csv.Document with a comma delimiter, producing generic column names (Column1, Column2, Column3) with the header row as the first data row.",
+      "output": {"columns":[{"name":"Column1","type":"text"},{"name":"Column2","type":"text"},{"name":"Column3","type":"text"}],"rows":[{"Column1":"Name","Column2":"Age","Column3":"City"},{"Column1":"Alice","Column2":"30","Column3":"Seattle"},{"Column1":"Bob","Column2":"25","Column3":"Portland"}]}
+    },
+    {
+      "name": "Promoted",
+      "description": "Promotes the first row as column headers using Table.PromoteHeaders, renaming columns to Name, Age, and City.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"text"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":"30","City":"Seattle"},{"Name":"Bob","Age":"25","City":"Portland"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table with named columns and two data rows parsed from the inline CSV string.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"text"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":"30","City":"Seattle"},{"Name":"Bob","Age":"25","City":"Portland"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Parse with a typed schema
 
@@ -92,4 +118,30 @@ in
 
 <!--output
 {"columns":[{"name":"Product","type":"text"},{"name":"Price","type":"text"}],"rows":[{"Product":"Widget","Price":"9.99"},{"Product":"Gadget","Price":"14.50"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "CsvText",
+      "description": "Defines an inline CSV string with a header row and two product rows, using #(lf) for newlines.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Product,Price#(lf)Widget,9.99#(lf)Gadget,14.50"}]}
+    },
+    {
+      "name": "Schema",
+      "description": "Defines a table type specifying Product as text and Price as number to be applied during parsing.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [Product = text, Price = number]"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Parses the CSV text using Csv.Document with the schema type, producing a table where the header row is still the first data row.",
+      "output": {"columns":[{"name":"Column1","type":"text"},{"name":"Column2","type":"text"}],"rows":[{"Column1":"Product","Column2":"Price"},{"Column1":"Widget","Column2":"9.99"},{"Column1":"Gadget","Column2":"14.50"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.PromoteHeaders promotes the first row as column names, yielding a two-row table with Product and Price columns.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"Price","type":"text"}],"rows":[{"Product":"Widget","Price":"9.99"},{"Product":"Gadget","Price":"14.50"}]}
+    }
+  ]
+}
 -->

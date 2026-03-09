@@ -51,3 +51,24 @@ in
 <!--output
 {"columns":[{"name":"DoubledQty","type":"number"}],"rows":[{"DoubledQty":8},{"DoubledQty":4},{"DoubledQty":20},{"DoubledQty":2}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Quantities",
+      "description": "Extracts the Quantity column from the first 4 rows of the Sales table as a flat list of numbers.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":4},{"Value":2},{"Value":10},{"Value":1}]}
+    },
+    {
+      "name": "Doubled",
+      "description": "Applies List.Transform to multiply each quantity by 2, producing a new list of the same length with doubled values.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":8},{"Value":4},{"Value":20},{"Value":2}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table displaying the doubled quantity values.",
+      "output": {"columns":[{"name":"DoubledQty","type":"number"}],"rows":[{"DoubledQty":8},{"DoubledQty":4},{"DoubledQty":20},{"DoubledQty":2}]}
+    }
+  ]
+}
+-->

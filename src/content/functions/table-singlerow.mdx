@@ -55,6 +55,28 @@ in
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[CustomerID = 3, Name = \"Charlie\", Email = \"charlie@example.com\", City = \"Houston\", State = \"TX\"]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Defines a table with 4 customer rows containing CustomerID, Name, Email, City, and State columns.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Email","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","Email":"alice@example.com","City":"New York","State":"NY"},{"CustomerID":"2","Name":"Bob","Email":"bob@example.com","City":"Chicago","State":"IL"},{"CustomerID":"3","Name":"Charlie","Email":"charlie@example.com","City":"Houston","State":"TX"},{"CustomerID":"4","Name":"Diana","Email":"diana@example.com","City":"Seattle","State":"WA"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters Customers to keep only rows where CustomerID equals 3, producing a single-row table containing Charlie's record.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Email","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"CustomerID":"3","Name":"Charlie","Email":"charlie@example.com","City":"Houston","State":"TX"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — asserts the filtered table has exactly one row and returns that row as a record.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[CustomerID = 3, Name = \"Charlie\", Email = \"charlie@example.com\", City = \"Houston\", State = \"TX\"]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Read a configuration value using field access on the single row
 
 ```powerquery
@@ -70,6 +92,28 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"USD"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Config",
+      "description": "Defines a configuration table with 3 parameter rows containing Parameter and Value columns.",
+      "output": {"columns":[{"name":"Parameter","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Parameter":"DefaultRegion","Value":"East"},{"Parameter":"MaxOrders","Value":"500"},{"Parameter":"CurrencyCode","Value":"USD"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters Config to keep only the row where Parameter equals \"CurrencyCode\", producing a single-row table.",
+      "output": {"columns":[{"name":"Parameter","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Parameter":"CurrencyCode","Value":"USD"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — asserts exactly one row exists, returns it as a record, then extracts the Value field as a scalar text value.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"USD"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Assert a product lookup returns exactly one result
@@ -88,4 +132,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"75"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a typed table with 4 products containing ProductID, ProductName, Category, Price, and InStock columns.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25","InStock":"true"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50","InStock":"true"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets","Price":"15","InStock":"false"},{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75","InStock":"true"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters Products to keep only the row where ProductID equals 4, producing a single-row table containing Gadget D.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75","InStock":"true"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — asserts exactly one row exists, returns it as a record, then extracts the Price field as a scalar number.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"75"}]}
+    }
+  ]
+}
 -->

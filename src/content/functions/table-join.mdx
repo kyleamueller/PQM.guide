@@ -74,6 +74,22 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Name","type":"text"},{"name":"Country","type":"text"}],"rows":[{"OrderID":1,"CustomerID":"C001","Amount":250.00,"Name":"Alice Johnson","Country":"USA"},{"OrderID":2,"CustomerID":"C002","Amount":120.00,"Name":"Bob Smith","Country":"Canada"},{"OrderID":3,"CustomerID":"C001","Amount":75.00,"Name":"Alice Johnson","Country":"USA"},{"OrderID":4,"CustomerID":"C003","Amount":500.00,"Name":"Carol Davis","Country":"USA"},{"OrderID":5,"CustomerID":"C002","Amount":90.00,"Name":"Bob Smith","Country":"Canada"},{"OrderID":6,"CustomerID":"C004","Amount":200.00,"Name":"David Lee","Country":"UK"},{"OrderID":7,"CustomerID":"C001","Amount":350.00,"Name":"Alice Johnson","Country":"USA"},{"OrderID":8,"CustomerID":"C003","Amount":160.00,"Name":"Carol Davis","Country":"USA"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Joined",
+      "description": "Performs an inner join of Sales to Customers on CustomerID, combining all columns from both tables side by side into a flat result.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Region","type":"text"},{"name":"Status","type":"text"},{"name":"CustomerID.1","type":"text"},{"name":"Name","type":"text"},{"name":"Country","type":"text"},{"name":"Email","type":"text"}],"rows":[{"OrderID":1,"CustomerID":"C001","Amount":250,"Region":"East","Status":"Shipped","CustomerID.1":"C001","Name":"Alice Johnson","Country":"USA","Email":"alice@example.com"},{"OrderID":2,"CustomerID":"C002","Amount":120,"Region":"West","Status":"Shipped","CustomerID.1":"C002","Name":"Bob Smith","Country":"Canada","Email":"bob@example.com"},{"OrderID":3,"CustomerID":"C001","Amount":75,"Region":"East","Status":"Pending","CustomerID.1":"C001","Name":"Alice Johnson","Country":"USA","Email":"alice@example.com"},{"OrderID":4,"CustomerID":"C003","Amount":500,"Region":"North","Status":"Shipped","CustomerID.1":"C003","Name":"Carol Davis","Country":"USA","Email":"carol@example.com"},{"OrderID":5,"CustomerID":"C002","Amount":90,"Region":"West","Status":"Pending","CustomerID.1":"C002","Name":"Bob Smith","Country":"Canada","Email":"bob@example.com"},{"OrderID":6,"CustomerID":"C004","Amount":200,"Region":"East","Status":"Shipped","CustomerID.1":"C004","Name":"David Lee","Country":"UK","Email":"david@example.com"},{"OrderID":7,"CustomerID":"C001","Amount":350,"Region":"East","Status":"Shipped","CustomerID.1":"C001","Name":"Alice Johnson","Country":"USA","Email":"alice@example.com"},{"OrderID":8,"CustomerID":"C003","Amount":160,"Region":"North","Status":"Pending","CustomerID.1":"C003","Name":"Carol Davis","Country":"USA","Email":"carol@example.com"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — selects only the five desired columns (OrderID, CustomerID, Amount, Name, Country) from the joined table, dropping duplicate and unwanted columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerID","type":"text"},{"name":"Amount","type":"number"},{"name":"Name","type":"text"},{"name":"Country","type":"text"}],"rows":[{"OrderID":1,"CustomerID":"C001","Amount":250,"Name":"Alice Johnson","Country":"USA"},{"OrderID":2,"CustomerID":"C002","Amount":120,"Name":"Bob Smith","Country":"Canada"},{"OrderID":3,"CustomerID":"C001","Amount":75,"Name":"Alice Johnson","Country":"USA"},{"OrderID":4,"CustomerID":"C003","Amount":500,"Name":"Carol Davis","Country":"USA"},{"OrderID":5,"CustomerID":"C002","Amount":90,"Name":"Bob Smith","Country":"Canada"},{"OrderID":6,"CustomerID":"C004","Amount":200,"Name":"David Lee","Country":"UK"},{"OrderID":7,"CustomerID":"C001","Amount":350,"Name":"Alice Johnson","Country":"USA"},{"OrderID":8,"CustomerID":"C003","Amount":160,"Name":"Carol Davis","Country":"USA"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Left anti-join to find unmatched rows
 

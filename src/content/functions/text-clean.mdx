@@ -48,6 +48,23 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelloWorld"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Messy",
+      "description": "Constructs a text value of \"Hello\" followed by a line feed character and \"World\" followed by a tab character, simulating text imported with embedded control characters.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello\nWorld\t"}]}
+    },
+    {
+      "name": "Cleaned",
+      "description": "The final output — removes all control characters (including the line feed and tab) from the messy string, returning only the printable characters concatenated together.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"HelloWorld"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Clean a column of messy imported values
 
 ```powerquery

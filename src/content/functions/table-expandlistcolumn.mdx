@@ -48,6 +48,22 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Tags","type":"any"}],"rows":[{"Name":"Alice","Tags":"A"},{"Name":"Alice","Tags":"B"},{"Name":"Bob","Tags":"C"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates an inline table with Name and Tags columns, where Alice has a list of two tags {\"A\", \"B\"} and Bob has a single tag {\"C\"}.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Tags","type":"any"}],"rows":[{"Name":"Alice","Tags":"{\"A\", \"B\"}"},{"Name":"Bob","Tags":"{\"C\"}"}]}
+    },
+    {
+      "name": "Expanded",
+      "description": "The final output — expands the Tags list column into individual rows, duplicating the Name value for each list element.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Tags","type":"any"}],"rows":[{"Name":"Alice","Tags":"A"},{"Name":"Alice","Tags":"B"},{"Name":"Bob","Tags":"C"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Flatten grouped results
 

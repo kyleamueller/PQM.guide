@@ -67,6 +67,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"CustomerID\"}, Primary = true]}"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Defines an inline Customers table with CustomerID, Name, and Email columns containing two rows — the table has no key metadata at this point.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Email","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","Email":"alice@example.com"},{"CustomerID":"2","Name":"Bob","Email":"bob@example.com"}]}
+    },
+    {
+      "name": "WithKey",
+      "description": "Calls Table.AddKey to declare CustomerID as a primary key on the Customers table, adding key metadata to the table's type without changing its rows.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Email","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","Email":"alice@example.com"},{"CustomerID":"2","Name":"Bob","Email":"bob@example.com"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Keys returns a list with one record describing the declared primary key on the CustomerID column.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"CustomerID\"}, Primary = true]}"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Declare both a primary and a non-primary key, then inspect
 
@@ -84,4 +105,30 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ProductID\"}, Primary = true], [Columns = {\"ProductName\"}, Primary = false]}"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines an inline Products table with ProductID, ProductName, and Category columns containing two rows — no key metadata is set yet.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"}]}
+    },
+    {
+      "name": "Step1",
+      "description": "Adds a primary key declaration on the ProductID column, registering it as the table's primary key in type metadata.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"}]}
+    },
+    {
+      "name": "Step2",
+      "description": "Adds a second (non-primary) key declaration on the ProductName column, so the table now has two key definitions in its metadata.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Keys returns a list of two records: one describing the primary key on ProductID and one describing the non-primary key on ProductName.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ProductID\"}, Primary = true], [Columns = {\"ProductName\"}, Primary = false]}"}]}
+    }
+  ]
+}
 -->

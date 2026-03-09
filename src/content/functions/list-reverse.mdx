@@ -60,6 +60,33 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{9, 6, 5, 4, 3, 2, 1, 1}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines an unsorted list of 8 integers, including a duplicate 1.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3},{"Value":1},{"Value":4},{"Value":1},{"Value":5},{"Value":9},{"Value":2},{"Value":6}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts Values in ascending order using the default sort, producing {1, 1, 2, 3, 4, 5, 6, 9}.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1},{"Value":1},{"Value":2},{"Value":3},{"Value":4},{"Value":5},{"Value":6},{"Value":9}]}
+    },
+    {
+      "name": "Descending",
+      "description": "Reverses the Sorted list to produce a descending-order result.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{9, 6, 5, 4, 3, 2, 1, 1}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the list of integers sorted in descending order.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{9, 6, 5, 4, 3, 2, 1, 1}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Reverse a list of text items
 
 ```powerquery

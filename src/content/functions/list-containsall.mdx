@@ -55,6 +55,33 @@ in
 {"columns":[{"name":"AllColumnsPresent","type":"logical"}],"rows":[{"AllColumnsPresent":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RequiredColumns",
+      "description": "Defines the list of column names that must be present in the table for downstream processing.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"OrderID"},{"Value":"CustomerID"},{"Value":"Amount"},{"Value":"Region"}]}
+    },
+    {
+      "name": "ActualColumns",
+      "description": "Retrieves the actual column names from the Sales table as a list.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"OrderID"},{"Value":"CustomerName"},{"Value":"Product"},{"Value":"Category"},{"Value":"UnitPrice"},{"Value":"Quantity"},{"Value":"OrderDate"},{"Value":"Region"}]}
+    },
+    {
+      "name": "AllPresent",
+      "description": "Checks whether every required column name appears in the actual columns list.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":"true"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the logical result in a single-row table labeled AllColumnsPresent.",
+      "output": {"columns":[{"name":"AllColumnsPresent","type":"logical"}],"rows":[{"AllColumnsPresent":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Check for missing values
 When not all values are present, the function returns false.
 
@@ -69,4 +96,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines the list to search within, containing three text values.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"a"},{"Value":"b"},{"Value":"c"}]}
+    },
+    {
+      "name": "CheckList",
+      "description": "Defines the list of values that must all be present in Source; note that \"d\" is not in Source.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"a"},{"Value":"b"},{"Value":"d"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns false because \"d\" from CheckList is not found in Source.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+    }
+  ]
+}
 -->

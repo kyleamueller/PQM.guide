@@ -60,6 +60,28 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Items",
+      "description": "Defines a list of three text values to be indexed.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alpha"},{"Value":"Beta"},{"Value":"Gamma"}]}
+    },
+    {
+      "name": "Indexed",
+      "description": "Pairs each item with its zero-based position by zipping the positions list with the Items list, producing a list of {index, value} pairs.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list of {position, item} pairs for each element in Items.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{0, Alpha}, {1, Beta}, {2, Gamma}}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Filter items by even index positions
 
 ```powerquery
@@ -76,4 +98,31 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, C, E}"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Items",
+      "description": "Defines a list of 6 text values to filter by index position.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"A"},{"Value":"B"},{"Value":"C"},{"Value":"D"},{"Value":"E"},{"Value":"F"}]}
+    },
+    {
+      "name": "Positions",
+      "description": "Generates a list of zero-based index positions {0, 1, 2, 3, 4, 5} corresponding to each item in Items.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0},{"Value":1},{"Value":2},{"Value":3},{"Value":4},{"Value":5}]}
+    },
+    {
+      "name": "EvenIndexItems",
+      "description": "Filters Positions to keep only even indices (0, 2, 4) and then retrieves the Items at those positions, returning \"A\", \"C\", and \"E\".",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, C, E}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list containing only the items at even index positions from the original list.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{A, C, E}"}]}
+    }
+  ]
+}
 -->

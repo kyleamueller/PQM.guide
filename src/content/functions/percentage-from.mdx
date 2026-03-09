@@ -82,3 +82,24 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Quantity","type":"number"},{"name":"MarketShare","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Quantity":4,"MarketShare":0.1739},{"OrderID":2,"CustomerName":"Bob","Quantity":2,"MarketShare":0.0870},{"OrderID":3,"CustomerName":"Charlie","Quantity":10,"MarketShare":0.4348},{"OrderID":4,"CustomerName":"Alice","Quantity":1,"MarketShare":0.0435}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TotalQty",
+      "description": "Sums all values in the Quantity column of the Sales table (4+2+10+1+6+1+3+8 = 35) to use as the denominator for share calculations.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":35}]}
+    },
+    {
+      "name": "WithShare",
+      "description": "Adds a MarketShare column to the first 4 Sales rows, computing each order's quantity as a fraction of 35 and annotating it as Percentage.Type so visuals display it as a percentage.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Quantity","type":"number"},{"name":"MarketShare","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Quantity":4,"MarketShare":0.1739},{"OrderID":2,"CustomerName":"Bob","Quantity":2,"MarketShare":0.0870},{"OrderID":3,"CustomerName":"Charlie","Quantity":10,"MarketShare":0.4348},{"OrderID":4,"CustomerName":"Alice","Quantity":1,"MarketShare":0.0435}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the four-column table showing each order's ID, customer, quantity, and percentage share of total quantity.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Quantity","type":"number"},{"name":"MarketShare","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Quantity":4,"MarketShare":0.1739},{"OrderID":2,"CustomerName":"Bob","Quantity":2,"MarketShare":0.0870},{"OrderID":3,"CustomerName":"Charlie","Quantity":10,"MarketShare":0.4348},{"OrderID":4,"CustomerName":"Alice","Quantity":1,"MarketShare":0.0435}]}
+    }
+  ]
+}
+-->

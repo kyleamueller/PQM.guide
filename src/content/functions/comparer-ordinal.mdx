@@ -45,3 +45,24 @@ in
 <!--output
 {"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"BOB JONES"},{"FullName":"Charlie Brown"},{"FullName":"Eve Martinez"},{"FullName":"alice smith"},{"FullName":"diana PRINCE"},{"FullName":"frank lee"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Names",
+      "description": "Extracts the FullName column from the Employees table as a list using Table.Column.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"alice smith"},{"Value":"BOB JONES"},{"Value":"Charlie Brown"},{"Value":"diana PRINCE"},{"Value":"Eve Martinez"},{"Value":"frank lee"}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the names using List.Sort with Comparer.Ordinal, placing uppercase letters before lowercase because uppercase letters have lower byte values.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"BOB JONES"},{"Value":"Charlie Brown"},{"Value":"Eve Martinez"},{"Value":"alice smith"},{"Value":"diana PRINCE"},{"Value":"frank lee"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table of employee names in case-sensitive ordinal sort order.",
+      "output": {"columns":[{"name":"FullName","type":"text"}],"rows":[{"FullName":"BOB JONES"},{"FullName":"Charlie Brown"},{"FullName":"Eve Martinez"},{"FullName":"alice smith"},{"FullName":"diana PRINCE"},{"FullName":"frank lee"}]}
+    }
+  ]
+}
+-->

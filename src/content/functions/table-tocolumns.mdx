@@ -45,6 +45,23 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1,2,3},{4,5,6}}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a two-column table with columns A and B containing three rows of numbers.",
+      "output": {"columns":[{"name":"A","type":"any"},{"name":"B","type":"any"}],"rows":[{"A":1,"B":4},{"A":2,"B":5},{"A":3,"B":6}]}
+    },
+    {
+      "name": "Columns",
+      "description": "The final output — converts the table into a list of lists, one inner list per column: the first inner list contains all values from column A and the second from column B.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1,2,3},{4,5,6}}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Transpose a table using ToColumns and FromColumns
 
 ```powerquery
@@ -58,4 +75,26 @@ in
 
 <!--output
 {"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"}],"rows":[{"Column1":1,"Column2":4},{"Column1":2,"Column2":5},{"Column1":3,"Column2":6}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a three-column table with columns A, B, and C containing two rows.",
+      "output": {"columns":[{"name":"A","type":"any"},{"name":"B","type":"any"},{"name":"C","type":"any"}],"rows":[{"A":1,"B":2,"C":3},{"A":4,"B":5,"C":6}]}
+    },
+    {
+      "name": "Cols",
+      "description": "Converts the table into a list of three inner lists — one per column — collecting {1,4}, {2,5}, and {3,6} respectively.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{{1,4},{2,5},{3,6}}"}]}
+    },
+    {
+      "name": "Transposed",
+      "description": "The final output — reconstructs a table from the column lists using Table.FromColumns, effectively swapping rows and columns so that the original columns become rows.",
+      "output": {"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"}],"rows":[{"Column1":1,"Column2":4},{"Column1":2,"Column2":5},{"Column1":3,"Column2":6}]}
+    }
+  ]
+}
 -->

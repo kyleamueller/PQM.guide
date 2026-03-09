@@ -55,3 +55,25 @@ in
 <!--output
 {"columns":[{"name":"Index","type":"number"},{"name":"Line","type":"text"}],"rows":[{"Index":1,"Line":"Alice"},{"Index":2,"Line":"Bob"},{"Index":3,"Line":"Charlie"},{"Index":4,"Line":"Diana"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines a multi-line text string containing four names separated by line-feed characters.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice#(lf)Bob#(lf)Charlie#(lf)Diana"}]}
+    },
+    {
+      "name": "Lines",
+      "description": "Splits the Source text on line-feed characters using Lines.FromText, producing a list of four text values.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice"},{"Value":"Bob"},{"Value":"Charlie"},{"Value":"Diana"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a four-row table with a 1-based Index column and a Line column containing each name from the original text.",
+      "output": {"columns":[{"name":"Index","type":"number"},{"name":"Line","type":"text"}],"rows":[{"Index":1,"Line":"Alice"},{"Index":2,"Line":"Bob"},{"Index":3,"Line":"Charlie"},{"Index":4,"Line":"Diana"}]}
+    }
+  ]
+}
+-->

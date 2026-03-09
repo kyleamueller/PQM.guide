@@ -76,6 +76,27 @@ in
 <!--output
 {"columns":[{"name":"PartitionIndex","type":"any"},{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[{"PartitionIndex":"0","OrderID":"2","CustomerName":"Bob","Region":"West"},{"PartitionIndex":"0","OrderID":"4","CustomerName":"Diana","Region":"North"},{"PartitionIndex":"1","OrderID":"1","CustomerName":"Alice","Region":"East"},{"PartitionIndex":"1","OrderID":"3","CustomerName":"Charlie","Region":"East"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline Sales table with four rows containing OrderID, CustomerName, and Region columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Region":"East"},{"OrderID":"4","CustomerName":"Diana","Region":"North"}]}
+    },
+    {
+      "name": "Partitions",
+      "description": "Partitions the Sales table into 2 buckets based on OrderID modulo 2, producing a list of two sub-tables (partition 0 contains even OrderIDs, partition 1 contains odd OrderIDs).",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[Table] (Bob/West, Diana/North)"},{"Value":"[Table] (Alice/East, Charlie/East)"}]}
+    },
+    {
+      "name": "Reassembled",
+      "description": "The final output — combines the partition sub-tables back into one table with a PartitionIndex column prepended to identify which partition each row came from.",
+      "output": {"columns":[{"name":"PartitionIndex","type":"any"},{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[{"PartitionIndex":"0","OrderID":"2","CustomerName":"Bob","Region":"West"},{"PartitionIndex":"0","OrderID":"4","CustomerName":"Diana","Region":"North"},{"PartitionIndex":"1","OrderID":"1","CustomerName":"Alice","Region":"East"},{"PartitionIndex":"1","OrderID":"3","CustomerName":"Charlie","Region":"East"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Build a labeled union from separate region datasets
 

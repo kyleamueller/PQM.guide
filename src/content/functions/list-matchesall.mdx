@@ -73,3 +73,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "OrderAmounts",
+      "description": "Defines a list of order total amounts to validate.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":150.00},{"Value":225.50},{"Value":89.99},{"Value":310.00}]}
+    },
+    {
+      "name": "MinOrder",
+      "description": "Defines the minimum acceptable order amount threshold.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":50.00}]}
+    },
+    {
+      "name": "AllValid",
+      "description": "The final output — checks whether every order amount in the list meets or exceeds the minimum order threshold, returning true because all values are above 50.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->

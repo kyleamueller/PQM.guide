@@ -64,3 +64,25 @@ in
 <!--output
 {"columns":[{"name":"Date","type":"date"}],"rows":[{"Date":"2024-01-15"},{"Date":"2024-01-16"},{"Date":"2024-01-17"},{"Date":"2024-01-18"},{"Date":"2024-01-19"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "StartDate",
+      "description": "Extracts the earliest OrderDate from the Sales table to use as the sequence starting point.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-15"}]}
+    },
+    {
+      "name": "Dates",
+      "description": "Uses List.Generate to produce a list of 5 consecutive dates beginning from StartDate, incrementing by one day each iteration.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-15"},{"Value":"2024-01-16"},{"Value":"2024-01-17"},{"Value":"2024-01-18"},{"Value":"2024-01-19"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the generated date list into a single-column table with a \"Date\" header.",
+      "output": {"columns":[{"name":"Date","type":"date"}],"rows":[{"Date":"2024-01-15"},{"Date":"2024-01-16"},{"Date":"2024-01-17"},{"Date":"2024-01-18"},{"Date":"2024-01-19"}]}
+    }
+  ]
+}
+-->

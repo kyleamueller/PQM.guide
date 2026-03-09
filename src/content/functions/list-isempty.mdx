@@ -69,3 +69,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"null"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines a list of numbers to filter.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":10},{"Value":20},{"Value":30}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters the Values list to keep only items greater than 50, producing an empty list because no items qualify.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns null because the filtered list is empty, using List.IsEmpty to safely guard against calling List.First on an empty list.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"null"}]}
+    }
+  ]
+}
+-->

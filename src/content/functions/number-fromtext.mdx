@@ -79,3 +79,24 @@ in
 <!--output
 {"columns":[{"name":"ID","type":"number"},{"name":"PriceText","type":"text"},{"name":"Price","type":"number"}],"rows":[{"ID":1,"PriceText":"25.00","Price":25},{"ID":2,"PriceText":"N/A","Price":null},{"ID":3,"PriceText":"75.50","Price":75.5}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Data",
+      "description": "Creates a three-row inline table with an ID column and a PriceText column containing a mix of valid number strings and an unparseable value.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"PriceText","type":"text"}],"rows":[{"ID":1,"PriceText":"25.00"},{"ID":2,"PriceText":"N/A"},{"ID":3,"PriceText":"75.50"}]}
+    },
+    {
+      "name": "WithParsed",
+      "description": "Adds a Price column by attempting to parse each PriceText value with Number.FromText, returning null instead of an error when parsing fails (as with \"N/A\").",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"PriceText","type":"text"},{"name":"Price","type":"number"}],"rows":[{"ID":1,"PriceText":"25.00","Price":25},{"ID":2,"PriceText":"N/A","Price":null},{"ID":3,"PriceText":"75.50","Price":75.5}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the table with a parsed Price column where unparseable text produces null rather than an error.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"PriceText","type":"text"},{"name":"Price","type":"number"}],"rows":[{"ID":1,"PriceText":"25.00","Price":25},{"ID":2,"PriceText":"N/A","Price":null},{"ID":3,"PriceText":"75.50","Price":75.5}]}
+    }
+  ]
+}
+-->

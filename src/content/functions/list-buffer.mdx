@@ -54,6 +54,28 @@ in
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline table with five orders containing OrderID, CustomerName, and Product columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A"}]}
+    },
+    {
+      "name": "AllowedProducts",
+      "description": "Buffers the allowed product list into memory so it is evaluated only once instead of once per row during filtering.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget A"},{"Value":"Widget C"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "The final output — filters the Sales table to keep only rows whose Product appears in the buffered allowed list.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Buffer a list used in multiple aggregations
 
 Buffer a computed list once and use it for both count and sum, rather than computing it twice.
@@ -71,6 +93,33 @@ in
 {"columns":[{"name":"Count","type":"number"},{"name":"Total","type":"number"}],"rows":[{"Count":100,"Total":5050}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Generates a list of 100 integers from 1 to 100 and buffers it in memory for reuse.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1},{"Value":2},{"Value":3},{"Value":"..."},{"Value":100}]}
+    },
+    {
+      "name": "Count",
+      "description": "Counts the number of items in the buffered list, reading from memory rather than re-evaluating the source.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":100}]}
+    },
+    {
+      "name": "Total",
+      "description": "Sums all items in the buffered list, again reading from the in-memory snapshot.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5050}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents the count and sum together in a two-column table.",
+      "output": {"columns":[{"name":"Count","type":"number"},{"name":"Total","type":"number"}],"rows":[{"Count":100,"Total":5050}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Buffer random numbers to prevent re-evaluation
 
 `List.Random` generates a new sequence each time it is evaluated. Buffering it pins the values so they remain stable across multiple references in the same query.
@@ -86,4 +135,31 @@ in
 
 <!--output
 {"columns":[{"name":"Min","type":"number"},{"name":"Max","type":"number"}],"rows":[{"Min":0.218,"Max":0.879}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Randoms",
+      "description": "Generates a list of 5 pseudo-random numbers seeded with 42 and buffers it so the values are fixed and not regenerated on each access.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.218},{"Value":"..."},{"Value":0.879}]}
+    },
+    {
+      "name": "Min",
+      "description": "Finds the smallest value in the buffered random list.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.218}]}
+    },
+    {
+      "name": "Max",
+      "description": "Finds the largest value in the buffered random list.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.879}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents the minimum and maximum of the buffered random numbers in a two-column table.",
+      "output": {"columns":[{"name":"Min","type":"number"},{"name":"Max","type":"number"}],"rows":[{"Min":0.218,"Max":0.879}]}
+    }
+  ]
+}
 -->

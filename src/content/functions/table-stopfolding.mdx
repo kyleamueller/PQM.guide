@@ -53,6 +53,33 @@ in
 {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"RevenueCategory is computed locally; no SQL translation is attempted for this column."}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to the SalesDB SQL database on myserver, returning a navigator record of available schemas and tables.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"SQL connection to myserver/SalesDB"}]}
+    },
+    {
+      "name": "Orders",
+      "description": "Navigates into the dbo schema and retrieves the Orders table data, with query folding still active.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Orders table from dbo schema"}]}
+    },
+    {
+      "name": "Stopped",
+      "description": "Wraps the Orders table with Table.StopFolding so no further operations will be translated to SQL — all subsequent steps run locally in Power Query.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Same as Orders but folding is disabled"}]}
+    },
+    {
+      "name": "Enriched",
+      "description": "The final output — adds a local RevenueCategory column computed by M; because folding was stopped, this conditional logic runs in memory and is never sent to the SQL engine.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"RevenueCategory is computed locally; no SQL translation is attempted for this column."}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Prevent folding when a data source misinterprets a filter
 
 When a source applies case-sensitive filtering but M should apply case-insensitive, stop folding to ensure M's semantics apply.
@@ -69,6 +96,33 @@ in
 
 <!--output
 {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Filter is applied locally by M after all rows are fetched, ensuring case-insensitive matching."}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to the CRM SQL database on myserver, returning a navigator record of available schemas and tables.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"SQL connection to myserver/CRM"}]}
+    },
+    {
+      "name": "Contacts",
+      "description": "Retrieves the Contacts table from the dbo schema, with query folding still active for any downstream filters.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Contacts table from dbo schema"}]}
+    },
+    {
+      "name": "Local",
+      "description": "Wraps the Contacts table with Table.StopFolding, marking the point after which no operations will fold to SQL — all rows are fetched from the source locally.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Same as Contacts but folding is disabled"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "The final output — applies a case-insensitive last-name filter in M after all rows have been fetched locally, guaranteeing M's semantics rather than the source's case-sensitive comparison.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Filter is applied locally by M after all rows are fetched, ensuring case-insensitive matching."}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Use Table.Buffer as a folding alternative when caching is the real goal
@@ -88,4 +142,31 @@ in
 
 <!--output
 {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Table.Buffer materializes Sales once; subsequent operations read from memory rather than re-querying the source."}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to the Analytics SQL database on myserver, returning a navigator record of available schemas and tables.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"SQL connection to myserver/Analytics"}]}
+    },
+    {
+      "name": "Sales",
+      "description": "Retrieves the Sales table from the dbo schema with query folding active.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Sales table from dbo schema"}]}
+    },
+    {
+      "name": "Buffered",
+      "description": "Materializes and caches the entire Sales table in memory using Table.Buffer, preventing repeated trips to the data source for subsequent operations.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Sales data fully loaded into memory"}]}
+    },
+    {
+      "name": "Joined",
+      "description": "The final output — performs a nested join between the buffered Sales table and OtherTable on matching IDs; since Sales is already in memory, no additional source queries are issued.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Table.Buffer materializes Sales once; subsequent operations read from memory rather than re-querying the source."}]}
+    }
+  ]
+}
 -->

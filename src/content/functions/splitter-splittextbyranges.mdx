@@ -63,6 +63,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["SMITH     ","JOHN      ","1985"]}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "record",
+      "description": "Stores the fixed-width text string \"SMITH     JOHN      1985\" representing a last name, first name, and birth year with space padding.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"SMITH     JOHN      1985"}]}
+    },
+    {
+      "name": "splitter",
+      "description": "Creates a splitter function that extracts three ranges: characters 0–9 (last name), 10–19 (first name), and 20–23 (year) using Splitter.SplitTextByRanges.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "parts",
+      "description": "Applies the splitter to the record string, extracting the three defined ranges as a list of three text values.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"SMITH     "},{"Value":"JOHN      "},{"Value":"1985"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list of the three extracted range segments from the fixed-width record.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["SMITH     ","JOHN      ","1985"]}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Use with Table.SplitColumn
 

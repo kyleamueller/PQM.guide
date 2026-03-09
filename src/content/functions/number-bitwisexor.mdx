@@ -81,3 +81,34 @@ in
 <!--output
 {"columns":[{"name":"Original","type":"number"},{"name":"Encoded","type":"number"},{"name":"Decoded","type":"number"}],"rows":[{"Original":42,"Encoded":37,"Decoded":42}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Assigns the starting integer value 42 (binary 101010) to be encoded.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Mask",
+      "description": "Assigns the XOR key 15 (binary 001111) used for both encoding and decoding.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":15}]}
+    },
+    {
+      "name": "Encoded",
+      "description": "XORs 42 (101010) with 15 (001111) to produce 37 (100101) — the encoded value.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":37}]}
+    },
+    {
+      "name": "Decoded",
+      "description": "XORs the encoded value 37 with the same mask 15 again, recovering the original value 42 — demonstrating XOR's self-inverse property.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing Original = 42, Encoded = 37, and Decoded = 42.",
+      "output": {"columns":[{"name":"Original","type":"number"},{"name":"Encoded","type":"number"},{"name":"Decoded","type":"number"}],"rows":[{"Original":42,"Encoded":37,"Decoded":42}]}
+    }
+  ]
+}
+-->

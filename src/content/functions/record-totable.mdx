@@ -75,3 +75,30 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"CustomerName","Value":null},{"Name":"Notes","Value":null}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Row",
+      "description": "Defines a literal record with four fields, two of which (CustomerName and Notes) are null.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":null},{"Field":"Product","Value":"Widget A"},{"Field":"Notes","Value":null}]}
+    },
+    {
+      "name": "AsTable",
+      "description": "Converts the record to a two-column Name/Value table using Record.ToTable, making all fields inspectable as rows.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":null},{"Name":"Product","Value":"Widget A"},{"Name":"Notes","Value":null}]}
+    },
+    {
+      "name": "NullFields",
+      "description": "Filters the table to keep only rows where the Value column is null, identifying fields that have no data.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"CustomerName","Value":null},{"Name":"Notes","Value":null}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table listing only the fields from the record that contain null values.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"CustomerName","Value":null},{"Name":"Notes","Value":null}]}
+    }
+  ]
+}
+-->

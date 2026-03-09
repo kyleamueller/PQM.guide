@@ -68,3 +68,30 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8="}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Creates a binary value from a list of byte values representing the ASCII codes for \"Hello\".",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"SGVsbG8="}]}
+    },
+    {
+      "name": "Encoded",
+      "description": "Encodes the binary value to a base-64 text string using Binary.ToText.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"SGVsbG8="}]}
+    },
+    {
+      "name": "Decoded",
+      "description": "Decodes the base-64 text string back to a binary value using Binary.FromText, completing the round-trip.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"SGVsbG8="}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the decoded binary value, identical to the original.",
+      "output": {"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8="}]}
+    }
+  ]
+}
+-->

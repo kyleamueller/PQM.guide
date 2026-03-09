@@ -50,6 +50,32 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"RefreshedAtUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":2,"OrderDate":"2024-01-18","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":3,"OrderDate":"2024-02-01","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":4,"OrderDate":"2024-02-10","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RefreshTime",
+      "description": "Calls DateTimeZone.FixedUtcNow() once to capture a stable UTC datetimezone value for the entire query evaluation.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2026-03-08T16:00:00+00:00"}]}
+    },
+    {
+      "name": "Source",
+      "description": "Selects only the OrderID and OrderDate columns from the first 4 rows of the Sales table using Table.SelectColumns and Table.FirstN.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15"},{"OrderID":2,"OrderDate":"2024-01-18"},{"OrderID":3,"OrderDate":"2024-02-01"},{"OrderID":4,"OrderDate":"2024-02-10"}]}
+    },
+    {
+      "name": "WithStamp",
+      "description": "Adds a RefreshedAtUTC column to Source containing the fixed RefreshTime UTC datetimezone value stamped identically on every row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"RefreshedAtUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":2,"OrderDate":"2024-01-18","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":3,"OrderDate":"2024-02-01","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":4,"OrderDate":"2024-02-10","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the WithStamp table showing each order alongside its consistent UTC refresh timestamp.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"RefreshedAtUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":2,"OrderDate":"2024-01-18","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":3,"OrderDate":"2024-02-01","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"},{"OrderID":4,"OrderDate":"2024-02-10","RefreshedAtUTC":"2026-03-08T16:00:00+00:00"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Return the fixed UTC now
 
@@ -85,4 +111,35 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAtEST","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":2,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":3,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "UTCNow",
+      "description": "Calls DateTimeZone.FixedUtcNow() to capture the current UTC time as a stable datetimezone with +00:00 offset.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2026-03-08T16:00:00+00:00"}]}
+    },
+    {
+      "name": "EasternNow",
+      "description": "Calls DateTimeZone.SwitchZone on UTCNow with offset -5 to convert the UTC timestamp to Eastern Standard Time.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2026-03-08T11:00:00-05:00"}]}
+    },
+    {
+      "name": "Source",
+      "description": "Selects only the OrderID column from the first 3 rows of the Sales table using Table.SelectColumns and Table.FirstN.",
+      "output": {"columns":[{"name":"OrderID","type":"number"}],"rows":[{"OrderID":1},{"OrderID":2},{"OrderID":3}]}
+    },
+    {
+      "name": "WithStamp",
+      "description": "Adds a RefreshedAtEST column to Source containing the EasternNow value stamped identically on every row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAtEST","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":2,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":3,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the WithStamp table showing each order alongside its Eastern Time refresh timestamp converted from UTC.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAtEST","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":2,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":3,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"}]}
+    }
+  ]
+}
 -->

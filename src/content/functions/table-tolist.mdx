@@ -49,6 +49,23 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":1},{"Result":2},{"Result":3}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a single-column table with a Value column containing three rows: 1, 2, and 3.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":1},{"Value":2},{"Value":3}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the table to a list by extracting the first element of each row's value list, producing a plain list of numbers.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":1},{"Result":2},{"Result":3}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Join row values into delimited text
 
 ```powerquery
@@ -61,4 +78,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"x|y"},{"Result":"p|q"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a two-column table with columns A and B containing two rows of text values.",
+      "output": {"columns":[{"name":"A","type":"any"},{"name":"B","type":"any"}],"rows":[{"A":"x","B":"y"},{"A":"p","B":"q"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts each row to a pipe-delimited text string by applying the CombineTextByDelimiter combiner, producing one text value per row.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"x|y"},{"Result":"p|q"}]}
+    }
+  ]
+}
 -->

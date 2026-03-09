@@ -67,6 +67,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ENGINEERING","Engineering"]}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "isEqual",
+      "description": "Creates a case-insensitive equality predicate by wrapping Comparer.OrdinalIgnoreCase with Comparer.Equals.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"function"}]}
+    },
+    {
+      "name": "departments",
+      "description": "Defines a literal list of department name strings with mixed casing.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Sales"},{"Value":"ENGINEERING"},{"Value":"marketing"},{"Value":"Engineering"}]}
+    },
+    {
+      "name": "filtered",
+      "description": "Filters the departments list using List.Select, keeping only entries that match \"engineering\" case-insensitively via the isEqual predicate.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"ENGINEERING"},{"Value":"Engineering"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list containing the two entries that match \"engineering\" regardless of casing.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ENGINEERING","Engineering"]}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Case-insensitive distinct values from a list
 

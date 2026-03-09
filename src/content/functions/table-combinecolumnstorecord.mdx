@@ -72,3 +72,24 @@ in
 <!--output
 {"columns":[{"name":"ID","type":"any"},{"name":"X","type":"any"},{"name":"Y","type":"any"}],"rows":[{"ID":"1","X":"10","Y":"20"},{"ID":"2","X":"30","Y":"40"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates an inline table with ID, X, and Y columns for two rows of coordinate data.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"X","type":"any"},{"name":"Y","type":"any"}],"rows":[{"ID":"1","X":"10","Y":"20"},{"ID":"2","X":"30","Y":"40"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Packages the X and Y columns into a single record column named Coords, removing the original X and Y columns.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Coords","type":"record"}],"rows":[{"ID":"1","Coords":"[X = 10, Y = 20]"},{"ID":"2","Coords":"[X = 30, Y = 40]"}]}
+    },
+    {
+      "name": "Expanded",
+      "description": "The final output — expands the Coords record column back into separate X and Y columns, restoring the original flat structure.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"X","type":"any"},{"name":"Y","type":"any"}],"rows":[{"ID":"1","X":"10","Y":"20"},{"ID":"2","X":"30","Y":"40"}]}
+    }
+  ]
+}
+-->

@@ -55,6 +55,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"1000"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Parameters",
+      "description": "Defines an inline parameters table with Name and Value columns containing three configuration entries.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Name":"StartDate","Value":"2024-01-01"},{"Name":"EndDate","Value":"2024-12-31"},{"Name":"MaxRows","Value":"1000"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters the Parameters table to the single row where Name equals \"MaxRows\".",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Name":"MaxRows","Value":"1000"}]}
+    },
+    {
+      "name": "Projected",
+      "description": "Selects only the Value column from the filtered row, leaving a single-column, single-row table.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"1000"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FirstValue reads the scalar from the first cell of the projected table, returning the string \"1000\".",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"1000"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Return a default when no match is found
 
@@ -73,6 +99,32 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"100"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Parameters",
+      "description": "Defines an inline parameters table with a single entry: StartDate = \"2024-01-01\".",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Name":"StartDate","Value":"2024-01-01"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters the Parameters table to rows where Name equals \"Threshold\", which matches nothing and returns an empty table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "Projected",
+      "description": "Selects only the Value column from the empty filtered table, producing an empty single-column table.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FirstValue on the empty table returns the supplied default value \"100\" instead of null.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"100"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Extract the lowest unit price from the Products table
 
@@ -90,4 +142,30 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"15"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines an inline Products table with typed columns for ProductID, ProductName, Price, and InStock containing three product rows.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Price":25,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Price":50,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Price":15,"InStock":false}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the Products table by Price ascending so the cheapest product appears in the first row.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":3,"ProductName":"Widget C","Price":15,"InStock":false},{"ProductID":1,"ProductName":"Widget A","Price":25,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Price":50,"InStock":true}]}
+    },
+    {
+      "name": "PriceCol",
+      "description": "Selects only the Price column from the sorted table, isolating the values so Table.FirstValue reads the correct column.",
+      "output": {"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":15},{"Price":25},{"Price":50}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FirstValue returns the scalar from the first cell of PriceCol, which is the lowest price 15.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"15"}]}
+    }
+  ]
+}
 -->

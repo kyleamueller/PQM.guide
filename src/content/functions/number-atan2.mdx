@@ -76,3 +76,19 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":53.13010235415598}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AngleDegrees",
+      "description": "Calls Number.Atan2 with Y=4 and X=3 to get the angle in radians, then multiplies by 180/Number.PI to convert to degrees, giving approximately 53.13°.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":53.13010235415598}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the bearing angle in degrees from the positive x-axis to the point (3, 4).",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":53.13010235415598}]}
+    }
+  ]
+}
+-->

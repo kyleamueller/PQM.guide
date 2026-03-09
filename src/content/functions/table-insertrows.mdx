@@ -78,6 +78,27 @@ in
 <!--output
 {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Defines an inline Customers table with three existing rows containing CustomerID, Name, and City columns.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"}]}
+    },
+    {
+      "name": "NewRow",
+      "description": "Defines a record representing the new customer Diana to be appended, with CustomerID 4 and city Seattle.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"CustomerID","Value":"4"},{"Field":"Name","Value":"Diana"},{"Field":"City","Value":"Seattle"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.InsertRows appends the NewRow record at the end of Customers using Table.RowCount as the offset, producing a four-row table.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Insert multiple rows at position 0 (prepend)
 

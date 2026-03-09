@@ -54,6 +54,32 @@ in
 <!--output
 {"columns":[{"name":"Original","type":"text"},{"name":"Base64","type":"text"}],"rows":[{"Original":"Power Query","Base64":"UG93ZXIgUXVlcnk="}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Defines the literal text string \"Power Query\" as the input value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Power Query"}]}
+    },
+    {
+      "name": "AsBinary",
+      "description": "Converts the text string to its binary (UTF-8) representation using Binary.From.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Base64",
+      "description": "Encodes the binary value as a Base64 text string using Binary.ToText with BinaryEncoding.Base64.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"UG93ZXIgUXVlcnk="}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original text alongside its Base64-encoded form.",
+      "output": {"columns":[{"name":"Original","type":"text"},{"name":"Base64","type":"text"}],"rows":[{"Original":"Power Query","Base64":"UG93ZXIgUXVlcnk="}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Encode text as hexadecimal
 
@@ -70,4 +96,30 @@ in
 
 <!--output
 {"columns":[{"name":"Original","type":"text"},{"name":"Hex","type":"text"}],"rows":[{"Original":"Hello","Hex":"48656C6C6F"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Defines the literal text string \"Hello\" as the input value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello"}]}
+    },
+    {
+      "name": "AsBinary",
+      "description": "Converts the text string to its binary (UTF-8) representation using Binary.From.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Hex",
+      "description": "Encodes the binary value as an uppercase hexadecimal text string using Binary.ToText with BinaryEncoding.Hex.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"48656C6C6F"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original text alongside its hex-encoded form.",
+      "output": {"columns":[{"name":"Original","type":"text"},{"name":"Hex","type":"text"}],"rows":[{"Original":"Hello","Hex":"48656C6C6F"}]}
+    }
+  ]
+}
 -->

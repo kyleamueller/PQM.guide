@@ -61,6 +61,27 @@ in
 <!--output
 {"columns":[{"name":"Consistent StdDev","type":"number"},{"name":"Volatile StdDev","type":"number"}],"rows":[{"Consistent StdDev":0.707106781,"Volatile StdDev":44.384194}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Consistent",
+      "description": "Computes the sample standard deviation of a tightly clustered list {10, 11, 10, 9, 10}, yielding a small value near 0.707.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.707106781}]}
+    },
+    {
+      "name": "Volatile",
+      "description": "Computes the sample standard deviation of a widely spread list {1, 50, 3, 98, 5}, yielding a large value near 44.38.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":44.384194}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table comparing the standard deviations of the consistent and volatile lists side by side.",
+      "output": {"columns":[{"name":"Consistent StdDev","type":"number"},{"name":"Volatile StdDev","type":"number"}],"rows":[{"Consistent StdDev":0.707106781,"Volatile StdDev":44.384194}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Detect outliers using standard deviation
 
@@ -76,4 +97,35 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{200}"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines the source list of seven numbers, most of which cluster near 100, with one outlier at 200.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":100},{"Value":105},{"Value":98},{"Value":102},{"Value":97},{"Value":200},{"Value":103}]}
+    },
+    {
+      "name": "Mean",
+      "description": "Computes the average of the Values list, which is approximately 115 due to the influence of the 200 outlier.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":115}]}
+    },
+    {
+      "name": "StdDev",
+      "description": "Computes the sample standard deviation of the Values list, which is elevated because 200 is far from the mean.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":37.11}]}
+    },
+    {
+      "name": "Outliers",
+      "description": "Filters Values to keep only items more than 2 standard deviations from the Mean, identifying 200 as the sole outlier.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":200}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list containing only the outlier value 200.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{200}"}]}
+    }
+  ]
+}
 -->

@@ -47,3 +47,25 @@ in
 <!--output
 {"columns":[{"name":"FieldName","type":"text"}],"rows":[{"FieldName":"OrderID"},{"FieldName":"CustomerName"},{"FieldName":"Product"},{"FieldName":"Category"},{"FieldName":"UnitPrice"},{"FieldName":"Quantity"},{"FieldName":"OrderDate"},{"FieldName":"Region"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstRow",
+      "description": "Retrieves the first row of the Sales table as a record with all eight fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "Names",
+      "description": "Extracts the field names from the record as a list of text values in field order.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"OrderID"},{"Value":"CustomerName"},{"Value":"Product"},{"Value":"Category"},{"Value":"UnitPrice"},{"Value":"Quantity"},{"Value":"OrderDate"},{"Value":"Region"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — transforms the list of field names into a single-column table with a FieldName column.",
+      "output": {"columns":[{"name":"FieldName","type":"text"}],"rows":[{"FieldName":"OrderID"},{"FieldName":"CustomerName"},{"FieldName":"Product"},{"FieldName":"Category"},{"FieldName":"UnitPrice"},{"FieldName":"Quantity"},{"FieldName":"OrderDate"},{"FieldName":"Region"}]}
+    }
+  ]
+}
+-->

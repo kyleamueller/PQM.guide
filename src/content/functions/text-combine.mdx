@@ -52,3 +52,25 @@ in
 <!--output
 {"columns":[{"name":"CityList","type":"text"}],"rows":[{"CityList":"New York, Chicago, Houston, Seattle"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Cities",
+      "description": "Extracts all values from the City column of the Customers table, producing a list of four city names.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"New York"},{"Value":"Chicago"},{"Value":"Houston"},{"Value":"Seattle"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Joins all city names into a single comma-and-space-separated text string using Text.Combine.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"New York, Chicago, Houston, Seattle"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the combined city string into a one-row table with a CityList column for display.",
+      "output": {"columns":[{"name":"CityList","type":"text"}],"rows":[{"CityList":"New York, Chicago, Houston, Seattle"}]}
+    }
+  ]
+}
+-->

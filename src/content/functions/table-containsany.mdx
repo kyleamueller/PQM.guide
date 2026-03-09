@@ -58,6 +58,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates an inline table with OrderID, CustomerName, and Region columns for four orders spanning East, West, East, and North regions.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Region":"North"}]}
+    },
+    {
+      "name": "TargetRegions",
+      "description": "Defines a list of two records representing the regions to search for: North and South.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[Region = \"North\"]"},{"Value":"[Region = \"South\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns true because at least one of the target regions (North) appears in the Sales table.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: None of the candidates are present
 
@@ -75,6 +96,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Creates an inline table with a single Category column containing three values: Widgets, Gadgets, and Misc.",
+      "output": {"columns":[{"name":"Category","type":"any"}],"rows":[{"Category":"Widgets"},{"Category":"Gadgets"},{"Category":"Misc"}]}
+    },
+    {
+      "name": "SearchCategories",
+      "description": "Defines a list of two records representing the categories to search for: Electronics and Furniture.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[Category = \"Electronics\"]"},{"Value":"[Category = \"Furniture\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns false because neither Electronics nor Furniture appears in the Products table.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Match on a specific customer with full record comparison
 
@@ -91,4 +133,25 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates an inline table with CustomerName and Product columns for three orders.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"CustomerName":"Alice","Product":"Widget A"},{"CustomerName":"Bob","Product":"Gadget B"},{"CustomerName":"Diana","Product":"Widget C"}]}
+    },
+    {
+      "name": "Candidates",
+      "description": "Defines a list of two records to search for: Diana with Widget C, and Eve with Gadget D.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[CustomerName = \"Diana\", Product = \"Widget C\"]"},{"Value":"[CustomerName = \"Eve\", Product = \"Gadget D\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns true because the first candidate (Diana / Widget C) matches an exact row in the Sales table.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
 -->

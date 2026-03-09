@@ -85,3 +85,29 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-05"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Today",
+      "description": "Calls Date.From on DateTime.LocalNow() to get today's date as a plain date value.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2026-03-09"}]}
+    },
+    {
+      "name": "WeekStart",
+      "description": "Calls Date.StartOfWeek with Day.Monday on Today to get the Monday that begins the current week.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2026-03-09"}]}
+    },
+    {
+      "name": "WeekEnd",
+      "description": "Calls Date.EndOfWeek with Day.Monday on Today to get the Sunday that ends the current week at 23:59:59.9999999.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2026-03-15T23:59:59.9999999"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — filters the Sales table to rows where OrderDate falls within the current Monday-to-Sunday week.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-05"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+    }
+  ]
+}
+-->

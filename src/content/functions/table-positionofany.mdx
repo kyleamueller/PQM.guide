@@ -66,6 +66,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 4 orders containing OrderID, CustomerName, and Product columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"4","CustomerName":"Diana","Product":"Gadget D"}]}
+    },
+    {
+      "name": "Targets",
+      "description": "Defines a list of two records to search for — rows where CustomerName is \"Charlie\" or \"Diana\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[CustomerName = \"Charlie\"]"},{"Value":"[CustomerName = \"Diana\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns the zero-based index of the first row in Sales matching any target by CustomerName, which is row 2 (Charlie).",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"2"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: No candidate matches — returns -1
 
 ```powerquery
@@ -83,6 +105,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"-1"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a table with 3 product names in a single ProductName column.",
+      "output": {"columns":[{"name":"ProductName","type":"any"}],"rows":[{"ProductName":"Widget A"},{"ProductName":"Gadget B"},{"ProductName":"Widget C"}]}
+    },
+    {
+      "name": "Searches",
+      "description": "Defines a list of two records to search for — rows where ProductName is \"Thingamajig E\" or \"Widget Z\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[ProductName = \"Thingamajig E\"]"},{"Value":"[ProductName = \"Widget Z\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns -1 because neither \"Thingamajig E\" nor \"Widget Z\" appears in the Products table.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"-1"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Return all positions matching any of the target customers
 
 ```powerquery
@@ -98,4 +142,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 1, 2, 5, 6}"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 7 orders where Alice appears at rows 0, 2, 6 and Bob appears at rows 1 and 5.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"3","CustomerName":"Alice"},{"OrderID":"4","CustomerName":"Charlie"},{"OrderID":"5","CustomerName":"Diana"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Alice"}]}
+    },
+    {
+      "name": "Targets",
+      "description": "Defines a list of two records to search for — rows where CustomerName is \"Alice\" or \"Bob\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[CustomerName = \"Alice\"]"},{"Value":"[CustomerName = \"Bob\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns a list of all zero-based row indices in Sales where CustomerName matches Alice (0, 2, 6) or Bob (1, 5).",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{0, 1, 2, 5, 6}"}]}
+    }
+  ]
+}
 -->

@@ -57,3 +57,24 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Takes the first 3 rows of Sales and selects only the OrderID, CustomerName, and Product columns, producing a 3-row table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"}]}
+    },
+    {
+      "name": "AsRecords",
+      "description": "Converts the table into a list of records where each record represents one row with fields OrderID, CustomerName, and Product.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[OrderID = 1, CustomerName = \"Alice\", Product = \"Widget A\"]"},{"Value":"[OrderID = 2, CustomerName = \"Bob\", Product = \"Gadget B\"]"},{"Value":"[OrderID = 3, CustomerName = \"Charlie\", Product = \"Widget C\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FromRecords converts the list of records back into a table, reconstructing the original three-column, three-row structure.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C"}]}
+    }
+  ]
+}
+-->

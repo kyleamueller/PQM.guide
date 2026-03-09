@@ -76,3 +76,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{200, 120, 75}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Defines a list of product prices as raw numbers.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":75},{"Value":120},{"Value":25},{"Value":200},{"Value":50}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the prices list in descending order so the highest values come first.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":200},{"Value":120},{"Value":75},{"Value":50},{"Value":25}]}
+    },
+    {
+      "name": "TopThree",
+      "description": "The final output — takes the first 3 items from the sorted descending list, yielding the 3 highest prices.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{200, 120, 75}"}]}
+    }
+  ]
+}
+-->

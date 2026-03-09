@@ -74,6 +74,27 @@ in
 <!--output
 {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Creates a typed table with EmployeeID, FullName, and Department as text columns and Salary as a number column, with two rows that have leading/trailing whitespace in some text fields.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":" alice smith ","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES ","Department":"Engineering","Salary":"95000"}]}
+    },
+    {
+      "name": "TextCols",
+      "description": "Returns the names of all text-typed columns in Employees: {\"EmployeeID\", \"FullName\", \"Department\"}.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"EmployeeID"},{"Value":"FullName"},{"Value":"Department"}]}
+    },
+    {
+      "name": "Trimmed",
+      "description": "The final output — applies Text.Trim to every text column identified in TextCols, removing leading and trailing whitespace from all text values.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Find number and logical columns
 

@@ -104,3 +104,25 @@ in
 <!--output
 {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C v2","Price":"18"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a table with 4 products containing ProductID, ProductName, and Price columns.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"}]}
+    },
+    {
+      "name": "Pos",
+      "description": "Uses Table.PositionOf to find the zero-based row index of the first row where ProductID equals 3, returning 2.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"2"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — since Pos is 2 (>= 0), replaces 1 row at position 2 with an updated record for Widget C v2 at price 18.00.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C v2","Price":"18"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"}]}
+    }
+  ]
+}
+-->

@@ -49,6 +49,28 @@ in
 {"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"},{"Year":"2024","Month":"04"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to an Azure Data Lake Storage account, returning a table of available containers and files.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Azure Data Lake Storage navigator"}]}
+    },
+    {
+      "name": "PartitionedTable",
+      "description": "Navigates to the \"sales\" table within the data lake, returning a reference to the partitioned table.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Partitioned sales table reference"}]}
+    },
+    {
+      "name": "Partitions",
+      "description": "The final output — calls Table.PartitionValues to retrieve the partition key metadata, returning one row per available partition with Year and Month columns.",
+      "output": {"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"},{"Year":"2024","Month":"04"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Inspect partition metadata from a Fabric Lakehouse
 
 ```powerquery
@@ -62,6 +84,28 @@ in
 
 <!--output
 {"columns":[{"name":"Year","type":"any"}],"rows":[{"Year":"2022"},{"Year":"2023"},{"Year":"2024"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to a Microsoft Fabric Lakehouse by workspace and lakehouse ID, returning the available data items.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Fabric Lakehouse navigator"}]}
+    },
+    {
+      "name": "SalesTable",
+      "description": "Navigates to the \"sales\" table within the Lakehouse, returning a reference to the partitioned table.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Partitioned sales table reference"}]}
+    },
+    {
+      "name": "Partitions",
+      "description": "The final output — calls Table.PartitionValues to retrieve partition metadata, returning one row per year partition available in the Lakehouse table.",
+      "output": {"columns":[{"name":"Year","type":"any"}],"rows":[{"Year":"2022"},{"Year":"2023"},{"Year":"2024"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Filter to load only recent partitions
@@ -86,4 +130,36 @@ in
 
 <!--output
 {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Returns all rows from 2024 partitions only, reducing data transfer from the lake."}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Connects to an Azure Data Lake Storage account, returning a navigator for available containers and files.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Azure Data Lake Storage navigator"}]}
+    },
+    {
+      "name": "PartitionedTable",
+      "description": "Navigates to the \"sales\" table within the data lake, returning a reference to the partitioned table.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Partitioned sales table reference"}]}
+    },
+    {
+      "name": "Partitions",
+      "description": "Retrieves all available partition key rows from the sales table, returning one row per partition with Year and Month values.",
+      "output": {"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"},{"Year":"2024","Month":"04"}]}
+    },
+    {
+      "name": "RecentPartitions",
+      "description": "Filters the partition metadata to keep only rows where Year equals \"2024\", identifying which partitions to load.",
+      "output": {"columns":[{"name":"Year","type":"any"},{"name":"Month","type":"any"}],"rows":[{"Year":"2024","Month":"01"},{"Year":"2024","Month":"02"},{"Year":"2024","Month":"03"},{"Year":"2024","Month":"04"}]}
+    },
+    {
+      "name": "Data",
+      "description": "The final output — loads and combines only the 2024 partitions from the data lake, reducing data transfer compared to loading all years.",
+      "output": {"columns":[{"name":"Note","type":"text"}],"rows":[{"Note":"Returns all rows from 2024 partitions only, reducing data transfer from the lake."}]}
+    }
+  ]
+}
 -->

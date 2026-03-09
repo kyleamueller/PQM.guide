@@ -113,3 +113,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"smith"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "fullName",
+      "description": "Stores the source text \"alice smith\" as the string to search and extract from.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"alice smith"}]}
+    },
+    {
+      "name": "spacePos",
+      "description": "Finds the zero-based position of the first space character in \"alice smith\", returning 5.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — since spacePos is not -1, extracts all text after the space using Text.Middle starting at index 6, returning the last name \"smith\".",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"smith"}]}
+    }
+  ]
+}
+-->

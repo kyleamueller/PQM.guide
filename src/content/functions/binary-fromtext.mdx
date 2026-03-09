@@ -54,6 +54,32 @@ in
 <!--output
 {"columns":[{"name":"Encoded","type":"text"},{"name":"Decoded","type":"text"}],"rows":[{"Encoded":"SGVsbG8gV29ybGQ=","Decoded":"Hello World"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Base64Text",
+      "description": "Defines the Base64-encoded text string \"SGVsbG8gV29ybGQ=\" as the input value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"SGVsbG8gV29ybGQ="}]}
+    },
+    {
+      "name": "Decoded",
+      "description": "Decodes the Base64 text into a binary value using Binary.FromText with BinaryEncoding.Base64.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsText",
+      "description": "Converts the decoded binary back into a readable text string using Text.FromBinary.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello World"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original Base64 string alongside the decoded text.",
+      "output": {"columns":[{"name":"Encoded","type":"text"},{"name":"Decoded","type":"text"}],"rows":[{"Encoded":"SGVsbG8gV29ybGQ=","Decoded":"Hello World"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Decode hexadecimal text
 
@@ -70,4 +96,30 @@ in
 
 <!--output
 {"columns":[{"name":"Hex","type":"text"},{"name":"Decoded","type":"text"}],"rows":[{"Hex":"48656C6C6F","Decoded":"Hello"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "HexText",
+      "description": "Defines the hexadecimal-encoded text string \"48656C6C6F\" as the input value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"48656C6C6F"}]}
+    },
+    {
+      "name": "Decoded",
+      "description": "Decodes the hex text into a binary value using Binary.FromText with BinaryEncoding.Hex.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsText",
+      "description": "Converts the decoded binary back into a readable text string using Text.FromBinary.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original hex string alongside the decoded text.",
+      "output": {"columns":[{"name":"Hex","type":"text"},{"name":"Decoded","type":"text"}],"rows":[{"Hex":"48656C6C6F","Decoded":"Hello"}]}
+    }
+  ]
+}
 -->

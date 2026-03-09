@@ -51,6 +51,27 @@ in
 <!--output
 {"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Year":2024,"Month":1,"Day":15,"Hour":9,"Minute":30,"Second":0}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstRow",
+      "description": "Calls Table.First on OrderLog to retrieve the first row as a record, giving access to all its fields including Timestamp.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"LogID","Value":"L001"},{"Field":"OrderID","Value":"1"},{"Field":"Action","Value":"Created"},{"Field":"Timestamp","Value":"2024-01-15T09:30:00"},{"Field":"DurationMinutes","Value":"null"},{"Field":"Notes","Value":"New order: Widget A"}]}
+    },
+    {
+      "name": "Rec",
+      "description": "Calls DateTime.ToRecord on FirstRow[Timestamp] to decompose the datetime 2024-01-15T09:30:00 into a record with Year, Month, Day, Hour, Minute, and Second fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Year","Value":2024},{"Field":"Month","Value":1},{"Field":"Day","Value":15},{"Field":"Hour","Value":9},{"Field":"Minute","Value":30},{"Field":"Second","Value":0}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table displaying each datetime component extracted from the first OrderLog Timestamp.",
+      "output": {"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Year":2024,"Month":1,"Day":15,"Hour":9,"Minute":30,"Second":0}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Convert a scalar datetime to a record
 

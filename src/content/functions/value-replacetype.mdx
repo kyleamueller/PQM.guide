@@ -62,3 +62,34 @@ in
 <!--output
 {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"},{"name":"TypeAssigned","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"East","TypeAssigned":"true"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstRow",
+      "description": "Takes the first row of Sales, keeps only CustomerName, Product, and Region, and returns it as a record.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "CustomType",
+      "description": "Defines a custom record type with explicit text annotations for CustomerName, Product, and Region fields.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Type: CustomerName=text, Product=text, Region=text]"}]}
+    },
+    {
+      "name": "Typed",
+      "description": "Replaces the type metadata on FirstRow with CustomType, annotating the record without changing its data.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "IsMatch",
+      "description": "Checks whether the typed record conforms to the custom record type, returning true if the type annotation matches.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"true"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the typed record's field values alongside a TypeAssigned flag confirming the type was successfully applied.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Region","type":"text"},{"name":"TypeAssigned","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Region":"East","TypeAssigned":"true"}]}
+    }
+  ]
+}
+-->

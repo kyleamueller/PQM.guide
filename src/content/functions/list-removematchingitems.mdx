@@ -68,6 +68,33 @@ in
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{quick, brown, fox}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Words",
+      "description": "Defines a list of 6 words including multiple occurrences of the stopword \"the\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"the"},{"Value":"quick"},{"Value":"the"},{"Value":"brown"},{"Value":"fox"},{"Value":"the"}]}
+    },
+    {
+      "name": "Stopwords",
+      "description": "Defines a list of common stopwords to be removed: \"the\", \"a\", and \"an\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"the"},{"Value":"a"},{"Value":"an"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Removes all occurrences of any Stopwords value from Words, eliminating all three instances of \"the\".",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{quick, brown, fox}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the word list with all stopword occurrences removed.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{quick, brown, fox}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Case-insensitive removal
 
 ```powerquery

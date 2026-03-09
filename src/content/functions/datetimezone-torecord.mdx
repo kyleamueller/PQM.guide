@@ -94,3 +94,29 @@ in
 <!--output
 {"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"OffsetLabel","type":"text"}],"rows":[{"DTZ":"2024-03-15T09:00:00-05:00","OffsetLabel":"-5:00"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "DTZ",
+      "description": "Defines a literal datetimezone value of March 15, 2024 at 9:00 AM with a UTC-5 offset.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-15T09:00:00-05:00"}]}
+    },
+    {
+      "name": "R",
+      "description": "Calls DateTimeZone.ToRecord on DTZ to decompose it into a record with Year, Month, Day, Hour, Minute, Second, ZoneHours, and ZoneMinutes fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Year","Value":2024},{"Field":"Month","Value":3},{"Field":"Day","Value":15},{"Field":"Hour","Value":9},{"Field":"Minute","Value":0},{"Field":"Second","Value":0},{"Field":"ZoneHours","Value":-5},{"Field":"ZoneMinutes","Value":0}]}
+    },
+    {
+      "name": "OffsetLabel",
+      "description": "Builds a formatted UTC offset string from R[ZoneHours] and R[ZoneMinutes] using text concatenation, producing \"-5:00\" for a UTC-5 offset.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"-5:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original datetimezone alongside the formatted offset label string.",
+      "output": {"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"OffsetLabel","type":"text"}],"rows":[{"DTZ":"2024-03-15T09:00:00-05:00","OffsetLabel":"-5:00"}]}
+    }
+  ]
+}
+-->

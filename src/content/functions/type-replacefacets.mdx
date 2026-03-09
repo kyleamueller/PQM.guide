@@ -53,6 +53,23 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "BaseType",
+      "description": "Stores the base type number as the starting point for facet customization.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
+    },
+    {
+      "name": "Constrained",
+      "description": "The final output — applies Precision = 10 and Scale = 2 facets to the number type using Type.ReplaceFacets, then calls Type.Facets to inspect the resulting facet values.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Set MaxLength on a text type
 
 ```powerquery
@@ -78,4 +95,21 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":null},{"Name":"Scale","Value":null}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Constrained",
+      "description": "Creates a number type with Precision = 10 and Scale = 2 facets applied using Type.ReplaceFacets.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+    },
+    {
+      "name": "Cleared",
+      "description": "The final output — removes both facets by setting them to null with another call to Type.ReplaceFacets, then calls Type.Facets to confirm the facet values are now null.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":null},{"Name":"Scale","Value":null}]}
+    }
+  ]
+}
 -->

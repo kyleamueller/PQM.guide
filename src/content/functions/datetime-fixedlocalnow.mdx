@@ -52,6 +52,37 @@ in
 <!--output
 {"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DaysOld","type":"number"},{"name":"HoursOld","type":"number"}],"rows":[{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DaysOld":781.9,"HoursOld":18765.7},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DaysOld":778.1,"HoursOld":18675.2},{"LogID":"L006","Timestamp":"2024-02-02T10:05:00","DaysOld":765.8,"HoursOld":18379.9}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Now",
+      "description": "Calls DateTime.FixedLocalNow() once to capture a stable reference timestamp for the entire query evaluation.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2026-03-08T10:00:00"}]}
+    },
+    {
+      "name": "Source",
+      "description": "Filters OrderLog to rows where DurationMinutes is not null, then selects only the LogID and Timestamp columns.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"}],"rows":[{"LogID":"L002","Timestamp":"2024-01-16T14:15:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00"},{"LogID":"L006","Timestamp":"2024-02-02T10:05:00"},{"LogID":"L008","Timestamp":"2024-02-12T09:30:00"}]}
+    },
+    {
+      "name": "WithDays",
+      "description": "Adds a DaysOld column to Source by computing Duration.TotalDays between Now and each row's Timestamp using the fixed reference.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DaysOld","type":"number"}],"rows":[{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DaysOld":781.9},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DaysOld":778.1},{"LogID":"L006","Timestamp":"2024-02-02T10:05:00","DaysOld":765.8},{"LogID":"L008","Timestamp":"2024-02-12T09:30:00","DaysOld":755.0}]}
+    },
+    {
+      "name": "WithHours",
+      "description": "Adds a HoursOld column to WithDays by computing Duration.TotalHours between Now and each row's Timestamp using the same fixed reference.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DaysOld","type":"number"},{"name":"HoursOld","type":"number"}],"rows":[{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DaysOld":781.9,"HoursOld":18765.7},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DaysOld":778.1,"HoursOld":18675.2},{"LogID":"L006","Timestamp":"2024-02-02T10:05:00","DaysOld":765.8,"HoursOld":18379.9}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the WithHours table showing each log entry's age in both days and hours, computed from a single fixed timestamp.",
+      "output": {"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DaysOld","type":"number"},{"name":"HoursOld","type":"number"}],"rows":[{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DaysOld":781.9,"HoursOld":18765.7},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DaysOld":778.1,"HoursOld":18675.2},{"LogID":"L006","Timestamp":"2024-02-02T10:05:00","DaysOld":765.8,"HoursOld":18379.9}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Stamp rows with a consistent refresh timestamp
 
@@ -69,6 +100,27 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"AsOf","type":"datetime"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","AsOf":"2026-03-08T10:00:00"},{"OrderID":2,"OrderDate":"2024-01-18","AsOf":"2026-03-08T10:00:00"},{"OrderID":3,"OrderDate":"2024-02-01","AsOf":"2026-03-08T10:00:00"},{"OrderID":4,"OrderDate":"2024-02-10","AsOf":"2026-03-08T10:00:00"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RefreshTime",
+      "description": "Calls DateTime.FixedLocalNow() to capture a single stable datetime that will be stamped on every row.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2026-03-08T10:00:00"}]}
+    },
+    {
+      "name": "Source",
+      "description": "Selects only the OrderID and OrderDate columns from the first 4 rows of the Sales table using Table.SelectColumns and Table.FirstN.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15"},{"OrderID":2,"OrderDate":"2024-01-18"},{"OrderID":3,"OrderDate":"2024-02-01"},{"OrderID":4,"OrderDate":"2024-02-10"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adds an AsOf column to Source containing the fixed RefreshTime value on every row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"AsOf","type":"datetime"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","AsOf":"2026-03-08T10:00:00"},{"OrderID":2,"OrderDate":"2024-01-18","AsOf":"2026-03-08T10:00:00"},{"OrderID":3,"OrderDate":"2024-02-01","AsOf":"2026-03-08T10:00:00"},{"OrderID":4,"OrderDate":"2024-02-10","AsOf":"2026-03-08T10:00:00"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Filter orders from the current day using a fixed reference

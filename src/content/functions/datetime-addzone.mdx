@@ -99,3 +99,29 @@ in
 <!--output
 {"columns":[{"name":"LocalEST","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"LocalEST":"2024-03-15T09:00:00-05:00","UTC":"2024-03-15T14:00:00+00:00"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "LocalTime",
+      "description": "Defines a literal datetime value of March 15, 2024 at 9:00 AM representing the source local time.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-03-15T09:00:00"}]}
+    },
+    {
+      "name": "WithZone",
+      "description": "Calls DateTime.AddZone on LocalTime with offset -5 to tag it as Eastern Standard Time, producing a datetimezone without changing the time value.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-15T09:00:00-05:00"}]}
+    },
+    {
+      "name": "AsUTC",
+      "description": "Calls DateTimeZone.SwitchZone on WithZone with offset 0 to convert the EST datetimezone to UTC, shifting the time forward by 5 hours.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-15T14:00:00+00:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table showing both the original EST datetimezone and the converted UTC datetimezone side by side.",
+      "output": {"columns":[{"name":"LocalEST","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"LocalEST":"2024-03-15T09:00:00-05:00","UTC":"2024-03-15T14:00:00+00:00"}]}
+    }
+  ]
+}
+-->

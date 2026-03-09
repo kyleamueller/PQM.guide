@@ -59,6 +59,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 1, CustomerName = \"Alice\", Product = \"Widget A\", UnitPrice = 25, Quantity = 4, OrderDate = #date(2024,1,15), Region = \"East\"]"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline Sales table with three orders containing OrderID, CustomerName, Product, UnitPrice, Quantity, OrderDate, and Region columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","UnitPrice":15,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the Sales table by OrderDate ascending so the earliest order appears first.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","UnitPrice":15,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.First returns the first row of the sorted table as a record, which corresponds to the earliest order.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 1, CustomerName = \"Alice\", Product = \"Widget A\", UnitPrice = 25, Quantity = 4, OrderDate = #date(2024,1,15), Region = \"East\"]"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Extract a specific field from the first row
 
@@ -78,6 +99,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Gadget B"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline Sales table with two orders containing OrderID, CustomerName, Product, and UnitPrice columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the Sales table by UnitPrice descending so the most expensive product appears first.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50},{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.First returns the top row as a record and [Product] accesses its Product field, yielding the most expensive product name.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Gadget B"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Return a safe default when the filter matches no rows
 
@@ -94,4 +136,25 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"None\", Region = \"N/A\"]"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline Sales table with two rows containing OrderID, CustomerName, and Region columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Region":"West"}]}
+    },
+    {
+      "name": "Filtered",
+      "description": "Filters the table to keep only rows where Region equals \"North\", which matches no rows and produces an empty table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.First on the empty filtered table returns the supplied default record since there are no rows to return.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"None\", Region = \"N/A\"]"}]}
+    }
+  ]
+}
 -->

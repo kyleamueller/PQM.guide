@@ -70,6 +70,12 @@ export interface FunctionIndexEntry {
   keywords?: string;
 }
 
+export interface ExampleStep {
+  name: string;
+  description?: string;
+  output: PQTableData;
+}
+
 export interface ConceptFrontmatter {
   title: string;
   slug: string;

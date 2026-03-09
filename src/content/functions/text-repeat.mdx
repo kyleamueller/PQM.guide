@@ -74,6 +74,28 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"      - Item"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "level",
+      "description": "Stores the nesting level as the number 3, representing how deep the item is indented.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3}]}
+    },
+    {
+      "name": "indent",
+      "description": "Repeats two spaces three times using Text.Repeat to create a six-character indentation prefix.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"      "}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — concatenates the indentation prefix with \"- Item\" to produce an indented list entry at nesting level 3.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"      - Item"}]}
+    }
+  ]
+}
+-->
+
 ### Example 4: Zero repetitions returns an empty string
 
 ```powerquery

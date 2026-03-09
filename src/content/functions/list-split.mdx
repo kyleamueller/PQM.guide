@@ -73,3 +73,29 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AllIDs",
+      "description": "Generates a list of 250 consecutive integers starting at 1, representing the full set of IDs to batch-process.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1},{"Value":2},{"Value":"..."},{"Value":250}]}
+    },
+    {
+      "name": "Batches",
+      "description": "Splits AllIDs into chunks of 100, producing a list of 3 sub-lists (two full batches of 100 and one partial batch of 50).",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"{1..100}"},{"Value":"{101..200}"},{"Value":"{201..250}"}]}
+    },
+    {
+      "name": "BatchCount",
+      "description": "Counts the number of batches in the Batches list, confirming that 250 items split into chunks of 100 yields 3 batches.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the scalar count 3, representing the number of batches produced.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+    }
+  ]
+}
+-->

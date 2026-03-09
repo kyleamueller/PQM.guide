@@ -62,6 +62,28 @@ in
 {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50"},{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a table with 5 products containing ProductID, ProductName, Category, and Price columns.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets","Price":"15"},{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75"},{"ProductID":"5","ProductName":"Thingamajig E","Category":"Misc","Price":"120"}]}
+    },
+    {
+      "name": "Discontinued",
+      "description": "Defines a list of two full records representing the discontinued products to remove (Widget C and Thingamajig E).",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[ProductID = 3, ProductName = \"Widget C\", Category = \"Widgets\", Price = 15]"},{"Value":"[ProductID = 5, ProductName = \"Thingamajig E\", Category = \"Misc\", Price = 120]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes all rows from Products that exactly match any record in the Discontinued list, leaving 3 active products.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50"},{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Remove specific customers by name using equationCriteria
 
 Use `equationCriteria` to match only on CustomerName, ignoring other columns.
@@ -82,6 +104,28 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Region":"West"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 5 orders containing OrderID, CustomerName, Product, and Region columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Region":"West"}]}
+    },
+    {
+      "name": "Excluded",
+      "description": "Defines a list of two partial records identifying customers to exclude — Bob and Charlie.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[CustomerName = \"Bob\"]"},{"Value":"[CustomerName = \"Charlie\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes all rows from Sales where CustomerName matches any record in Excluded (comparing only CustomerName), leaving Alice and Diana's orders.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Region":"West"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Remove multiple specific order IDs from the Sales table
 
 ```powerquery
@@ -98,4 +142,26 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 5 orders containing OrderID, CustomerName, and Product columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"}]}
+    },
+    {
+      "name": "ToRemove",
+      "description": "Defines a list of two partial records identifying order IDs to remove — orders 2 and 4.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[OrderID = 2]"},{"Value":"[OrderID = 4]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes all rows from Sales where OrderID matches any record in ToRemove (comparing only OrderID), leaving orders 1, 3, and 5.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"}]}
+    }
+  ]
+}
 -->

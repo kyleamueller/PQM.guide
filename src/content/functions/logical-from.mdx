@@ -57,3 +57,29 @@ in
 <!--output
 {"columns":[{"name":"InputValue","type":"text"},{"name":"AsLogical","type":"text"}],"rows":[{"InputValue":"0","AsLogical":"false"},{"InputValue":"1","AsLogical":"true"},{"InputValue":"4","AsLogical":"true"},{"InputValue":"-1","AsLogical":"true"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines a list of four numbers {0, 1, 4, -1} representing the input values to convert.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0},{"Value":1},{"Value":4},{"Value":-1}]}
+    },
+    {
+      "name": "Results",
+      "description": "Applies Logical.From to each number in Values, converting 0 to false and all non-zero values to true.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":"false"},{"Value":"true"},{"Value":"true"},{"Value":"true"}]}
+    },
+    {
+      "name": "TextResults",
+      "description": "Converts the logical Results list to text strings so they can be displayed in a table column alongside the original input values.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"false"},{"Value":"true"},{"Value":"true"},{"Value":"true"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-column table pairing each numeric input value with its corresponding logical conversion result.",
+      "output": {"columns":[{"name":"InputValue","type":"text"},{"name":"AsLogical","type":"text"}],"rows":[{"InputValue":"0","AsLogical":"false"},{"InputValue":"1","AsLogical":"true"},{"InputValue":"4","AsLogical":"true"},{"InputValue":"-1","AsLogical":"true"}]}
+    }
+  ]
+}
+-->

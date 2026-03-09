@@ -91,3 +91,30 @@ in
 <!--output
 {"columns":[{"name":"Original","type":"duration"},{"name":"AsText","type":"text"},{"name":"Recovered","type":"duration"}],"rows":[{"Original":"1.04:45:00","AsText":"1.04:45:00","Recovered":"1.04:45:00"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Defines a duration literal of 1 day, 4 hours, 45 minutes, and 0 seconds.",
+      "output": {"columns":[{"name":"Value","type":"duration"}],"rows":[{"Value":"1.04:45:00"}]}
+    },
+    {
+      "name": "AsText",
+      "description": "Converts the Original duration to its text representation in D.HH:MM:SS format using Duration.ToText.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"1.04:45:00"}]}
+    },
+    {
+      "name": "BackToDuration",
+      "description": "Parses the AsText string back into a duration value using Duration.FromText, demonstrating the round-trip is lossless.",
+      "output": {"columns":[{"name":"Value","type":"duration"}],"rows":[{"Value":"1.04:45:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the original duration, its text form, and the recovered duration after round-tripping through text.",
+      "output": {"columns":[{"name":"Original","type":"duration"},{"name":"AsText","type":"text"},{"name":"Recovered","type":"duration"}],"rows":[{"Original":"1.04:45:00","AsText":"1.04:45:00","Recovered":"1.04:45:00"}]}
+    }
+  ]
+}
+-->

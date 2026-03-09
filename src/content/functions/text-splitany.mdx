@@ -86,3 +86,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Sales","East","Q1"]}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "raw",
+      "description": "Stores the source string \"Sales,,East,,Q1\" which contains consecutive comma separators that will produce empty entries when split.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Sales,,East,,Q1"}]}
+    },
+    {
+      "name": "parts",
+      "description": "Splits the string on every comma using Text.SplitAny, producing a list of five elements including two empty strings from the consecutive commas.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Sales"},{"Value":""},{"Value":"East"},{"Value":""},{"Value":"Q1"}]}
+    },
+    {
+      "name": "nonEmpty",
+      "description": "The final output — filters the list with List.Select to remove all empty strings, leaving only the three non-empty segments.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Sales","East","Q1"]}]}
+    }
+  ]
+}
+-->

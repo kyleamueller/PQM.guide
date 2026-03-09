@@ -79,3 +79,20 @@ in
 <!--output
 {"columns":[{"name":"Date","type":"date"}],"rows":[{"Date":"2024-01-01"},{"Date":"2024-01-02"},{"Date":"..."}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "DateList",
+      "description": "Generates a list of 366 consecutive daily dates starting from 2024-01-01, covering the full leap year.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-01"},{"Value":"2024-01-02"},{"Value":"..."},{"Value":"2024-12-31"}]}
+    },
+    {
+      "name": "DateTable",
+      "description": "The final output — converts the date list into a single-column table with each date in its own row.",
+      "output": {"columns":[{"name":"Date","type":"date"}],"rows":[{"Date":"2024-01-01"},{"Date":"2024-01-02"},{"Date":"..."}]}
+    }
+  ]
+}
+-->

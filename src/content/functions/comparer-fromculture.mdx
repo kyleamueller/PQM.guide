@@ -53,3 +53,24 @@ in
 <!--output
 {"columns":[{"name":"Category","type":"text"}],"rows":[{"Category":"Gadgets"},{"Category":"Misc"},{"Category":"Widgets"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Categories",
+      "description": "Extracts the distinct Category values from the Sales table using Table.Column and List.Distinct, producing a deduplicated list.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widgets"},{"Value":"Gadgets"},{"Value":"Misc"}]}
+    },
+    {
+      "name": "Sorted",
+      "description": "Sorts the distinct categories alphabetically using List.Sort with a culture-aware, case-insensitive comparer from Comparer.FromCulture(\"en-US\", true).",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Gadgets"},{"Value":"Misc"},{"Value":"Widgets"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-column table of product categories sorted alphabetically using English culture rules.",
+      "output": {"columns":[{"name":"Category","type":"text"}],"rows":[{"Category":"Gadgets"},{"Category":"Misc"},{"Category":"Widgets"}]}
+    }
+  ]
+}
+-->

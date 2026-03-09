@@ -89,3 +89,29 @@ in
 <!--output
 {"columns":[{"name":"Original","type":"datetimezone"},{"name":"UTC","type":"datetimezone"},{"name":"UTCDatetime","type":"datetime"}],"rows":[{"Original":"2024-03-15T09:00:00-05:00","UTC":"2024-03-15T14:00:00+00:00","UTCDatetime":"2024-03-15T14:00:00"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Input",
+      "description": "Defines a literal datetimezone value of March 15, 2024 at 9:00 AM with a UTC-5 Eastern offset.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-15T09:00:00-05:00"}]}
+    },
+    {
+      "name": "AsUTC",
+      "description": "Calls DateTimeZone.ToUtc on Input to convert the EST timestamp to its UTC equivalent, shifting the time forward by 5 hours.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-15T14:00:00+00:00"}]}
+    },
+    {
+      "name": "AsDatetime",
+      "description": "Calls DateTimeZone.RemoveZone on AsUTC to strip the +00:00 offset annotation, producing a plain UTC datetime value.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-03-15T14:00:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the original datetimezone, the UTC datetimezone, and the plain UTC datetime side by side.",
+      "output": {"columns":[{"name":"Original","type":"datetimezone"},{"name":"UTC","type":"datetimezone"},{"name":"UTCDatetime","type":"datetime"}],"rows":[{"Original":"2024-03-15T09:00:00-05:00","UTC":"2024-03-15T14:00:00+00:00","UTCDatetime":"2024-03-15T14:00:00"}]}
+    }
+  ]
+}
+-->

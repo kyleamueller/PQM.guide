@@ -48,3 +48,30 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"}],"rows":[{"Name":"Alice"},{"Name":"Bob"},{"Name":"Charlie"},{"Name":"Diana"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "SalesNames",
+      "description": "Extracts the distinct customer names from the Sales table's CustomerName column.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice"},{"Value":"Bob"},{"Value":"Charlie"},{"Value":"Diana"}]}
+    },
+    {
+      "name": "CustomerNames",
+      "description": "Extracts the Name column from the Customers table as a list.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice"},{"Value":"Bob"},{"Value":"Charlie"},{"Value":"Diana"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Combines both name lists into one and removes duplicates, producing a single distinct list of all customer names.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice"},{"Value":"Bob"},{"Value":"Charlie"},{"Value":"Diana"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — converts the combined distinct name list into a single-column table labeled Name.",
+      "output": {"columns":[{"name":"Name","type":"text"}],"rows":[{"Name":"Alice"},{"Name":"Bob"},{"Name":"Charlie"},{"Name":"Diana"}]}
+    }
+  ]
+}
+-->

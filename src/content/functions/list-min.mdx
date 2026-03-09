@@ -69,3 +69,25 @@ in
 <!--output
 {"columns":[{"name":"EarliestOrder","type":"date"}],"rows":[{"EarliestOrder":"2024-01-15"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Dates",
+      "description": "Extracts the OrderDate column from the Sales table as a list of date values.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-15"},{"Value":"2024-01-18"},{"Value":"2024-02-01"},{"Value":"2024-02-10"},{"Value":"2024-03-05"},{"Value":"2024-03-12"},{"Value":"2024-04-01"},{"Value":"2024-04-15"}]}
+    },
+    {
+      "name": "Oldest",
+      "description": "Finds the minimum (earliest) date from the Dates list.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-01-15"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the earliest date into a single-row table with an \"EarliestOrder\" column header.",
+      "output": {"columns":[{"name":"EarliestOrder","type":"date"}],"rows":[{"EarliestOrder":"2024-01-15"}]}
+    }
+  ]
+}
+-->

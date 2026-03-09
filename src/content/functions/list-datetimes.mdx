@@ -77,3 +77,20 @@ in
 <!--output
 {"columns":[{"name":"DateTime","type":"datetime"}],"rows":[{"DateTime":"2024-01-01 12:00:00"},{"DateTime":"2024-01-02 12:00:00"},{"DateTime":"2024-01-03 12:00:00"},{"DateTime":"..."}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "DateTimes",
+      "description": "Generates a list of 7 daily datetime values starting at noon on 2024-01-01, each one day apart.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-01 12:00:00"},{"Value":"2024-01-02 12:00:00"},{"Value":"2024-01-03 12:00:00"},{"Value":"..."},{"Value":"2024-01-07 12:00:00"}]}
+    },
+    {
+      "name": "AsTable",
+      "description": "The final output — converts the datetime list into a single-column table with each value in its own row.",
+      "output": {"columns":[{"name":"DateTime","type":"datetime"}],"rows":[{"DateTime":"2024-01-01 12:00:00"},{"DateTime":"2024-01-02 12:00:00"},{"DateTime":"2024-01-03 12:00:00"},{"DateTime":"..."}]}
+    }
+  ]
+}
+-->

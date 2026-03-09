@@ -59,6 +59,38 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates an empty table with ID (number) and Name (text) columns using #table.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "OldType",
+      "description": "Retrieves the current type of the table using Value.Type, which has no keys defined.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [ID = number, Name = text]"}]}
+    },
+    {
+      "name": "NewType",
+      "description": "Replaces all key definitions on the type with a single primary key on the ID column using Type.ReplaceTableKeys.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [ID = number, Name = text]"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "Retrieves the list of key definitions from the new type using Type.TableKeys.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"[Columns={\"ID\"}, Primary=true]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — reads the Primary field of the first key to confirm it is true.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Clear all keys by passing an empty list
 
 ```powerquery
@@ -73,6 +105,33 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates an empty table with ID (number) and Name (text) columns using #table.",
+      "output": {"columns":[{"name":"ID","type":"number"},{"name":"Name","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "TypeWithKey",
+      "description": "Adds a primary key on the ID column to the table's type using Type.AddTableKey.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [ID = number, Name = text]"}]}
+    },
+    {
+      "name": "TypeNoKeys",
+      "description": "Replaces all keys with an empty list using Type.ReplaceTableKeys, effectively removing all key definitions.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [ID = number, Name = text]"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "The final output — retrieves the key list from the updated type using Type.TableKeys, then counts it to confirm zero keys remain.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Replace with both a primary key and an alternate key
@@ -94,4 +153,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Creates an empty table with OrderID (number), Email (text), and Product (text) columns using #table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Email","type":"text"},{"name":"Product","type":"text"}],"rows":[]}
+    },
+    {
+      "name": "NewType",
+      "description": "Replaces all key definitions on the table's type with two keys — a primary key on OrderID and an alternate key on Email — using Type.ReplaceTableKeys.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type table [OrderID = number, Email = text, Product = text]"}]}
+    },
+    {
+      "name": "Keys",
+      "description": "The final output — retrieves the key list from the new type using Type.TableKeys, then counts it to confirm two keys are present.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
+    }
+  ]
+}
 -->

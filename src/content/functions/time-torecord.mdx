@@ -53,6 +53,33 @@ in
 {"columns":[{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Hour":9,"Minute":30,"Second":0}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstRow",
+      "description": "Retrieves the first row from the OrderLog table as a record.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"LogID","Value":"L001"},{"Field":"OrderID","Value":1},{"Field":"Action","Value":"Created"},{"Field":"Timestamp","Value":"2024-01-15T09:30:00"},{"Field":"DurationMinutes","Value":null},{"Field":"Notes","Value":"New order: Widget A"}]}
+    },
+    {
+      "name": "TimeValue",
+      "description": "Extracts only the time component from the Timestamp field of the first row using DateTime.Time.",
+      "output": {"columns":[{"name":"Value","type":"time"}],"rows":[{"Value":"09:30:00"}]}
+    },
+    {
+      "name": "Rec",
+      "description": "Converts the time value into a record with Hour, Minute, and Second fields using Time.ToRecord.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"Hour","Value":9},{"Field":"Minute","Value":30},{"Field":"Second","Value":0}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents the time components as a single-row table with Hour, Minute, and Second columns.",
+      "output": {"columns":[{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Hour":9,"Minute":30,"Second":0}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Convert a scalar time to a record
 
 Convert a literal time value into its component parts.

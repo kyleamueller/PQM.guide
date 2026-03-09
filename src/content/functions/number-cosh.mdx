@@ -71,3 +71,24 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "X",
+      "description": "Assigns the input value 3 at which the hyperbolic identity will be evaluated.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3}]}
+    },
+    {
+      "name": "Identity",
+      "description": "Computes cosh(3)² − sinh(3)², which theoretically equals 1 by the fundamental hyperbolic identity (before floating-point rounding).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1.0000000000000002}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Number.Round applied to 10 decimal places, confirming the hyperbolic identity result rounds to exactly 1.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+    }
+  ]
+}
+-->

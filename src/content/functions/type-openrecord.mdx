@@ -51,6 +51,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Closed",
+      "description": "Closes the base record type using Type.ClosedRecord, producing a closed record type that disallows extra fields.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type record"}]}
+    },
+    {
+      "name": "Opened",
+      "description": "The final output — converts the closed record type back to open using Type.OpenRecord, then checks Type.IsOpenRecord to confirm it is open.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Open a typed record type built with Type.ForRecord
 
 ```powerquery
@@ -65,6 +82,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Closed",
+      "description": "Constructs a closed record type with a required Name (text) field using Type.ForRecord with isOpen = false.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [Name = text]"}]}
+    },
+    {
+      "name": "Opened",
+      "description": "The final output — converts the closed typed record type to open using Type.OpenRecord, then checks Type.IsOpenRecord to confirm it is open.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Opening an already-open type returns it unchanged
 
 ```powerquery
@@ -77,4 +111,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AlreadyOpen",
+      "description": "Stores the base record type (type record), which is already open by default in Power Query M.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type record"}]}
+    },
+    {
+      "name": "StillOpen",
+      "description": "The final output — calls Type.OpenRecord on the already-open type, then checks Type.IsOpenRecord to confirm it is still open (the function is idempotent).",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
 -->

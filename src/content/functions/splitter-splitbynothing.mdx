@@ -70,3 +70,24 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "splitter",
+      "description": "Calls Splitter.SplitByNothing() to obtain the no-op splitter function.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "result",
+      "description": "Applies the splitter to the text \"Sales Rep\", producing a single-element list containing the original text.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Sales Rep"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the count of elements in the list, which is always 1 because SplitByNothing never splits.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+    }
+  ]
+}
+-->

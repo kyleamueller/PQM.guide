@@ -73,3 +73,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{64, 22, 88, 46, 13}"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Randoms",
+      "description": "Generates a list of 5 random decimal numbers between 0 and 1 using seed 1 for reproducibility.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.64},{"Value":0.22},{"Value":0.88},{"Value":0.46},{"Value":0.13}]}
+    },
+    {
+      "name": "Integers",
+      "description": "Transforms each decimal in Randoms by multiplying by 100 and rounding down, then adding 1 to produce integers in the range 1–100.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{64, 22, 88, 46, 13}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a list of 5 random integers between 1 and 100 generated from seed 1.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{64, 22, 88, 46, 13}"}]}
+    }
+  ]
+}
+-->

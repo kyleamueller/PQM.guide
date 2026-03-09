@@ -65,6 +65,28 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Score","type":"number"}],"rows":[{"Name":"Alice","Score":95},{"Name":"Bob","Score":82}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "JsonText",
+      "description": "Defines a JSON string literal containing an array of two objects, each with a Name and Score property.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[{\"Name\":\"Alice\",\"Score\":95},{\"Name\":\"Bob\",\"Score\":82}]"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Parses the JSON string using Json.Document, producing an M list of two records.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Record, Record]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-row table with Name and Score columns, converted from the list of records using Table.FromRecords.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Score","type":"number"}],"rows":[{"Name":"Alice","Score":95},{"Name":"Bob","Score":82}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Parse a JSON object
 
 Parse a single JSON object and extract values from the resulting record.
@@ -79,4 +101,26 @@ in
 
 <!--output
 {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"status","Value":"ok"},{"Field":"count","Value":"42"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "JsonText",
+      "description": "Defines a JSON string literal representing a single object with a status text field and a count number field.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"{\"status\":\"ok\",\"count\":42}"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Parses the JSON string using Json.Document, producing an M record with fields status and count accessible by name.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"status","Value":"ok"},{"Field":"count","Value":"42"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-row table showing each field name and its value extracted from the parsed record, with count converted to text.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"status","Value":"ok"},{"Field":"count","Value":"42"}]}
+    }
+  ]
+}
 -->

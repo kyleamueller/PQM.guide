@@ -75,3 +75,29 @@ in
 <!--output
 {"columns":[{"name":"Type","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Type":"Single","Value":1.2345679},{"Type":"Double","Value":1.23456789012345}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Stores the high-precision double-precision literal 1.23456789012345.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1.23456789012345}]}
+    },
+    {
+      "name": "AsSingle",
+      "description": "Converts the original value to single-precision (32-bit float) using Single.From, truncating to approximately 7 significant digits.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1.2345679}]}
+    },
+    {
+      "name": "AsDouble",
+      "description": "Converts the original value to double-precision using Double.From, preserving all 15 significant digits.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1.23456789012345}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table comparing the single-precision and double-precision representations side by side.",
+      "output": {"columns":[{"name":"Type","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Type":"Single","Value":1.2345679},{"Type":"Double","Value":1.23456789012345}]}
+    }
+  ]
+}
+-->

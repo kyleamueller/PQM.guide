@@ -59,3 +59,30 @@ in
 <!--output
 {"columns":[{"name":"Original","type":"text"},{"name":"Encoded","type":"text"}],"rows":[{"Original":"Hello World","Encoded":"Hello%20World"},{"Original":"A&B=C","Encoded":"A%26B%3DC"},{"Original":"path/to/file","Encoded":"path%2Fto%2Ffile"},{"Original":"100% done","Encoded":"100%25%20done"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines a list of four text values, each containing characters that require percent-encoding when used in a URI.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello World"},{"Value":"A&B=C"},{"Value":"path/to/file"},{"Value":"100% done"}]}
+    },
+    {
+      "name": "Encoded",
+      "description": "Transforms each text value by applying Uri.EscapeDataString, replacing spaces, ampersands, equals signs, slashes, and percent signs with their %XX equivalents.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello%20World"},{"Value":"A%26B%3DC"},{"Value":"path%2Fto%2Ffile"},{"Value":"100%25%20done"}]}
+    },
+    {
+      "name": "Rows",
+      "description": "Builds a list of two-element lists pairing each original value with its encoded counterpart for use as table rows.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":["Hello World","Hello%20World"]},{"Value":["A&B=C","A%26B%3DC"]},{"Value":["path/to/file","path%2Fto%2Ffile"]},{"Value":["100% done","100%25%20done"]}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table showing each original text value alongside its percent-encoded equivalent.",
+      "output": {"columns":[{"name":"Original","type":"text"},{"name":"Encoded","type":"text"}],"rows":[{"Original":"Hello World","Encoded":"Hello%20World"},{"Original":"A&B=C","Encoded":"A%26B%3DC"},{"Original":"path/to/file","Encoded":"path%2Fto%2Ffile"},{"Original":"100% done","Encoded":"100%25%20done"}]}
+    }
+  ]
+}
+-->

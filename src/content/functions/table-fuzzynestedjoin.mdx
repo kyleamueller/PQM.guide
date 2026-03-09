@@ -85,6 +85,27 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"CustomerMatches","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","CustomerMatches":"[Table]"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","CustomerMatches":"[Table]"},{"OrderID":"3","CustomerName":"Charlei","Amount":"300","CustomerMatches":"[Table]"},{"OrderID":"4","CustomerName":"Diana","Amount":"150","CustomerMatches":"[Table]"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines an inline Orders table with four rows where customer names contain typos or misspellings alongside OrderID and Amount.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180"},{"OrderID":"3","CustomerName":"Charlei","Amount":"300"},{"OrderID":"4","CustomerName":"Diana","Amount":"150"}]}
+    },
+    {
+      "name": "Customers",
+      "description": "Defines a canonical Customers lookup table with correctly spelled Name and City for four customers.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"Name":"Alice","City":"New York"},{"Name":"Bob","City":"Chicago"},{"Name":"Charlie","City":"Houston"},{"Name":"Diana","City":"Seattle"}]}
+    },
+    {
+      "name": "Joined",
+      "description": "The final output — Table.FuzzyNestedJoin performs a left outer fuzzy join, adding a CustomerMatches column to each order row containing a nested table of matching customers from the Customers table.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"CustomerMatches","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","CustomerMatches":"[Table]"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","CustomerMatches":"[Table]"},{"OrderID":"3","CustomerName":"Charlei","Amount":"300","CustomerMatches":"[Table]"},{"OrderID":"4","CustomerName":"Diana","Amount":"150","CustomerMatches":"[Table]"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Expand the nested column to bring in City data
 
@@ -100,6 +121,32 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"CanonicalName","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","CanonicalName":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","CanonicalName":"Bob","City":"Chicago","State":"IL"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines an inline Orders table with two rows containing misspelled customer names (Alise, Bobb) and order amounts.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180"}]}
+    },
+    {
+      "name": "Customers",
+      "description": "Defines a canonical Customers lookup table with correctly spelled Name, City, and State for two customers.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"Name":"Alice","City":"New York","State":"NY"},{"Name":"Bob","City":"Chicago","State":"IL"}]}
+    },
+    {
+      "name": "Joined",
+      "description": "Performs a fuzzy nested join matching each misspelled CustomerName to its closest canonical Name, adding a CustomerMatches column containing nested tables of matched customer rows.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"CustomerMatches","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","CustomerMatches":"[Table]"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","CustomerMatches":"[Table]"}]}
+    },
+    {
+      "name": "Expanded",
+      "description": "The final output — Table.ExpandTableColumn flattens the CustomerMatches nested column, expanding Name, City, and State from each matched customer row into separate columns renamed CanonicalName, City, and State.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"CanonicalName","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","CanonicalName":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","CanonicalName":"Bob","City":"Chicago","State":"IL"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Count fuzzy matches per order row
@@ -119,4 +166,35 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"Product","type":"any"},{"name":"MatchCount","type":"number"}],"rows":[{"OrderID":"1","Product":"Widge A","MatchCount":"2"},{"OrderID":"2","Product":"Gadgit B","MatchCount":"2"},{"OrderID":"3","Product":"Xyz","MatchCount":"0"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines an inline Orders table with three rows containing OrderID and misspelled or unrecognizable product names.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","Product":"Widge A"},{"OrderID":"2","Product":"Gadgit B"},{"OrderID":"3","Product":"Xyz"}]}
+    },
+    {
+      "name": "Products",
+      "description": "Defines a canonical Products lookup table with four correctly spelled product names.",
+      "output": {"columns":[{"name":"CanonicalName","type":"any"}],"rows":[{"CanonicalName":"Widget A"},{"CanonicalName":"Widget C"},{"CanonicalName":"Gadget B"},{"CanonicalName":"Gadget D"}]}
+    },
+    {
+      "name": "Joined",
+      "description": "Performs a fuzzy nested join with a 0.6 threshold, adding a Matches column to each order row containing a nested table of all canonical products whose names scored above the threshold.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"Product","type":"any"},{"name":"Matches","type":"table"}],"rows":[{"OrderID":"1","Product":"Widge A","Matches":"[Table]"},{"OrderID":"2","Product":"Gadgit B","Matches":"[Table]"},{"OrderID":"3","Product":"Xyz","Matches":"[Table]"}]}
+    },
+    {
+      "name": "WithCount",
+      "description": "Adds a MatchCount column computed by calling Table.RowCount on each row's nested Matches table, revealing how many canonical products matched each order product.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"Product","type":"any"},{"name":"Matches","type":"table"},{"name":"MatchCount","type":"number"}],"rows":[{"OrderID":"1","Product":"Widge A","Matches":"[Table]","MatchCount":"2"},{"OrderID":"2","Product":"Gadgit B","Matches":"[Table]","MatchCount":"2"},{"OrderID":"3","Product":"Xyz","Matches":"[Table]","MatchCount":"0"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes the Matches nested table column, leaving only OrderID, Product, and MatchCount for each order.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"Product","type":"any"},{"name":"MatchCount","type":"number"}],"rows":[{"OrderID":"1","Product":"Widge A","MatchCount":"2"},{"OrderID":"2","Product":"Gadgit B","MatchCount":"2"},{"OrderID":"3","Product":"Xyz","MatchCount":"0"}]}
+    }
+  ]
+}
 -->

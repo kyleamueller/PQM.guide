@@ -50,3 +50,29 @@ in
 <!--output
 {"columns":[{"name":"InputText","type":"text"},{"name":"AsLogical","type":"text"}],"rows":[{"InputText":"true","AsLogical":"true"},{"InputText":"false","AsLogical":"false"},{"InputText":"TRUE","AsLogical":"true"},{"InputText":"False","AsLogical":"false"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines a list of four text strings representing boolean values in different casing: {\"true\", \"false\", \"TRUE\", \"False\"}.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"true"},{"Value":"false"},{"Value":"TRUE"},{"Value":"False"}]}
+    },
+    {
+      "name": "Results",
+      "description": "Applies Logical.FromText to each text string in Values, converting each case-insensitive boolean string to its logical equivalent.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":"true"},{"Value":"false"},{"Value":"true"},{"Value":"false"}]}
+    },
+    {
+      "name": "TextResults",
+      "description": "Converts the logical Results list back to lowercase text strings so they can be displayed uniformly in a table column.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"true"},{"Value":"false"},{"Value":"true"},{"Value":"false"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-column table pairing each original text input with its normalized lowercase logical conversion.",
+      "output": {"columns":[{"name":"InputText","type":"text"},{"name":"AsLogical","type":"text"}],"rows":[{"InputText":"true","AsLogical":"true"},{"InputText":"false","AsLogical":"false"},{"InputText":"TRUE","AsLogical":"true"},{"InputText":"False","AsLogical":"false"}]}
+    }
+  ]
+}
+-->

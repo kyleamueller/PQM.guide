@@ -77,6 +77,27 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"CustomerInfo","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","CustomerInfo":"[Table]"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","CustomerInfo":"[Table]"},{"OrderID":"3","CustomerName":"Alice","Product":"Widget C","UnitPrice":"15","CustomerInfo":"[Table]"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Constructs a 3-row table with OrderID, CustomerName, Product, and UnitPrice columns using #table.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50},{"OrderID":3,"CustomerName":"Alice","Product":"Widget C","UnitPrice":15}]}
+    },
+    {
+      "name": "Customers",
+      "description": "Constructs a 2-row lookup table with Name and City columns using #table.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"Name":"Alice","City":"New York"},{"Name":"Bob","City":"Chicago"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adds a CustomerInfo column to Sales where each cell contains a nested table of matching Customers rows, joined on CustomerName = Name.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"CustomerInfo","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","CustomerInfo":"[Table]"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","CustomerInfo":"[Table]"},{"OrderID":"3","CustomerName":"Alice","Product":"Widget C","UnitPrice":"15","CustomerInfo":"[Table]"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Expand the nested column to get city data
 
@@ -101,6 +122,32 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bob","City":"Chicago","State":"IL"},{"OrderID":"3","CustomerName":"Charlie","City":"Houston","State":"TX"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Constructs a 3-row table with OrderID and CustomerName columns using #table.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":1,"CustomerName":"Alice"},{"OrderID":2,"CustomerName":"Bob"},{"OrderID":3,"CustomerName":"Charlie"}]}
+    },
+    {
+      "name": "Customers",
+      "description": "Constructs a 3-row lookup table with Name, City, and State columns using #table.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"Name":"Alice","City":"New York","State":"NY"},{"Name":"Bob","City":"Chicago","State":"IL"},{"Name":"Charlie","City":"Houston","State":"TX"}]}
+    },
+    {
+      "name": "Joined",
+      "description": "Adds a CustomerInfo column to Sales where each cell contains a nested table of matching Customers rows, joined on CustomerName = Name.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"CustomerInfo","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alice","CustomerInfo":"[Table]"},{"OrderID":"2","CustomerName":"Bob","CustomerInfo":"[Table]"},{"OrderID":"3","CustomerName":"Charlie","CustomerInfo":"[Table]"}]}
+    },
+    {
+      "name": "Expanded",
+      "description": "The final output — expands the CustomerInfo nested tables to bring City and State into the flat result alongside OrderID and CustomerName.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bob","City":"Chicago","State":"IL"},{"OrderID":"3","CustomerName":"Charlie","City":"Houston","State":"TX"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Join on multiple key columns
 
@@ -123,4 +170,25 @@ in
 
 <!--output
 {"columns":[{"name":"Region","type":"any"},{"name":"Product","type":"any"},{"name":"Qty","type":"any"},{"name":"PriceInfo","type":"table"}],"rows":[{"Region":"East","Product":"Widget A","Qty":"4","PriceInfo":"[Table]"},{"Region":"West","Product":"Gadget B","Qty":"2","PriceInfo":"[Table]"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Constructs a 2-row table with Region, Product, and Qty columns using #table.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Product","type":"any"},{"name":"Qty","type":"any"}],"rows":[{"Region":"East","Product":"Widget A","Qty":4},{"Region":"West","Product":"Gadget B","Qty":2}]}
+    },
+    {
+      "name": "Prices",
+      "description": "Constructs a 2-row lookup table with Region, Product, and Price columns using #table.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Product","type":"any"},{"name":"Price","type":"any"}],"rows":[{"Region":"East","Product":"Widget A","Price":25},{"Region":"West","Product":"Gadget B","Price":50}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adds a PriceInfo column to Orders with nested tables of matching Prices rows, joined on the composite key {Region, Product}.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Product","type":"any"},{"name":"Qty","type":"any"},{"name":"PriceInfo","type":"table"}],"rows":[{"Region":"East","Product":"Widget A","Qty":"4","PriceInfo":"[Table]"},{"Region":"West","Product":"Gadget B","Qty":"2","PriceInfo":"[Table]"}]}
+    }
+  ]
+}
 -->

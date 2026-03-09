@@ -67,6 +67,22 @@ in
 <!--output
 {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"Alice Smith","Department":"Sales"},{"EmployeeID":"E002","FullName":"Bob Jones","Department":"Engineering"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Creates an inline table with EmployeeID, FirstName, LastName, and Department columns for three employees.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FirstName","type":"any"},{"name":"LastName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FirstName":"Alice","LastName":"Smith","Department":"Sales"},{"EmployeeID":"E002","FirstName":"Bob","LastName":"Jones","Department":"Engineering"},{"EmployeeID":"E003","FirstName":"Charlie","LastName":"Brown","Department":"Marketing"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "The final output — merges the FirstName and LastName columns into a single FullName column separated by a space, removing the source columns.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"Alice Smith","Department":"Sales"},{"EmployeeID":"E002","FullName":"Bob Jones","Department":"Engineering"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Build a full address string from city and state
 
@@ -88,6 +104,22 @@ in
 
 <!--output
 {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Location","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","Location":"New York, NY"},{"CustomerID":"2","Name":"Bob","Location":"Chicago, IL"},{"CustomerID":"3","Name":"Charlie","Location":"Houston, TX"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Creates an inline table with CustomerID, Name, City, and State columns for three customers.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York","State":"NY"},{"CustomerID":"2","Name":"Bob","City":"Chicago","State":"IL"},{"CustomerID":"3","Name":"Charlie","City":"Houston","State":"TX"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "The final output — merges the City and State columns into a single Location column using \", \" as the delimiter, removing the source columns.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Location","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","Location":"New York, NY"},{"CustomerID":"2","Name":"Bob","Location":"Chicago, IL"},{"CustomerID":"3","Name":"Charlie","Location":"Houston, TX"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Combine fixed-width segments using CombineTextByLengths

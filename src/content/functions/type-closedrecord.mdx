@@ -65,6 +65,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Open",
+      "description": "Creates an open record type with a single required Name field of type text using Type.ForRecord.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [Name = text, ...]"}]}
+    },
+    {
+      "name": "Closed",
+      "description": "The final output — converts the open record type to a closed record type using Type.ClosedRecord, then checks Type.IsOpenRecord to confirm it is no longer open.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Round-trip open → close → open preserves field declarations
 
 ```powerquery
@@ -79,4 +96,31 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RT",
+      "description": "Constructs a closed record type with a required ID field of type number using Type.ForRecord.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [ID = number]"}]}
+    },
+    {
+      "name": "Opened",
+      "description": "Converts the closed record type to an open record type using Type.OpenRecord.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [ID = number, ...]"}]}
+    },
+    {
+      "name": "Closed",
+      "description": "Converts the open record type back to closed using Type.ClosedRecord, preserving the declared fields.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [ID = number]"}]}
+    },
+    {
+      "name": "Fields",
+      "description": "The final output — retrieves the field descriptors from the closed type using Type.RecordFields, then reads the Type of the ID field to confirm it is type number.",
+      "output": {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type number"}]}
+    }
+  ]
+}
 -->

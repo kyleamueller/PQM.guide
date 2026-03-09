@@ -79,3 +79,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "code",
+      "description": "Stores the text value \"US-12345\" as the source string to validate.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"US-12345"}]}
+    },
+    {
+      "name": "sep",
+      "description": "Retrieves the character at zero-based index 2 of the code string, which is the hyphen separator \"-\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"-"}]}
+    },
+    {
+      "name": "isValid",
+      "description": "The final output — checks whether the extracted separator character equals \"-\", returning true if the format is valid.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->

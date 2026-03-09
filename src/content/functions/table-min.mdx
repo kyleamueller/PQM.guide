@@ -93,3 +93,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"N/A\", Region = \"West\", UnitPrice = 0]"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a table with 2 East-region orders containing OrderID, CustomerName, Region, and UnitPrice columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East","UnitPrice":"25"},{"OrderID":"3","CustomerName":"Charlie","Region":"East","UnitPrice":"15"}]}
+    },
+    {
+      "name": "WestSales",
+      "description": "Filters Sales to keep only rows where Region equals \"West\", producing an empty table since all rows are East-region.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — since WestSales is empty, Table.Min returns the provided default record with UnitPrice 0 instead of null.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"N/A\", Region = \"West\", UnitPrice = 0]"}]}
+    }
+  ]
+}
+-->

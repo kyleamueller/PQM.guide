@@ -86,3 +86,30 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Alice,Widget A","Bob,Gadget B","Charlie,Widget C"]}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "original",
+      "description": "Defines the starting list of three comma-separated text lines.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,Widget A"},{"Value":"Bob,Gadget B"},{"Value":"Charlie,Widget C"}]}
+    },
+    {
+      "name": "asBinary",
+      "description": "Converts the list of lines into a UTF-8 encoded binary value by joining them with line feed separators.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"QWxpY2UsV2lkZ2V0IEEKY29iLEdhZGdldCBCCkNoYXJsaWUsV2lkZ2V0IEM="}]}
+    },
+    {
+      "name": "asText",
+      "description": "Decodes the binary value back into a single multi-line text string using Text.FromBinary.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice,Widget A\nBob,Gadget B\nCharlie,Widget C"}]}
+    },
+    {
+      "name": "backToLines",
+      "description": "The final output — splits the multi-line text back into the original list of three lines.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Alice,Widget A","Bob,Gadget B","Charlie,Widget C"]}]}
+    }
+  ]
+}
+-->

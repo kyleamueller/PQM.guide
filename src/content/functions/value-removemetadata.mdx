@@ -60,6 +60,28 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Annotated",
+      "description": "Creates the number 42 with a metadata record attached containing Source = \"Raw\" and Verified = false.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Clean",
+      "description": "Removes all metadata from the annotated value using Value.RemoveMetadata, leaving the underlying value intact but with an empty metadata record.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — retrieves the metadata from the cleaned value, returning an empty record (no rows) confirming all metadata was removed.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[]}
+    }
+  ]
+}
+-->
+
 ### Example 2: The underlying value is preserved after removing metadata
 
 ```powerquery
@@ -74,6 +96,28 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Annotated",
+      "description": "Creates the number 42 with a metadata record attached containing Source = \"Raw\".",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Clean",
+      "description": "Removes all metadata from the annotated value — the underlying number 42 is preserved.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns the cleaned value directly, showing that the number 42 is intact after metadata removal.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Verify that stripped value equals the unwrapped literal
 
 ```powerquery
@@ -86,4 +130,26 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Annotated",
+      "description": "Creates the text value \"hello\" with a metadata record attached containing Tag = \"test\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"hello"}]}
+    },
+    {
+      "name": "Stripped",
+      "description": "Removes all metadata from the annotated value, returning \"hello\" with no metadata attached.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"hello"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — checks that the stripped value is equal to the plain literal \"hello\", returning true to confirm the underlying value is unchanged.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
 -->

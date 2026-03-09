@@ -85,3 +85,25 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Status","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Status":"Processed"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Row",
+      "description": "Retrieves the first row of the Sales table as a record.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"}]}
+    },
+    {
+      "name": "WithStatus",
+      "description": "Adds a new \"Status\" field with the value \"Processed\" to the row record.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"OrderID","Value":1},{"Field":"CustomerName","Value":"Alice"},{"Field":"Product","Value":"Widget A"},{"Field":"Category","Value":"Widgets"},{"Field":"UnitPrice","Value":25},{"Field":"Quantity","Value":4},{"Field":"OrderDate","Value":"2024-01-15"},{"Field":"Region","Value":"East"},{"Field":"Status","Value":"Processed"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — selects only OrderID, CustomerName, Product, and Status from the enriched record.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Status","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Status":"Processed"}]}
+    }
+  ]
+}
+-->

@@ -86,3 +86,39 @@ in
 <!--output
 {"columns":[{"name":"ReadWrite","type":"number"},{"name":"AllPerms","type":"number"}],"rows":[{"ReadWrite":3,"AllPerms":7}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Read",
+      "description": "Assigns the integer value 1 to represent the Read permission flag.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1}]}
+    },
+    {
+      "name": "Write",
+      "description": "Assigns the integer value 2 to represent the Write permission flag.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":2}]}
+    },
+    {
+      "name": "Execute",
+      "description": "Assigns the integer value 4 to represent the Execute permission flag.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":4}]}
+    },
+    {
+      "name": "ReadWrite",
+      "description": "Combines Read (1) and Write (2) permission flags using bitwise OR, producing 3 (binary 011).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3}]}
+    },
+    {
+      "name": "AllPerms",
+      "description": "Combines ReadWrite (3) with Execute (4) using bitwise OR, producing 7 (binary 111) — all three permissions set.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":7}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing ReadWrite = 3 and AllPerms = 7.",
+      "output": {"columns":[{"name":"ReadWrite","type":"number"},{"name":"AllPerms","type":"number"}],"rows":[{"ReadWrite":3,"AllPerms":7}]}
+    }
+  ]
+}
+-->

@@ -58,6 +58,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates an inline table with OrderID and CustomerName columns for five orders, including Alice and Diana as customers.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"3","CustomerName":"Charlie"},{"OrderID":"4","CustomerName":"Alice"},{"OrderID":"5","CustomerName":"Diana"}]}
+    },
+    {
+      "name": "RequiredCustomers",
+      "description": "Defines a list of two records representing the customer names that must appear in the Sales table: Alice and Diana.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[CustomerName = \"Alice\"]"},{"Value":"[CustomerName = \"Diana\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns true because both Alice and Diana appear in the CustomerName column of Sales.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->
 
 ### Example 2: Detect a missing required category
 
@@ -75,6 +96,27 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Creates an inline table with ProductName and Category columns for three products covering Widgets, Gadgets, and Misc categories.",
+      "output": {"columns":[{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductName":"Widget A","Category":"Widgets"},{"ProductName":"Gadget B","Category":"Gadgets"},{"ProductName":"Thingamajig E","Category":"Misc"}]}
+    },
+    {
+      "name": "RequiredCategories",
+      "description": "Defines a list of three records representing the categories that must all appear in Products: Widgets, Gadgets, and Electronics.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[Category = \"Widgets\"]"},{"Value":"[Category = \"Gadgets\"]"},{"Value":"[Category = \"Electronics\"]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns false because the Electronics category is not present in the Products table.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+    }
+  ]
+}
+-->
 
 ### Example 3: Validate all mandatory OrderIDs exist before processing
 
@@ -91,4 +133,25 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates an inline table with OrderID, CustomerName, and Product columns for three orders with OrderIDs 1, 2, and 3.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"}]}
+    },
+    {
+      "name": "MandatoryOrders",
+      "description": "Defines a list of three records representing the OrderIDs that must all exist in Sales: 1, 2, and 3.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"[OrderID = 1]"},{"Value":"[OrderID = 2]"},{"Value":"[OrderID = 3]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — returns true because all three required OrderIDs (1, 2, 3) are present in the Sales table.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
 -->

@@ -81,3 +81,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Keys",
+      "description": "Defines a list of key strings to validate for uniqueness.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"ID-001"},{"Value":"ID-002"},{"Value":"ID-003"},{"Value":"ID-004"}]}
+    },
+    {
+      "name": "IsUnique",
+      "description": "The final output — checks whether all values in the Keys list are distinct, returning true because no duplicates exist.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->

@@ -91,3 +91,24 @@ in
 <!--output
 {"columns":[{"name":"Created","type":"datetime"},{"name":"Shipped","type":"datetime"},{"name":"ElapsedHours","type":"number"}],"rows":[{"Created":"2024-01-15T09:30:00","Shipped":"2024-01-16T14:15:00","ElapsedHours":28.75}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Created",
+      "description": "Defines the order creation timestamp as January 15, 2024 at 9:30 AM using a datetime literal.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-15T09:30:00"}]}
+    },
+    {
+      "name": "Shipped",
+      "description": "Defines the order shipment timestamp as January 16, 2024 at 2:15 PM using a datetime literal.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-01-16T14:15:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing both timestamps and the elapsed hours computed by Duration.TotalHours(Shipped - Created), which yields 28.75 hours.",
+      "output": {"columns":[{"name":"Created","type":"datetime"},{"name":"Shipped","type":"datetime"},{"name":"ElapsedHours","type":"number"}],"rows":[{"Created":"2024-01-15T09:30:00","Shipped":"2024-01-16T14:15:00","ElapsedHours":28.75}]}
+    }
+  ]
+}
+-->

@@ -71,3 +71,34 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1161.8341765024749}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Principal",
+      "description": "Assigns the initial investment amount of $1,000.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1000}]}
+    },
+    {
+      "name": "Rate",
+      "description": "Assigns the annual interest rate of 5% expressed as a decimal (0.05).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.05}]}
+    },
+    {
+      "name": "Years",
+      "description": "Assigns the investment duration of 3 years.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":3}]}
+    },
+    {
+      "name": "FinalValue",
+      "description": "Applies the continuous compounding formula P × e^(r×t): multiplies $1,000 by e^(0.05 × 3) = e^0.15 ≈ 1.16183, yielding approximately $1,161.83.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1161.8341765024749}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the continuously compounded future value of the investment after 3 years.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1161.8341765024749}]}
+    }
+  ]
+}
+-->

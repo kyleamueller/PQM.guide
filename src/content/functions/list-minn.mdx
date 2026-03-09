@@ -79,3 +79,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":450},{"Result":850},{"Result":975}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Costs",
+      "description": "Defines a list of item costs to find the lowest values from.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1200},{"Value":850},{"Value":3400},{"Value":450},{"Value":2100},{"Value":975}]}
+    },
+    {
+      "name": "BottomThree",
+      "description": "The final output — returns the 3 smallest cost values from the list, sorted in ascending order.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":450},{"Result":850},{"Result":975}]}
+    }
+  ]
+}
+-->

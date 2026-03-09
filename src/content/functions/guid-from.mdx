@@ -78,3 +78,20 @@ in
 <!--output
 {"columns":[{"name":"RawID","type":"text"}],"rows":[{"RawID":"a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72"},{"RawID":"b1c2d3e4-f5a6-b7c8-d9e0-f1a2b3c4d5e6"},{"RawID":null}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "rawIds",
+      "description": "Constructs a three-row table with a single RawID column containing GUIDs in mixed formats: one with uppercase and hyphens, one as 32 hex digits without hyphens, and one null.",
+      "output": {"columns":[{"name":"RawID","type":"text"}],"rows":[{"RawID":"A3F8C2D1-4B7E-4F2A-9C6D-1E8B3A5F0D72"},{"RawID":"b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6"},{"RawID":null}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — all RawID values normalized to lowercase hyphenated GUID format using Guid.From; the null value is preserved as null.",
+      "output": {"columns":[{"name":"RawID","type":"text"}],"rows":[{"RawID":"a3f8c2d1-4b7e-4f2a-9c6d-1e8b3a5f0d72"},{"RawID":"b1c2d3e4-f5a6-b7c8-d9e0-f1a2b3c4d5e6"},{"RawID":null}]}
+    }
+  ]
+}
+-->

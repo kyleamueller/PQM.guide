@@ -74,3 +74,34 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{6, 7, 8, 9, 10}"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AllItems",
+      "description": "Generates a list of 15 consecutive integers starting at 1, representing the full dataset to paginate through.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":1},{"Value":2},{"Value":3},{"Value":4},{"Value":5},{"Value":6},{"Value":7},{"Value":8},{"Value":9},{"Value":10},{"Value":11},{"Value":12},{"Value":13},{"Value":14},{"Value":15}]}
+    },
+    {
+      "name": "PageSize",
+      "description": "Defines the number of items per page as the scalar value 5.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5}]}
+    },
+    {
+      "name": "Page",
+      "description": "Defines the current page number as the scalar value 2.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":2}]}
+    },
+    {
+      "name": "PageItems",
+      "description": "Skips the first 5 items (page 1) using List.Skip, then takes the next 5 items using List.FirstN, returning the second page of results.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":6},{"Value":7},{"Value":8},{"Value":9},{"Value":10}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the five items that make up page 2 of the paginated list.",
+      "output": {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"{6, 7, 8, 9, 10}"}]}
+    }
+  ]
+}
+-->

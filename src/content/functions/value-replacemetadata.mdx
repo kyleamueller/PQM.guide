@@ -56,6 +56,28 @@ in
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Calculated"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Annotated",
+      "description": "Attaches a metadata record with Source = \"Calculated\" and Verified = true to the number 42 using Value.ReplaceMetadata.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Meta",
+      "description": "Retrieves the metadata record from the annotated value, returning a record with Source and Verified fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"Source","Value":"Calculated"},{"Field":"Verified","Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — accesses the Source field from the metadata record, returning \"Calculated\".",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Calculated"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Replace existing metadata — old fields are discarded
 
 ```powerquery
@@ -69,6 +91,33 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"new"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Creates the text value \"hello\" with a metadata record containing Tag = \"old\" attached via the meta keyword.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"hello"}]}
+    },
+    {
+      "name": "Updated",
+      "description": "Replaces the entire metadata record on \"hello\" with a new record containing Tag = \"new\" — the old Tag = \"old\" is discarded.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"hello"}]}
+    },
+    {
+      "name": "Meta",
+      "description": "Retrieves the metadata record from the updated value, returning the new metadata with Tag = \"new\".",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"Tag","Value":"new"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — accesses the Tag field from the new metadata record, returning \"new\" to confirm the replacement.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"new"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: The underlying value is unchanged by metadata replacement

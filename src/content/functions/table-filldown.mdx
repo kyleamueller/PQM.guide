@@ -56,3 +56,24 @@ in
 <!--output
 {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Sorts the Sales table by Region ascending, then selects only Region, Product, and Quantity columns, producing an 8-row table grouped by region.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"North","Product":"Gadget D","Quantity":1},{"Region":"North","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+    },
+    {
+      "name": "WithBlanks",
+      "description": "Replaces every occurrence of \"North\" in the Region column with null, simulating a grouped export where region labels appear only on the first row of each group.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":null,"Product":"Gadget D","Quantity":1},{"Region":null,"Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — applies Table.FillDown on the Region column, propagating the last non-null value downward so the null \"North\" rows are restored.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+    }
+  ]
+}
+-->

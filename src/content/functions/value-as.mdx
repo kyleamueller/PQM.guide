@@ -53,3 +53,25 @@ in
 <!--output
 {"columns":[{"name":"UnitPrice","type":"number"}],"rows":[{"UnitPrice":25},{"UnitPrice":50},{"UnitPrice":15},{"UnitPrice":75}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Extracts the UnitPrice column values from the first 4 rows of the Sales table as a list of numbers.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":25},{"Value":50},{"Value":15},{"Value":75}]}
+    },
+    {
+      "name": "Asserted",
+      "description": "Applies Value.As to each price value asserting it is of type number — since all values are numbers, the list passes through unchanged.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":25},{"Value":50},{"Value":15},{"Value":75}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a table displaying the four asserted UnitPrice values.",
+      "output": {"columns":[{"name":"UnitPrice","type":"number"}],"rows":[{"UnitPrice":25},{"UnitPrice":50},{"UnitPrice":15},{"UnitPrice":75}]}
+    }
+  ]
+}
+-->

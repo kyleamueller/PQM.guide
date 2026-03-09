@@ -70,3 +70,35 @@ in
 <!--output
 {"columns":[{"name":"Total","type":"number"},{"name":"NonNull","type":"number"},{"name":"Completeness %","type":"number"}],"rows":[{"Total":7,"NonNull":4,"Completeness %":57.142857142857142}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Values",
+      "description": "Defines a list of 7 items containing 4 numbers and 3 null values.",
+      "output": {"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":100},{"Value":null},{"Value":250},{"Value":null},{"Value":null},{"Value":400},{"Value":150}]}
+    },
+    {
+      "name": "Total",
+      "description": "Counts all items in Values including nulls, returning 7 as the total list length.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":7}]}
+    },
+    {
+      "name": "NonNull",
+      "description": "Counts only the non-null items in Values, returning 4.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":4}]}
+    },
+    {
+      "name": "Completeness",
+      "description": "Divides NonNull by Total to compute the fill rate as a decimal (4 / 7 ≈ 0.5714).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":0.5714285714285714}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing Total, NonNull, and Completeness % for the Values list.",
+      "output": {"columns":[{"name":"Total","type":"number"},{"name":"NonNull","type":"number"},{"name":"Completeness %","type":"number"}],"rows":[{"Total":7,"NonNull":4,"Completeness %":57.142857142857142}]}
+    }
+  ]
+}
+-->

@@ -83,3 +83,25 @@ in
 <!--output
 {"columns":[{"name":"UTC Timestamp","type":"datetimezone"}],"rows":[{"UTC Timestamp":"2024-03-01 14:00:00 +00:00"},{"UTC Timestamp":"2024-03-02 14:00:00 +00:00"},{"UTC Timestamp":"2024-03-03 14:00:00 +00:00"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "EasternTimes",
+      "description": "Generates a list of 3 daily datetimezone values starting at 09:00 US Eastern time (UTC-5) on 2024-03-01.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-01 09:00:00 -05:00"},{"Value":"2024-03-02 09:00:00 -05:00"},{"Value":"2024-03-03 09:00:00 -05:00"}]}
+    },
+    {
+      "name": "AsUtc",
+      "description": "Converts each Eastern time value to UTC by applying DateTimeZone.ToUtc, shifting the time forward by 5 hours.",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-03-01 14:00:00 +00:00"},{"Value":"2024-03-02 14:00:00 +00:00"},{"Value":"2024-03-03 14:00:00 +00:00"}]}
+    },
+    {
+      "name": "AsTable",
+      "description": "The final output — converts the UTC datetimezone list into a single-column table labeled UTC Timestamp.",
+      "output": {"columns":[{"name":"UTC Timestamp","type":"datetimezone"}],"rows":[{"UTC Timestamp":"2024-03-01 14:00:00 +00:00"},{"UTC Timestamp":"2024-03-02 14:00:00 +00:00"},{"UTC Timestamp":"2024-03-03 14:00:00 +00:00"}]}
+    }
+  ]
+}
+-->

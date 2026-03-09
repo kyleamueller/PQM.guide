@@ -56,3 +56,25 @@ in
 <!--output
 {"columns":[{"name":"Expression","type":"text"},{"name":"Result","type":"number"}],"rows":[{"Expression":"AddFn(10, 32)","Result":42}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AddType",
+      "description": "Defines a function type signature that accepts two number parameters (a and b) and returns a number.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"type function (a as number, b as number) as number"}]}
+    },
+    {
+      "name": "AddFn",
+      "description": "Creates a typed two-parameter function using Function.From, wrapping a unary function that adds the two named parameters from the received record.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the expression called and the numeric result of invoking AddFn(10, 32), which returns 42.",
+      "output": {"columns":[{"name":"Expression","type":"text"},{"name":"Result","type":"number"}],"rows":[{"Expression":"AddFn(10, 32)","Result":42}]}
+    }
+  ]
+}
+-->

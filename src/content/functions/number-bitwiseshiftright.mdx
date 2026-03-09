@@ -78,3 +78,29 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Assigns the starting integer value 5.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5}]}
+    },
+    {
+      "name": "Shifted",
+      "description": "Shifts the bits of 5 left by 3 positions using Number.BitwiseShiftLeft, producing 40 (5 × 2³).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":40}]}
+    },
+    {
+      "name": "Restored",
+      "description": "Shifts 40 right by 3 positions using Number.BitwiseShiftRight, recovering the original value 5 (40 ÷ 2³).",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":5}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the round-trip result, confirming the original value 5 is fully restored.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
+    }
+  ]
+}
+-->
