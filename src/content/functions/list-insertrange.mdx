@@ -35,13 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.InsertRange` returns a new list with the specified `values` inserted at the given zero-based `index`. The original list is not modified.
+`List.InsertRange` returns a new list with the `values` list inserted at the specified zero-based `index`. All items at and after the insertion position are shifted right. The original list is not modified.
 
-- Items at and after the insertion point are shifted to the right.
-- An index of `0` inserts at the beginning.
-- An index equal to the list length inserts at the end (equivalent to appending).
-- If the index is out of range, an error is raised.
-- To insert a single value, wrap it in a list: `{value}`.
+An index of `0` inserts at the very beginning. An index equal to the list length inserts at the end, equivalent to using `List.Combine({list, values})`. If the index is out of range (negative or greater than the list length), an error is raised. To insert a single value rather than a list of values, wrap it in a list literal: `{myValue}`.
+
+This function is most useful when building a list programmatically and needing to splice values into a specific position. For replacing a range of items, use `List.ReplaceRange`. For removing items, use `List.RemoveRange`.
 
 ## Examples
 

@@ -28,11 +28,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.StartOfQuarter` returns the first day of the calendar quarter (Q1: January 1, Q2: April 1, Q3: July 1, Q4: October 1) that contains the given `date`, `datetime`, or `datetimezone` value. The return type matches the input type. This is useful for period-over-period comparisons and filtering within a quarter.
+`Date.StartOfQuarter` returns the first day of the calendar quarter (Q1: January 1, Q2: April 1, Q3: July 1, Q4: October 1) that contains the given `date`, `datetime`, or `datetimezone` value. The return type matches the input type. This is useful for period-over-period comparisons, quarter-to-date filters, and grouping data by quarter.
+
+Pair with `Date.EndOfQuarter` to construct inclusive quarter-range filters: `[OrderDate] >= Date.StartOfQuarter(refDate) and [OrderDate] <= Date.EndOfQuarter(refDate)`. When passed a plain `date`, the result is also a `date` (unlike `Date.EndOfQuarter`, which returns a `datetime`).
+
+For the current quarter start, use `Date.StartOfQuarter(Date.From(DateTime.LocalNow()))`. To get the start of the prior quarter, apply `Date.AddQuarters` first: `Date.StartOfQuarter(Date.AddQuarters(Date.From(DateTime.LocalNow()), -1))`.
 
 ## Examples
 
-### Example 1: Add quarter-start date to Sales table
+### Example 1: Add quarter-start date to the Sales table
 
 Add a column showing the first day of the quarter for each order.
 
@@ -52,17 +56,43 @@ Table.AddColumn(
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"QuarterStart","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","QuarterStart":"2024-01-01"},{"OrderID":2,"OrderDate":"2024-01-18","QuarterStart":"2024-01-01"},{"OrderID":3,"OrderDate":"2024-02-01","QuarterStart":"2024-01-01"},{"OrderID":4,"OrderDate":"2024-02-10","QuarterStart":"2024-01-01"},{"OrderID":5,"OrderDate":"2024-03-05","QuarterStart":"2024-01-01"}]}
 -->
 
-### Example 2: Start of Q3
+### Example 2: Start of quarter for all four quarters
 
-Return the first day of Q3 2024.
+Show the start date for each quarter of 2024.
 
 ```powerquery
 #table(
-    type table [Date = date, StartOfQ3 = date],
-    {{#date(2024, 8, 15), Date.StartOfQuarter(#date(2024, 8, 15))}}
+    type table [Quarter = text, StartDate = date],
+    {
+        {"Q1", Date.StartOfQuarter(#date(2024, 2, 15))},
+        {"Q2", Date.StartOfQuarter(#date(2024, 5, 20))},
+        {"Q3", Date.StartOfQuarter(#date(2024, 8, 15))},
+        {"Q4", Date.StartOfQuarter(#date(2024, 11, 1))}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"Date","type":"date"},{"name":"StartOfQ3","type":"date"}],"rows":[{"Date":"2024-08-15","StartOfQ3":"2024-07-01"}]}
+{"columns":[{"name":"Quarter","type":"text"},{"name":"StartDate","type":"date"}],"rows":[{"Quarter":"Q1","StartDate":"2024-01-01"},{"Quarter":"Q2","StartDate":"2024-04-01"},{"Quarter":"Q3","StartDate":"2024-07-01"},{"Quarter":"Q4","StartDate":"2024-10-01"}]}
+-->
+
+### Example 3: Filter orders for the current quarter to date
+
+Combine StartOfQuarter with today's date to get current-quarter orders up to today.
+
+Input: `Sales`
+
+```powerquery
+let
+    Today = Date.From(DateTime.LocalNow()),
+    QuarterStart = Date.StartOfQuarter(Today)
+in
+    Table.SelectRows(
+        Sales,
+        each [OrderDate] >= QuarterStart and [OrderDate] <= Today
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
 -->

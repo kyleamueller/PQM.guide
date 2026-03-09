@@ -29,11 +29,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Permutations` computes P(n, k) — the number of ordered arrangements of `permutationSize` items drawn from a set of `setSize` items. Unlike combinations, the order of selection matters here: choosing A then B is different from choosing B then A.
+`Number.Permutations` computes P(n, k) — the number of distinct ordered arrangements of `permutationSize` items drawn from a set of `setSize` items. Unlike `Number.Combinations`, order matters: selecting item A then B is a different outcome than B then A.
 
 The formula is: P(n, k) = n! / (n − k)!
 
-`Number.Permutations(n, k)` is always >= `Number.Combinations(n, k)` (by a factor of k!). When `permutationSize` equals `setSize`, the result is n! (all possible orderings of the full set).
+The relationship between permutations and combinations is: P(n, k) = C(n, k) × k!, because for each combination of k items, there are k! ways to arrange them. `Number.Permutations(n, k)` is always ≥ `Number.Combinations(n, k)` (equal only when k = 0 or k = 1).
+
+Special cases: `P(n, 0) = 1` (one way to arrange nothing), `P(n, n) = n!` (total orderings of the full set). When `permutationSize > setSize`, the result is 0 (impossible).
+
+Use `Number.Permutations` when order is meaningful: race placements, password combinations, scheduling sequences, or any scenario where the same items in a different order count as a distinct outcome.
 
 ## Examples
 
@@ -47,7 +51,7 @@ Number.Permutations(5, 3)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":60}]}
 -->
 
-### Example 2: How many ways 3 runners can place in 1st, 2nd, 3rd from 8 competitors
+### Example 2: How many ways can 3 runners finish 1st, 2nd, 3rd from 8 competitors?
 
 ```powerquery
 Number.Permutations(8, 3)
@@ -57,7 +61,7 @@ Number.Permutations(8, 3)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":336}]}
 -->
 
-### Example 3: Compare permutations vs combinations for same n and k
+### Example 3: Compare permutations vs combinations — ratio equals k!
 
 ```powerquery
 #table(
@@ -65,11 +69,11 @@ Number.Permutations(8, 3)
     {
         {"Combinations C(8,3)", Number.Combinations(8, 3)},
         {"Permutations P(8,3)", Number.Permutations(8, 3)},
-        {"Ratio (k!)", Number.Factorial(3)}
+        {"Ratio P/C = k! = 3!", Number.Permutations(8, 3) / Number.Combinations(8, 3)}
     }
 )
 ```
 
 <!--output
-{"columns":[{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Measure":"Combinations C(8,3)","Value":56},{"Measure":"Permutations P(8,3)","Value":336},{"Measure":"Ratio (k!)","Value":6}]}
+{"columns":[{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Measure":"Combinations C(8,3)","Value":56},{"Measure":"Permutations P(8,3)","Value":336},{"Measure":"Ratio P/C = k! = 3!","Value":6}]}
 -->

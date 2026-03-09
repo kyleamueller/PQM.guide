@@ -30,36 +30,66 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Column` extracts all values from a named column as a list. This is a concise alternative to `Table.ToList` when you only need one column's values. The result is commonly passed to list aggregation functions such as `List.Sum`, `List.Max`, or `List.Distinct`.
+`Table.Column` extracts all values from a named column and returns them as a list. It is a concise shorthand for `Table.ToColumns(Table.SelectColumns(table, {column}))`{0}` and the result is identical to accessing a column via `table[ColumnName]` syntax. The `table[ColumnName]` shorthand is often preferred for brevity in expressions, while `Table.Column` is clearer in procedural step-by-step queries.
 
-If the column name does not exist in the table, an error is raised.
+The returned list is commonly passed to aggregation functions such as `List.Sum`, `List.Max`, `List.Distinct`, or `List.Average`. If the column name does not exist, an error is raised at runtime. To avoid this in dynamic scenarios, guard with `Table.HasColumns` first.
+
+`Table.Column` does not fold to data sources. If you need aggregate values from a large database table, prefer native aggregation via `Table.Group` or source-side functions to preserve query folding.
 
 ## Examples
 
-### Example 1: Extract a column as a list
-
-```powerquery
-Table.Column(
-    #table({"Product", "Amount"}, {{"A", 250}, {"B", 180}, {"C", 420}}),
-    "Amount"
-)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{250, 180, 420}"}]}
--->
-
-### Example 2: Sum values from a column
+### Example 1: Extract all unit prices from the Products table
 
 ```powerquery
 let
-    Source = #table({"Item", "Sales"}, {{"X", 100}, {"Y", 200}, {"Z", 300}}),
-    Values = Table.Column(Source, "Sales"),
-    Total  = List.Sum(Values)
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Category = text, Price = number, InStock = logical],
+        {{1, "Widget A", "Widgets", 25.00, true}, {2, "Gadget B", "Gadgets", 50.00, true},
+         {3, "Widget C", "Widgets", 15.00, false}, {4, "Gadget D", "Gadgets", 75.00, true},
+         {5, "Thingamajig E", "Misc", 120.00, false}}
+    )
 in
-    Total
+    Table.Column(Products, "Price")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"600"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{25, 50, 15, 75, 120}"}]}
+-->
+
+### Example 2: Sum all order quantities
+
+Use the extracted list directly in an aggregation function.
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Category", "UnitPrice", "Quantity", "OrderDate", "Region"},
+        {{1,"Alice","Widget A","Widgets",25.00,4,#date(2024,1,15),"East"},
+         {2,"Bob","Gadget B","Gadgets",50.00,2,#date(2024,1,18),"West"},
+         {3,"Charlie","Widget C","Widgets",15.00,10,#date(2024,2,1),"East"}}
+    ),
+    Quantities = Table.Column(Sales, "Quantity")
+in
+    List.Sum(Quantities)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"16"}]}
+-->
+
+### Example 3: Get distinct customer names
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Alice","Widget C"},{4,"Bob","Gadget D"}}
+    ),
+    Names = Table.Column(Sales, "CustomerName")
+in
+    List.Distinct(Names)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Alice\", \"Bob\"}"}]}
 -->

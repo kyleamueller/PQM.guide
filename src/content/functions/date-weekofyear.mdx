@@ -31,7 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.WeekOfYear` returns the week number within the calendar year, starting from 1. The first week is the one containing January 1. The `firstDayOfWeek` parameter controls which day begins a new week (default Sunday). Note that this uses a simple week counting convention and may differ from ISO 8601 week numbers, which define the first week as the one containing the first Thursday of the year. If the input is `null`, the function returns `null`.
+`Date.WeekOfYear` returns the week number within the calendar year, starting from 1. Week 1 is always the week containing January 1. The optional `firstDayOfWeek` parameter controls which day starts a new week — default is `Day.Sunday` (0). Always use the `Day.*` enum constants rather than integer literals to keep code readable. If the input is `null`, the function returns `null`.
+
+Be aware that `Date.WeekOfYear` uses a simple sequential week-counting rule rather than the ISO 8601 standard. ISO 8601 defines week 1 as the week containing the first Thursday of the year, which means January 1 may fall in week 52 or 53 of the previous year in ISO numbering. If you need true ISO week numbers, you will need a custom calculation using `Date.StartOfWeek` with `Day.Monday`.
+
+`Date.WeekOfYear` is useful for week-over-week trend analysis and for creating weekly grouping keys alongside the year. Combine with `Date.Year` to build a year-week key such as `"2024-W03"` for consistent period labeling.
 
 ## Examples
 
@@ -47,7 +51,7 @@ Table.AddColumn(
         Table.FirstN(Sales, 5),
         {"OrderID", "OrderDate"}
     ),
-    "WeekOfYear", each Date.WeekOfYear([OrderDate]), Int64.Type
+    "WeekOfYear", each Date.WeekOfYear([OrderDate], Day.Sunday), Int64.Type
 )
 ```
 
@@ -68,4 +72,25 @@ Return the week number for March 15, 2024 using Monday as the first day of the w
 
 <!--output
 {"columns":[{"name":"Date","type":"date"},{"name":"WeekOfYear","type":"number"}],"rows":[{"Date":"2024-03-15","WeekOfYear":11}]}
+-->
+
+### Example 3: Build a year-week period label
+
+Create a sortable label like "2024-W03" for use in reports and visualizations.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "OrderDate"}),
+    "YearWeek",
+    each
+        Text.From(Date.Year([OrderDate])) & "-W"
+        & Text.PadStart(Text.From(Date.WeekOfYear([OrderDate], Day.Sunday)), 2, "0"),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"YearWeek","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","YearWeek":"2024-W03"},{"OrderID":2,"OrderDate":"2024-01-18","YearWeek":"2024-W03"},{"OrderID":3,"OrderDate":"2024-02-01","YearWeek":"2024-W05"},{"OrderID":4,"OrderDate":"2024-02-10","YearWeek":"2024-W06"},{"OrderID":5,"OrderDate":"2024-03-05","YearWeek":"2024-W10"}]}
 -->

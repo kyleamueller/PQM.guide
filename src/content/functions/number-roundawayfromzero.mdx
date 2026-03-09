@@ -31,15 +31,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.RoundAwayFromZero` implements the "Round Half Away From Zero" rule: when a value falls exactly halfway between two representable values, it rounds to the value farther from zero. For positive numbers this is the familiar "round half up" behavior; for negative numbers it rounds down (further negative).
+`Number.RoundAwayFromZero` implements "Round Half Away From Zero" — when a value falls exactly halfway between two representable values, it rounds to the value that is farther from zero. For positive numbers this means rounding up (2.5 → 3); for negative numbers this means rounding down toward more negative values (-2.5 → -3).
 
-This contrasts with `Number.Round`, which defaults to "Round Half to Even" (banker's rounding) to minimize statistical bias over large datasets.
+This is the **conventional rounding** taught in most schools and used in Excel's `ROUND` function. It is a useful alternative to `Number.Round`, which defaults to "Round Half to Even" (banker's rounding), where ties round to the nearest even number (2.5 → 2, 3.5 → 4). Banker's rounding is statistically unbiased over large datasets, but `Number.RoundAwayFromZero` matches common human expectations and matches Excel's behavior.
 
-Use `Number.RoundAwayFromZero` when you need conventional rounding as taught in most school curricula, or when matching Excel's `ROUND` function behavior.
+The optional `digits` parameter specifies how many decimal places to retain. When omitted, it rounds to the nearest integer. Negative values are not supported for `digits`.
+
+When to use each:
+- Use `Number.RoundAwayFromZero` when matching Excel, matching user expectations, or when presenting rounded values to end users
+- Use `Number.Round` (banker's rounding) when statistically unbiased rounding is required for large financial datasets
 
 ## Examples
 
-### Example 1: Round a positive tie away from zero
+### Example 1: Positive half-value rounds up (away from zero)
 
 ```powerquery
 Number.RoundAwayFromZero(2.5)
@@ -49,7 +53,7 @@ Number.RoundAwayFromZero(2.5)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
 
-### Example 2: Round a negative tie away from zero
+### Example 2: Negative half-value rounds down (away from zero, toward -∞)
 
 ```powerquery
 Number.RoundAwayFromZero(-2.5)
@@ -69,17 +73,20 @@ Number.RoundAwayFromZero(1.555, 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1.56}]}
 -->
 
-### Example 4: Round sales amounts in a table
-
-Input: `Sales`
+### Example 4: Compare banker's rounding vs. away-from-zero on half-values
 
 ```powerquery
-Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "UnitPrice"}),
-    "Rounded", each Number.RoundAwayFromZero([UnitPrice], 0), type number
+#table(
+    {"Value", "Number.Round (Banker's)", "RoundAwayFromZero"},
+    {
+        {0.5, Number.Round(0.5), Number.RoundAwayFromZero(0.5)},
+        {1.5, Number.Round(1.5), Number.RoundAwayFromZero(1.5)},
+        {2.5, Number.Round(2.5), Number.RoundAwayFromZero(2.5)},
+        {3.5, Number.Round(3.5), Number.RoundAwayFromZero(3.5)}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"},{"name":"Rounded","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25.5,"Rounded":26},{"OrderID":2,"UnitPrice":149.5,"Rounded":150},{"OrderID":3,"UnitPrice":74.5,"Rounded":75}]}
+{"columns":[{"name":"Value","type":"number"},{"name":"Number.Round (Banker's)","type":"number"},{"name":"RoundAwayFromZero","type":"number"}],"rows":[{"Value":0.5,"Number.Round (Banker's)":0,"RoundAwayFromZero":1},{"Value":1.5,"Number.Round (Banker's)":2,"RoundAwayFromZero":2},{"Value":2.5,"Number.Round (Banker's)":2,"RoundAwayFromZero":3},{"Value":3.5,"Number.Round (Banker's)":4,"RoundAwayFromZero":4}]}
 -->

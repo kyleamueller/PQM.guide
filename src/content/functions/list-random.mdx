@@ -30,12 +30,13 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Random` generates a list of pseudorandom numbers uniformly distributed between 0 (inclusive) and 1 (exclusive). This is useful for sampling, simulations, randomized testing, and adding noise to data.
+`List.Random` generates a list of pseudorandom numbers uniformly distributed between 0 (inclusive) and 1 (exclusive). This is useful for sampling, simulations, randomized testing, shuffling data, and adding noise.
 
-- Without a `seed`, each query execution produces a different sequence.
-- With a fixed `seed`, the same sequence is produced every time — useful for reproducible results.
-- To generate random integers in a range, use `List.Transform` with `Number.RoundDown`.
-- Because Power Query is lazy and may re-evaluate expressions, consider using `List.Buffer` on the result if the list needs to be stable across multiple references.
+Without a `seed`, `List.Random` is **non-deterministic**: each query refresh produces a different sequence of values. This means the results will change every time the query is evaluated, including between previews. If you need stable values within a session (for example, to use the same random values in multiple calculations), wrap the result in `List.Buffer` immediately after generating it.
+
+With a fixed `seed`, the same sequence is produced on every evaluation. Use a seed when you need reproducible results for testing or documentation purposes.
+
+To generate random integers in a range `[min, max)`, use `List.Transform(List.Random(n), each Number.RoundDown(_ * (max - min)) + min)`. To simulate random boolean values (coin flips), use `List.Transform(List.Random(n), each _ >= 0.5)`.
 
 ## Examples
 

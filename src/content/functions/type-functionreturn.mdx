@@ -26,15 +26,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.FunctionReturn` extracts the declared return type from a function type. If the function type does not declare a return type, the result is `type any`.
+`Type.FunctionReturn` extracts the declared return type from a function type. When a function type explicitly declares its return type (e.g., `type function (x as number) as text`), this function returns that declared type. When no return type is declared, or when the return type is `any`, the result is `type any`.
 
-Use `Value.Type(fn)` to obtain the function type from a function value before passing it to this function.
+This function operates on a **function type value** — not a function value directly. To get the type of an existing function, pass it through `Value.Type(fn)` first, then call `Type.FunctionReturn` on the result.
 
-This is useful for introspecting function signatures in metaprogramming, custom documentation generation, or building generic pipelines that need to know the output type of a function.
+`Type.FunctionReturn` is used alongside `Type.FunctionParameters` for runtime signature inspection. Typical use cases include:
+
+- **Documentation generators** that describe what a function produces
+- **Generic pipelines** that need to validate or adapt based on a function's output type
+- **Custom connector development** where function return types are declared programmatically
+
+Most built-in Power Query functions declare `nullable` return types (e.g., `type nullable number`) because they can return null when inputs are null.
 
 ## Examples
 
-### Example 1: Return type of a typed function
+### Example 1: Return type of a typed function literal
 
 ```powerquery
 let
@@ -47,7 +53,7 @@ in
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
 -->
 
-### Example 2: Return type of Number.Abs
+### Example 2: Return type of a built-in function
 
 ```powerquery
 Type.FunctionReturn(Value.Type(Number.Abs))
@@ -57,7 +63,7 @@ Type.FunctionReturn(Value.Type(Number.Abs))
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type nullable number"}]}
 -->
 
-### Example 3: A function without declared return type returns any
+### Example 3: Undeclared return type produces type any
 
 ```powerquery
 let

@@ -43,39 +43,84 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.AddJoinColumn` is similar to `Table.NestedJoin` but is designed for use in custom connector scenarios where the right-side data (`table2`) may be a function that is called per key. For standard table-to-table joins in Power Query, `Table.NestedJoin` is typically preferred.
+`Table.AddJoinColumn` adds a column of nested tables to `table1` by matching each row's key against `table2`. The `table2` parameter is typed as `function` in the signature because this function was designed for custom connector scenarios where the right-side data may be a function invoked per key rather than a static table. In practice, you can pass an actual table and the function behaves like a left outer nested join.
 
-The result adds a column to `table1` where each cell is a nested table of matching rows from `table2`. Use `Table.ExpandTableColumn` to flatten the nested results.
+For standard table-to-table joins in Power Query, `Table.NestedJoin` is preferred because it is more legible and has the same semantics. Reserve `Table.AddJoinColumn` for situations where the data connector pattern requires it, such as when building a connector that pages right-side data on demand.
+
+Each cell in the new nested column contains a table of all matching rows from `table2`. Use `Table.ExpandTableColumn` to flatten these nested tables into additional columns on `table1`. Rows with no match produce an empty nested table (not null), so the expansion yields no rows for that key rather than an error.
 
 ## Examples
 
-### Example 1: Add a nested join column
+### Example 1: Add a nested join column using Sales and Customers
+
+Each Sales row gets a nested table of matching Customer records.
 
 ```powerquery
 let
-    Orders    = #table({"OrderID", "CustomerID"}, {{1, 10}, {2, 20}, {3, 10}}),
-    Customers = #table({"CustomerID", "Name"}, {{10, "Alice"}, {20, "Bob"}}),
-    Result    = Table.AddJoinColumn(Orders, "CustomerID", Customers, "CustomerID", "CustomerDetails")
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice"},
+        {
+            {1, "Alice", "Widget A", 25.00},
+            {2, "Bob",   "Gadget B", 50.00},
+            {3, "Alice", "Widget C", 15.00}
+        }
+    ),
+    Customers = #table(
+        {"Name", "City"},
+        {{"Alice", "New York"}, {"Bob", "Chicago"}}
+    ),
+    Result = Table.AddJoinColumn(Sales, "CustomerName", Customers, "Name", "CustomerInfo")
 in
     Result
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerID","type":"any"},{"name":"CustomerDetails","type":"table"}],"rows":[{"OrderID":"1","CustomerID":"10","CustomerDetails":"[Table]"},{"OrderID":"2","CustomerID":"20","CustomerDetails":"[Table]"},{"OrderID":"3","CustomerID":"10","CustomerDetails":"[Table]"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"CustomerInfo","type":"table"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","CustomerInfo":"[Table]"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","CustomerInfo":"[Table]"},{"OrderID":"3","CustomerName":"Alice","Product":"Widget C","UnitPrice":"15","CustomerInfo":"[Table]"}]}
 -->
 
-### Example 2: Expand the nested column
+### Example 2: Expand the nested column to get city data
+
+After adding the join column, expand to pull the City field into the flat result.
 
 ```powerquery
 let
-    Orders    = #table({"OrderID", "CustomerID"}, {{1, 10}, {2, 20}}),
-    Customers = #table({"CustomerID", "Name"}, {{10, "Alice"}, {20, "Bob"}}),
-    Joined    = Table.AddJoinColumn(Orders, "CustomerID", Customers, "CustomerID", "CustomerDetails"),
-    Expanded  = Table.ExpandTableColumn(Joined, "CustomerDetails", {"Name"})
+    Sales = #table(
+        {"OrderID", "CustomerName"},
+        {{1, "Alice"}, {2, "Bob"}, {3, "Charlie"}}
+    ),
+    Customers = #table(
+        {"Name", "City", "State"},
+        {{"Alice", "New York", "NY"}, {"Bob", "Chicago", "IL"}, {"Charlie", "Houston", "TX"}}
+    ),
+    Joined   = Table.AddJoinColumn(Sales, "CustomerName", Customers, "Name", "CustomerInfo"),
+    Expanded = Table.ExpandTableColumn(Joined, "CustomerInfo", {"City", "State"})
 in
     Expanded
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"OrderID":"1","CustomerID":"10","Name":"Alice"},{"OrderID":"2","CustomerID":"20","Name":"Bob"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bob","City":"Chicago","State":"IL"},{"OrderID":"3","CustomerName":"Charlie","City":"Houston","State":"TX"}]}
+-->
+
+### Example 3: Join on multiple key columns
+
+Supply a list for both `key1` and `key2` to match on composite keys.
+
+```powerquery
+let
+    Orders = #table(
+        {"Region", "Product", "Qty"},
+        {{"East", "Widget A", 4}, {"West", "Gadget B", 2}}
+    ),
+    Prices = #table(
+        {"Region", "Product", "Price"},
+        {{"East", "Widget A", 25.00}, {"West", "Gadget B", 50.00}}
+    ),
+    Result = Table.AddJoinColumn(Orders, {"Region", "Product"}, Prices, {"Region", "Product"}, "PriceInfo")
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Region","type":"any"},{"name":"Product","type":"any"},{"name":"Qty","type":"any"},{"name":"PriceInfo","type":"table"}],"rows":[{"Region":"East","Product":"Widget A","Qty":"4","PriceInfo":"[Table]"},{"Region":"West","Product":"Gadget B","Qty":"2","PriceInfo":"[Table]"}]}
 -->

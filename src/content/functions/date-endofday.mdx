@@ -28,25 +28,29 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.EndOfDay` returns a `datetime` (or `datetimezone`, if the input is a `datetimezone`) representing the very last instant of the day: 23:59:59.9999999. When passed a plain `date`, the result is a `datetime`. This is useful for building inclusive date range filters where you need to capture every event that occurred on a given day.
+`Date.EndOfDay` returns the very last instant of the day — 23:59:59.9999999 — as a `datetime` (or `datetimezone`, if the input is a `datetimezone`). When passed a plain `date`, the result is a `datetime`. This is useful for building inclusive upper-bound filters when working with datetime columns, ensuring that events at any time on that day are captured.
+
+A common pattern is combining `Date.StartOfDay` and `Date.EndOfDay` to create an inclusive date range: `[EventTime] >= Date.StartOfDay(startDate) and [EventTime] <= Date.EndOfDay(endDate)`. This avoids the off-by-one errors that occur when filtering datetimes with a date-only boundary.
+
+When passed a `datetimezone`, the output preserves the timezone offset and adjusts only the time components. The function does not convert across timezones — use `DateTimeZone.SwitchZone` if you need timezone conversion before applying the day boundary.
 
 ## Examples
 
-### Example 1: Filter events that occurred on or before the end of a specific day
+### Example 1: Filter log entries on or before the end of January 15
 
-Keep only rows where EventTime falls on or before the end of January 15, 2024.
+Use an inclusive upper-bound filter on a datetime column.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.SelectRows(
-    Events,
-    each [EventTime] <= Date.EndOfDay(#date(2024, 1, 15))
+    OrderLog,
+    each [Timestamp] <= Date.EndOfDay(#date(2024, 1, 15))
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00"},{"EventID":2,"EventTime":"2024-01-15T23:59:59"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L001","OrderID":1,"Action":"Created","Timestamp":"2024-01-15T09:30:00","DurationMinutes":null,"Notes":"New order: Widget A"}]}
 -->
 
 ### Example 2: End-of-day for a specific date
@@ -62,4 +66,26 @@ Return the last instant of March 15, 2024.
 
 <!--output
 {"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T23:59:59.9999999"}]}
+-->
+
+### Example 3: Build an inclusive date range filter
+
+Filter log entries to a specific day using both StartOfDay and EndOfDay.
+
+Input: `OrderLog`
+
+```powerquery
+let
+    TargetDate = #date(2024, 1, 16),
+    RangeStart = Date.StartOfDay(TargetDate),
+    RangeEnd = Date.EndOfDay(TargetDate)
+in
+    Table.SelectRows(
+        OrderLog,
+        each [Timestamp] >= RangeStart and [Timestamp] <= RangeEnd
+    )
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L002","OrderID":1,"Action":"Shipped","Timestamp":"2024-01-16T14:15:00","DurationMinutes":1725,"Notes":"Shipped via express"}]}
 -->

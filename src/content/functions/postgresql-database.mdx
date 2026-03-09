@@ -34,25 +34,23 @@ relatedFunctions:
 
 ## Remarks
 
-`PostgreSQL.Database` connects to a PostgreSQL server and returns a navigation table of tables, views, and other objects from the specified database. The connector uses Npgsql (the .NET PostgreSQL driver) which is bundled with Power BI Desktop.
+`PostgreSQL.Database` connects to a PostgreSQL server and returns a navigation table of tables, views, and other objects from the specified database. The connector uses Npgsql (the open-source .NET driver for PostgreSQL), which is bundled with Power BI Desktop. No separate driver installation is required for Power BI Desktop. The function supports PostgreSQL on-premises, Amazon RDS, Amazon Aurora (PostgreSQL-compatible), Azure Database for PostgreSQL, and other managed PostgreSQL services.
 
-**Authentication**: Supports database authentication (username and password). Configure credentials in the Power Query credentials dialog.
+**Authentication**: Database username and password authentication is the standard method. Configure credentials in the Power Query data source credentials dialog — do not embed passwords in the M query. Windows authentication (Kerberos) may be supported depending on your PostgreSQL server's `pg_hba.conf` configuration.
 
-**Query folding**: PostgreSQL supports query folding. Filters, projections, sorts, and aggregations are translated into SQL and pushed to the PostgreSQL server.
+**Schema navigation**: PostgreSQL organizes tables into schemas (the default schema is `public`). The navigation table is organized by schema. Reference a table using the `{[Schema="schema_name", Item="table_name"]}` key record syntax. To group the navigation table visually by schema, set `[HierarchicalNavigation = true]` in the options record.
+
+**Query folding**: PostgreSQL supports full query folding. Filters, projections, sorts, joins, groupings, and aggregations applied in Power Query are translated to SQL and executed on the PostgreSQL server. This is critical for performance on large tables — always apply filters before expanding columns.
 
 **Custom port**: The default PostgreSQL port is 5432. To connect on a non-default port, append it to the server string: `"myserver.com:5433"`.
 
-**Schemas**: PostgreSQL organizes tables into schemas (similar to SQL Server schemas). The navigation table is organized by schema, and you reference tables using `{[Schema="schema_name", Item="table_name"]}`.
-
 **Key options**:
-- `CommandTimeout` (duration) — maximum time for a query to execute before timing out.
-- `CreateNavigationProperties` (logical) — generate navigation properties based on foreign key constraints.
+- `CommandTimeout` (duration) — maximum time to wait for a query to complete before timing out.
+- `CreateNavigationProperties` (logical) — generate navigation properties from PostgreSQL foreign key constraints.
 - `HierarchicalNavigation` (logical) — group the navigation table by schema.
-- `Query` (text) — execute a native PostgreSQL SQL query instead of navigating to a table.
+- `Query` (text) — execute a native PostgreSQL SQL statement directly instead of navigating to a table. Useful for database-specific syntax (e.g., `date_trunc`, `LATERAL` joins, CTEs).
 
-**SSL/TLS**: PostgreSQL connections typically use SSL. The Npgsql driver negotiates SSL automatically if the server requires it.
-
-**Amazon RDS / Aurora / Azure Database for PostgreSQL**: These managed PostgreSQL services are fully supported. Use the cloud instance endpoint as the server address.
+**Power BI Service**: Direct cloud refresh for PostgreSQL is not supported without an on-premises data gateway. Install the gateway on a machine that can reach the PostgreSQL server, and configure database credentials in the gateway data source settings.
 
 ## Examples
 
@@ -61,7 +59,7 @@ relatedFunctions:
 PostgreSQL.Database("myserver.com", "sales")
 ```
 
-### Example 2: Connect to PostgreSQL on a custom port
+### Example 2: Connect to PostgreSQL on a non-default port
 ```powerquery
 PostgreSQL.Database("myserver.com:5433", "analytics")
 ```
@@ -75,16 +73,11 @@ in
     Orders
 ```
 
-### Example 4: Run a native SQL query
+### Example 4: Run a native PostgreSQL SQL query using PostgreSQL-specific syntax
 ```powerquery
 PostgreSQL.Database(
     "myserver.com",
     "analytics",
     [Query = "SELECT date_trunc('month', created_at) AS month, SUM(revenue) AS total FROM orders GROUP BY 1 ORDER BY 1"]
 )
-```
-
-### Example 5: Connect to Amazon RDS PostgreSQL
-```powerquery
-PostgreSQL.Database("myinstance.rds.amazonaws.com", "production")
 ```

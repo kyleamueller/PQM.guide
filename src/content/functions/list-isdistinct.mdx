@@ -30,13 +30,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.IsDistinct` checks whether every item in the list is unique. It returns `true` if all items are distinct, and `false` if any value appears more than once.
+`List.IsDistinct` checks whether every item in a list is unique. It returns `true` if all items are distinct, and `false` if any value appears more than once. This is a convenient data quality check — for example, verifying that a key column has no duplicate values before using it in a merge.
 
-This is a convenient shorthand for checking `List.Count(list) = List.Count(List.Distinct(list))`, but may be more efficient.
+An empty list returns `true` (vacuous truth: no duplicates can exist). Null values are treated as equal to each other, so a list containing two or more nulls is not distinct. Comparison is case-sensitive for text by default; pass `Comparer.OrdinalIgnoreCase` for case-insensitive uniqueness checking.
 
-- An empty list returns `true` (vacuous truth — no duplicates exist).
-- Null values are treated as equal to each other, so two nulls make the list non-distinct.
-- Pass `Comparer.OrdinalIgnoreCase` for case-insensitive text comparison.
+`List.IsDistinct` is equivalent to `List.Count(list) = List.Count(List.Distinct(list))` but expresses intent more clearly. When you need to validate uniqueness for a table column, pass the column as a list: `List.IsDistinct(Table[ColumnName])`.
 
 ## Examples
 

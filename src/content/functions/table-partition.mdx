@@ -38,37 +38,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Partition` distributes rows into `groups` sub-tables by hashing the values in the specified column. Each row is assigned to exactly one partition based on `Number.Mod(Value.NativeQuery(column_value, "hash"), groups)`. The result is a list of tables; all partition tables together contain all rows of the original table.
+`Table.Partition` distributes rows from a table into a list of `groups` sub-tables using a hash function applied to the specified `column`. Each row is assigned to exactly one partition based on a hash of its column value, modulo the number of groups. Every row in the original table appears in exactly one partition — no rows are dropped or duplicated.
 
-This is primarily used for parallel processing scenarios or data distribution. The `seed` parameter affects the hash, allowing different distributions for the same data.
+The `seed` parameter influences the hash function and changes how rows are distributed across partitions. Changing `seed` with the same data and `groups` count may yield a different distribution. Partitioning is primarily used for parallel or chunked processing — for example, processing a large table in N independent batches, or distributing work across multiple calls.
+
+`Table.Partition` is the counterpart of `Table.FromPartitions` — use `Table.FromPartitions` to reassemble partitioned tables back into one. For splitting a table into sequential pages by row count, use `Table.Split` instead.
 
 ## Examples
 
-### Example 1: Partition a table into 2 groups
+### Example 1: Partition 8 Sales rows into 3 buckets
 
 ```powerquery
 let
-    Source     = #table({"ID"}, {{1}, {2}, {3}, {4}, {5}, {6}}),
-    Partitions = Table.Partition(Source, "ID", 2, 0)
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Region"},
+        {{1,"Alice","Widget A","East"},{2,"Bob","Gadget B","West"},{3,"Charlie","Widget C","East"},
+         {4,"Alice","Gadget D","North"},{5,"Diana","Widget A","West"},{6,"Bob","Thingamajig E","East"},
+         {7,"Charlie","Gadget B","West"},{8,"Diana","Widget C","North"}}
+    ),
+    Partitions = Table.Partition(Sales, "OrderID", 3, 0)
 in
-    Partitions
+    List.Count(Partitions)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Table], [Table]}"}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"3"}]}
 -->
 
-### Example 2: Access a specific partition
+### Example 2: Access and count rows in each partition
 
 ```powerquery
 let
-    Source     = #table({"Key", "Value"}, {{"A", 1}, {"B", 2}, {"C", 3}, {"D", 4}}),
-    Partitions = Table.Partition(Source, "Key", 3, 0),
-    FirstPart  = Partitions{0}
+    Sales = #table(
+        {"OrderID", "CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Charlie"},{4,"Alice"},{5,"Diana"},{6,"Bob"},{7,"Charlie"},{8,"Diana"}}
+    ),
+    Partitions = Table.Partition(Sales, "OrderID", 2, 0),
+    Counts     = List.Transform(Partitions, Table.RowCount)
 in
-    FirstPart
+    Counts
 ```
 
 <!--output
-{"columns":[{"name":"Key","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Key":"A","Value":"1"},{"Key":"D","Value":"4"}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{4, 4}"}]}
+-->
+
+### Example 3: Process each partition independently and recombine
+
+```powerquery
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Salary = number],
+        {{"E001","alice smith",55000},{"E002","BOB JONES",95000},{"E003","Charlie Brown",72000},
+         {"E004","diana PRINCE",68000},{"E005","Eve Martinez",88000},{"E006","frank lee",52000}}
+    ),
+    Partitions = Table.Partition(Employees, "EmployeeID", 2, 0),
+    Processed  = List.Transform(Partitions, each Table.AddColumn(_, "Bonus", each [Salary] * 0.10, type number)),
+    Combined   = Table.Combine(Processed)
+in
+    Combined
+```
+
+<!--output
+{"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"number"},{"name":"Bonus","type":"number"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","Salary":"95000","Bonus":"9500"},{"EmployeeID":"E004","FullName":"diana PRINCE","Salary":"68000","Bonus":"6800"},{"EmployeeID":"E006","FullName":"frank lee","Salary":"52000","Bonus":"5200"},{"EmployeeID":"E001","FullName":"alice smith","Salary":"55000","Bonus":"5500"},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":"72000","Bonus":"7200"},{"EmployeeID":"E005","FullName":"Eve Martinez","Salary":"88000","Bonus":"8800"}]}
 -->

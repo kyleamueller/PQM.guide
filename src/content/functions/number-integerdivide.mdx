@@ -33,15 +33,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.IntegerDivide` returns the integer portion of a division operation, discarding the remainder. It is equivalent to applying `Number.RoundDown` to the result of regular division. This makes it useful for grouping, bucketing, or computing how many whole units fit into a quantity.
+`Number.IntegerDivide` returns the integer **quotient** of dividing `number1` by `number2`, discarding any remainder. For positive operands this is equivalent to `Number.RoundDown(number1 / number2)`. It always truncates toward negative infinity (floor division), not toward zero — this is relevant when operands have different signs.
 
-For the corresponding remainder, pair this function with `Number.Mod`.
+The remainder (what `Number.IntegerDivide` discards) can be obtained with `Number.Mod`. The two are complementary: `(Number.IntegerDivide(a, b) * b) + Number.Mod(a, b) = a`.
 
-Dividing by zero raises an error. Use `try`/`otherwise` to handle potential division-by-zero scenarios in production queries.
+Dividing by zero raises a runtime error. If your data might contain zero divisors, guard with `if [Divisor] = 0 then null else Number.IntegerDivide([Value], [Divisor])` or use `try`/`otherwise`.
+
+The optional `precision` parameter accepts `Precision.Decimal` to perform decimal-aware division; for most use cases omit this parameter.
+
+Common uses: bucketing quantities into fixed-size groups (`Number.IntegerDivide(quantity, groupSize) * groupSize`), computing whole time units from a total, and chunking data for batch processing.
 
 ## Examples
 
-### Example 1: How many full weeks in a number of days
+### Example 1: How many full weeks fit in 17 days?
 
 ```powerquery
 Number.IntegerDivide(17, 7)
@@ -51,7 +55,7 @@ Number.IntegerDivide(17, 7)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
 -->
 
-### Example 2: Compute full weeks and remaining days
+### Example 2: Split total days into full weeks and remaining days
 
 ```powerquery
 let
@@ -66,17 +70,19 @@ in
 {"columns":[{"name":"Weeks","type":"number"},{"name":"RemainderDays","type":"number"}],"rows":[{"Weeks":2,"RemainderDays":3}]}
 -->
 
-### Example 3: Bucket quantities into groups of 10
+### Example 3: Bucket order quantities into groups of 5
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Quantity"}),
-    "Bucket", each Number.IntegerDivide([Quantity], 10) * 10, type number
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "CustomerName", "Quantity"}),
+    "QtyBucket",
+    each Number.IntegerDivide([Quantity], 5) * 5,
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Quantity","type":"number"},{"name":"Bucket","type":"number"}],"rows":[{"OrderID":1,"Quantity":5,"Bucket":0},{"OrderID":2,"Quantity":23,"Bucket":20},{"OrderID":3,"Quantity":10,"Bucket":10},{"OrderID":4,"Quantity":47,"Bucket":40}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Quantity","type":"number"},{"name":"QtyBucket","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Quantity":4,"QtyBucket":0},{"OrderID":2,"CustomerName":"Bob","Quantity":2,"QtyBucket":0},{"OrderID":3,"CustomerName":"Charlie","Quantity":10,"QtyBucket":10},{"OrderID":4,"CustomerName":"Alice","Quantity":1,"QtyBucket":0},{"OrderID":5,"CustomerName":"Diana","Quantity":6,"QtyBucket":5}]}
 -->

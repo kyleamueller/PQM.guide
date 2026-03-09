@@ -26,15 +26,21 @@ relatedFunctions:
 
 ## Remarks
 
-In Power Query M, every value can carry an associated **metadata record** — an auxiliary record of key-value pairs attached to the value without changing its underlying data. Metadata is used by the engine to carry extra information such as column display names, type annotations, and data source information.
+In Power Query M, every value can carry an associated **metadata record** — an auxiliary record of key-value pairs attached to the value without affecting its underlying data or equality. Metadata is attached using the `meta` keyword: `value meta [Key = "value"]`.
 
-`Value.Metadata` retrieves this metadata record. If the value has no metadata, an empty record (`[]`) is returned.
+`Value.Metadata` retrieves this metadata record. If the value has no metadata, an empty record (`[]`) is returned — never `null`.
 
-Metadata does not affect equality comparisons or type checks — `1 meta [Source = "Sales"]` compares equal to `1`.
+Key behaviors of metadata in M:
+
+- **Transparent to equality**: `1 meta [Tag = "x"]` is equal to `1`. Metadata does not affect the `=` operator, `Value.Equals`, or type checks.
+- **Lost on operations**: most M operations discard metadata from their inputs. For example, `(1 meta [Tag = "x"]) + 1` returns `2` with no metadata. Metadata must be explicitly re-attached if needed after transformations.
+- **Used by the engine**: Power Query uses metadata internally to carry display format strings, column descriptions, and data source information. You can read this engine metadata with `Value.Metadata`.
+
+The companion functions are `Value.ReplaceMetadata` (to set or replace metadata) and `Value.RemoveMetadata` (to strip it). The `meta` keyword expression `v meta r` is equivalent to `Value.ReplaceMetadata(v, r)`.
 
 ## Examples
 
-### Example 1: Retrieve metadata from a value with metadata
+### Example 1: Retrieve metadata attached with the meta keyword
 
 ```powerquery
 Value.Metadata(1 meta [Source = "Sales", Verified = true])
@@ -54,7 +60,7 @@ Value.Metadata(42)
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[]}
 -->
 
-### Example 3: Access a specific metadata field
+### Example 3: Access a specific field from the metadata record
 
 ```powerquery
 let

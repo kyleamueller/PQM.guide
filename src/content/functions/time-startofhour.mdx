@@ -27,25 +27,29 @@ relatedFunctions:
 
 ## Remarks
 
-`Time.StartOfHour` returns the first instant of the clock hour containing the input value: XX:00:00. When passed a plain `time`, it returns a `time` with minutes and seconds set to zero. When passed a `datetime` or `datetimezone`, it returns the same type with only the time component adjusted. This is useful for bucketing events into hourly groups or building hourly range filters.
+`Time.StartOfHour` returns the first instant of the clock hour containing the input value: XX:00:00. When passed a plain `time`, it returns a `time` with minutes and seconds set to zero. When passed a `datetime` or `datetimezone`, it returns the same type with only the time component adjusted — the date and any timezone offset are preserved unchanged. This is useful for bucketing events into hourly groups or building inclusive hourly range filters.
+
+Pair `Time.StartOfHour` with `Time.EndOfHour` using the same input to construct a complete inclusive hourly boundary: `[EventTime] >= Time.StartOfHour(ref) and [EventTime] <= Time.EndOfHour(ref)`. Use `Time.StartOfHour` as the grouping key for hourly aggregations — group by `Time.StartOfHour([Timestamp])` to bucket all events into their clock hour.
+
+For truncating a `datetime` to midnight (start of day) rather than the start of an hour, use `Date.StartOfDay` instead.
 
 ## Examples
 
-### Example 1: Truncate event times to the hour
+### Example 1: Truncate log timestamps to the hour
 
-Round each event time down to the start of its hour.
+Round each log timestamp down to the start of its clock hour.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
-    "HourStart", each Time.StartOfHour([EventTime]), type datetime
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "HourStart", each Time.StartOfHour([Timestamp]), type datetime
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"HourStart","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-03-15T08:30:00","HourStart":"2024-03-15T08:00:00"},{"EventID":2,"EventTime":"2024-03-15T14:45:00","HourStart":"2024-03-15T14:00:00"},{"EventID":3,"EventTime":"2024-03-16T09:15:00","HourStart":"2024-03-16T09:00:00"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"HourStart","type":"datetime"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","HourStart":"2024-01-15T09:00:00"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","HourStart":"2024-01-16T14:00:00"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","HourStart":"2024-01-18T11:00:00"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","HourStart":"2024-01-20T08:00:00"}]}
 -->
 
 ### Example 2: Start of hour for a specific time
@@ -61,4 +65,22 @@ Return the first instant of the 14:xx hour.
 
 <!--output
 {"columns":[{"name":"Result","type":"time"}],"rows":[{"Result":"14:00:00"}]}
+-->
+
+### Example 3: Group log entries by clock hour
+
+Use HourStart as a grouping key to count events per hour.
+
+Input: `OrderLog`
+
+```powerquery
+Table.Group(
+    Table.AddColumn(OrderLog, "HourStart", each Time.StartOfHour([Timestamp]), type datetime),
+    {"HourStart"},
+    {{"EventCount", each Table.RowCount(_), Int64.Type}}
+)
+```
+
+<!--output
+{"columns":[{"name":"HourStart","type":"datetime"},{"name":"EventCount","type":"number"}],"rows":[{"HourStart":"2024-01-15T09:00:00","EventCount":1},{"HourStart":"2024-01-16T14:00:00","EventCount":1},{"HourStart":"2024-01-18T11:00:00","EventCount":1},{"HourStart":"2024-01-20T08:00:00","EventCount":1},{"HourStart":"2024-02-01T16:00:00","EventCount":1},{"HourStart":"2024-02-02T10:00:00","EventCount":1},{"HourStart":"2024-02-10T13:00:00","EventCount":1},{"HourStart":"2024-02-12T09:00:00","EventCount":1}]}
 -->

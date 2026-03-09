@@ -37,17 +37,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Value.NativeQuery` passes a native query string directly to a data source, bypassing the M query folding pipeline. This is useful when:
+`Value.NativeQuery` sends a native query string (typically SQL) directly to a data source, bypassing M's query folding pipeline. Use it when:
 
-- You need to use database-specific SQL syntax that M cannot express or fold
-- You want fine-grained control over the query sent to the data source
-- Performance requires a specific query plan that M folding would not generate
+- You need database-specific syntax that M cannot express or fold (e.g., stored procedure calls, window functions, CTEs with specific hints)
+- You want precise control over the exact query plan executed at the source
+- Performance requires a hand-tuned query that M's generated SQL would not produce
 
-The `target` is typically a database connection object, such as the result of `Sql.Database(...)`, or a table within that connection.
+The `target` is typically a database connection object (such as `Sql.Database("server", "db")`) or a table from within that connection.
 
-**Security note**: Do not construct native queries by string concatenation with user input, as this can expose your queries to SQL injection. Use parameterized queries via the `parameters` argument when incorporating external values.
+**Security warning — SQL injection risk**: Never construct the `query` string by concatenating user-supplied input. Use the `parameters` argument to pass values safely. Parameterized queries are supported on most connectors and are the correct way to incorporate dynamic values.
 
-By default, M cannot fold further operations on top of a native query result. Pass `[EnableFolding = true]` in `options` to allow folding (supported on connectors that implement it).
+By default, M cannot fold further operations on top of a native query result — filtering, sorting, or joining in M will be applied in-memory after retrieving the full result. To allow the engine to fold additional operations on top of the native query, pass `[EnableFolding = true]` in the `options` record (only supported by connectors that implement this capability).
+
+Note that `Value.NativeQuery` is not supported in Excel Online (see compatibility). Also note that the function may require query approval in Power BI Desktop depending on data source settings.
 
 ## Examples
 
@@ -68,7 +70,7 @@ in
 {"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
 -->
 
-### Example 2: Parameterized native query
+### Example 2: Parameterized query — safe way to include dynamic values
 
 ```powerquery
 let
@@ -81,6 +83,28 @@ let
     )
 in
     Result
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"number"},{"name":"Name","type":"text"},{"name":"ListPrice","type":"number"}],"rows":[{"ProductID":749,"Name":"Road-150 Red, 62","ListPrice":3578.27},{"ProductID":750,"Name":"Road-150 Red, 44","ListPrice":3578.27}]}
+-->
+
+### Example 3: Enable folding on the native query result
+
+Pass `[EnableFolding = true]` so M can push additional operations (like filters) to the source:
+
+```powerquery
+let
+    Source = Sql.Database("myserver", "AdventureWorks"),
+    NativeResult = Value.NativeQuery(
+        Source,
+        "SELECT ProductID, Name, ListPrice FROM Production.Product",
+        null,
+        [EnableFolding = true]
+    ),
+    Filtered = Table.SelectRows(NativeResult, each [ListPrice] > 500)
+in
+    Filtered
 ```
 
 <!--output

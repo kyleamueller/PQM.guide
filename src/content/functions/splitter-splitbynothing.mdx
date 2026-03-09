@@ -23,42 +23,46 @@ relatedFunctions:
 
 ## Remarks
 
-`Splitter.SplitByNothing` returns a splitter function that wraps its input in a single-element list, effectively performing no split. Each value passed to the returned function is returned unchanged as `{value}`.
+`Splitter.SplitByNothing` returns a splitter function that wraps each input value in a single-element list without any splitting. It is the identity splitter: `Splitter.SplitByNothing()("Hello")` returns `{"Hello"}`. The function takes no parameters — just call it with empty parentheses to get the splitter, then call the returned function on a value.
 
-This function is used as a no-op splitter in contexts where a splitter function is required by the API but splitting is not desired. For example, when using `Table.SplitColumn` or other functions that take a splitter argument, passing `Splitter.SplitByNothing()` preserves the original column values as single-element lists.
+This function's primary purpose is to serve as a no-op placeholder in contexts where a splitter function is required by the API but you do not want any splitting to occur. The most common example is `Table.SplitColumn`: if you call it with `Splitter.SplitByNothing()`, each column value is preserved as-is and placed into a single output column, effectively renaming or reformatting the column without splitting its contents.
+
+This can also be useful when building generic transformation pipelines where the splitter is a parameter. By substituting `Splitter.SplitByNothing()`, you can disable splitting behavior without restructuring the pipeline logic.
 
 ## Examples
 
-### Example 1: Apply the no-op splitter to a value
+### Example 1: Apply the no-op splitter to a text value
 
 ```powerquery
-Splitter.SplitByNothing()("Hello World")
+Splitter.SplitByNothing()("Widget A")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Hello World"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Widget A"]}]}
 -->
 
-### Example 2: Use in Table.SplitColumn as a no-op
+### Example 2: Use in Table.SplitColumn to preserve column values
+
+Passing `Splitter.SplitByNothing()` to `Table.SplitColumn` keeps values intact and renames the column with a `.1` suffix.
 
 ```powerquery
 Table.SplitColumn(
-    #table({"Name"}, {{"Alice"}, {"Bob"}}),
-    "Name",
+    #table({"Product"}, {{"Widget A"}, {"Gadget B"}, {"Widget C"}}),
+    "Product",
     Splitter.SplitByNothing()
 )
 ```
 
 <!--output
-{"columns":[{"name":"Name.1","type":"text"}],"rows":[{"Name.1":"Alice"},{"Name.1":"Bob"}]}
+{"columns":[{"name":"Product.1","type":"text"}],"rows":[{"Product.1":"Widget A"},{"Product.1":"Gadget B"},{"Product.1":"Widget C"}]}
 -->
 
-### Example 3: Confirm it produces a single-element list
+### Example 3: Verify the splitter always returns a single-element list
 
 ```powerquery
 let
     splitter = Splitter.SplitByNothing(),
-    result = splitter("Power Query")
+    result = splitter("Sales Rep")
 in
     List.Count(result)
 ```

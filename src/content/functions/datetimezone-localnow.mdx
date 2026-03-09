@@ -23,9 +23,11 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.LocalNow` returns the current local date and time including the UTC offset as a `datetimezone` value. Unlike `DateTimeZone.FixedLocalNow()`, this function may return different values if called multiple times during a long-running query evaluation. For a consistent snapshot, use `DateTimeZone.FixedLocalNow()` instead.
+`DateTimeZone.LocalNow` returns the current local date and time including the UTC offset as a `datetimezone` value. Unlike `DateTimeZone.FixedLocalNow()`, this function may return different values if called at different points during a long-running query evaluation — each call captures the clock at that moment. For a consistent snapshot across all rows and calls, use `DateTimeZone.FixedLocalNow()` instead.
 
-In Power BI Service scheduled refreshes, the "local" time is the time zone of the gateway (for on-premises data) or the cloud region's system time (for cloud connectors).
+In Power BI Service scheduled refreshes, the "local" time reflects the time zone of the on-premises gateway (for gateway-connected data sources) or the cloud region's system time (for cloud connectors and imported data). This is often UTC or a cloud region's configured timezone, not the developer's local machine timezone. Always test cloud refresh behavior to confirm the offset is what you expect.
+
+`DateTimeZone.LocalNow()` is most useful in ad-hoc M expressions where you need the current moment with its offset and a single call is sufficient. For calculated columns or queries where multiple rows must share the same "now" reference, always capture `DateTimeZone.FixedLocalNow()` in a `let` binding and reference that variable.
 
 ## Examples
 
@@ -44,19 +46,39 @@ Return the current local datetimezone for auditing or display.
 {"columns":[{"name":"LocalNow","type":"datetimezone"}],"rows":[{"LocalNow":"2026-03-08T10:00:00-06:00"}]}
 -->
 
-### Example 2: Add a refresh timestamp column
+### Example 2: Add a refresh timestamp column using the fixed variant
 
-Stamp each row with the current local time and timezone offset.
+Stamp each row with the same consistent local time and timezone offset.
 
 Input: `Sales`
 
 ```powerquery
-Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
-    "RefreshedAt", each DateTimeZone.LocalNow(), type datetimezone
-)
+let
+    RefreshTime = DateTimeZone.FixedLocalNow()
+in
+    Table.AddColumn(
+        Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
+        "RefreshedAt", each RefreshTime, type datetimezone
+    )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAt","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":2,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":3,"RefreshedAt":"2026-03-08T10:00:01-06:00"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAt","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":2,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":3,"RefreshedAt":"2026-03-08T10:00:00-06:00"}]}
+-->
+
+### Example 3: Filter orders from the current calendar day using local time
+
+Use DateTimeZone.LocalNow to define today in the local timezone and filter accordingly.
+
+Input: `Sales`
+
+```powerquery
+let
+    Today = Date.From(DateTimeZone.LocalNow())
+in
+    Table.SelectRows(Sales, each [OrderDate] = Today)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
 -->

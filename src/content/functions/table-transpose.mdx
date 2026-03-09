@@ -31,35 +31,66 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Transpose` rotates the table 90 degrees: each column in the original becomes a row in the result, and each row becomes a column. The column headers of the original table become the values in the first column of the transposed result, unless the optional `columns` parameter is supplied.
+`Table.Transpose` rotates a table 90 degrees: each column becomes a row and each row becomes a column. The original column headers are not automatically preserved — they become the values in the first row of the transposed result (or the first column, depending on orientation). This means transposing almost always requires a follow-up step, typically `Table.PromoteHeaders` to elevate the first row into column names, or `Table.DemoteHeaders` to push original headers into data first.
 
-After transposing, you typically use `Table.PromoteHeaders` to elevate the first row as the new column names. This function does not fold to data sources.
+The optional `columns` parameter controls the column names of the transposed output. Supplying it avoids the need for `Table.PromoteHeaders` by setting column names directly. If omitted, columns are named `Column1`, `Column2`, etc.
+
+`Table.Transpose` is useful for pivoting "wide" month-column datasets into a "long" time-series format, or for converting a key-value column layout into a horizontal record. It does not fold to data sources, so for large datasets avoid transposing unless necessary. For more structured pivoting by dimension, consider `Table.Pivot` and `Table.Unpivot` instead.
 
 ## Examples
 
-### Example 1: Basic transpose
+### Example 1: Transpose a monthly metrics table and promote headers
 
-```powerquery
-Table.Transpose(
-    #table({"A", "B"}, {{1, 2}, {3, 4}})
-)
-```
-
-<!--output
-{"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"},{"name":"Column3","type":"any"}],"rows":[{"Column1":"A","Column2":"1","Column3":"3"},{"Column1":"B","Column2":"2","Column3":"4"}]}
--->
-
-### Example 2: Transpose and promote headers
+Convert a column-per-month layout into a row-per-month layout.
 
 ```powerquery
 let
-    Source = #table({"Metric", "Jan", "Feb"}, {{"Sales", 100, 200}, {"Cost", 50, 80}}),
+    Source     = #table({"Metric","Jan","Feb","Mar","Apr"},
+                         {{"Revenue",100,200,150,300},{"Cost",50,80,60,120}}),
     Transposed = Table.Transpose(Source),
-    Promoted = Table.PromoteHeaders(Transposed)
+    Promoted   = Table.PromoteHeaders(Transposed)
 in
     Promoted
 ```
 
 <!--output
-{"columns":[{"name":"Metric","type":"any"},{"name":"Sales","type":"any"},{"name":"Cost","type":"any"}],"rows":[{"Metric":"Jan","Sales":"100","Cost":"50"},{"Metric":"Feb","Sales":"200","Cost":"80"}]}
+{"columns":[{"name":"Metric","type":"any"},{"name":"Revenue","type":"any"},{"name":"Cost","type":"any"}],"rows":[{"Metric":"Jan","Revenue":"100","Cost":"50"},{"Metric":"Feb","Revenue":"200","Cost":"80"},{"Metric":"Mar","Revenue":"150","Cost":"60"},{"Metric":"Apr","Revenue":"300","Cost":"120"}]}
+-->
+
+### Example 2: Transpose Employees table and supply column names directly
+
+Provide the `columns` argument to name the output columns without needing `Table.PromoteHeaders`.
+
+```powerquery
+let
+    Subset = #table(
+        {"EmployeeID","FullName","Department","Salary"},
+        {{"E001","alice smith","Sales",55000},{"E002","BOB JONES","Engineering",95000}}
+    ),
+    Transposed = Table.Transpose(Subset, {"Field","Employee1","Employee2"})
+in
+    Transposed
+```
+
+<!--output
+{"columns":[{"name":"Field","type":"any"},{"name":"Employee1","type":"any"},{"name":"Employee2","type":"any"}],"rows":[{"Field":"EmployeeID","Employee1":"E001","Employee2":"E002"},{"Field":"FullName","Employee1":"alice smith","Employee2":"BOB JONES"},{"Field":"Department","Employee1":"Sales","Employee2":"Engineering"},{"Field":"Salary","Employee1":"55000","Employee2":"95000"}]}
+-->
+
+### Example 3: Round-trip: demote headers, transpose, and promote to reshape a wide table
+
+```powerquery
+let
+    Wide = #table(
+        {"CustomerName","Q1","Q2","Q3","Q4"},
+        {{"Alice",100,200,150,300},{"Bob",80,120,90,160}}
+    ),
+    Demoted    = Table.DemoteHeaders(Wide),
+    Transposed = Table.Transpose(Demoted),
+    Promoted   = Table.PromoteHeaders(Transposed)
+in
+    Promoted
+```
+
+<!--output
+{"columns":[{"name":"CustomerName","type":"any"},{"name":"Alice","type":"any"},{"name":"Bob","type":"any"}],"rows":[{"CustomerName":"Q1","Alice":"100","Bob":"80"},{"CustomerName":"Q2","Alice":"200","Bob":"120"},{"CustomerName":"Q3","Alice":"150","Bob":"90"},{"CustomerName":"Q4","Alice":"300","Bob":"160"}]}
 -->

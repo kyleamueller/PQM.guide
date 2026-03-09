@@ -27,54 +27,50 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.Reverse` returns a new text value containing all the characters of `text` in reverse order. If `text` is `null`, the function returns `null`. An empty string returns an empty string.
+`Text.Reverse` returns a new text value containing all the characters of `text` in reverse order. If `text` is `null`, the function returns `null`. An empty string returns an empty string unchanged.
 
-This function operates on individual Unicode code units. For text containing surrogate pairs or combining characters, results may not be linguistically meaningful.
+This function operates on individual Unicode code units (16-bit values). For text containing surrogate pairs or combining character sequences (such as emoji composed of multiple code units, or diacritics applied to a base character), the result may not be linguistically meaningful. For ASCII and most Western European text, reversal works as expected.
 
-Practical uses include palindrome detection, parsing right-to-left fixed-format strings, or reversing a portion of a text value when combined with `Text.Middle`.
+In most production data transformation work, `Text.Reverse` is used for specific parsing patterns. A common technique is to extract the last occurrence of a variable-position delimiter: `Text.Reverse` the string, use `Text.BeforeDelimiter` on the first occurrence, then `Text.Reverse` the result again. This is equivalent to using `Text.BeforeDelimiter` with `{0, RelativePosition.FromEnd}` but may be easier to understand in some contexts.
 
 ## Examples
 
-### Example 1: Reverse a simple string
+### Example 1: Reverse a text string
 
 ```powerquery
-Text.Reverse("Hello")
+Text.Reverse("Widget A")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"olleH"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"A tegdiW"}]}
 -->
 
-### Example 2: Palindrome check
+### Example 2: Check if a string is a palindrome
 
 ```powerquery
 let
     word = "racecar",
-    ispalindrome = word = Text.Reverse(word)
+    isPalindrome = (word = Text.Reverse(word))
 in
-    ispalindrome
+    isPalindrome
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 3: Reverse a numeric string
+### Example 3: Extract the last segment of a delimited string by reversing
+
+Reverse the string, take the text before the first delimiter, then reverse again — equivalent to `Text.AfterDelimiter` with `RelativePosition.FromEnd`.
 
 ```powerquery
-Text.Reverse("12345")
+let
+    path = "Sales/East/Q1/Alice",
+    lastSegment = Text.Reverse(Text.BeforeDelimiter(Text.Reverse(path), "/"))
+in
+    lastSegment
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"54321"}]}
--->
-
-### Example 4: Handle null input
-
-```powerquery
-Text.Reverse(null)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice"}]}
 -->

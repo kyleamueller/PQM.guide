@@ -27,13 +27,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInPreviousDay` returns `true` if the input date falls on the calendar day immediately preceding today's date (`DateTime.LocalNow() - 1 day`). It does not include today itself. The function is re-evaluated on each query refresh, making it useful for identifying yesterday's transactions or events.
+`Date.IsInPreviousDay` returns `true` if the input date falls on the calendar day immediately preceding today's date (`DateTime.LocalNow() - 1 day`). It does not include today itself. The function is re-evaluated on each query refresh, making it useful for "yesterday's transactions" or daily comparison dashboards.
+
+This function checks exactly one day. To check a broader historical window, use `Date.IsInPreviousNDays`. To include today in the filter, combine with `or Date.IsInCurrentDay([OrderDate])`.
+
+As with all `Date.IsIn*` functions, the reference is `DateTime.LocalNow()`. In cloud environments, this is the server's UTC clock. Day boundaries may differ from your local timezone if there is a large UTC offset.
 
 ## Examples
 
 ### Example 1: Filter yesterday's orders
 
-Keep only rows from the Sales table where OrderDate was yesterday.
+Keep only rows where OrderDate was yesterday.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -50,6 +56,8 @@ Table.SelectRows(
 
 Add a boolean column identifying rows from yesterday.
 
+Input: `Sales`
+
 ```powerquery
 Table.AddColumn(
     Sales,
@@ -59,4 +67,23 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsYesterday","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-06","IsYesterday":false},{"OrderID":41,"OrderDate":"2026-03-07","IsYesterday":true},{"OrderID":42,"OrderDate":"2026-03-08","IsYesterday":false}]}
+-->
+
+### Example 3: Flag today and yesterday together
+
+Combine IsInCurrentDay and IsInPreviousDay for a two-day comparison window.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "TodayOrYesterday",
+    each Date.IsInCurrentDay([OrderDate]) or Date.IsInPreviousDay([OrderDate]),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"TodayOrYesterday","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-06","TodayOrYesterday":false},{"OrderID":41,"OrderDate":"2026-03-07","TodayOrYesterday":true},{"OrderID":42,"OrderDate":"2026-03-08","TodayOrYesterday":true}]}
 -->

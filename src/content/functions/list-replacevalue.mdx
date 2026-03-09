@@ -39,16 +39,14 @@ relatedFunctions:
 
 ## Remarks
 
-`List.ReplaceValue` replaces items in a list using a replacer function. The `replacer` parameter controls how the comparison and substitution are performed:
+`List.ReplaceValue` replaces items in a list using a replacer function that controls both the matching and substitution logic. The `replacer` parameter is required and must be one of two built-in replacer functions:
 
-- `Replacer.ReplaceValue` — performs an exact equality match and replaces matching items with `newValue`.
-- `Replacer.ReplaceText` — performs a text substring replacement, replacing occurrences of `oldValue` (a text substring) within each text item with `newValue`.
+- `Replacer.ReplaceValue` — exact equality match: replaces items that equal `oldValue` with `newValue`. Works with any type (numbers, text, nulls, etc.).
+- `Replacer.ReplaceText` — substring replacement: replaces occurrences of the text `oldValue` within each text item. Each item in the list must be a text value when using this mode.
 
-This function is the list counterpart of the similarly-named table column replacement functions.
+All occurrences of `oldValue` in the list are replaced. Items that do not match are passed through unchanged. This function is the list counterpart of `Table.ReplaceValue`, which operates on table columns.
 
-- All occurrences of `oldValue` are replaced.
-- Items that don't match are passed through unchanged.
-- When using `Replacer.ReplaceText`, each item must be a text value.
+For replacing null values specifically, `Replacer.ReplaceValue` with `null` as `oldValue` is the clean approach. For more complex conditional replacements, `List.Transform` with an `if` expression gives more control.
 
 ## Examples
 

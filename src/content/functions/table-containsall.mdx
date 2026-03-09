@@ -34,46 +34,59 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.ContainsAll` returns `true` only if every record in the `rows` list has at least one matching row in the table. It is the logical AND of multiple `Table.Contains` checks. If even one of the specified rows is absent from the table, the function returns `false`.
+`Table.ContainsAll` returns `true` only if every record in the `rows` list has at least one matching row in the table. It is the logical AND of multiple `Table.Contains` checks: all specified rows must be present. If any single row from the list is missing from the table, the function returns `false`.
 
-Use this function to validate that a required set of keys or rows is fully present in a dataset.
+This is useful for data quality validation — for example, asserting that a dimension table includes all required reference values before proceeding with a transformation, or confirming that a set of mandatory product IDs all appear in a lookup.
+
+The `equationCriteria` parameter restricts which columns participate in the comparison, enabling partial record matching. An empty `rows` list returns `true` by vacuous truth. Like `Table.Contains`, this function does not fold to data sources.
 
 ## Examples
 
-### Example 1: All rows present
+### Example 1: Verify all required customers have placed orders
 
 ```powerquery
-Table.ContainsAll(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}, {3, "Carol"}}),
-    {[ID = 1, Name = "Alice"], [ID = 2, Name = "Bob"]}
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Charlie"},{4,"Alice"},{5,"Diana"}}
+    ),
+    RequiredCustomers = {[CustomerName = "Alice"], [CustomerName = "Diana"]}
+in
+    Table.ContainsAll(Sales, RequiredCustomers, "CustomerName")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
-### Example 2: One row missing returns false
+### Example 2: Detect a missing required category
 
 ```powerquery
-Table.ContainsAll(
-    #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    {[ID = 1, Name = "Alice"], [ID = 3, Name = "Carol"]}
-)
+let
+    Products = #table(
+        {"ProductName", "Category"},
+        {{"Widget A","Widgets"},{"Gadget B","Gadgets"},{"Thingamajig E","Misc"}}
+    ),
+    RequiredCategories = {[Category = "Widgets"], [Category = "Gadgets"], [Category = "Electronics"]}
+in
+    Table.ContainsAll(Products, RequiredCategories, "Category")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
 
-### Example 3: Match on a single column
+### Example 3: Validate all mandatory OrderIDs exist before processing
 
 ```powerquery
-Table.ContainsAll(
-    #table({"Code"}, {{"A"}, {"B"}, {"C"}}),
-    {[Code = "A"], [Code = "C"]},
-    "Code"
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {{1,"Alice","Widget A"},{2,"Bob","Gadget B"},{3,"Charlie","Widget C"}}
+    ),
+    MandatoryOrders = {[OrderID = 1], [OrderID = 2], [OrderID = 3]}
+in
+    Table.ContainsAll(Sales, MandatoryOrders, "OrderID")
 ```
 
 <!--output

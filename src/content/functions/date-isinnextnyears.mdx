@@ -33,36 +33,59 @@ relatedFunctions:
 
 `Date.IsInNextNYears` returns `true` if the input date falls within the next N complete calendar years after the current year. The current year itself is not included; use `Date.IsInCurrentYear` to also match the current year. The function is re-evaluated on each query refresh.
 
-For example, if the current year is 2026 and `years = 3`, it matches any date in 2027, 2028, or 2029.
+For example, if the current year is 2026 and `years = 3`, it matches any date in 2027, 2028, or 2029. This function counts whole calendar years (January 1 through December 31), not a rolling 365-day window. For a rolling window, use `Date.IsInNextNDays(n * 365)` or compute the boundary dates explicitly.
+
+Use this function for medium-term planning scenarios such as multi-year contract expiration reporting, asset replacement schedules, or budget forecasting horizons.
 
 ## Examples
 
-### Example 1: Find contracts expiring in the next 2 years
+### Example 1: Find orders due in the next 2 years
 
-Keep only rows where ExpiryDate falls within the next 2 calendar years.
+Keep only rows where OrderDate falls within the next 2 complete calendar years.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Contracts,
-    each Date.IsInNextNYears([ExpiryDate], 2)
+    Sales,
+    each Date.IsInNextNYears([OrderDate], 2)
 )
 ```
 
 <!--output
-{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-06-30","Customer":"Contoso"},{"ContractID":"C002","ExpiryDate":"2027-12-31","Customer":"Fabrikam"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":50,"CustomerName":"Alice","OrderDate":"2027-03-15"},{"OrderID":51,"CustomerName":"Bob","OrderDate":"2027-09-22"}]}
 -->
 
-### Example 2: Flag long-term contracts
+### Example 2: Flag long-term orders
 
-Add a boolean column for contracts expiring in the next 5 years.
+Add a boolean column for orders due within the next 5 years.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Contracts,
-    "ExpiresInNext5Years", each Date.IsInNextNYears([ExpiryDate], 5), type logical
+    Sales,
+    "DueInNext5Years", each Date.IsInNextNYears([OrderDate], 5), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"ContractID","type":"text"},{"name":"ExpiryDate","type":"date"},{"name":"ExpiresInNext5Years","type":"logical"}],"rows":[{"ContractID":"C001","ExpiryDate":"2027-06-30","ExpiresInNext5Years":true},{"ContractID":"C003","ExpiryDate":"2032-03-01","ExpiresInNext5Years":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DueInNext5Years","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","DueInNext5Years":false},{"OrderID":50,"OrderDate":"2027-03-15","DueInNext5Years":true},{"OrderID":55,"OrderDate":"2032-01-01","DueInNext5Years":false}]}
+-->
+
+### Example 3: Combine current year and next 2 years for a 3-year view
+
+Flag rows from the current year or either of the next 2 years.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentYear([OrderDate]) or Date.IsInNextNYears([OrderDate], 2)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":42,"CustomerName":"Charlie","OrderDate":"2026-03-08"},{"OrderID":50,"CustomerName":"Alice","OrderDate":"2027-03-15"},{"OrderID":51,"CustomerName":"Bob","OrderDate":"2027-09-22"}]}
 -->

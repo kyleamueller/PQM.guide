@@ -25,17 +25,21 @@ relatedFunctions:
 
 ## Remarks
 
-`Value.Expression` returns a structured representation (an abstract syntax tree, or AST) of the M expression that would produce the given value. The result is a record with fields describing the expression kind and its children, following the M AST schema used by the Power Query formula engine.
+`Value.Expression` returns an **abstract syntax tree (AST)** representation of the M expression that would produce the given value. The AST is itself an M value — a record with fields describing the expression kind (e.g., `"Constant"`, `"List"`, `"Record"`) and its children (sub-expressions).
 
-This function is primarily used for **metaprogramming** — building query generators, expression analyzers, or code transformation tools that operate on M expressions as data. It is used internally by the Power Query editor and by custom connector development tools.
+This function is an advanced introspection tool used for **metaprogramming** — building query generators, expression analyzers, serializers, or code transformation utilities that treat M expressions as data. It is used internally by the Power Query Editor and by custom connector development tooling.
 
-For most data transformation tasks, `Value.Expression` is not needed. It is an advanced introspection tool.
+For the vast majority of data transformation work in Power Query, `Value.Expression` is not needed. It is relevant only when you are building tools that operate on M queries themselves rather than on data.
 
-The returned AST can be passed to `Expression.Evaluate` or `Text.FromBinary(Expression.Document(ast))` in appropriate contexts.
+The structure of the returned AST record follows the M specification's expression grammar. For example:
+- A numeric literal produces `[Kind = "Constant", Value = 42]`
+- A list literal produces `[Kind = "List", Items = { ... }]` where each item is its own AST node
+
+The AST can be passed to `Expression.Evaluate` (with an appropriate environment) to re-evaluate it, or processed with M record and list operations to inspect or transform the expression structure.
 
 ## Examples
 
-### Example 1: Get the expression for a literal number
+### Example 1: AST of a numeric literal
 
 ```powerquery
 Value.Expression(42)
@@ -45,7 +49,7 @@ Value.Expression(42)
 {"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
 -->
 
-### Example 2: Get the expression for a list literal
+### Example 2: AST of a list literal shows nested nodes
 
 ```powerquery
 Value.Expression({1, 2, 3})
@@ -53,4 +57,14 @@ Value.Expression({1, 2, 3})
 
 <!--output
 {"columns":[{"name":"Kind","type":"text"},{"name":"Items","type":"any"}],"rows":[{"Kind":"List","Items":[{"Kind":"Constant","Value":1},{"Kind":"Constant","Value":2},{"Kind":"Constant","Value":3}]}]}
+-->
+
+### Example 3: Inspect the Kind field of the AST
+
+```powerquery
+Value.Expression({1, 2, 3})[Kind]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"List"}]}
 -->

@@ -35,48 +35,61 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Max` returns the entire row (as a record) that contains the maximum value for the given comparison criteria. If multiple rows share the maximum value, the first one encountered is returned. Field values can be accessed using record field access: `Table.Max(t, "Score")[Name]`.
+`Table.Max` returns the entire row (as a record) that contains the maximum value for the given comparison criteria. If multiple rows share the maximum value, the first one encountered is returned. Access individual fields from the result with record field syntax: `Table.Max(t, "UnitPrice")[Product]`.
 
-For the top N rows, use `Table.MaxN`. For just the maximum cell value without the full row, access the field directly from the returned record.
+For the top N rows instead of just the top 1, use `Table.MaxN`. For just the maximum scalar value without needing the full row context, chain field access: `Table.Max(t, "Quantity")[Quantity]`. This is equivalent to `List.Max(Table.Column(t, "Quantity"))` but keeps the row context available.
+
+If the table is empty, `Table.Max` returns `null` by default, or the specified `default` value. Always provide a default when the table may be empty to avoid null-propagation errors in downstream steps.
 
 ## Examples
 
-### Example 1: Get the row with the highest score
+### Example 1: Find the highest-priced order in the Sales table
 
 ```powerquery
-Table.Max(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
-    "Score"
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice", "Quantity"},
+        {{1,"Alice","Widget A",25.00,4},{2,"Bob","Gadget B",50.00,2},
+         {6,"Bob","Thingamajig E",120.00,1},{4,"Alice","Gadget D",75.00,1}}
+    )
+in
+    Table.Max(Sales, "UnitPrice")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"Carol\", Score = 99]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 6, CustomerName = \"Bob\", Product = \"Thingamajig E\", UnitPrice = 120, Quantity = 1]"}]}
 -->
 
-### Example 2: Get the name of the top scorer
+### Example 2: Extract just the product name with the highest unit price
 
 ```powerquery
-Table.Max(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
-    "Score"
-)[Name]
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice"},
+        {{1,"Alice","Widget A",25.00},{2,"Bob","Gadget B",50.00},
+         {6,"Bob","Thingamajig E",120.00},{4,"Alice","Gadget D",75.00}}
+    )
+in
+    Table.Max(Sales, "UnitPrice")[Product]
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Carol"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Thingamajig E"}]}
 -->
 
-### Example 3: Return a default for an empty table
+### Example 3: Return a safe default when no East-region orders exist
 
 ```powerquery
-Table.Max(
-    #table({"Name", "Score"}, {}),
-    "Score",
-    [Name = "N/A", Score = 0]
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Region", "UnitPrice"},
+        {{2,"Bob","West",50.00},{5,"Diana","West",25.00},{7,"Charlie","West",50.00}}
+    ),
+    EastSales = Table.SelectRows(Sales, each [Region] = "East")
+in
+    Table.Max(EastSales, "UnitPrice", [OrderID = 0, CustomerName = "N/A", Region = "East", UnitPrice = 0])
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"N/A\", Score = 0]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"N/A\", Region = \"East\", UnitPrice = 0]"}]}
 -->

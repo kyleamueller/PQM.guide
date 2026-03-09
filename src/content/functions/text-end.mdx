@@ -31,50 +31,52 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.End` extracts a substring from the end of a text value. It returns the last `count` characters of `text`.
+`Text.End` extracts a substring from the end of a text value, returning the last `count` characters. It is the right-side counterpart to `Text.Start`, and together they cover the most common fixed-length extraction patterns.
 
-If `text` is `null`, the function returns `null`. If `count` is greater than the length of `text`, the entire text is returned. If `count` is 0, an empty text string `""` is returned.
+If `text` is `null`, the function returns `null`. If `count` is greater than the length of `text`, the entire text is returned without error — this differs from list indexing, which raises an error on out-of-range access. If `count` is 0, an empty string is returned.
 
-This function is commonly used to extract suffixes, file extensions, or the trailing portion of a formatted string such as a phone number or product code.
+Use `Text.End` when the trailing portion of a string has a known fixed length (file extensions, phone number suffixes, date components, ID suffixes). When the suffix is variable-length and delimited by a separator, `Text.AfterDelimiter` with `{0, RelativePosition.FromEnd}` is more appropriate. For extracting from the middle of a string, use `Text.Middle` or `Text.Range`.
 
 ## Examples
 
-### Example 1: Get the last four characters of a string
+### Example 1: Extract the last four digits of a phone number
 
 ```powerquery
-Text.End("Hello World", 5)
+Text.End("(555) 123-4567", 4)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"World"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"4567"}]}
 -->
 
-### Example 2: Extract a file extension
+### Example 2: Extract a file extension from a filename
 
 ```powerquery
-Text.End("report_2024.xlsx", 4)
+Text.End("Sales_Report_2024.xlsx", 4)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"xlsx"}]}
 -->
 
-### Example 3: Get the last four digits of a phone number
+### Example 3: Extract the numeric portion of employee IDs
+
+Employee IDs in the Employees table follow the format `"E001"` — the trailing digits can be extracted with a fixed count.
 
 ```powerquery
-Text.End("555-867-5309", 4)
+Text.End("E003", 3)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"5309"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"003"}]}
 -->
 
-### Example 4: Handle null input
+### Example 4: Count exceeds text length — entire text is returned
 
 ```powerquery
-Text.End(null, 3)
+Text.End("Hi", 10)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":null}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hi"}]}
 -->

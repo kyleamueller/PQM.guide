@@ -36,14 +36,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Percentile` computes the value at one or more percentiles within a numeric list. Percentiles are specified as values between `0` and `1` (inclusive), where `0` corresponds to the minimum and `1` corresponds to the maximum.
+`List.Percentile` computes the value at one or more percentiles within a numeric list. Percentiles are specified as values between `0` and `1` inclusive, where `0` returns the minimum and `1` returns the maximum. Passing `0.5` gives the median, equivalent to `List.Median`.
 
-- Pass a single number to get a single percentile value.
-- Pass a list of numbers to get multiple percentile values returned as a list.
-- `0.5` returns the median (equivalent to `List.Median`).
-- Null values in the list are ignored.
-- The `options` record allows specifying the interpolation method via the `PercentileMode` field, using the `PercentileMode` enum (e.g., `PercentileMode.ExclInclusive`, `PercentileMode.InclInclusive`).
-- By default, linear interpolation is used between data points.
+Pass a single number to get a single scalar result. Pass a list of numbers (e.g., `{0.25, 0.5, 0.75}`) to compute multiple percentiles in one call, which returns a list of results in the same order as the input percentiles.
+
+Null values in the list are ignored. By default, linear interpolation is used between data points when the percentile falls between two values. The optional `options` record accepts a `PercentileMode` field to control the interpolation method (e.g., `PercentileMode.ExclInclusive` for Excel's `PERCENTILE.EXC` behavior, `PercentileMode.InclInclusive` for `PERCENTILE.INC` behavior). For statistical reporting, passing all four quartile percentiles at once is the most efficient approach.
 
 ## Examples
 

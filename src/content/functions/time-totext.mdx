@@ -31,29 +31,31 @@ relatedFunctions:
 
 ## Remarks
 
-`Time.ToText` formats a `time` value as a text string. Without options, it produces a 24-hour string such as `"14:30:00"`. Use the `Format` field in the options record to apply custom patterns such as `"h:mm tt"` (12-hour with AM/PM) or `"HH:mm"` (24-hour without seconds). The `Culture` field controls locale-specific formatting. Format strings follow .NET custom time format conventions.
+`Time.ToText` formats a `time` value as a text string. Without options, it produces a 24-hour string such as `"14:30:00"`. Use the `Format` field in the options record to apply custom patterns such as `"h:mm tt"` (12-hour with AM/PM) or `"HH:mm"` (24-hour without seconds). The `Culture` field controls locale-specific formatting for AM/PM designators and other locale-sensitive specifiers. Format strings follow .NET custom time format conventions.
 
-If the input is `null`, the function returns `null`.
+Always specify `Culture` when using locale-sensitive specifiers such as `tt` (AM/PM designator). Without an explicit `Culture`, the AM/PM text and time-separator character may vary between Power BI Desktop and Power BI Service cloud refresh depending on the host machine's locale. Use `"en-US"` for consistent English output.
+
+If the input is `null`, the function returns `null`. To format a full `datetime` including the time, use `DateTime.ToText`. To format only the date component, use `Date.ToText`.
 
 ## Examples
 
-### Example 1: Format event times in 12-hour AM/PM format
+### Example 1: Format log timestamps as 12-hour AM/PM time strings
 
-Convert time values to 12-hour format strings for display.
+Extract and format the time component of log timestamps in 12-hour AM/PM notation.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "StartTime"}),
-    "DisplayTime",
-    each Time.ToText([StartTime], [Format="h:mm tt"]),
+    Table.SelectColumns(Table.FirstN(OrderLog, 4), {"LogID", "Timestamp"}),
+    "TimeDisplay",
+    each Time.ToText(Time.From([Timestamp]), [Format="h:mm tt", Culture="en-US"]),
     type text
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"StartTime","type":"time"},{"name":"DisplayTime","type":"text"}],"rows":[{"EventID":1,"StartTime":"08:30:00","DisplayTime":"8:30 AM"},{"EventID":2,"StartTime":"14:00:00","DisplayTime":"2:00 PM"},{"EventID":3,"StartTime":"09:15:00","DisplayTime":"9:15 AM"},{"EventID":4,"StartTime":"17:45:00","DisplayTime":"5:45 PM"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"TimeDisplay","type":"text"}],"rows":[{"LogID":"L001","Timestamp":"2024-01-15T09:30:00","TimeDisplay":"9:30 AM"},{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","TimeDisplay":"2:15 PM"},{"LogID":"L003","Timestamp":"2024-01-18T11:00:00","TimeDisplay":"11:00 AM"},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","TimeDisplay":"8:45 AM"}]}
 -->
 
 ### Example 2: Format a specific time value
@@ -63,10 +65,29 @@ Format 14:30:00 in 24-hour abbreviated format.
 ```powerquery
 #table(
     type table [Time = time, Formatted = text],
-    {{#time(14, 30, 0), Time.ToText(#time(14, 30, 0), [Format="HH:mm"])}}
+    {{#time(14, 30, 0), Time.ToText(#time(14, 30, 0), [Format="HH:mm", Culture="en-US"])}}
 )
 ```
 
 <!--output
 {"columns":[{"name":"Time","type":"time"},{"name":"Formatted","type":"text"}],"rows":[{"Time":"14:30:00","Formatted":"14:30"}]}
+-->
+
+### Example 3: Format times with multiple patterns for different audiences
+
+Show the same time in both 12-hour and 24-hour formats.
+
+```powerquery
+#table(
+    type table [Time = time, Format12h = text, Format24h = text],
+    {
+        {#time(9, 30, 0),  Time.ToText(#time(9, 30, 0),  [Format="h:mm tt", Culture="en-US"]), Time.ToText(#time(9, 30, 0),  [Format="HH:mm", Culture="en-US"])},
+        {#time(14, 15, 0), Time.ToText(#time(14, 15, 0), [Format="h:mm tt", Culture="en-US"]), Time.ToText(#time(14, 15, 0), [Format="HH:mm", Culture="en-US"])},
+        {#time(0, 0, 0),   Time.ToText(#time(0, 0, 0),   [Format="h:mm tt", Culture="en-US"]), Time.ToText(#time(0, 0, 0),   [Format="HH:mm", Culture="en-US"])}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Time","type":"time"},{"name":"Format12h","type":"text"},{"name":"Format24h","type":"text"}],"rows":[{"Time":"09:30:00","Format12h":"9:30 AM","Format24h":"09:30"},{"Time":"14:15:00","Format12h":"2:15 PM","Format24h":"14:15"},{"Time":"00:00:00","Format12h":"12:00 AM","Format24h":"00:00"}]}
 -->

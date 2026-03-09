@@ -26,19 +26,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Character.ToNumber` returns the Unicode code point (an integer) for the given single character. This is the inverse of `Character.FromNumber`.
+`Character.ToNumber` returns the Unicode code point (an integer) for the given single character. This is the inverse of `Character.FromNumber`. The input must be exactly one character long — passing a multi-character string or an empty string raises an error.
 
-The `character` argument must be a single-character text value. Passing a multi-character string or empty string raises an error.
+The primary use of this function is character classification: you can test whether a character falls within a known Unicode range to determine if it is a digit (48–57), uppercase letter (65–90), lowercase letter (97–122), or a control character (0–31). This approach is faster than converting to a list and filtering when you only need to classify one character at a time.
 
-Common uses include:
-- Testing whether a character is alphabetic, numeric, or a control character by comparing its code point to known ranges
-- Sorting characters by Unicode value
-- Computing character-level transformations
-- Detecting non-printable or control characters in data
+When processing every character in a string, combine `Text.ToList` with `List.Transform` to apply `Character.ToNumber` across all characters at once. The resulting list of code points can then be filtered or analyzed with standard list functions.
+
+Note that Power Query text comparisons are case-sensitive by default. If you need to classify characters without regard to case, compare against both the uppercase and lowercase ranges, or normalize the character with `Text.Upper` or `Text.Lower` first.
 
 ## Examples
 
-### Example 1: Get the code point for uppercase A
+### Example 1: Get the code point for a character
 
 ```powerquery
 Character.ToNumber("A")
@@ -48,17 +46,9 @@ Character.ToNumber("A")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":65}]}
 -->
 
-### Example 2: Get the code point for a space
+### Example 2: Check whether a character is a digit
 
-```powerquery
-Character.ToNumber(" ")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":32}]}
--->
-
-### Example 3: Check whether a character is a digit
+Compare the code point against the digit range (48–57) to classify a character without using `Text.Contains` or regular expressions.
 
 ```powerquery
 let
@@ -73,12 +63,14 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 4: Get code points for each character in a word
+### Example 3: Get code points for each character in a string
+
+Pair with `Text.ToList` to process all characters in a value, such as scanning employee IDs for non-alphanumeric characters.
 
 ```powerquery
-List.Transform(Text.ToList("ABC"), Character.ToNumber)
+List.Transform(Text.ToList("E001"), Character.ToNumber)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[65,66,67]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":[69,48,48,49]}]}
 -->

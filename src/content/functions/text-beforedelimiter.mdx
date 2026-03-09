@@ -35,29 +35,31 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.BeforeDelimiter` returns all text that precedes the specified `delimiter` occurrence. By default it uses the first occurrence (index 0).
+`Text.BeforeDelimiter` returns all text that precedes the specified `delimiter` occurrence. By default it uses the first occurrence (index 0). This is the complement of `Text.AfterDelimiter` — together they let you extract either side of any delimiter without needing to split the string into a list first.
 
-The `index` parameter can be:
-- A non-negative integer: the zero-based occurrence to use (0 = first, 1 = second, etc.)
-- A list `{n, RelativePosition.FromEnd}`: count occurrences from the end of the string
+The `index` parameter offers two forms of occurrence control:
+- A non-negative integer `n`: the zero-based occurrence index (0 = first, 1 = second, etc.)
+- A two-element list `{n, RelativePosition.FromEnd}`: count `n` occurrences from the end of the string
 
-If the delimiter is not found, the entire text is returned. If `text` is `null`, the function returns `null`.
+Unlike `Text.AfterDelimiter`, when the delimiter is **not found**, `Text.BeforeDelimiter` returns the entire original text — not an empty string. This difference is worth noting if you use both functions together: a missing delimiter will cause them to return different sentinel values. If `text` is `null`, the function returns `null`.
 
-This function is commonly used in the Power Query UI when splitting or extracting columns by delimiter.
+The delimiter search is always case-sensitive. There is no `comparer` parameter, so if you need case-insensitive delimiter matching, use `Text.PositionOf` with `Comparer.OrdinalIgnoreCase` to locate the position, then `Text.Start` to extract the prefix.
 
 ## Examples
 
-### Example 1: Text before the first hyphen
+### Example 1: Extract the first segment before a delimiter
 
 ```powerquery
-Text.BeforeDelimiter("US-WA-Seattle", "-")
+Text.BeforeDelimiter("Sales/East/Q1", "/")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Sales"}]}
 -->
 
-### Example 2: Text before the second hyphen
+### Example 2: Extract all text before the second occurrence
+
+A zero-based index of `1` means "before the second occurrence", capturing multiple segments.
 
 ```powerquery
 Text.BeforeDelimiter("US-WA-Seattle", "-", 1)
@@ -67,22 +69,28 @@ Text.BeforeDelimiter("US-WA-Seattle", "-", 1)
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US-WA"}]}
 -->
 
-### Example 3: Text before the last hyphen (from end)
+### Example 3: Extract the path excluding the last segment
+
+`{0, RelativePosition.FromEnd}` finds the last delimiter, making this robust when segment count varies.
 
 ```powerquery
-Text.BeforeDelimiter("US-WA-Seattle", "-", {0, RelativePosition.FromEnd})
+Text.BeforeDelimiter("Sales/East/Q1/Alice", "/", {0, RelativePosition.FromEnd})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"US-WA"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Sales/East/Q1"}]}
 -->
 
-### Example 4: Extract username from email address
+### Example 4: Extract the username from an email column
 
 ```powerquery
-Text.BeforeDelimiter("user@example.com", "@")
+Table.AddColumn(
+    #table({"Email"}, {{"alice@example.com"}, {"bob@contoso.com"}}),
+    "Username",
+    each Text.BeforeDelimiter([Email], "@")
+)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"user"}]}
+{"columns":[{"name":"Email","type":"text"},{"name":"Username","type":"text"}],"rows":[{"Email":"alice@example.com","Username":"alice"},{"Email":"bob@contoso.com","Username":"bob"}]}
 -->

@@ -31,15 +31,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Double.From` converts a value to a double-precision floating-point number — the standard numeric type used throughout Power Query M. Double-precision provides approximately 15–17 significant decimal digits of precision and covers an enormous range (~±1.8 × 10^308).
+`Double.From` converts a value to a 64-bit IEEE 754 double-precision floating-point number. This is the **default numeric type in Power Query M** — every numeric literal like `3.14` or `1000` is a double unless a more specific type is applied. Double-precision provides approximately 15–17 significant decimal digits and can represent values up to approximately ±1.8 × 10^308.
 
-Text values are parsed using the specified culture (or the session locale by default). `true` converts to `1.0`, `false` to `0.0`, `null` to `null`.
+In practice, `Double.From` is functionally identical to `Number.From`. The distinction matters primarily when you need to explicitly annotate a column or variable as double-precision — for example, when building a typed table schema for a custom connector, or when documenting that a column uses 64-bit floating-point rather than the fixed-point `Decimal` or `Currency` types.
 
-This is effectively equivalent to `Number.From` in most contexts, since the default M number type is double-precision. Use it explicitly when you need to annotate or enforce the type annotation in a query.
+A key limitation of double-precision arithmetic is that it cannot represent all decimal fractions exactly. Values like `0.1` and `0.2` are stored as approximations, which means repeated arithmetic can accumulate small errors. For financial or monetary data where exactness matters, use `Decimal.From` or `Currency.From` instead. Text values are parsed using the specified culture — pass `"de-DE"` for German-formatted numbers with a comma decimal separator. Logical `true` converts to `1.0`, `false` to `0.0`, and `null` returns `null`.
 
 ## Examples
 
-### Example 1: Convert text to double
+### Example 1: Parse a decimal text string
 
 ```powerquery
 Double.From("3.14159")
@@ -49,17 +49,9 @@ Double.From("3.14159")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3.14159}]}
 -->
 
-### Example 2: Convert an integer to double
+### Example 2: Parse a German-formatted number with culture
 
-```powerquery
-Double.From(42)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
--->
-
-### Example 3: Parse a German-formatted decimal
+German numbers use `.` as the thousands separator and `,` as the decimal separator. Without specifying the culture, this would fail.
 
 ```powerquery
 Double.From("1.234,56", "de-DE")
@@ -67,4 +59,20 @@ Double.From("1.234,56", "de-DE")
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234.56}]}
+-->
+
+### Example 3: Convert a logical value to double
+
+```powerquery
+#table(
+    {"Input", "AsDouble"},
+    {
+        {true, Double.From(true)},
+        {false, Double.From(false)}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"Input","type":"logical"},{"name":"AsDouble","type":"number"}],"rows":[{"Input":true,"AsDouble":1},{"Input":false,"AsDouble":0}]}
 -->

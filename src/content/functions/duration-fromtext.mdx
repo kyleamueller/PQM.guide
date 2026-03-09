@@ -27,27 +27,31 @@ relatedFunctions:
 
 ## Remarks
 
-`Duration.FromText` parses a text value in the format `"D.HH:MM:SS"` (days, hours, minutes, seconds) or `"HH:MM:SS"` (when days are zero) into a `duration` value. This is the inverse of `Duration.ToText`. The day component is optional; if omitted, the value is treated as less than one day.
+`Duration.FromText` parses a text value in the format `"D.HH:MM:SS"` (days, hours, minutes, seconds) or `"HH:MM:SS"` (when days are zero) into a `duration` value. This is the inverse of `Duration.ToText`. The day component (the `D.` prefix) is optional and may be omitted for durations shorter than one day. Fractional seconds are also supported.
 
-If the text is `null`, the function returns `null`. If the text cannot be parsed, the function raises an error.
+If the text is `null`, the function returns `null`. If the text cannot be parsed — for example, it contains an unexpected format or non-numeric characters — the function raises an error. Use `try Duration.FromText(...) otherwise null` to handle malformed data without stopping the query.
+
+A typical source of text-format durations is systems that serialize `duration` values to string for storage or transport (such as ISO 8601 PTxHxMxS strings — note that M uses its own `D.HH:MM:SS` format, not ISO 8601). You will need to reformat ISO 8601 duration strings before passing them to `Duration.FromText`.
 
 ## Examples
 
-### Example 1: Parse duration strings from a log table
+### Example 1: Parse duration text values in M format
 
-Convert text duration values in the Logs table into typed duration values.
-
-Input: `Logs`
+Convert text durations in "D.HH:MM:SS" format to typed duration values.
 
 ```powerquery
-Table.TransformColumns(
-    Table.SelectColumns(Table.FirstN(Logs, 4), {"LogID", "DurationText"}),
-    {{"DurationText", each Duration.FromText(_), type duration}}
+#table(
+    type table [DurationText = text, Parsed = duration],
+    {
+        {"1.04:45:00", Duration.FromText("1.04:45:00")},
+        {"1.21:45:00", Duration.FromText("1.21:45:00")},
+        {"00:15:30",   Duration.FromText("00:15:30")}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"LogID","type":"text"},{"name":"DurationText","type":"duration"}],"rows":[{"LogID":"L001","DurationText":"0.02:30:00"},{"LogID":"L002","DurationText":"1.12:45:00"},{"LogID":"L003","DurationText":"0.00:15:30"},{"LogID":"L004","DurationText":"3.08:00:00"}]}
+{"columns":[{"name":"DurationText","type":"text"},{"name":"Parsed","type":"duration"}],"rows":[{"DurationText":"1.04:45:00","Parsed":"1.04:45:00"},{"DurationText":"1.21:45:00","Parsed":"1.21:45:00"},{"DurationText":"00:15:30","Parsed":"0.00:15:30"}]}
 -->
 
 ### Example 2: Parse a specific duration text value
@@ -63,4 +67,23 @@ Convert "1.02:30:00" (1 day, 2 hours, 30 minutes) to a duration.
 
 <!--output
 {"columns":[{"name":"DurationText","type":"text"},{"name":"Parsed","type":"duration"}],"rows":[{"DurationText":"1.02:30:00","Parsed":"1.02:30:00"}]}
+-->
+
+### Example 3: Safe parsing with try...otherwise for mixed data
+
+Handle rows with invalid or missing duration text without erroring the query.
+
+```powerquery
+#table(
+    type table [DurationText = text, Parsed = duration],
+    {
+        {"1.04:45:00", try Duration.FromText("1.04:45:00") otherwise null},
+        {"invalid",    try Duration.FromText("invalid") otherwise null},
+        {"0.17:45:00", try Duration.FromText("0.17:45:00") otherwise null}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"DurationText","type":"text"},{"name":"Parsed","type":"duration"}],"rows":[{"DurationText":"1.04:45:00","Parsed":"1.04:45:00"},{"DurationText":"invalid","Parsed":null},{"DurationText":"0.17:45:00","Parsed":"0.17:45:00"}]}
 -->

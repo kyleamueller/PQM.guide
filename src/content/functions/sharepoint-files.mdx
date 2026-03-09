@@ -31,27 +31,26 @@ relatedFunctions:
 
 ## Remarks
 
-`SharePoint.Files` connects to a SharePoint Online or SharePoint on-premises site and returns a flat table of all files found across all document libraries under the specified URL. The `Content` column contains the binary data of each file, which can be passed to parsing functions like `Excel.Workbook`, `Csv.Document`, `Json.Document`, or `Pdf.Tables`.
+`SharePoint.Files` connects to a SharePoint Online or SharePoint on-premises site and returns a flat table of all files found across all document libraries under the specified URL. It is the SharePoint equivalent of `Folder.Files` for local file systems. The `Content` column contains the binary data of each file, which can be passed to parsing functions like `Excel.Workbook`, `Csv.Document`, `Json.Document`, or `Pdf.Tables`.
 
-This function is the SharePoint equivalent of `Folder.Files` for local file systems.
-
-**Authentication**: Microsoft Account (OAuth) for SharePoint Online, or Windows/Basic credentials for SharePoint on-premises. Use the site root URL as the credential scope.
-
-**Query folding**: Not supported for most operations. Filtering the file list (by name, extension, or date) is performed in Power Query after the full file list is retrieved.
-
-**Columns returned**:
+**Columns returned**: Each row in the result represents one file and includes:
 - `Name` (text) — the file name including extension.
-- `Folder Path` (text) — the SharePoint URL path of the folder containing the file.
+- `Folder Path` (text) — the full SharePoint URL path of the folder containing the file (without the file name). Use `Text.Contains([Folder Path], "/LibraryName/SubFolder/")` to scope results to a specific library or folder.
 - `Date accessed` (datetime) — last access timestamp.
 - `Date modified` (datetime) — last modification timestamp.
 - `Date created` (datetime) — creation timestamp.
-- `Extension` (text) — the file extension including the leading dot.
-- `Attributes` (record) — file metadata attributes.
-- `Content` (binary) — the binary content of the file.
+- `Extension` (text) — the file extension including the leading dot (e.g., `.xlsx`).
+- `Attributes` (record) — SharePoint file metadata attributes.
+- `Content` (binary) — the binary content of the file. Loaded lazily — do not expand this column until you have filtered to the files you need.
 
-**Performance**: `Content` is loaded lazily. Filter by extension or folder before expanding `Content` to avoid downloading unnecessary files.
+**Authentication**: Microsoft Account (OAuth 2.0) for SharePoint Online. Windows or Basic credentials for SharePoint on-premises. Configure credentials using the site root URL as the credential scope. For SharePoint Online with multi-factor authentication, Power BI Desktop handles the interactive OAuth flow.
 
-**Typical use**: Combine files of the same type (e.g., all `.xlsx` files in a SharePoint library) into a single unified table.
+**Performance**: The `Content` column is lazy — files are not downloaded until the column is accessed. Always filter rows by `Extension`, `Folder Path`, or `Name` before adding or expanding the `Content` column. This avoids downloading files you do not need and significantly reduces refresh time in sites with many files.
+
+**Power BI Service**: SharePoint Online is supported for direct cloud refresh without a gateway when using Microsoft Account (OAuth) authentication. SharePoint on-premises requires an on-premises data gateway.
+
+**Key option**:
+- `ApiVersion` (number) — the SharePoint REST API version. Defaults to `15` (SharePoint 2013+). Set to `14` for SharePoint 2010.
 
 ## Examples
 
@@ -60,20 +59,20 @@ This function is the SharePoint equivalent of `Folder.Files` for local file syst
 SharePoint.Files("https://contoso.sharepoint.com/sites/Finance")
 ```
 
-### Example 2: Combine all Excel files from a SharePoint library
+### Example 2: Combine all Excel files from a SharePoint document library
 ```powerquery
 let
     Source = SharePoint.Files("https://contoso.sharepoint.com/sites/Finance"),
     ExcelFiles = Table.SelectRows(Source, each [Extension] = ".xlsx"),
     AddWorkbook = Table.AddColumn(ExcelFiles, "Workbook", each Excel.Workbook([Content])),
     Expanded = Table.ExpandTableColumn(AddWorkbook, "Workbook", {"Name", "Data"}),
-    Sheet1 = Table.SelectRows(Expanded, each [Name] = "Sheet1"),
-    Combined = Table.Combine(Sheet1[Data])
+    Sheet1Only = Table.SelectRows(Expanded, each [Name] = "Sheet1"),
+    Combined = Table.Combine(Sheet1Only[Data])
 in
     Combined
 ```
 
-### Example 3: Filter files from a specific library folder
+### Example 3: Filter files to a specific library subfolder
 ```powerquery
 let
     Source = SharePoint.Files("https://contoso.sharepoint.com/sites/Finance"),
@@ -85,12 +84,12 @@ in
     Filtered
 ```
 
-### Example 4: Read a single known file from SharePoint
+### Example 4: Read a specific known file from SharePoint
 ```powerquery
 let
     Source = SharePoint.Files("https://contoso.sharepoint.com/sites/Finance"),
-    File = Source{[Name="Budget2024.xlsx"]}[Content],
-    Workbook = Excel.Workbook(File),
+    FileContent = Source{[Name="Budget2024.xlsx"]}[Content],
+    Workbook = Excel.Workbook(FileContent),
     Sheet = Workbook{[Name="Summary"]}[Data]
 in
     Sheet

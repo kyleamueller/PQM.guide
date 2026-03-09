@@ -33,13 +33,17 @@ relatedFunctions:
 
 `Date.IsInPreviousNYears` returns `true` if the input date falls within the N complete calendar years preceding the current year. The current year itself is not included; use `Date.IsInCurrentYear` to also match the current year. The function is re-evaluated on each query refresh.
 
-For example, if the current year is 2026 and `years = 3`, it matches any date in 2023, 2024, or 2025.
+For example, if the current year is 2026 and `years = 3`, it matches any date in 2023, 2024, or 2025. This is useful for multi-year historical analysis such as a trailing-3-year revenue trend, a 5-year cohort comparison, or long-term asset depreciation data.
+
+Note that this function counts whole calendar years, not a rolling 365-day window. If you need a rolling lookback, calculate the boundary using `Date.AddYears(Date.From(DateTime.LocalNow()), -N)` and compare directly.
 
 ## Examples
 
 ### Example 1: Filter orders from the previous 3 years
 
-Keep only rows where OrderDate falls within the previous 3 calendar years.
+Keep only rows where OrderDate falls within the previous 3 complete calendar years.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -49,20 +53,44 @@ Table.SelectRows(
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":10,"OrderDate":"2023-05-15"},{"OrderID":20,"OrderDate":"2024-08-22"},{"OrderID":30,"OrderDate":"2025-11-03"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15"},{"OrderID":2,"OrderDate":"2024-01-18"},{"OrderID":3,"OrderDate":"2024-02-01"},{"OrderID":4,"OrderDate":"2024-02-10"},{"OrderID":5,"OrderDate":"2024-03-05"},{"OrderID":6,"OrderDate":"2024-03-12"},{"OrderID":7,"OrderDate":"2024-04-01"},{"OrderID":8,"OrderDate":"2024-04-15"}]}
 -->
 
-### Example 2: Flag records from the past 5 years
+### Example 2: Flag records within the past 2 years
 
-Add a boolean column for records within the previous 5 years.
+Add a boolean column identifying orders from the previous 2 calendar years.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    HistoricalData,
-    "IsRecentHistory", each Date.IsInPreviousNYears([RecordDate], 5), type logical
+    Sales,
+    "IsRecentHistory", each Date.IsInPreviousNYears([OrderDate], 2), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"RecordID","type":"number"},{"name":"RecordDate","type":"date"},{"name":"IsRecentHistory","type":"logical"}],"rows":[{"RecordID":1,"RecordDate":"2020-01-15","IsRecentHistory":false},{"RecordID":5,"RecordDate":"2022-06-30","IsRecentHistory":true},{"RecordID":10,"RecordDate":"2025-12-01","IsRecentHistory":true}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsRecentHistory","type":"logical"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","IsRecentHistory":true},{"OrderID":42,"OrderDate":"2026-03-08","IsRecentHistory":false},{"OrderID":30,"OrderDate":"2023-05-15","IsRecentHistory":false}]}
+-->
+
+### Example 3: Label rows by historical period for trend analysis
+
+Assign period labels across the previous 3 years and the current year.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "Period",
+    each
+        if Date.IsInCurrentYear([OrderDate]) then "Current Year"
+        else if Date.IsInPreviousNYears([OrderDate], 3) then "Past 3 Years"
+        else "Older",
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Period","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Period":"Past 3 Years"},{"OrderID":42,"OrderDate":"2026-03-08","Period":"Current Year"},{"OrderID":30,"OrderDate":"2022-05-15","Period":"Older"}]}
 -->

@@ -35,13 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Durations` generates a sequence of `duration` values. Duration values represent a span of time specified as days, hours, minutes, and seconds using the `#duration(days, hours, minutes, seconds)` literal.
+`List.Durations` generates a sequence of `duration` values — each representing a span of time as days, hours, minutes, and seconds. The values are created using the `#duration(days, hours, minutes, seconds)` literal syntax.
 
-This function is useful for generating time intervals for scheduling analysis, elapsed time buckets, or SLA calculations.
+This function is useful for building SLA threshold buckets, generating time interval labels, or producing elapsed-time checkpoints for scheduling analysis. Unlike calendar-based intervals (days, months), duration arithmetic is exact: there are no irregularities from leap years or variable month lengths.
 
-- `count` must be a non-negative integer; 0 returns an empty list.
-- The `start` and `step` values use the `#duration` literal syntax.
-- Duration arithmetic is exact — there are no calendar irregularities (unlike months).
+A `count` of 0 returns an empty list; negative counts cause an error. The `start` value defines the first duration in the sequence; `step` defines the increment. Both can be zero (to start from zero duration) or negative (to generate decreasing durations). The resulting list can be transformed to text using `Duration.ToText` or manipulated with other duration functions like `Duration.Hours` and `Duration.TotalHours`.
 
 ## Examples
 

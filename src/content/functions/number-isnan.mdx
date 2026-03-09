@@ -26,15 +26,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.IsNaN` returns `true` when the input is the special IEEE 754 "Not a Number" value. NaN arises from undefined arithmetic such as `0 / 0` or taking the square root of a negative number. NaN is not equal to itself — `NaN = NaN` evaluates to `false` in M — so `Number.IsNaN` is the correct way to detect it.
+`Number.IsNaN` returns `true` when the input is the special IEEE 754 "Not a Number" (NaN) value. NaN is the result of undefined floating-point operations such as `0 / 0`, `Number.Sqrt(-1)`, `Number.Acos(2)` (out-of-domain input), or arithmetic involving existing NaN values.
 
-Use this function to guard against NaN values before performing further calculations or writing results to a destination.
+The critical behavior that makes `Number.IsNaN` necessary: **NaN is not equal to itself**. In M, `(0/0) = (0/0)` evaluates to `false`, not `true`. This means you cannot use the `=` operator or `Value.Equals` to detect NaN — you must use `Number.IsNaN`.
 
-Note: `Number.IsNaN` does not accept `null` — pass a non-null number. If your column may contain nulls, filter or coalesce first.
+NaN propagates silently through arithmetic: adding, multiplying, or comparing with NaN produces NaN or incorrect results without raising an error. This makes NaN values dangerous in pipelines — they can corrupt aggregations and summaries without any visible error. Always guard against NaN at data ingestion or when dividing values.
+
+**Important limitation**: `Number.IsNaN` does not accept `null` as input and will raise an error if the value is null. Always filter out nulls before calling this function: `if value = null then null else Number.IsNaN(value)`.
 
 ## Examples
 
-### Example 1: Detect NaN from zero division
+### Example 1: Zero divided by zero produces NaN
 
 ```powerquery
 Number.IsNaN(0 / 0)
@@ -44,7 +46,7 @@ Number.IsNaN(0 / 0)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: A normal number is not NaN
+### Example 2: A finite number is not NaN
 
 ```powerquery
 Number.IsNaN(3.14)
@@ -54,19 +56,22 @@ Number.IsNaN(3.14)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
-### Example 3: Replace NaN values in a column
+### Example 3: Guard against division-by-zero NaN when computing a ratio
 
 Input: `Sales`
 
+Safely compute UnitPrice divided by Quantity, replacing NaN with null when Quantity is 0.
+
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Ratio"}),
-    "SafeRatio",
-    each if Number.IsNaN([Ratio]) then null else [Ratio],
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "CustomerName", "UnitPrice", "Quantity"}),
+    "PricePerUnit",
+    each let ratio = [UnitPrice] / [Quantity]
+        in if Number.IsNaN(ratio) then null else ratio,
     type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Ratio","type":"number"},{"name":"SafeRatio","type":"number"}],"rows":[{"OrderID":1,"Ratio":0.5,"SafeRatio":0.5},{"OrderID":2,"Ratio":null,"SafeRatio":null},{"OrderID":3,"Ratio":0.75,"SafeRatio":0.75},{"OrderID":4,"Ratio":null,"SafeRatio":null}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"PricePerUnit","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4,"PricePerUnit":6.25},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2,"PricePerUnit":25},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10,"PricePerUnit":1.5},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"Quantity":1,"PricePerUnit":75},{"OrderID":5,"CustomerName":"Diana","UnitPrice":25,"Quantity":6,"PricePerUnit":4.166666666666667}]}
 -->

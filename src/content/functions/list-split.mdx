@@ -31,14 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Split` divides a list into consecutive chunks (pages), each containing at most `pageSize` items. If the total number of items is not evenly divisible by `pageSize`, the last sub-list will contain the remaining items (fewer than `pageSize`).
+`List.Split` divides a list into consecutive chunks (sub-lists), each containing at most `pageSize` items. If the list length is not evenly divisible by `pageSize`, the last chunk contains the remaining items and will be smaller than `pageSize`. The result is always a **list of lists** — never a flat list.
 
-This function is useful for batching API calls, chunking large datasets for processing, or implementing pagination logic.
+This function is the standard way to implement batching in Power Query. Common use cases include splitting a large list of IDs to send in multiple API requests, chunking a dataset for incremental processing, or paginating through records. After splitting, use `List.Transform` or `List.Accumulate` to process each batch.
 
-- The result is a **list of lists**, not a flat list.
-- The `pageSize` must be a positive integer.
-- If the source list is empty, the result is an empty list.
-- All chunks except possibly the last will have exactly `pageSize` items.
+The `pageSize` must be a positive integer; using `0` or a negative number causes an error. If the source list is empty, the result is an empty list. To flatten a list of lists back into a single list, use `List.Combine`.
 
 ## Examples
 

@@ -28,16 +28,13 @@ relatedFunctions:
 
 ## Remarks
 
-`Comparer.Equals` wraps a base comparer function and returns a new binary function `(x, y) => logical`. The returned function returns `true` when the comparer considers `x` and `y` equal (i.e., the comparer returns 0), and `false` otherwise.
+`Comparer.Equals` wraps a base comparer function and returns a new binary predicate of the form `(x, y) => logical`. The returned function returns `true` when the comparer considers `x` and `y` equal (i.e., the comparer returns 0), and `false` otherwise. It is not meant to be called directly as a standalone comparison — its purpose is to produce a reusable equality function that can be passed to other functions.
 
-A comparer function in M is a function of the form `(x, y) => number` that returns:
-- A negative number when `x < y`
-- Zero when `x = y`
-- A positive number when `x > y`
+A comparer function in M has the signature `(x, y) => number` and returns a negative number when `x < y`, zero when `x = y`, and a positive number when `x > y`. `Comparer.Equals` extracts only the equality case from this ordering contract.
 
-`Comparer.Equals` converts this ordering relation into a simple equality test, which is useful in contexts that require a predicate rather than a full ordering relation.
+Power Query is case-sensitive by default, so plain `=` comparisons treat `"hello"` and `"HELLO"` as different values. `Comparer.Equals(Comparer.OrdinalIgnoreCase)` is the standard way to perform case-insensitive equality testing. You should always specify the comparer explicitly rather than relying on locale defaults — use `Comparer.OrdinalIgnoreCase` for case-insensitive ASCII/Latin comparisons, or `Comparer.FromCulture("en-US", true)` when culture-aware folding is required.
 
-Common use cases include passing to `List.Contains`, `List.Distinct`, or building custom equality predicates for case-insensitive or culture-aware comparisons.
+The returned equality function is accepted by `List.Contains`, `List.Distinct`, `List.Intersect`, and `List.Difference` as their optional comparer parameter. For functions that accept a comparer directly (like `List.Contains`), you can also pass the base comparer (`Comparer.OrdinalIgnoreCase`) without wrapping it in `Comparer.Equals`.
 
 ## Examples
 
@@ -54,40 +51,31 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: Case-sensitive equality check
+### Example 2: Use as a predicate to filter a list case-insensitively
 
-```powerquery
-let
-    equalOrdinal = Comparer.Equals(Comparer.Ordinal)
-in
-    equalOrdinal("hello", "HELLO")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
--->
-
-### Example 3: Use in List.Contains for case-insensitive membership test
-
-```powerquery
-List.Contains({"Apple", "Banana", "Cherry"}, "apple", Comparer.OrdinalIgnoreCase)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
--->
-
-### Example 4: Build a reusable equality predicate
+Filter department names regardless of how the source data was cased, matching against the Employees sample data.
 
 ```powerquery
 let
     isEqual = Comparer.Equals(Comparer.OrdinalIgnoreCase),
-    values = {"Alpha", "BETA", "gamma"},
-    filtered = List.Select(values, each isEqual(_, "beta"))
+    departments = {"Sales", "ENGINEERING", "marketing", "Engineering"},
+    filtered = List.Select(departments, each isEqual(_, "engineering"))
 in
     filtered
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["BETA"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["ENGINEERING","Engineering"]}]}
+-->
+
+### Example 3: Case-insensitive distinct values from a list
+
+`List.Distinct` accepts a comparer directly — pass `Comparer.OrdinalIgnoreCase` to deduplicate regardless of casing.
+
+```powerquery
+List.Distinct({"East", "EAST", "West", "west", "East"}, Comparer.OrdinalIgnoreCase)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["East","West"]}]}
 -->

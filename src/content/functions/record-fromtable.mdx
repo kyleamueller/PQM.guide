@@ -27,11 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.FromTable` is the inverse of `Record.ToTable`. It converts a two-column table with `Name` and `Value` columns into a record, where each row provides one field name and its value.
+`Record.FromTable` is the inverse of `Record.ToTable`. It converts a two-column table with `Name` and `Value` columns into a record, where each row contributes one field: the `Name` column value becomes the field name and the `Value` column value becomes the field value.
 
-The table must have exactly a `Name` column (text type) and a `Value` column. Field names must be unique — duplicate names will raise an error.
+The input table must have exactly two columns named `Name` (text) and `Value` (any). Field names must be unique — duplicate `Name` values raise an error. The resulting record preserves the row order of the input table as the field order.
 
-This function is useful when you have key-value data stored in tabular format and need to pivot it into a record for further processing.
+This function is most useful when you have key-value data in tabular form — such as configuration tables, parameter tables, or pivoted data — and you need to operate on it as a record. A common pattern is to read a two-column settings table from a data source and convert it to a record for use in subsequent query steps.
 
 ## Examples
 
@@ -39,15 +39,15 @@ This function is useful when you have key-value data stored in tabular format an
 
 ```powerquery
 Record.FromTable(
-    #table({"Name", "Value"}, {{"CustomerID", 1}, {"Name", "Alice"}, {"City", "New York"}})
+    #table({"Name", "Value"}, {{"CustomerID", 1}, {"FullName", "Alice"}, {"City", "New York"}})
 )
 ```
 
 <!--output
-{"columns":[{"name":"CustomerID","type":"number"},{"name":"Name","type":"text"},{"name":"City","type":"text"}],"rows":[{"CustomerID":1,"Name":"Alice","City":"New York"}]}
+{"columns":[{"name":"CustomerID","type":"number"},{"name":"FullName","type":"text"},{"name":"City","type":"text"}],"rows":[{"CustomerID":1,"FullName":"Alice","City":"New York"}]}
 -->
 
-### Example 2: Round-trip a record through ToTable and back
+### Example 2: Round-trip a record through ToTable and back — verifies lossless conversion
 
 ```powerquery
 let
@@ -55,23 +55,23 @@ let
     AsTable = Record.ToTable(Original),
     BackToRecord = Record.FromTable(AsTable)
 in
-    BackToRecord
+    BackToRecord[B]
 ```
 
 <!--output
-{"columns":[{"name":"A","type":"number"},{"name":"B","type":"text"},{"name":"C","type":"logical"}],"rows":[{"A":1,"B":"hello","C":true}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"hello"}]}
 -->
 
-### Example 3: Build a record from a filtered key-value table
+### Example 3: Build a summary record from Sales table statistics
 
 Input: `Sales`
 
 ```powerquery
 let
     Pairs = #table({"Name", "Value"}, {
-        {"Source", "Sales"},
-        {"RecordCount", Table.RowCount(Sales)},
-        {"FirstOrderID", Sales{0}[OrderID]}
+        {"TotalOrders", Table.RowCount(Sales)},
+        {"FirstOrderID", Sales{0}[OrderID]},
+        {"LastOrderID", Sales{Table.RowCount(Sales) - 1}[OrderID]}
     }),
     Summary = Record.FromTable(Pairs)
 in
@@ -79,5 +79,5 @@ in
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Source","Value":"Sales"},{"Name":"RecordCount","Value":100},{"Name":"FirstOrderID","Value":1}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"TotalOrders","Value":5},{"Name":"FirstOrderID","Value":1},{"Name":"LastOrderID","Value":5}]}
 -->

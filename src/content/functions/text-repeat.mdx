@@ -30,46 +30,54 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.Repeat` concatenates `text` with itself `count` times. If `count` is 0, an empty string is returned. If `text` is `null`, the function returns `null`.
+`Text.Repeat` concatenates `text` with itself `count` times and returns the result. If `count` is 0, an empty string `""` is returned. If `text` is `null`, the function returns `null`.
 
-Common uses include generating separators, padding patterns, or building test data strings. When combined with `Text.Length`, it can be used to create fixed-length fill strings.
+Common practical uses include generating separator strings (`Text.Repeat("-", 40)` for a horizontal rule), building fill characters for fixed-width output, creating indentation, or constructing test data. When you need to fill a string to a specific total length (rather than repeat a fixed number of times), `Text.PadStart` or `Text.PadEnd` are simpler alternatives.
+
+Note that `Text.Repeat` repeats the exact text including any spaces or special characters. A `count` of 1 returns the original text unchanged.
 
 ## Examples
 
-### Example 1: Repeat a string three times
+### Example 1: Create a separator line
 
 ```powerquery
-Text.Repeat("abc", 3)
+Text.Repeat("-", 30)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"abcabcabc"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"------------------------------"}]}
 -->
 
-### Example 2: Create a separator line
+### Example 2: Repeat a multi-character pattern
 
 ```powerquery
-Text.Repeat("-", 20)
+Text.Repeat("= ", 5)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"--------------------"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"= = = = = "}]}
 -->
 
-### Example 3: Repeat a multi-character pattern
+### Example 3: Build an indentation prefix for nested output
+
+Repeat a tab or spaces to create dynamic indentation based on a nesting level.
 
 ```powerquery
-Text.Repeat("AB", 4)
+let
+    level = 3,
+    indent = Text.Repeat("  ", level)
+in
+    indent & "- Item"
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"ABABABAB"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"      - Item"}]}
 -->
 
-### Example 4: Zero repetitions returns empty string
+### Example 4: Zero repetitions returns an empty string
 
 ```powerquery
-Text.Repeat("Hello", 0)
+Text.Repeat("Widget", 0)
 ```
 
 <!--output

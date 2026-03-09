@@ -26,11 +26,13 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.FunctionParameters` extracts parameter type information from a function type. The result is a record where each field corresponds to a parameter — the field name is the parameter name and the value is the parameter's declared type.
+`Type.FunctionParameters` returns a record describing the parameter types of a function type. Each field in the result corresponds to one parameter: the field name is the parameter name, and the value is the parameter's declared type. The order of fields in the result matches the parameter order in the function signature.
 
-This function operates on the **type** of a function, not the function itself. To get the type of a function value, use `Value.Type(myFunction)` first.
+This function operates on a **function type** — not a function value directly. To get the type of an existing function value, use `Value.Type(myFunction)` first, then pass the result to `Type.FunctionParameters`.
 
-Use this for metaprogramming, documentation generation, or validation of function signatures.
+`Type.FunctionParameters` is used in metaprogramming scenarios such as runtime signature inspection, documentation generation, or building generic pipelines that adapt their behavior based on the parameters a function accepts. For related introspection, use `Type.FunctionReturn` to get the return type and `Type.FunctionRequiredParameters` to determine how many parameters are required.
+
+Note that optional parameters appear in the result with their declared type just like required parameters — to distinguish required from optional, check the count returned by `Type.FunctionRequiredParameters`.
 
 ## Examples
 
@@ -58,4 +60,17 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"number","Value":"type nullable number"},{"Name":"digits","Value":"type nullable number"},{"Name":"roundingMode","Value":"type nullable number"}]}
+-->
+
+### Example 3: Count the total parameters of a function
+
+```powerquery
+let
+    FType = Value.Type(Text.BetweenDelimiters)
+in
+    Record.FieldCount(Type.FunctionParameters(FType))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
 -->

@@ -35,15 +35,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Int64.From` converts a value to a signed 64-bit integer (long integer). This is the largest fixed-size integer type in Power Query M, covering approximately ±9.2 × 10^18. Fractional values are rounded using the optional rounding mode (default: round-toward-even).
+`Int64.From` converts a value to a signed 64-bit integer — the largest fixed-size integer type in Power Query M, covering approximately ±9.2 × 10^18. This is the type displayed as **"Whole Number"** in the Power BI Desktop data type menu, making it the standard integer type for most data modeling work. It maps to `BIGINT` in SQL Server and equivalent 64-bit integer types in other databases.
 
-Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+Use `Int64.From` for primary key columns, row counts, Unix epoch timestamps (milliseconds), and any integer data where values might exceed the 32-bit range (-2.1B to 2.1B). For the vast majority of integer use cases in Power BI models, `Int64.From` is the right choice over `Int32.From` or `Int16.From`, as the memory overhead difference is rarely significant compared to the risk of overflow.
 
-In Power BI and Analysis Services, this type is called `Whole Number`. It maps to `bigint` in SQL Server. Use this for IDs, row counts, timestamps in epoch format, or any integer that may exceed the 32-bit range.
+The default rounding mode is round-half-to-even (banker's rounding), not conventional "round half up." Pass `RoundingMode.AwayFromZero` for conventional behavior. Note that a 64-bit integer stores up to 19 significant digits, whereas M's default `number` type (double-precision float) only has ~15–17 significant digits — so for very large integers, converting to `Int64.From` may lose no precision whereas the double representation would. Text values are parsed numerically; logical `true` converts to `1`, `false` to `0`, and `null` returns `null`.
 
 ## Examples
 
-### Example 1: Convert a large number
+### Example 1: Convert a large integer value
 
 ```powerquery
 Int64.From(9007199254740992)
@@ -53,7 +53,7 @@ Int64.From(9007199254740992)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":9007199254740992}]}
 -->
 
-### Example 2: Convert from text
+### Example 2: Parse a large integer from text
 
 ```powerquery
 Int64.From("1234567890123")
@@ -63,17 +63,17 @@ Int64.From("1234567890123")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1234567890123}]}
 -->
 
-### Example 3: Use in a column type conversion
+### Example 3: Apply Whole Number type to the OrderID column in Sales
 
 Input: `Sales`
 
 ```powerquery
 Table.TransformColumnTypes(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName"}),
     {{"OrderID", Int64.Type}}
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"}],"rows":[{"OrderID":1},{"OrderID":2},{"OrderID":3}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice"},{"OrderID":2,"CustomerName":"Bob"},{"OrderID":3,"CustomerName":"Charlie"},{"OrderID":4,"CustomerName":"Alice"}]}
 -->

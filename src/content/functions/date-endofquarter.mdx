@@ -27,13 +27,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.EndOfQuarter` returns the last instant of the calendar quarter (Q1: Jan–Mar, Q2: Apr–Jun, Q3: Jul–Sep, Q4: Oct–Dec) that contains the given `date`, `datetime`, or `datetimezone` value. When given a plain `date`, the result is a `datetime` at 23:59:59.9999999 on the last day of the quarter. The return type matches the input type for `datetime` and `datetimezone`.
+`Date.EndOfQuarter` returns the last instant (23:59:59.9999999) of the calendar quarter containing the given `date`, `datetime`, or `datetimezone` value. Calendar quarters are Q1 (Jan–Mar), Q2 (Apr–Jun), Q3 (Jul–Sep), and Q4 (Oct–Dec). When given a plain `date`, the result is a `datetime`. The return type matches the input type for `datetime` and `datetimezone`.
+
+This function is commonly used in quarter-to-date range filters. Pair it with `Date.StartOfQuarter` to define an inclusive window: `[OrderDate] >= Date.StartOfQuarter(today) and [OrderDate] <= Date.EndOfQuarter(today)`. For just the date portion of the quarter end (without time), wrap the result in `DateTime.Date(Date.EndOfQuarter(d))` or use `Date.EndOfMonth` on the last month of the quarter.
+
+Note that `Date.EndOfQuarter` always returns a `datetime` (not a `date`) even when passed a plain date, because the quarter end is a specific instant in time with a time component. If downstream logic requires a `date`, explicitly cast the result.
 
 ## Examples
 
-### Example 1: Find the end of quarter for each order date
+### Example 1: Add quarter-end date to each order
 
-Add a column showing the end of the quarter for each order.
+Show the last day of the quarter for each order date.
 
 Input: `Sales`
 
@@ -51,17 +55,43 @@ Table.AddColumn(
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"QuarterEnd","type":"datetime"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","QuarterEnd":"2024-03-31T23:59:59.9999999"},{"OrderID":2,"OrderDate":"2024-01-18","QuarterEnd":"2024-03-31T23:59:59.9999999"},{"OrderID":3,"OrderDate":"2024-02-01","QuarterEnd":"2024-03-31T23:59:59.9999999"},{"OrderID":4,"OrderDate":"2024-02-10","QuarterEnd":"2024-03-31T23:59:59.9999999"},{"OrderID":5,"OrderDate":"2024-03-05","QuarterEnd":"2024-03-31T23:59:59.9999999"}]}
 -->
 
-### Example 2: End of Q3
+### Example 2: Return quarter-end dates for each quarter
 
-Return the last instant of Q3 2024.
+Show the last instant of each of the four quarters in 2024.
 
 ```powerquery
 #table(
-    type table [Date = date, EndOfQ3 = datetime],
-    {{#date(2024, 8, 15), Date.EndOfQuarter(#date(2024, 8, 15))}}
+    type table [Quarter = text, EndDate = datetime],
+    {
+        {"Q1", Date.EndOfQuarter(#date(2024, 1, 1))},
+        {"Q2", Date.EndOfQuarter(#date(2024, 4, 1))},
+        {"Q3", Date.EndOfQuarter(#date(2024, 7, 1))},
+        {"Q4", Date.EndOfQuarter(#date(2024, 10, 1))}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"Date","type":"date"},{"name":"EndOfQ3","type":"datetime"}],"rows":[{"Date":"2024-08-15","EndOfQ3":"2024-09-30T23:59:59.9999999"}]}
+{"columns":[{"name":"Quarter","type":"text"},{"name":"EndDate","type":"datetime"}],"rows":[{"Quarter":"Q1","EndDate":"2024-03-31T23:59:59.9999999"},{"Quarter":"Q2","EndDate":"2024-06-30T23:59:59.9999999"},{"Quarter":"Q3","EndDate":"2024-09-30T23:59:59.9999999"},{"Quarter":"Q4","EndDate":"2024-12-31T23:59:59.9999999"}]}
+-->
+
+### Example 3: Filter to current quarter-to-date orders
+
+Keep only orders placed from the start of the current quarter through the most recent order date in the Sales table.
+
+Input: `Sales`
+
+```powerquery
+let
+    QuarterStart = Date.StartOfQuarter(Date.From(DateTime.LocalNow())),
+    QuarterEnd = Date.EndOfQuarter(Date.From(DateTime.LocalNow()))
+in
+    Table.SelectRows(
+        Sales,
+        each [OrderDate] >= QuarterStart and DateTime.From([OrderDate]) <= QuarterEnd
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
 -->

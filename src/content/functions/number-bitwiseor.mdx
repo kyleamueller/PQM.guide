@@ -32,19 +32,23 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.BitwiseOr` performs a bitwise OR between two integers. Each bit position in the result is set to `1` when the corresponding bit is `1` in at least one of the operands. Common uses include:
+`Number.BitwiseOr` performs a bitwise OR between two integers. Each bit position in the result is `1` when the corresponding bit is `1` in **at least one** of the operands; it is `0` only when both operands have `0` at that position. Both inputs are treated as integers — fractional parts are truncated.
 
-- **Setting flags**: combining multiple flag bits into a single value
-- **Merging bitmasks**: combining permission sets
-- **Constructing values**: building a result from individual bit contributions
+Bitwise OR is most commonly used to **set bits** (turn specific bits on) or **merge bitmasks**. Unlike AND (which tests/extracts bits), OR ensures that bits are added to a value. A value ORed with a mask will always have at least the mask's bits set.
 
-Both inputs are treated as integers. Floating-point values are truncated before the operation.
+Common patterns:
+
+- **Combine flags**: `Number.BitwiseOr(flags, 4)` sets bit 2 in `flags` regardless of its current state
+- **Merge permission sets**: OR-ing two permission integers gives the union of all permitted capabilities
+- **Reconstruct packed values**: building an integer from separate bit-field contributions by OR-ing shifted components
+
+Note that `Number.BitwiseOr(x, x) = x` (idempotent) and `Number.BitwiseOr(x, 0) = x` (OR with 0 is identity).
 
 ## Examples
 
 ### Example 1: Basic bitwise OR
 
-12 in binary is `1100`, 10 is `1010`. OR gives `1110` = 14.
+12 (`1100`) OR 10 (`1010`) = `1110` = 14.
 
 ```powerquery
 Number.BitwiseOr(12, 10)
@@ -54,7 +58,9 @@ Number.BitwiseOr(12, 10)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":14}]}
 -->
 
-### Example 2: Set a specific bit (bit 0) in a value
+### Example 2: Set bit 0 (value 1) in a number that doesn't have it
+
+12 (`1100`) OR 1 (`0001`) = `1101` = 13.
 
 ```powerquery
 Number.BitwiseOr(12, 1)
@@ -64,19 +70,19 @@ Number.BitwiseOr(12, 1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":13}]}
 -->
 
-### Example 3: Merge two permission bitmasks
-
-Read=1, Write=2, Execute=4. Grant Read and Write:
+### Example 3: Combine permission flags (Read=1, Write=2, Execute=4)
 
 ```powerquery
 let
     Read = 1,
     Write = 2,
-    Permissions = Number.BitwiseOr(Read, Write)
+    Execute = 4,
+    ReadWrite = Number.BitwiseOr(Read, Write),
+    AllPerms = Number.BitwiseOr(ReadWrite, Execute)
 in
-    Permissions
+    #table({"ReadWrite", "AllPerms"}, {{ReadWrite, AllPerms}})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
+{"columns":[{"name":"ReadWrite","type":"number"},{"name":"AllPerms","type":"number"}],"rows":[{"ReadWrite":3,"AllPerms":7}]}
 -->

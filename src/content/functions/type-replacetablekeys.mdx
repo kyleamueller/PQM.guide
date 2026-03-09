@@ -30,18 +30,20 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.ReplaceTableKeys` replaces all existing key definitions on a table type with a new set of keys provided as a list. Each element of the list is a record with:
+`Type.ReplaceTableKeys` replaces **all** existing key definitions on a table type with a completely new set of keys provided as a list. Each element of the list must be a record with two fields:
 
-- `Columns` — a list of column name text values
+- `Columns` — a list of column name text values forming the key
 - `Primary` — `true` for the primary key, `false` for alternate keys
 
-To remove all keys from a table type, pass an empty list (`{}`).
+Passing an empty list (`{}`) removes all keys from the type.
 
-This function is the bulk replacement counterpart to `Type.AddTableKey`. Use it to set a complete key configuration at once rather than adding keys one at a time.
+`Type.ReplaceTableKeys` is the bulk-replacement counterpart to `Type.AddTableKey`. Use it when you want to set the complete key configuration in a single call — for example, when rebuilding a schema from scratch or applying a key set derived from external metadata. Use `Type.AddTableKey` when you only need to add one key at a time on top of existing keys.
+
+Like all type functions in M, `Type.ReplaceTableKeys` returns a new type value — it does not modify the original. To apply the resulting type to an actual table, use `Value.ReplaceType(table, newType)`. Use `Type.TableKeys` to verify the result.
 
 ## Examples
 
-### Example 1: Replace keys with a new primary key
+### Example 1: Replace existing keys with a new primary key
 
 ```powerquery
 let
@@ -71,4 +73,25 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->
+
+### Example 3: Replace with both a primary key and an alternate key
+
+```powerquery
+let
+    T = #table(type table [OrderID = number, Email = text, Product = text], {}),
+    NewType = Type.ReplaceTableKeys(
+        Value.Type(T),
+        {
+            [Columns = {"OrderID"}, Primary = true],
+            [Columns = {"Email"}, Primary = false]
+        }
+    ),
+    Keys = Type.TableKeys(NewType)
+in
+    List.Count(Keys)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
 -->

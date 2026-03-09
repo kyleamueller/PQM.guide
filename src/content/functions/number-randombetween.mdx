@@ -28,15 +28,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.RandomBetween` returns a pseudo-random floating-point number uniformly distributed between `bottom` and `top`, both endpoints inclusive. It is equivalent to `bottom + Number.Random() * (top - bottom)`.
+`Number.RandomBetween` returns a pseudo-random floating-point number uniformly distributed in the range [bottom, top] — both endpoints inclusive. It is equivalent to `bottom + Number.Random() * (top - bottom)`.
 
-Like `Number.Random`, the value regenerates on each refresh. When used inside `Table.AddColumn`, the engine typically evaluates the expression once per row, producing different values per row. However, caching behavior may vary — if consistent per-row randomness is critical, test in your specific environment.
+**Non-determinism warning**: like `Number.Random`, this function produces a different value on every call and on every refresh. Results are not reproducible across query evaluations, and there is no built-in seed mechanism. Use `Number.RandomBetween` only in scenarios where non-determinism is acceptable — for example, generating sample data, adding random jitter to test data, or simulating distributions.
 
-`bottom` must not exceed `top`. Both parameters accept decimal values.
+The `bottom` value must be less than or equal to `top`. Both parameters accept decimal (fractional) values. `Number.RandomBetween` returns a **floating-point** number even when both bounds are integers — to get random integers, wrap with `Number.RoundDown(Number.RandomBetween(min, max))` or use `Int64.From(Number.RoundDown(...))`.
+
+When used inside `Table.AddColumn` with `each`, Power Query typically evaluates the function once per row, producing different values per row. However, this behavior can vary depending on the host environment and query folding. If per-row uniqueness is critical, test your specific setup.
 
 ## Examples
 
-### Example 1: Random integer-range value between 1 and 100
+### Example 1: A random floating-point number between 1 and 100
 
 ```powerquery
 Number.RandomBetween(1, 100)
@@ -56,17 +58,19 @@ Number.RandomBetween(-0.05, 0.05)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.0238}]}
 -->
 
-### Example 3: Add a random discount column
+### Example 3: Add a random discount percentage column to Sales rows
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "UnitPrice"}),
-    "Discount", each Number.Round(Number.RandomBetween(0, 0.3), 2), type number
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    "DiscountPct",
+    each Number.Round(Number.RandomBetween(0, 0.3), 2),
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"UnitPrice","type":"number"},{"name":"Discount","type":"number"}],"rows":[{"OrderID":1,"UnitPrice":25,"Discount":0.12},{"OrderID":2,"UnitPrice":150,"Discount":0.27},{"OrderID":3,"UnitPrice":75,"Discount":0.05},{"OrderID":4,"UnitPrice":200,"Discount":0.19}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"DiscountPct","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"DiscountPct":0.12},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"DiscountPct":0.27},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"DiscountPct":0.05},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"DiscountPct":0.19}]}
 -->

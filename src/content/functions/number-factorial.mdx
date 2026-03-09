@@ -26,13 +26,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Factorial` computes n! — the product of all positive integers from 1 to n. By convention, `0! = 1`. The result grows extremely rapidly; `Number.Factorial(170)` is near the limit of double-precision floating point, and values beyond that will return infinity.
+`Number.Factorial` computes n! — the product of all positive integers from 1 up to n. By convention, `0! = 1` (the empty product). The input must be a non-negative integer; passing a negative number or a fractional value raises an error.
 
-Factorials are fundamental to combinatorics. They underlie `Number.Combinations` (C(n,k) = n! / (k!(n-k)!)) and `Number.Permutations` (P(n,k) = n! / (n-k)!).
+Factorial values grow **extremely rapidly**: 10! = 3,628,800; 20! ≈ 2.4 × 10^18; 170! ≈ 7.3 × 10^306 (near the double-precision limit). `Number.Factorial(171)` returns infinity because the result overflows IEEE 754 double-precision. Do not use factorial to directly compute large combinatorics — use `Number.Combinations` or `Number.Permutations` instead, as those functions are implemented to avoid the intermediate factorial overflow.
+
+Factorials are the mathematical foundation for: combinatorics (C(n,k) = n! / (k!(n-k)!)), permutations (P(n,k) = n! / (n-k)!), and probability distributions (Poisson, binomial). In Power Query they are most useful for small n in lookup tables, educational examples, or computing factorial-based normalizing constants.
 
 ## Examples
 
 ### Example 1: Factorial of 5
+
+5! = 1 × 2 × 3 × 4 × 5 = 120
 
 ```powerquery
 Number.Factorial(5)
@@ -42,7 +46,7 @@ Number.Factorial(5)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":120}]}
 -->
 
-### Example 2: Factorial of 0 (by convention equals 1)
+### Example 2: Factorial of 0 — by convention equals 1
 
 ```powerquery
 Number.Factorial(0)
@@ -52,17 +56,17 @@ Number.Factorial(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 3: Manually verify combinations formula C(5,2)
+### Example 3: Verify the combinations formula using factorials
 
-C(5,2) = 5! / (2! * 3!) = 120 / (2 * 6) = 10
+C(5,2) = 5! / (2! × 3!) = 120 / (2 × 6) = 10. This confirms `Number.Combinations(5, 2)`.
 
 ```powerquery
 let
     N = 5,
     K = 2,
-    Result = Number.Factorial(N) / (Number.Factorial(K) * Number.Factorial(N - K))
+    Computed = Number.Factorial(N) / (Number.Factorial(K) * Number.Factorial(N - K))
 in
-    Result
+    Computed
 ```
 
 <!--output

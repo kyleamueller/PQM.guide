@@ -30,37 +30,62 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.ReplaceErrorValues` substitutes error values in specified columns with a provided replacement value. Each element of `errorReplacement` is a two-element list: `{columnName, replacementValue}`. Only columns explicitly listed are affected; errors in other columns remain.
+`Table.ReplaceErrorValues` substitutes error values in specified columns with a safe replacement value. Each element of `errorReplacement` is a two-element list: `{columnName, replacementValue}`. Only the explicitly listed columns are modified — errors in unlisted columns are left in place.
 
-This is commonly used after `Table.TransformColumnTypes` when certain values could not be converted, to substitute a safe default like `0`, `null`, or `"N/A"` instead of leaving errors.
+This function is most commonly used immediately after `Table.TransformColumnTypes` when type conversion fails for some rows (e.g., non-numeric text in a number column produces an error). Replacing those errors with `0`, `null`, or a sentinel value like `"N/A"` keeps the dataset processable. It is more targeted than `Table.RemoveRowsWithErrors`, which discards the entire row.
+
+You can also use `try ... otherwise` inside `Table.AddColumn` or `Table.TransformColumns` for single-column error handling, but `Table.ReplaceErrorValues` is simpler when replacing errors across multiple columns at once.
 
 ## Examples
 
-### Example 1: Replace errors in one column with 0
+### Example 1: Fix type-conversion errors in the Salary column after a type change
 
 ```powerquery
 let
-    Source = #table({"ID", "Amount"}, {{1, 100}, {2, error "parse error"}, {3, 300}})
+    Employees = #table(
+        {"EmployeeID", "FullName", "Salary"},
+        {{"E001","alice smith","55000"},{"E002","BOB JONES","N/A"},{"E003","Charlie Brown","72000"},{"E006","frank lee","unknown"}}
+    ),
+    Typed    = Table.TransformColumnTypes(Employees, {{"Salary", type number}}),
+    Cleaned  = Table.ReplaceErrorValues(Typed, {{"Salary", 0}})
 in
-    Table.ReplaceErrorValues(Source, {{"Amount", 0}})
+    Cleaned
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"ID":"1","Amount":"100"},{"ID":"2","Amount":"0"},{"ID":"3","Amount":"300"}]}
+{"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Salary":"0"},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":"72000"},{"EmployeeID":"E006","FullName":"frank lee","Salary":"0"}]}
 -->
 
-### Example 2: Replace errors in multiple columns
+### Example 2: Replace errors across multiple columns simultaneously
 
 ```powerquery
 let
-    Source = #table(
-        {"Name", "Score"},
-        {{"Alice", 95}, {error "bad name", 80}, {"Carol", error "N/A"}}
+    Sales = #table(
+        {"OrderID", "CustomerName", "UnitPrice", "Quantity"},
+        {{1,"Alice",25.00,4},{2,error "missing",50.00,2},{3,"Charlie",error "bad value",10},{4,"Alice",75.00,error "NaN"}}
     )
 in
-    Table.ReplaceErrorValues(Source, {{"Name", "Unknown"}, {"Score", 0}})
+    Table.ReplaceErrorValues(Sales, {{"CustomerName","Unknown"},{"UnitPrice",0},{"Quantity",0}})
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"Score","type":"any"}],"rows":[{"Name":"Alice","Score":"95"},{"Name":"Unknown","Score":"80"},{"Name":"Carol","Score":"0"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Unknown","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","UnitPrice":"0","Quantity":"10"},{"OrderID":"4","CustomerName":"Alice","UnitPrice":"75","Quantity":"0"}]}
+-->
+
+### Example 3: Replace price errors with null to distinguish missing from zero
+
+Using `null` as the replacement is appropriate when `0` has a real business meaning and you want to distinguish "missing" from "zero".
+
+```powerquery
+let
+    Products = #table(
+        {"ProductID","ProductName","Price"},
+        {{1,"Widget A",25.00},{2,"Gadget B",error "TBD"},{3,"Widget C",15.00},{5,"Thingamajig E",error "unlisted"}}
+    )
+in
+    Table.ReplaceErrorValues(Products, {{"Price", null}})
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":null},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"5","ProductName":"Thingamajig E","Price":null}]}
 -->

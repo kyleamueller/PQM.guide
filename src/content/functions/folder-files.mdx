@@ -31,57 +31,53 @@ relatedFunctions:
 
 ## Remarks
 
-`Folder.Files` reads a folder recursively and returns a table listing every file found in the folder and all of its subfolders. It is the recursive counterpart to `Folder.Contents`, which only reads the immediate children of a folder.
+`Folder.Files` reads a folder and all of its subfolders recursively, returning a flat table with one row per file. Subfolders themselves are not listed as rows — only files are included. This makes it the preferred function when you need to consolidate files that are spread across multiple subdirectories. Use `Folder.Contents` instead when you only need the immediate contents of a single folder.
 
-Subfolders themselves are not listed as rows — only files are included. The `Folder Path` column tells you which subfolder each file came from.
-
-**Columns returned**:
+**Columns returned**: Each row includes:
 - `Name` (text) — the file name including extension.
-- `Folder Path` (text) — the full folder path containing the file (not including the file name itself).
+- `Folder Path` (text) — the full path of the subfolder containing the file (not including the file name). Use this to reconstruct the full path or to filter files from a specific subfolder.
 - `Date accessed` (datetime) — last access timestamp.
 - `Date modified` (datetime) — last modification timestamp.
 - `Date created` (datetime) — creation timestamp.
 - `Extension` (text) — the file extension including the leading dot (e.g., `.csv`).
-- `Attributes` (record) — a record of file system attributes (Hidden, ReadOnly, System, Directory).
-- `Content` (binary) — the binary content of the file.
+- `Attributes` (record) — file system attributes including `Hidden`, `ReadOnly`, `System`, and `Directory`.
+- `Content` (binary) — the binary content of the file. Loaded lazily — accessing this column triggers the actual file read.
 
-**Authentication**: Determined by the Windows credentials of the user or gateway. No Power Query credential configuration is required for local paths.
+**Authentication**: Determined by the Windows credentials of the signed-in user or the service account running the on-premises data gateway. For UNC paths (`\\server\share\...`), the user or gateway account must have read access to the network share. No Power Query credential configuration is needed for paths accessible under Windows authentication.
 
-**Query folding**: Not supported.
+**Power BI Service and gateway requirements**: `Folder.Files` is not available for direct cloud refresh in Power BI Service. Schedule refresh using an on-premises data gateway installed on a machine with access to the folder path. For files stored in SharePoint or OneDrive for Business, use `SharePoint.Files` instead, which supports cloud refresh natively.
 
-**Power BI Service**: Not available for direct cloud refresh. An on-premises data gateway is required for local or network folder paths.
+**Performance and lazy evaluation**: `Content` is not read until Power Query accesses it. Always apply row filters (by `Extension`, `Date modified`, `Name`, or `Folder Path`) before expanding the `Content` column. Filtering early means Power Query will not open and read files that you do not need, significantly reducing refresh time in large folder trees.
 
-**Performance**: Because `Folder.Files` loads binary content for every file it finds, large folders with many files can be slow. Filter rows early (by extension, date, or name) to reduce the number of files whose `Content` column is accessed. Power Query uses lazy evaluation, so filtering before expanding `Content` avoids reading files you do not need.
-
-**Typical combine-files pattern**: This function is the basis for the "Combine Files" experience in Power Query UI. The standard pattern is: get file list, filter to the target file type, then use `Table.TransformColumns` or `Table.AddColumn` to parse each `Content` value.
+**Combine-files pattern**: `Folder.Files` is the engine behind the Power Query UI "Combine Files" experience. The standard M pattern is: get file list → filter to target extension → add a parsed column using the appropriate function → combine the results with `Table.Combine`.
 
 ## Examples
 
-### Example 1: List all files recursively in a folder
+### Example 1: List all files recursively in a folder tree
 ```powerquery
 Folder.Files("C:\Data\Reports")
 ```
 
-### Example 2: Combine all Excel workbooks in a folder tree
-```powerquery
-let
-    Source = Folder.Files("C:\Data\Reports"),
-    ExcelFiles = Table.SelectRows(Source, each [Extension] = ".xlsx"),
-    AddedSheets = Table.AddColumn(ExcelFiles, "Workbook", each Excel.Workbook([Content])),
-    Expanded = Table.ExpandTableColumn(AddedSheets, "Workbook", {"Name", "Data"}),
-    FilteredSheets = Table.SelectRows(Expanded, each [Name] = "Sheet1"),
-    Combined = Table.Combine(FilteredSheets[Data])
-in
-    Combined
-```
-
-### Example 3: Combine all CSV files across subfolders
+### Example 2: Combine all CSV files across subfolders into one table
 ```powerquery
 let
     Source = Folder.Files("C:\Data\Exports"),
     CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv"),
     Parsed = Table.AddColumn(CsvFiles, "Data", each Csv.Document([Content], [Delimiter=",", Encoding=65001])),
     Combined = Table.Combine(Parsed[Data])
+in
+    Combined
+```
+
+### Example 3: Combine a specific worksheet from all Excel files in a folder tree
+```powerquery
+let
+    Source = Folder.Files("C:\Data\Reports"),
+    ExcelFiles = Table.SelectRows(Source, each [Extension] = ".xlsx"),
+    AddedSheets = Table.AddColumn(ExcelFiles, "Workbook", each Excel.Workbook([Content])),
+    Expanded = Table.ExpandTableColumn(AddedSheets, "Workbook", {"Name", "Data"}),
+    Sheet1Only = Table.SelectRows(Expanded, each [Name] = "Sheet1"),
+    Combined = Table.Combine(Sheet1Only[Data])
 in
     Combined
 ```

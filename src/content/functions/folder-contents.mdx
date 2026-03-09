@@ -31,34 +31,34 @@ relatedFunctions:
 
 ## Remarks
 
-`Folder.Contents` reads a folder and returns a table listing all files and immediate subfolders. Unlike `Folder.Files`, it does not recurse into subfolders by default — it returns only the direct children of the specified path.
+`Folder.Contents` reads a local or network folder and returns a table with one row per file or subfolder found at that path. Unlike `Folder.Files`, it does not recurse into subfolders by default — it returns only the immediate children (files and one level of subdirectories). To include all files from subfolders recursively, pass `[IncludeSubFolders = true]` in the options record, or use `Folder.Files` instead.
 
-**Columns returned**:
+**Columns returned**: Each row in the result includes:
 - `Name` (text) — the file or folder name including extension.
-- `Folder Path` (text) — the full folder path (without the file name).
+- `Folder Path` (text) — the full path of the containing folder (without the file name).
 - `Date accessed` (datetime) — last access timestamp.
 - `Date modified` (datetime) — last modification timestamp.
 - `Date created` (datetime) — creation timestamp.
-- `Extension` (text) — the file extension including the leading dot (e.g., `.xlsx`), or empty for folders.
-- `Attributes` (record) — a record of file system attributes (Hidden, ReadOnly, System, Directory).
-- `Content` (binary) — the binary content of the file. `null` for folders.
+- `Extension` (text) — the file extension including the leading dot (e.g., `.xlsx`). Empty string for folders.
+- `Attributes` (record) — file system metadata attributes including `Hidden`, `ReadOnly`, `System`, and `Directory`.
+- `Content` (binary) — the binary content of the file. `null` for subfolders.
 
-**Authentication**: Access is determined by the Windows credentials of the user or gateway running the query. No special authentication is configured in Power Query itself.
+**Authentication**: Determined by the Windows credentials of the currently signed-in user or the service account running the on-premises data gateway. No credential configuration is required in Power Query for local paths. UNC paths (e.g., `\\server\share\folder`) require the user or gateway account to have read access to the network share.
 
-**Query folding**: Not supported. All filtering of the resulting table occurs in Power Query.
+**Power BI Service and gateway requirements**: `Folder.Contents` is not available for direct cloud refresh in Power BI Service. An on-premises data gateway installed on a machine with access to the folder path is required for scheduled refresh. SharePoint document libraries should use `SharePoint.Files` instead.
 
-**Power BI Service**: This function is not available for direct cloud refresh. Use an on-premises data gateway to refresh queries based on local or network folder paths.
+**Query folding**: Not supported. All filtering occurs in Power Query after the directory listing is fetched. For best performance, apply `Table.SelectRows` on `Extension`, `Date modified`, or `Name` before accessing the `Content` column, as `Content` is loaded lazily and does not trigger a file read until accessed.
 
-**Combining files**: The typical pattern is to use `Folder.Contents` (or `Folder.Files`) to get a list of files, filter to the ones you want, then expand the `Content` column by passing each binary value to the appropriate parsing function (`Csv.Document`, `Excel.Workbook`, `Json.Document`, etc.).
+**Combining files**: The standard pattern is: list files → filter by extension or name → expand `Content` using a parsing function. Pass each `Content` binary to `Csv.Document`, `Excel.Workbook`, `Json.Document`, or `Pdf.Tables` depending on the file type.
 
 ## Examples
 
-### Example 1: List all files and folders in a directory
+### Example 1: List all files and subfolders in a directory
 ```powerquery
 Folder.Contents("C:\Data\Reports")
 ```
 
-### Example 2: Filter to only CSV files
+### Example 2: Filter to only CSV files in the folder
 ```powerquery
 let
     Source = Folder.Contents("C:\Data\Reports"),
@@ -67,13 +67,13 @@ in
     CsvFiles
 ```
 
-### Example 3: Combine all CSV files in a folder into one table
+### Example 3: Combine all CSV files in the folder into one table
 ```powerquery
 let
     Source = Folder.Contents("C:\Data\Reports"),
     CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv"),
-    AddedContent = Table.AddColumn(CsvFiles, "Parsed", each Csv.Document([Content])),
-    Combined = Table.Combine(AddedContent[Parsed])
+    Parsed = Table.AddColumn(CsvFiles, "Data", each Csv.Document([Content], [Delimiter=",", Encoding=65001])),
+    Combined = Table.Combine(Parsed[Data])
 in
     Combined
 ```

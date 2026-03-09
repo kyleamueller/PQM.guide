@@ -34,15 +34,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.AddTableKey` adds a key definition to a table type. Keys identify columns whose values uniquely identify rows, analogous to primary and unique keys in relational databases.
+`Type.AddTableKey` adds a key definition to a table type, returning a new type value. Keys identify the column or columns whose values uniquely identify each row — analogous to primary and unique keys in relational databases. The `isPrimary` flag distinguishes the primary key (`true`) from alternate keys (`false`). A table type can have at most one primary key but multiple alternate keys.
 
-In Power BI, declaring keys enables relationship management and can improve query performance. The function returns a new type — it does not modify the input type. To apply the new type to a table, use `Value.ReplaceType(table, newType)`.
+This function operates on **types**, not tables. It returns a new type — the original type is unchanged and no data is modified. To apply the updated type to an actual table, use `Value.ReplaceType(table, newType)`. Alternatively, `Table.AddKey` applies a key to a table directly and handles the type plumbing for you.
 
-A table type can have at most one primary key but multiple alternate keys.
+Key declarations matter most in Power BI Desktop, where they are used by the engine to manage relationships and can improve query folding. In Fabric and dataflows, they inform the connector layer about uniqueness constraints.
+
+The result of `Type.AddTableKey` accumulates on top of any existing keys — it does not replace them. To replace all keys at once, use `Type.ReplaceTableKeys`. To inspect current keys, use `Type.TableKeys`.
 
 ## Examples
 
-### Example 1: Add a primary key on a single column
+### Example 1: Add a primary key on a single column and verify it
 
 ```powerquery
 let
@@ -57,7 +59,7 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: Add a composite key
+### Example 2: Add a composite primary key and inspect its columns
 
 ```powerquery
 let
@@ -70,4 +72,20 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Year","Month"]}]}
+-->
+
+### Example 3: Apply a primary key to a table using Value.ReplaceType
+
+```powerquery
+let
+    T = #table(type table [OrderID = number, Product = text], {{1, "Widget A"}, {2, "Widget B"}}),
+    TypeWithKey = Type.AddTableKey(Value.Type(T), {"OrderID"}, true),
+    TWithKey = Value.ReplaceType(T, TypeWithKey),
+    Keys = Type.TableKeys(Value.Type(TWithKey))
+in
+    Keys{0}[Columns]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["OrderID"]}]}
 -->

@@ -29,34 +29,61 @@ relatedFunctions:
 
 `Date.IsInNextWeek` returns `true` if the input date falls within the Sunday–Saturday calendar week immediately following the current week. The current week is not included; use `Date.IsInCurrentWeek` to also match the current week. The function is re-evaluated on each query refresh.
 
+The week boundary is always Sunday–Saturday. If your organization uses Monday-based weeks, there is no built-in parameter to change this — build the filter manually using `Date.StartOfWeek` and `Date.EndOfWeek` with `Day.Monday`.
+
+Use this function to surface upcoming deliverables, scheduled shifts, or events planned for next week. For a broader lookahead window, use `Date.IsInNextNWeeks` with the desired week count.
+
 ## Examples
 
-### Example 1: Filter next week's scheduled tasks
+### Example 1: Filter orders scheduled for next week
 
-Keep only rows where TaskDate falls in the next calendar week.
+Keep only orders with OrderDate in the next Sunday–Saturday week.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Tasks,
-    each Date.IsInNextWeek([TaskDate])
+    Sales,
+    each Date.IsInNextWeek([OrderDate])
 )
 ```
 
 <!--output
-{"columns":[{"name":"TaskID","type":"number"},{"name":"TaskDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":8,"TaskDate":"2026-03-16","TaskName":"Team sync"},{"TaskID":9,"TaskDate":"2026-03-18","TaskName":"Code review"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-03-16"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-03-18"}]}
 -->
 
-### Example 2: Flag next-week items
+### Example 2: Flag next-week orders
 
-Add a boolean column for tasks scheduled next week.
+Add a boolean column identifying orders in the next week.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Tasks,
-    "NextWeek", each Date.IsInNextWeek([TaskDate]), type logical
+    Sales,
+    "IsNextWeek", each Date.IsInNextWeek([OrderDate]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"TaskID","type":"number"},{"name":"TaskDate","type":"date"},{"name":"NextWeek","type":"logical"}],"rows":[{"TaskID":6,"TaskDate":"2026-03-10","NextWeek":false},{"TaskID":8,"TaskDate":"2026-03-16","NextWeek":true},{"TaskID":10,"TaskDate":"2026-03-23","NextWeek":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsNextWeek","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","IsNextWeek":false},{"OrderID":43,"OrderDate":"2026-03-16","IsNextWeek":true},{"OrderID":45,"OrderDate":"2026-03-23","IsNextWeek":false}]}
+-->
+
+### Example 3: Flag current and next week together for a two-week view
+
+Combine IsInCurrentWeek and IsInNextWeek for a rolling two-week alert window.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "TwoWeekWindow",
+    each Date.IsInCurrentWeek([OrderDate]) or Date.IsInNextWeek([OrderDate]),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"TwoWeekWindow","type":"logical"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-05","TwoWeekWindow":true},{"OrderID":42,"OrderDate":"2026-03-08","TwoWeekWindow":true},{"OrderID":43,"OrderDate":"2026-03-16","TwoWeekWindow":true},{"OrderID":45,"OrderDate":"2026-03-23","TwoWeekWindow":false}]}
 -->

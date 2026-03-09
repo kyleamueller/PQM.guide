@@ -31,45 +31,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.First` returns the first row of a table as a record. This allows you to access individual field values using record field access syntax (`[FieldName]`). If the table is empty and no `default` is provided, the function returns `null`.
+`Table.First` returns the first row of a table as a record, enabling field access via `[FieldName]` syntax. If the table is empty and no `default` value is specified, the function returns `null`. Providing a default record prevents null propagation errors in downstream steps when the table might occasionally be empty — for example, after a filter that may match zero rows.
 
-Providing a default value prevents null-related errors in downstream steps when the table may occasionally be empty.
+`Table.First` is commonly used after filtering to extract a single expected result (e.g., looking up a configuration value or getting the most recent transaction after sorting). For cases where you need to enforce that exactly one row exists, use `Table.SingleRow` instead, which will raise an error if the table has zero or more than one row. For reading just the top-left scalar value without unpacking a record, `Table.FirstValue` is more concise.
+
+After sorting, `Table.First` efficiently returns the top row without materializing the entire sorted result into memory — the engine can short-circuit the evaluation. However, `Table.First` alone (without a prior sort) returns whichever row happens to be first in the table's current order, which may not be deterministic for database sources.
 
 ## Examples
 
-### Example 1: Get the first row as a record
+### Example 1: Get the earliest order from the Sales table
+
+Sort by OrderDate first, then retrieve the first row.
 
 ```powerquery
-Table.First(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}})
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice", "Quantity", "OrderDate", "Region"},
+        {{1,"Alice","Widget A",25.00,4,#date(2024,1,15),"East"},
+         {2,"Bob","Gadget B",50.00,2,#date(2024,1,18),"West"},
+         {3,"Charlie","Widget C",15.00,10,#date(2024,2,1),"East"}}
+    ),
+    Sorted = Table.Sort(Sales, {{"OrderDate", Order.Ascending}})
+in
+    Table.First(Sorted)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"Alice\", Score = 95]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 1, CustomerName = \"Alice\", Product = \"Widget A\", UnitPrice = 25, Quantity = 4, OrderDate = #date(2024,1,15), Region = \"East\"]"}]}
 -->
 
-### Example 2: Access a field from the first row
+### Example 2: Extract a specific field from the first row
+
+Chain field access directly onto `Table.First` to get a scalar value.
 
 ```powerquery
-Table.First(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}})
-)[Name]
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "UnitPrice"},
+        {{1,"Alice","Widget A",25.00},{2,"Bob","Gadget B",50.00}}
+    ),
+    Sorted = Table.Sort(Sales, {{"UnitPrice", Order.Descending}})
+in
+    Table.First(Sorted)[Product]
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Gadget B"}]}
 -->
 
-### Example 3: Return a default when table is empty
+### Example 3: Return a safe default when the filter matches no rows
 
 ```powerquery
-Table.First(
-    #table({"Name", "Score"}, {}),
-    [Name = "N/A", Score = 0]
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Region"},
+        {{1,"Alice","East"},{2,"Bob","West"}}
+    ),
+    Filtered = Table.SelectRows(Sales, each [Region] = "North")
+in
+    Table.First(Filtered, [OrderID = 0, CustomerName = "None", Region = "N/A"])
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"N/A\", Score = 0]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"None\", Region = \"N/A\"]"}]}
 -->

@@ -31,13 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.FindText` filters a list of text values, returning only those that contain the specified `text` as a substring. The search is **case-insensitive**.
+`List.FindText` filters a list of text values, returning only those that contain the specified `text` as a substring. The search is **case-insensitive** — `"apple"` will match `"Apple"`, `"APPLE"`, and `"pineapple"`.
 
-All items in the list must be text values; non-text values will cause an error. Use `List.Select` with `Text.Contains` for more control, such as case-sensitive matching or working with mixed-type lists.
+All items in the list must be text values; non-text values (including null) will cause an error. If your list may contain mixed types, use `List.Select` with a guarded `Text.Contains` call instead. Returns an empty list if no items match.
 
-- Returns an empty list if no items match.
-- The search uses substring matching, not exact matching.
-- Equivalent to `List.Select(list, each Text.Contains(_, text, Comparer.OrdinalIgnoreCase))`.
+`List.FindText` is equivalent to `List.Select(list, each Text.Contains(_, text, Comparer.OrdinalIgnoreCase))`. Use `List.Select` directly when you need case-sensitive matching, more complex conditions (e.g., starts-with or ends-with), or when working with lists that may contain non-text values. `List.FindText` is most useful as a quick, readable substring filter on a clean list of text.
 
 ## Examples
 

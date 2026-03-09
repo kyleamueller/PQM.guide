@@ -30,15 +30,22 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.HasFields` checks whether a record contains one or more specified field names. Pass a single text value to check for one field, or a list of text values to check that all of them are present.
+`Record.HasFields` checks whether a record contains all of the specified field names. Pass a single text value to check for one field, or a list of text values to require that **all** listed fields are present (AND logic — all-or-nothing). If any one field is absent, the function returns `false`.
 
-This is useful for defensive data processing — before accessing a field that may or may not exist depending on the data source — and for conditional branching based on record shape.
+This is the preferred alternative to wrapping field access in `try`/`otherwise` for schema checks. It is useful for:
 
-To check for the presence of any field (not all), use `List.AnyTrue` combined with `List.Transform` and individual checks.
+- **Defensive coding**: verifying fields exist before accessing them with `[FieldName]` syntax
+- **Schema validation**: confirming that records from semi-structured sources (JSON, API responses) have the expected shape
+- **Conditional branching**: routing records to different transformation paths based on their structure
+
+To check whether **any** of a list of fields is present (OR logic), combine with `List.AnyTrue`:
+```powerquery
+List.AnyTrue(List.Transform({"Email", "Phone"}, each Record.HasFields(record, _)))
+```
 
 ## Examples
 
-### Example 1: Check for a single field
+### Example 1: Check for a single field that exists
 
 ```powerquery
 Record.HasFields([Name = "Alice", Age = 30], "Name")
@@ -48,7 +55,7 @@ Record.HasFields([Name = "Alice", Age = 30], "Name")
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: Check for multiple fields — all must be present
+### Example 2: Check for multiple fields — returns false if any are missing
 
 ```powerquery
 Record.HasFields([Name = "Alice", Age = 30], {"Name", "Email"})
@@ -58,19 +65,23 @@ Record.HasFields([Name = "Alice", Age = 30], {"Name", "Email"})
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
-### Example 3: Safely access a field in a row that may vary by source
+### Example 3: Use as a gate before accessing an optional field per Sales row
 
-Input: `Customers`
+Input: `Sales`
+
+Check whether each Sales row has a "Discount" field, and only apply it if present.
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Customers, 3), {"CustomerID", "Name"}),
-    "HasEmail",
-    each Record.HasFields(_, "Email"),
-    type logical
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    "FinalPrice",
+    each if Record.HasFields(_, "Discount")
+         then [UnitPrice] * (1 - [Discount])
+         else [UnitPrice],
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"CustomerID","type":"number"},{"name":"Name","type":"text"},{"name":"HasEmail","type":"logical"}],"rows":[{"CustomerID":1,"Name":"Alice","HasEmail":false},{"CustomerID":2,"Name":"Bob","HasEmail":false},{"CustomerID":3,"Name":"Charlie","HasEmail":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"FinalPrice","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"FinalPrice":25},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"FinalPrice":50},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"FinalPrice":15},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"FinalPrice":75}]}
 -->

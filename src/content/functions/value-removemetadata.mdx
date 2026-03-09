@@ -29,9 +29,20 @@ relatedFunctions:
 
 ## Remarks
 
-`Value.RemoveMetadata` strips metadata from a value. When called without the optional parameter, it removes all metadata. When a `metadataRecord` is provided, only the fields whose names appear in that record are removed from the metadata.
+`Value.RemoveMetadata` strips the metadata record from a value, returning the value with no (or fewer) metadata fields. There are two modes:
 
-This is useful for cleaning up values before passing them to systems that should not receive internal metadata annotations, or for stripping specific internal bookkeeping fields while retaining others.
+- **Without the optional parameter**: removes all metadata — the result has an empty metadata record
+- **With a `metadataRecord` parameter**: removes only the metadata fields whose names appear as fields in the provided record; other metadata fields are retained
+
+The underlying data value is not changed — only the attached metadata record is modified. This is the destructive counterpart to `Value.ReplaceMetadata`.
+
+Common use cases include:
+
+- **Cleaning values before output**: stripping internal engine annotations before returning values to end users or downstream systems
+- **Selective metadata removal**: keeping useful annotations (e.g., display names) while removing internal bookkeeping fields
+- **Testing**: verifying that a value after an operation carries no unexpected metadata
+
+Note that most M operations already discard metadata automatically. `Value.RemoveMetadata` is only needed when you have explicitly attached metadata and want to explicitly remove it, or when you receive a value from a connector that carries metadata you want to strip.
 
 ## Examples
 
@@ -61,4 +72,18 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+-->
+
+### Example 3: Verify that stripped value equals the unwrapped literal
+
+```powerquery
+let
+    Annotated = "hello" meta [Tag = "test"],
+    Stripped = Value.RemoveMetadata(Annotated)
+in
+    Value.Equals(Stripped, "hello")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->

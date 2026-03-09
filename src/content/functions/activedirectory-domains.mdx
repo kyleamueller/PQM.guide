@@ -23,24 +23,21 @@ relatedFunctions: []
 
 ## Remarks
 
-`ActiveDirectory.Domains` connects to Active Directory using LDAP and returns a table of domains in the forest. From the navigation table, you can drill into each domain to access its objects — such as users, groups, computers, and organizational units.
+`ActiveDirectory.Domains` connects to Active Directory via LDAP and returns a navigation table listing every domain in the forest accessible from the current machine or specified domain controller. Drilling into a domain's `Data` column exposes a second navigation table of object categories — `Users`, `Groups`, `Computers`, `OrganizationalUnits`, and others — each of which can be expanded into a flat table of LDAP attributes.
 
-**Authentication**: Uses the Windows credentials of the currently logged-in user (or the service account running the gateway). No explicit credential configuration is required.
-
-**Availability**: Only available in environments with network access to a domain controller. Not supported in Power BI Service (cloud) without an on-premises data gateway. Not available in Excel Online or dataflows.
-
-**Query folding**: Not supported. Active Directory queries are executed through LDAP, and filtering is performed in Power Query after the data is retrieved.
-
-**Navigation table columns**:
+**Navigation table structure**: The top-level result contains one row per domain with the following columns:
 - `DNS Name` (text) — the fully qualified domain name (e.g., `contoso.com`).
-- `NetBIOS Name` (text) — the short domain name (e.g., `CONTOSO`).
-- `DomainMode` (text) — the functional level of the domain.
-- `Data` (table) — a nested navigation table of Active Directory object categories (users, groups, computers, etc.) within the domain.
+- `NetBIOS Name` (text) — the short, legacy domain name (e.g., `CONTOSO`).
+- `DomainMode` (text) — the functional level of the domain (e.g., `Windows2016Domain`).
+- `Data` (table) — a nested navigation table of AD object categories within that domain.
 
-**Use cases**:
-- Auditing user accounts, group memberships, or computer objects in Active Directory.
-- Cross-referencing HR data with AD user attributes (department, manager, email, etc.).
-- Inventorying machines joined to the domain.
+**Authentication**: Uses the Windows credentials of the currently signed-in user, or the service account running the on-premises data gateway. No explicit credential configuration is required in the Power Query credentials dialog — access is determined entirely by the user's AD permissions.
+
+**Availability and gateway requirements**: `ActiveDirectory.Domains` requires network connectivity to a domain controller. It is not available in Power BI Service without an on-premises data gateway configured to run under a domain-joined service account. It is also not available in Excel Online, Fabric Notebooks, or dataflows. For scheduled refresh in Power BI Service, install an on-premises gateway on a machine that is joined to (or has LDAP access to) the Active Directory forest.
+
+**Query folding**: Not supported. All LDAP data is retrieved first; filtering and column selection take place in Power Query after the data is fetched. For large AD environments with many objects, apply `Table.SelectRows` and `Table.SelectColumns` early to reduce memory usage.
+
+**Common patterns**: The typical workflow is `ActiveDirectory.Domains()` → drill into a domain's `Data` → drill into an object category (e.g., `Users`) → select relevant LDAP attribute columns. Useful for auditing user accounts, reconciling HR records with AD attributes (`mail`, `department`, `manager`, `userPrincipalName`), or inventorying computers and group memberships.
 
 ## Examples
 
@@ -49,12 +46,12 @@ relatedFunctions: []
 ActiveDirectory.Domains()
 ```
 
-### Example 2: Query a specific domain controller
+### Example 2: Query a specific domain controller by hostname
 ```powerquery
 ActiveDirectory.Domains("dc01.contoso.com")
 ```
 
-### Example 3: Navigate to user accounts in a domain
+### Example 3: Navigate to user accounts in a named domain
 ```powerquery
 let
     Domains = ActiveDirectory.Domains(),
@@ -64,14 +61,16 @@ in
     Users
 ```
 
-### Example 4: Get all enabled user accounts with email addresses
+### Example 4: Extract user display names, email, and department
 ```powerquery
 let
     Domains = ActiveDirectory.Domains(),
     Domain = Domains{0}[Data],
     Users = Domain{[Name="Users"]}[Data],
-    Enabled = Table.SelectRows(Users, each [userAccountControl] <> "514"),
-    Selected = Table.SelectColumns(Users, {"displayName", "mail", "department", "manager"})
+    Selected = Table.SelectColumns(
+        Users,
+        {"displayName", "userPrincipalName", "mail", "department", "manager", "enabled"}
+    )
 in
     Selected
 ```

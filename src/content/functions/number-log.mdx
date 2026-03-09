@@ -31,13 +31,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Log` computes the logarithm of a number with respect to a specified base. When `base` is omitted, it behaves identically to `Number.Ln` (natural logarithm, base _e_). When `base` is `10`, it matches `Number.Log10`.
+`Number.Log` computes the logarithm of a number to a specified base. When the `base` parameter is **omitted**, it returns the natural logarithm (base e) — identical to `Number.Ln`. When base is `10`, it is equivalent to `Number.Log10`. For base 2, use `Number.Log(x, 2)` since there is no dedicated `Number.Log2` function in M.
 
-The number must be positive for a real result. Passing `0` returns negative infinity; a negative number returns `NaN`. The base must be positive and not equal to `1`.
+The number must be strictly positive for a real result. Passing `0` returns negative infinity; a negative number returns `NaN`. The base must be a positive number not equal to `1`. Avoid computing `Number.Log(x, 1)` — it returns `NaN` or infinity.
+
+A common pitfall: `Number.Log(x)` with no base returns the **natural log**, not the base-10 log. This differs from the behavior in some other languages where `log()` defaults to base 10. If you intend base-10, always specify `10` explicitly or use `Number.Log10(x)`.
+
+The base-change formula lets you compute any logarithm from the natural log: `log_b(x) = Number.Ln(x) / Number.Ln(b)`, which is how Power Query internally evaluates `Number.Log(x, b)`.
 
 ## Examples
 
-### Example 1: Base-2 logarithm (how many doublings to reach 1024)
+### Example 1: Base-2 logarithm — how many doublings reach 1024?
 
 ```powerquery
 Number.Log(1024, 2)
@@ -47,7 +51,7 @@ Number.Log(1024, 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
 -->
 
-### Example 2: Natural log (base e) when base is omitted
+### Example 2: Omitting base returns the natural logarithm (base e)
 
 ```powerquery
 Number.Log(Number.E)
@@ -67,17 +71,19 @@ Number.Log(1000, 10)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
 
-### Example 4: Apply log base 2 transformation to a column
+### Example 4: Apply log base 2 transformation to UnitPrice column
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Revenue"}),
-    "Log2Revenue", each Number.Log([Revenue], 2), type number
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    "Log2Price",
+    each Number.Log([UnitPrice], 2),
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"Log2Revenue","type":"number"}],"rows":[{"OrderID":1,"Revenue":1024,"Log2Revenue":10},{"OrderID":2,"Revenue":512,"Log2Revenue":9},{"OrderID":3,"Revenue":2048,"Log2Revenue":11}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Log2Price","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Log2Price":4.643856189774724},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Log2Price":5.643856189774724},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Log2Price":3.906890595961295},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"Log2Price":6.228818690495881}]}
 -->

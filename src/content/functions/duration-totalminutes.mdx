@@ -28,13 +28,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Duration.TotalMinutes` returns the entire duration as a decimal number of minutes. For example, 2 hours and 30 minutes returns `150.0`. This differs from `Duration.Minutes`, which returns only the minutes component of the duration. Use `Duration.TotalMinutes` when you need elapsed time as a single numeric value for SLA analysis, billing calculations, or reporting. If the input is `null`, the function returns `null`.
+`Duration.TotalMinutes` returns the entire duration as a decimal number of minutes. For example, 2 hours and 30 minutes returns `150.0`. This differs from `Duration.Minutes`, which returns only the minutes component of the duration (e.g., `30` for the same input, not `150`). Use `Duration.TotalMinutes` when you need elapsed time as a single numeric value for SLA analysis, billing calculations, or reporting. If the input is `null`, the function returns `null`.
+
+A natural way to produce a duration for this function is to subtract two `datetime` values: `Duration.TotalMinutes(endTime - startTime)`. The result is a decimal number, so 1 hour and 45.5 seconds returns `60.00833...`.
+
+For other total-duration conversions, use `Duration.TotalDays`, `Duration.TotalHours`, or `Duration.TotalSeconds`. Use `Duration.Minutes` when you only need the minutes component (0–59) of a multi-day duration, not the cumulative total.
 
 ## Examples
 
-### Example 1: Calculate response time in minutes from log data
+### Example 1: Confirm total minutes match the source DurationMinutes column
 
-Compute the total minutes elapsed between log start and end times.
+Validate that converting via #duration and back through TotalMinutes is lossless.
 
 Input: `OrderLog`
 
@@ -51,7 +55,7 @@ Table.AddColumn(
 ```
 
 <!--output
-{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"TotalMinutes","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"TotalMinutes":1725},{"LogID":"L004","DurationMinutes":2745,"TotalMinutes":2745},{"LogID":"L006","DurationMinutes":1065,"TotalMinutes":1065}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"TotalMinutes","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"TotalMinutes":1725},{"LogID":"L004","DurationMinutes":2745,"TotalMinutes":2745},{"LogID":"L006","DurationMinutes":1065,"TotalMinutes":1065},{"LogID":"L008","DurationMinutes":2670,"TotalMinutes":2670}]}
 -->
 
 ### Example 2: Total minutes for a mixed duration
@@ -67,4 +71,23 @@ Return the total minutes for a duration of 2 hours and 30 minutes.
 
 <!--output
 {"columns":[{"name":"Duration","type":"duration"},{"name":"TotalMinutes","type":"number"}],"rows":[{"Duration":"0.02:30:00","TotalMinutes":150}]}
+-->
+
+### Example 3: Compute elapsed minutes between two datetime values
+
+Subtract log Timestamps to get elapsed minutes between Created and Shipped events.
+
+```powerquery
+let
+    Created = #datetime(2024, 1, 15, 9, 30, 0),
+    Shipped = #datetime(2024, 1, 16, 14, 15, 0)
+in
+    #table(
+        type table [Created = datetime, Shipped = datetime, ElapsedMinutes = number],
+        {{Created, Shipped, Duration.TotalMinutes(Shipped - Created)}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Created","type":"datetime"},{"name":"Shipped","type":"datetime"},{"name":"ElapsedMinutes","type":"number"}],"rows":[{"Created":"2024-01-15T09:30:00","Shipped":"2024-01-16T14:15:00","ElapsedMinutes":1725}]}
 -->

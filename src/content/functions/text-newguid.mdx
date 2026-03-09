@@ -21,15 +21,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.NewGuid` generates a new version-4 (random) GUID each time it is called and returns it as a lowercase text string in the standard 8-4-4-4-12 hexadecimal format.
+`Text.NewGuid` generates a new version-4 (randomly generated) GUID each time it is called, returning it as a lowercase text string in the standard `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` format. It takes no parameters.
 
-Because `Text.NewGuid` is a volatile function (its result changes on each evaluation), Power Query may call it multiple times during a single refresh. If a stable, unique identifier per row is needed, consider generating GUIDs outside Power Query and loading them as data, or using a deterministic surrogate key approach.
+`Text.NewGuid` is a **volatile** (non-deterministic) function — its result changes on every evaluation. This has an important consequence in Power Query: because the engine may evaluate expressions multiple times during a query refresh (for example, when computing row counts, previewing data, or applying filters), each evaluation will produce a different GUID. You should not rely on `Text.NewGuid` to produce stable, consistent unique identifiers per row across refreshes.
 
-In Power Query Online and dataflows, volatile functions may be evaluated differently to support query folding and caching.
+If you need row-level GUIDs that persist across refreshes, generate them outside Power Query (in a database column, or as a static dataset) and load them as source data. For situations where only uniqueness within a single refresh is needed — such as generating a correlation ID for an API request — `Text.NewGuid` is appropriate.
+
+To validate or normalize an existing GUID string (e.g., from an external system), use `Guid.From` instead.
 
 ## Examples
 
-### Example 1: Generate a single GUID
+### Example 1: Generate a single GUID value
+
+Note that the output will differ on every refresh — the value shown here is illustrative.
 
 ```powerquery
 Text.NewGuid()
@@ -41,19 +45,23 @@ Text.NewGuid()
 
 ### Example 2: Add a GUID column to a table
 
+Each row receives a unique GUID during the refresh, but GUIDs will change on the next refresh.
+
 ```powerquery
 Table.AddColumn(
-    #table({"Name"}, {{"Alice"}, {"Bob"}}),
-    "ID",
+    #table({"CustomerName"}, {{"Alice"}, {"Bob"}, {"Charlie"}}),
+    "SessionID",
     each Text.NewGuid()
 )
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"ID","type":"text"}],"rows":[{"Name":"Alice","ID":"c1a2b3d4-e5f6-7890-abcd-ef1234567890"},{"Name":"Bob","ID":"d4e5f6a7-b8c9-0123-4567-89abcdef0123"}]}
+{"columns":[{"name":"CustomerName","type":"text"},{"name":"SessionID","type":"text"}],"rows":[{"CustomerName":"Alice","SessionID":"c1a2b3d4-e5f6-7890-abcd-ef1234567890"},{"CustomerName":"Bob","SessionID":"d4e5f6a7-b8c9-0123-4567-89abcdef0123"},{"CustomerName":"Charlie","SessionID":"e5f6a7b8-c9d0-1234-5678-9abcdef01234"}]}
 -->
 
-### Example 3: Validate GUID format with Guid.From
+### Example 3: Verify the output is valid GUID format
+
+Pass the result through `Guid.From` to confirm the format is well-formed.
 
 ```powerquery
 Guid.From(Text.NewGuid())

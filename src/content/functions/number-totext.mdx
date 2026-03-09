@@ -33,21 +33,25 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.ToText` converts a number to a text string. When called with no format, it returns a general representation of the number. The optional `format` parameter follows standard .NET numeric format specifiers:
+`Number.ToText` converts a number to a text string with optional format and culture control. When called with no format argument, it returns a compact general representation (similar to `"G"`). The format parameter follows **.NET standard numeric format specifiers** with an optional precision digit:
 
-- `"D"` — Integer (no decimal places, e.g., `"42"`)
-- `"F"` or `"F2"` — Fixed-point with specified decimal places (e.g., `"3.14"`)
-- `"P"` — Percentage (e.g., `"75.00%"`)
-- `"E"` — Scientific notation (e.g., `"3.14E+000"`)
-- `"C"` — Currency symbol added based on culture
-- `"G"` — General (default compact representation)
-- `"N"` — Number with thousands separators
+| Format | Name | Example |
+|--------|------|---------|
+| `"G"` | General | `"3.14159"` |
+| `"F"` / `"F2"` | Fixed-point | `"3.14"` |
+| `"N"` / `"N2"` | Number with thousands separators | `"1,234.56"` |
+| `"P"` / `"P1"` | Percentage | `"87.5%"` |
+| `"E"` / `"E2"` | Scientific notation | `"3.14E+002"` |
+| `"C"` / `"C2"` | Currency (symbol depends on culture) | `"$3.14"` |
+| `"D"` | Decimal integer (no fractions) | `"42"` |
 
-The `culture` parameter controls locale-specific symbols. For example, `"de-DE"` uses a comma as the decimal separator.
+The `culture` parameter controls locale-specific output: `"de-DE"` produces `"1.234,56"` for `"N2"` format, while `"en-US"` produces `"1,234.56"`. Always specify the culture explicitly for user-facing output that must be locale-consistent.
+
+Note that `Number.ToText` operates only on numbers. To convert other types to text, use `Text.From`.
 
 ## Examples
 
-### Example 1: Convert a number to fixed 2 decimal places
+### Example 1: Format to 2 fixed decimal places
 
 ```powerquery
 Number.ToText(3.14159, "F2")
@@ -57,7 +61,7 @@ Number.ToText(3.14159, "F2")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"3.14"}]}
 -->
 
-### Example 2: Format a ratio as a percentage
+### Example 2: Format a ratio as a percentage with 1 decimal place
 
 ```powerquery
 Number.ToText(0.8753, "P1")
@@ -67,17 +71,19 @@ Number.ToText(0.8753, "P1")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"87.5%"}]}
 -->
 
-### Example 3: Format numbers in a column with thousands separators
+### Example 3: Format unit prices with thousands separators and 2 decimal places
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID", "Revenue"}),
-    "FormattedRevenue", each Number.ToText([Revenue], "N2"), type text
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    "DisplayPrice",
+    each Number.ToText([UnitPrice], "N2", "en-US"),
+    type text
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"FormattedRevenue","type":"text"}],"rows":[{"OrderID":1,"Revenue":25000,"FormattedRevenue":"25,000.00"},{"OrderID":2,"Revenue":150000,"FormattedRevenue":"150,000.00"},{"OrderID":3,"Revenue":75000,"FormattedRevenue":"75,000.00"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"DisplayPrice","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"DisplayPrice":"25.00"},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"DisplayPrice":"50.00"},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"DisplayPrice":"15.00"},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"DisplayPrice":"75.00"}]}
 -->

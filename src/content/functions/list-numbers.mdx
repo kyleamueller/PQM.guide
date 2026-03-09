@@ -35,13 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Numbers` generates an arithmetic sequence of numeric values. It is the numeric equivalent of `List.Dates` and related sequence generators.
+`List.Numbers` generates an arithmetic sequence of numeric values — the numeric equivalent of `List.Dates`, `List.Times`, and related sequence generators. It is useful for creating index lists, generating test data, producing evenly-spaced values for axis labels, or building the basis for further transformations.
 
-- Default increment is `1` if omitted or null.
-- Use negative increment values to generate decreasing sequences.
-- Use decimal increments for fractional steps (e.g., `0.5` for half-unit increments).
-- `count` must be a non-negative integer; `0` returns an empty list.
-- For simple integer ranges, the `{0..N}` literal syntax may be more concise.
+The `increment` parameter defaults to `1` if omitted or null. Use a negative increment to generate a decreasing sequence. Use a decimal increment for fractional steps (e.g., `0.1` for 10% increments, `0.25` for quarter-unit steps). A `count` of 0 returns an empty list.
+
+For simple integer sequences starting at 0, the range literal `{0..N}` is more concise. For sequences starting at 1, `{1..N}` works equally well. `List.Numbers` is preferred when the start, count, or increment are dynamic values computed at runtime, or when the increment is non-integer.
 
 ## Examples
 

@@ -39,12 +39,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.ReplaceRange` combines removal and insertion: it removes `count` items starting at `index`, then inserts the items from `replaceWith` at that position. The replacement list can have a different number of items than the number removed.
+`List.ReplaceRange` is a combined remove-and-insert operation: it removes `count` items starting at the zero-based `index`, then inserts the items from `replaceWith` at that same position. The replacement list can have a different number of items than were removed, allowing the result to grow or shrink.
 
-- An index of `0` starts replacement from the first item.
-- If `replaceWith` is an empty list `{}`, this is equivalent to `List.RemoveRange`.
-- The result list length equals `List.Count(list) - count + List.Count(replaceWith)`.
-- The original list is not modified.
+The result list length is `List.Count(list) - count + List.Count(replaceWith)`. If `replaceWith` is an empty list `{}`, this is equivalent to `List.RemoveRange`. If `count` is `0`, no items are removed and `replaceWith` is inserted at `index` — equivalent to `List.InsertRange`.
+
+An index of `0` starts the replacement from the very first item. The original list is not modified; a new list is returned. This function is the most flexible of the range-manipulation functions and can implement both insertion and deletion as special cases.
 
 ## Examples
 

@@ -27,15 +27,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Log10` returns the common (base-10) logarithm of a number. It is equivalent to `Number.Log(number, 10)`. The result represents the power to which 10 must be raised to produce the given number — for example, `Number.Log10(1000)` returns `3` because 10³ = 1000.
+`Number.Log10` returns the common (base-10) logarithm of a number. It is equivalent to `Number.Log(number, 10)` but is a dedicated shortcut function. The result represents the power to which 10 must be raised to produce the given number — `Number.Log10(1000) = 3` because 10³ = 1000, `Number.Log10(1) = 0` because 10⁰ = 1.
 
-The input must be a positive number. Passing `0` returns negative infinity; a negative number returns `NaN`.
+The input must be a **strictly positive** number. Passing `0` returns negative infinity; passing a negative number returns `NaN`. Filter or guard data accordingly when applying this to table columns that might contain zeros or negatives.
 
-Base-10 logarithms are commonly used for decibel calculations, pH measurements, order-of-magnitude analysis, and log-scale chart axes.
+Base-10 logarithms are intuitive for humans because they correspond to the number of digits minus 1 in a positive integer. Common uses in data transformation: decibel calculations (`dB = 10 × log10(power_ratio)`), pH measurements, order-of-magnitude bucketing, and creating log-scale axes or normalization in visuals. For natural log (base e) use `Number.Ln`; for base 2 use `Number.Log(x, 2)`.
 
 ## Examples
 
-### Example 1: Log base 10 of 1000
+### Example 1: Log base 10 of 1000 returns 3
 
 ```powerquery
 Number.Log10(1000)
@@ -45,7 +45,7 @@ Number.Log10(1000)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
 
-### Example 2: Log base 10 of 1
+### Example 2: Log base 10 of 1 returns 0
 
 ```powerquery
 Number.Log10(1)
@@ -55,17 +55,21 @@ Number.Log10(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 3: Determine order of magnitude for revenue values
+### Example 3: Compute order-of-magnitude bucket for each unit price
+
+`Number.RoundDown(Number.Log10(x))` gives the integer number of digits minus 1 — useful for grouping values by scale.
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Revenue"}),
-    "OrderOfMagnitude", each Number.RoundDown(Number.Log10([Revenue])), type number
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    "Magnitude",
+    each Number.RoundDown(Number.Log10([UnitPrice])),
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"OrderOfMagnitude","type":"number"}],"rows":[{"OrderID":1,"Revenue":250,"OrderOfMagnitude":2},{"OrderID":2,"Revenue":5000,"OrderOfMagnitude":3},{"OrderID":3,"Revenue":75000,"OrderOfMagnitude":4},{"OrderID":4,"Revenue":1200000,"OrderOfMagnitude":6}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Magnitude","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Magnitude":1},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Magnitude":1},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Magnitude":1},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"Magnitude":1}]}
 -->

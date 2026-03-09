@@ -30,43 +30,51 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.FromValue` converts a single value into a table. The behavior depends on the input type:
+`Table.FromValue` is a general-purpose wrapper that converts almost any M value into a table. The output structure depends on the input type:
 
-- **Scalar** (number, text, date, etc.): produces a one-row, one-column table with the column named `Value`.
-- **List**: produces a one-column table with one row per list element.
-- **Record**: produces a two-column table with field names and values.
-- **Table**: returns the table as-is.
+- **Scalar** (number, text, date, logical, etc.): produces a single-row, single-column table named `Value`.
+- **List**: produces a single-column table with one row per list element, column named `Value`.
+- **Record**: produces a two-column table (`Name` and `Value`) with one row per field.
+- **Table**: returns the table unchanged.
 
-Use the `options` record with `DefaultColumnName` to rename the default column from `Value` to something more descriptive.
+Use the `options` record's `DefaultColumnName` field to rename the default `Value` column to something more descriptive. `Table.FromValue` is useful in dynamic scenarios where the input type is unknown at authoring time — it provides a uniform table interface regardless of what value is passed in.
+
+For converting a list to a single-column table with a known name, `Table.FromList` or `Table.FromValue({...}, [DefaultColumnName = "MyCol"])` are both valid. For records, `Table.FromValue` generates a vertical key-value layout (useful for serialization or display), which differs from `Table.FromRecords` (which expects a list of records and produces a row per record).
 
 ## Examples
 
-### Example 1: Wrap a scalar into a table
+### Example 1: Wrap a scalar number into a table
 
 ```powerquery
-Table.FromValue(42)
+Table.FromValue(42, [DefaultColumnName = "OrderCount"])
 ```
 
 <!--output
-{"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"42"}]}
+{"columns":[{"name":"OrderCount","type":"any"}],"rows":[{"OrderCount":"42"}]}
 -->
 
-### Example 2: Wrap a list into a table
+### Example 2: Convert a list of product prices into a table
 
 ```powerquery
-Table.FromValue({1, 2, 3})
+let
+    Prices = {25.00, 50.00, 15.00, 75.00, 120.00}
+in
+    Table.FromValue(Prices, [DefaultColumnName = "Price"])
 ```
 
 <!--output
-{"columns":[{"name":"Value","type":"any"}],"rows":[{"Value":"1"},{"Value":"2"},{"Value":"3"}]}
+{"columns":[{"name":"Price","type":"any"}],"rows":[{"Price":"25"},{"Price":"50"},{"Price":"15"},{"Price":"75"},{"Price":"120"}]}
 -->
 
-### Example 3: Use a custom column name
+### Example 3: Convert a record into a key-value table
 
 ```powerquery
-Table.FromValue({10, 20, 30}, [DefaultColumnName = "Amount"])
+let
+    Config = [StartDate = "2024-01-01", EndDate = "2024-12-31", MaxRows = 1000]
+in
+    Table.FromValue(Config)
 ```
 
 <!--output
-{"columns":[{"name":"Amount","type":"any"}],"rows":[{"Amount":"10"},{"Amount":"20"},{"Amount":"30"}]}
+{"columns":[{"name":"Name","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Name":"StartDate","Value":"2024-01-01"},{"Name":"EndDate","Value":"2024-12-31"},{"Name":"MaxRows","Value":"1000"}]}
 -->

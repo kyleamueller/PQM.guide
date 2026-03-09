@@ -30,19 +30,24 @@ relatedFunctions:
 
 ## Remarks
 
-`Uri.Combine` follows standard RFC 3986 URI resolution rules to combine a base URI with a relative reference. This is the correct way to build URLs in Power Query rather than using simple string concatenation, because it correctly handles path traversal, trailing slashes, and protocol-relative references.
+`Uri.Combine` follows standard RFC 3986 URI resolution rules to combine a base URI with a relative reference. This is the correct way to construct URLs in Power Query rather than using `&` or `Text.Combine`, because it properly handles path traversal, trailing slashes, and absolute path references.
 
-Key behaviors:
-- If `relativeUri` is an absolute URI (starts with a scheme like `https://`), it is returned as-is.
-- If `relativeUri` starts with `/`, it replaces the path on the base URI's host.
-- If `relativeUri` is a relative path (no leading `/`), it is resolved relative to the directory portion of the base URI's path.
-- Trailing slashes on `baseUri` matter: `https://example.com/api/` + `items` = `https://example.com/api/items`, but `https://example.com/api` + `items` = `https://example.com/items`.
+The most important behavioral detail is the **trailing slash rule**:
+- `"https://api.example.com/v1/"` + `"users"` produces `"https://api.example.com/v1/users"` (slash present — resolves relative to `/v1/` directory)
+- `"https://api.example.com/v1"` + `"users"` produces `"https://api.example.com/users"` (no slash — resolves relative to `/` since `v1` is treated as a file, not a directory)
 
-Use this function instead of `&` or `Text.Combine` when constructing URLs to avoid common path-joining bugs.
+Always ensure your base URI ends with a trailing slash when you intend to append path segments to it. This is the most common source of bugs when building paginated API calls.
+
+Other key behaviors:
+- If `relativeUri` starts with a scheme (e.g., `https://`), it is returned as-is, ignoring the base
+- If `relativeUri` starts with `/`, it replaces the entire path on the base host
+- If `relativeUri` is a relative path (no leading `/`), it resolves relative to the directory portion of the base path
+
+Prefer `Uri.Combine` over string concatenation even for simple cases — it documents intent clearly and prevents subtle URL construction errors that can be hard to diagnose.
 
 ## Examples
 
-### Example 1: Combine a base URL with a relative path
+### Example 1: Append a path segment to a base URL with trailing slash
 
 ```powerquery
 Uri.Combine("https://api.example.com/v1/", "users")
@@ -52,17 +57,9 @@ Uri.Combine("https://api.example.com/v1/", "users")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v1/users"}]}
 -->
 
-### Example 2: Absolute path replaces the base path
+### Example 2: No trailing slash — relative segment resolves to the parent directory
 
-```powerquery
-Uri.Combine("https://api.example.com/v1/users", "/v2/orders")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v2/orders"}]}
--->
-
-### Example 3: Relative path without trailing slash on base
+Without a trailing slash, the last segment of the base path is treated as a file and replaced.
 
 ```powerquery
 Uri.Combine("https://api.example.com/v1/users", "orders")
@@ -72,17 +69,31 @@ Uri.Combine("https://api.example.com/v1/users", "orders")
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v1/orders"}]}
 -->
 
-### Example 4: Build a paginated API URL
+### Example 3: Absolute path in the relative URI replaces the base path
+
+A leading `/` in `relativeUri` replaces the entire path on the host, ignoring the base path.
+
+```powerquery
+Uri.Combine("https://api.example.com/v1/users", "/v2/orders")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/v2/orders"}]}
+-->
+
+### Example 4: Build a paginated API URL dynamically
+
+Combine a stable base URL with a dynamic page parameter to loop through API pages.
 
 ```powerquery
 let
     baseUrl = "https://api.example.com/data/",
-    page = 3,
+    page = 2,
     url = Uri.Combine(baseUrl, "records?page=" & Number.ToText(page))
 in
     url
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/data/records?page=3"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"https://api.example.com/data/records?page=2"}]}
 -->

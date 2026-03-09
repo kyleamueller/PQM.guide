@@ -27,13 +27,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.AllTrue` returns `true` if every item in the list is logically true. It returns `false` as soon as any item is `false`. Null values in the list are treated as false.
+`List.AllTrue` returns `true` if every item in the list is logically true, and `false` as soon as any item is `false`. It is designed for lists of logical (`true`/`false`) values, and is typically paired with `List.Transform` to first convert a list of any type into a list of conditions.
 
-This function is commonly used to validate that a list of boolean results — such as the output of `List.Transform` applying a condition — all pass.
+An empty list returns `true` — this is known as vacuous truth: there are no items that could fail the condition. Null values in the list are treated as `false`, so a list containing any null will return `false`. Non-logical values (such as numbers or text) will cause a type error; use `List.Transform` to coerce or evaluate values before passing them in.
 
-- An empty list returns `true` (vacuous truth).
-- Null values cause the function to return `false`.
-- Non-logical values may cause an error; use `List.Transform` to coerce values first if needed.
+Compared to `List.MatchesAll`, which accepts a predicate function directly, `List.AllTrue` requires the list to already contain logical values. The typical pattern is `List.AllTrue(List.Transform(someList, each <condition>))`. Use `List.MatchesAll` when you prefer a single-step approach.
 
 ## Examples
 
@@ -57,12 +55,18 @@ List.AllTrue({true, false, true})
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
 -->
 
-### Example 3: Check all quantities are positive
+### Example 3: Validate all unit prices in the Sales table are positive
+
+Use `List.Transform` to produce the list of logical values, then check them all with `List.AllTrue`.
 
 ```powerquery
 let
-    Quantities = {10, 25, 5, 8},
-    AllPositive = List.AllTrue(List.Transform(Quantities, each _ > 0))
+    Sales = #table(
+        {"OrderID", "UnitPrice"},
+        {{1, 25.00}, {2, 50.00}, {3, 15.00}, {4, 75.00}}
+    ),
+    Prices = Sales[UnitPrice],
+    AllPositive = List.AllTrue(List.Transform(Prices, each _ > 0))
 in
     AllPositive
 ```

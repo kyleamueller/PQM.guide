@@ -30,13 +30,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.AddWeeks` adds or subtracts a whole number of weeks (7-day periods) from a `date`, `datetime`, or `datetimezone` value. `Date.AddWeeks(d, n)` is equivalent to `Date.AddDays(d, n * 7)`. Passing a negative `numberOfWeeks` subtracts weeks. The return type matches the input type.
+`Date.AddWeeks` adds or subtracts a whole number of weeks (7-day periods) from a `date`, `datetime`, or `datetimezone` value. `Date.AddWeeks(d, n)` is equivalent to `Date.AddDays(d, n * 7)`, but is more self-documenting when the intent is explicitly to shift by weeks. Passing a negative `numberOfWeeks` subtracts weeks. The return type matches the input type.
+
+Unlike `Date.AddMonths`, week arithmetic is always exact: there is no end-of-month clamping to worry about, since every week is exactly 7 days regardless of the calendar month boundaries. This makes `Date.AddWeeks` safe to use in rolling window calculations.
+
+Use `Date.AddWeeks` when your business logic is expressed in weeks — for example, a 2-week lead time, a 4-week rolling period, or a billing cycle measured in weeks. For day-precise shifts, use `Date.AddDays` directly.
 
 ## Examples
 
-### Example 1: Shift OrderDate forward by 2 weeks
+### Example 1: Add a 2-week lead time to each order date
 
-Add a 2-week lead time to each order date.
+Calculate a ship-by date that is 2 weeks after each order.
 
 Input: `Sales`
 
@@ -67,4 +71,24 @@ Find the date one week before a reference date.
 
 <!--output
 {"columns":[{"name":"Today","type":"date"},{"name":"LastWeek","type":"date"}],"rows":[{"Today":"2024-03-15","LastWeek":"2024-03-08"}]}
+-->
+
+### Example 3: Build a 4-week rolling window start date
+
+Compute the start of a 4-week lookback period for each order.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(
+        Table.FirstN(Sales, 5),
+        {"OrderID", "OrderDate"}
+    ),
+    "WindowStart", each Date.AddWeeks([OrderDate], -4), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"WindowStart","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","WindowStart":"2023-12-18"},{"OrderID":2,"OrderDate":"2024-01-18","WindowStart":"2023-12-21"},{"OrderID":3,"OrderDate":"2024-02-01","WindowStart":"2024-01-04"},{"OrderID":4,"OrderDate":"2024-02-10","WindowStart":"2024-01-13"},{"OrderID":5,"OrderDate":"2024-03-05","WindowStart":"2024-02-06"}]}
 -->

@@ -34,38 +34,62 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.AddKey` annotates a table's type metadata to declare that one or more columns form a key. This metadata is used by the Power Query engine to optimize operations such as joins and duplicate removal. It does not enforce uniqueness or validate the data; it is purely a hint to the engine.
+`Table.AddKey` annotates a table's type metadata to declare that one or more columns form a key. This metadata is a hint to the Power Query engine used for optimizing operations such as joins, duplicate removal, and incremental refresh in Power BI. It does not enforce uniqueness at runtime — it is the author's responsibility to ensure that the declared key columns are actually unique.
 
-A primary key (`isPrimary = true`) declares that the combination of columns is unique across all rows. A non-primary key is a candidate key that may be used for optimization purposes.
+A primary key (`isPrimary = true`) declares that the combination of columns uniquely identifies each row. A non-primary key (`isPrimary = false`) is a candidate key used for engine optimization without asserting it is the table's principal identifier. You can call `Table.AddKey` multiple times on the same table to declare multiple keys.
 
-Use `Table.Keys` to inspect existing key definitions on a table.
+Use `Table.Keys` to read back key definitions from a table. Keys declared via `Table.AddKey` persist on the query output and can influence downstream Power BI behaviors such as relationships and DirectQuery optimization.
 
 ## Examples
 
-### Example 1: Add a primary key on a single column
+### Example 1: Declare CustomerID as a primary key
 
 ```powerquery
 let
-    Source = #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    WithKey = Table.AddKey(Source, {"ID"}, true)
+    Customers = #table(
+        {"CustomerID", "Name", "City"},
+        {{1, "Alice", "New York"}, {2, "Bob", "Chicago"}, {3, "Charlie", "Houston"}, {4, "Diana", "Seattle"}}
+    ),
+    WithKey = Table.AddKey(Customers, {"CustomerID"}, true)
 in
     WithKey
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"2","Name":"Bob"}]}
+{"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
 -->
 
-### Example 2: Add a composite non-primary key
+### Example 2: Declare a composite primary key on a fact table
+
+When no single column is unique, declare a composite key from the combination that is.
 
 ```powerquery
 let
-    Source  = #table({"Year", "Region", "Sales"}, {{2024, "North", 100}, {2024, "South", 200}}),
-    WithKey = Table.AddKey(Source, {"Year", "Region"}, false)
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Quantity"},
+        {{1, "Alice", "Widget A", 4}, {2, "Bob", "Gadget B", 2}, {3, "Charlie", "Widget C", 10}}
+    ),
+    WithKey = Table.AddKey(Sales, {"OrderID"}, true)
 in
     WithKey
 ```
 
 <!--output
-{"columns":[{"name":"Year","type":"any"},{"name":"Region","type":"any"},{"name":"Sales","type":"any"}],"rows":[{"Year":"2024","Region":"North","Sales":"100"},{"Year":"2024","Region":"South","Sales":"200"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Quantity":"10"}]}
+-->
+
+### Example 3: Verify key metadata with Table.Keys
+
+Use `Table.Keys` immediately after `Table.AddKey` to confirm the key was registered.
+
+```powerquery
+let
+    Source  = #table({"ProductID", "ProductName"}, {{1, "Widget A"}, {2, "Gadget B"}}),
+    WithKey = Table.AddKey(Source, {"ProductID"}, true)
+in
+    Table.Keys(WithKey)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{[Columns = {\"ProductID\"}, Primary = true]}"}]}
 -->

@@ -36,12 +36,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Dates` is the standard way to generate a continuous or stepped sequence of date values in Power Query M. It is commonly used to create date dimension tables, fill in missing date gaps, or generate a calendar list.
+`List.Dates` is the standard way to generate a continuous or stepped sequence of date values in Power Query M. It is most commonly used to build date dimension tables, fill in missing dates in time-series data, or create calendar scaffolding for reports.
 
-- The `step` parameter is a `duration` value. Use `#duration(days, 0, 0, 0)` for day-based steps.
-- To generate weekly dates, use `#duration(7, 0, 0, 0)`.
-- To generate monthly dates, use `Date.AddMonths` with `List.Generate` instead, since months have variable lengths.
-- `count` must be a non-negative integer. Passing 0 returns an empty list.
+The `step` parameter is a `duration` value created with the `#duration(days, hours, minutes, seconds)` literal. For day-by-day sequences use `#duration(1, 0, 0, 0)`, for weekly use `#duration(7, 0, 0, 0)`. Avoid using `List.Dates` for monthly sequences — because calendar months have variable lengths, use `List.Generate` with `Date.AddMonths` instead to produce accurate monthly increments.
+
+A `count` of 0 returns an empty list; negative counts cause an error. To generate a full calendar year, calculate the count with `Duration.Days(#date(year+1,1,1) - #date(year,1,1))` to handle leap years automatically.
 
 ## Examples
 

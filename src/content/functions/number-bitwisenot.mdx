@@ -26,15 +26,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.BitwiseNot` flips every bit in the integer representation of the input. For a signed 64-bit integer representation, the result is `-(number + 1)`. This is the one's complement operation.
+`Number.BitwiseNot` flips every bit in the integer representation of the input — turning every `0` bit to `1` and every `1` bit to `0`. This is the bitwise complement operation. For a 64-bit signed integer representation, the mathematical result is always `-(number + 1)`.
 
-For example, `Number.BitwiseNot(0)` returns `-1`, and `Number.BitwiseNot(-1)` returns `0`.
+Key reference values: `Number.BitwiseNot(0) = -1`, `Number.BitwiseNot(-1) = 0`, `Number.BitwiseNot(5) = -6`.
 
-This function is useful in bitmasking scenarios where you need the inverse of a bitmask — for example, clearing all bits that are set in a mask.
+The primary use of `Number.BitwiseNot` is creating the **inverse of a bitmask**. If you want to clear specific bits from a flags integer, AND the value with NOT of your mask. For example, to clear bit 2 (the flag with value 4) from a flags byte: `Number.BitwiseAnd(flags, Number.BitwiseNot(4))`. This is the standard "clear bit" idiom used in systems programming.
+
+Note that the result is always a negative number for non-negative inputs, because in two's complement representation, flipping all bits of a non-negative integer always produces a negative value. This can be surprising if you expect an unsigned byte result — in Power Query all integers are signed 64-bit.
 
 ## Examples
 
-### Example 1: Bitwise NOT of 0
+### Example 1: Bitwise NOT of 0 returns -1
+
+All 64 bits flip from 0 to 1, which equals -1 in two's complement.
 
 ```powerquery
 Number.BitwiseNot(0)
@@ -44,9 +48,9 @@ Number.BitwiseNot(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
 -->
 
-### Example 2: Bitwise NOT of a positive integer
+### Example 2: Bitwise NOT of 5 returns -6
 
-NOT(5) = -(5+1) = -6
+The formula is always `-(n + 1)` for signed integers.
 
 ```powerquery
 Number.BitwiseNot(5)
@@ -56,9 +60,9 @@ Number.BitwiseNot(5)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-6}]}
 -->
 
-### Example 3: Clear bits using NOT as an inverse mask
+### Example 3: Clear a specific bit from a flags value using NOT as an inverse mask
 
-Clear bit 2 (value 4) from a flags value of 7:
+To clear bit 2 (value 4) from a flags value of 7 (`111` binary), AND with NOT(4) = NOT(`100`) = `...11111011`.
 
 ```powerquery
 Number.BitwiseAnd(7, Number.BitwiseNot(4))

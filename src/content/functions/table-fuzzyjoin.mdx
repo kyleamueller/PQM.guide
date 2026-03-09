@@ -47,48 +47,84 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.FuzzyJoin` performs a join between two tables using fuzzy string matching on key columns. Unlike `Table.Join`, which requires exact key equality, `Table.FuzzyJoin` tolerates typos, spacing differences, and spelling variations.
+`Table.FuzzyJoin` joins two tables using approximate string matching on key columns instead of exact equality. It tolerates typos, spacing differences, and case variations, making it useful when joining datasets from different sources where key values may not be standardized — such as customer names entered by hand, product descriptions from different vendors, or city names with varied spellings.
 
-The `joinOptions` record supports:
-- `Threshold`: similarity score from 0.0 (match everything) to 1.0 (exact match only). Default is 0.8.
-- `IgnoreCase`: boolean, default true.
-- `IgnoreSpace`: boolean, default true.
-- `NumberOfMatches`: maximum number of right-table matches per left-table row.
-- `TransformationTable`: a lookup table for custom value mappings before matching.
+The `joinOptions` record supports these fields:
 
-This function does not fold to data sources.
+- `Threshold` (number, 0.0–1.0): minimum similarity for a match. Default `0.8`. Lower values match more loosely; `1.0` is exact matching only.
+- `IgnoreCase` (logical): ignore case. Default `true`.
+- `IgnoreSpace` (logical): ignore whitespace. Default `true`.
+- `NumberOfMatches` (number): limit matches per left-table row. Default is all matches.
+- `TransformationTable` (table with `From` and `To` columns): pre-map known variants before scoring.
+
+`Table.FuzzyJoin` returns a flat joined table (unlike `Table.FuzzyNestedJoin`, which returns nested tables). It does not fold to data sources. The default join kind is `JoinKind.Inner` — use `JoinKind.LeftOuter` to retain unmatched left rows. Be cautious with low `Threshold` values on large tables as performance can degrade significantly.
 
 ## Examples
 
-### Example 1: Fuzzy join with default settings
+### Example 1: Match Sales customer names against a canonical Customers table
+
+Some orders have slightly misspelled customer names. Use `Table.FuzzyJoin` to resolve them.
 
 ```powerquery
-Table.FuzzyJoin(
-    #table({"CustomerName"}, {{"Micosoft"}, {"Gogle"}}),
-    "CustomerName",
-    #table({"CompanyName"}, {{"Microsoft"}, {"Google"}}),
-    "CompanyName",
-    JoinKind.LeftOuter
-)
+let
+    SalesWithTypos = #table(
+        {"OrderID", "CustomerName", "Amount"},
+        {{1,"Alise",250},{2,"Bobb",180},{3,"Charlie",300},{4,"Dianah",150}}
+    ),
+    Customers = #table(
+        {"Name", "City", "State"},
+        {{"Alice","New York","NY"},{"Bob","Chicago","IL"},{"Charlie","Houston","TX"},{"Diana","Seattle","WA"}}
+    )
+in
+    Table.FuzzyJoin(
+        SalesWithTypos, "CustomerName",
+        Customers,      "Name",
+        JoinKind.LeftOuter,
+        [Threshold = 0.75]
+    )
 ```
 
 <!--output
-{"columns":[{"name":"CustomerName","type":"any"},{"name":"CompanyName","type":"any"}],"rows":[{"CustomerName":"Micosoft","CompanyName":"Microsoft"},{"CustomerName":"Gogle","CompanyName":"Google"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"},{"name":"State","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alise","Amount":"250","Name":"Alice","City":"New York","State":"NY"},{"OrderID":"2","CustomerName":"Bobb","Amount":"180","Name":"Bob","City":"Chicago","State":"IL"},{"OrderID":"3","CustomerName":"Charlie","Amount":"300","Name":"Charlie","City":"Houston","State":"TX"},{"OrderID":"4","CustomerName":"Dianah","Amount":"150","Name":"Diana","City":"Seattle","State":"WA"}]}
 -->
 
-### Example 2: Fuzzy join with a custom threshold
+### Example 2: Use a TransformationTable to handle known aliases
+
+Pre-map known mismatches via `TransformationTable` before fuzzy scoring takes over.
+
+```powerquery
+let
+    Orders = #table({"CustomerRef","Total"},{{"Al","500"},{"Robbie","200"},{"Diane","350"}}),
+    Customers = #table({"Name"},{{"Alice"},{"Bob"},{"Diana"}}),
+    Mapping = #table({"From","To"},{{"Al","Alice"},{"Robbie","Bob"},{"Diane","Diana"}})
+in
+    Table.FuzzyJoin(
+        Orders, "CustomerRef",
+        Customers, "Name",
+        JoinKind.LeftOuter,
+        [Threshold = 0.5, TransformationTable = Mapping]
+    )
+```
+
+<!--output
+{"columns":[{"name":"CustomerRef","type":"any"},{"name":"Total","type":"any"},{"name":"Name","type":"any"}],"rows":[{"CustomerRef":"Al","Total":"500","Name":"Alice"},{"CustomerRef":"Robbie","Total":"200","Name":"Bob"},{"CustomerRef":"Diane","Total":"350","Name":"Diana"}]}
+-->
+
+### Example 3: Limit to one match per left row with NumberOfMatches
+
+Prevent one-to-many expansion by capping matches at 1.
 
 ```powerquery
 Table.FuzzyJoin(
-    #table({"Name"}, {{"Jon"}}),
-    "Name",
-    #table({"CanonicalName"}, {{"John"}, {"Jane"}}),
+    #table({"Product"},{{"Widge A"},{"Gadgit B"}}),
+    "Product",
+    #table({"CanonicalName","Category"},{{"Widget A","Widgets"},{"Gadget B","Gadgets"}}),
     "CanonicalName",
     JoinKind.LeftOuter,
-    [Threshold = 0.6]
+    [Threshold = 0.7, NumberOfMatches = 1]
 )
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"any"},{"name":"CanonicalName","type":"any"}],"rows":[{"Name":"Jon","CanonicalName":"John"}]}
+{"columns":[{"name":"Product","type":"any"},{"name":"CanonicalName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"Product":"Widge A","CanonicalName":"Widget A","Category":"Widgets"},{"Product":"Gadgit B","CanonicalName":"Gadget B","Category":"Gadgets"}]}
 -->

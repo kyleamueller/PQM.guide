@@ -27,36 +27,63 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInNextQuarter` returns `true` if the input date falls within the calendar quarter immediately following the current quarter (as determined by `DateTime.LocalNow()`). For example, if today is in Q1, this function returns `true` for any date in Q2. The function is re-evaluated on each query refresh.
+`Date.IsInNextQuarter` returns `true` if the input date falls within the calendar quarter immediately following the current quarter (as determined by `DateTime.LocalNow()`). For example, if today is in Q1 (Jan–Mar), this function returns `true` for any date in Q2 (Apr–Jun). The function is re-evaluated on each query refresh.
+
+This function matches exactly one quarter: the next one. For a broader forward window spanning multiple quarters, use `Date.IsInNextNQuarters`. To include the current quarter as well, combine with `or Date.IsInCurrentQuarter([OrderDate])`.
+
+Quarters are always standard calendar quarters. There is no support for custom fiscal quarter definitions. If your fiscal year starts in a month other than January, compute the quarter boundaries manually using `Date.AddMonths` and `Date.StartOfQuarter`.
 
 ## Examples
 
-### Example 1: Filter next quarter's pipeline
+### Example 1: Filter orders expected in the next quarter
 
-Keep only opportunities expected to close in the next quarter.
+Keep only orders dated in the next calendar quarter.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Pipeline,
-    each Date.IsInNextQuarter([ExpectedClose])
+    Sales,
+    each Date.IsInNextQuarter([OrderDate])
 )
 ```
 
 <!--output
-{"columns":[{"name":"OppID","type":"text"},{"name":"ExpectedClose","type":"date"},{"name":"OpportunityName","type":"text"}],"rows":[{"OppID":"O001","ExpectedClose":"2026-04-15","OpportunityName":"Deal A"},{"OppID":"O003","ExpectedClose":"2026-06-30","OpportunityName":"Deal C"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-04-10"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-05-18"},{"OrderID":45,"CustomerName":"Charlie","OrderDate":"2026-06-25"}]}
 -->
 
-### Example 2: Flag next-quarter opportunities
+### Example 2: Flag next-quarter orders
 
-Add a boolean column identifying next-quarter deals.
+Add a boolean column identifying orders in the next quarter.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Pipeline,
-    "NextQuarter", each Date.IsInNextQuarter([ExpectedClose]), type logical
+    Sales,
+    "IsNextQuarter", each Date.IsInNextQuarter([OrderDate]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"OppID","type":"text"},{"name":"ExpectedClose","type":"date"},{"name":"NextQuarter","type":"logical"}],"rows":[{"OppID":"O001","ExpectedClose":"2026-04-15","NextQuarter":true},{"OppID":"O002","ExpectedClose":"2026-03-20","NextQuarter":false},{"OppID":"O004","ExpectedClose":"2026-07-01","NextQuarter":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsNextQuarter","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","IsNextQuarter":false},{"OrderID":43,"OrderDate":"2026-04-10","IsNextQuarter":true},{"OrderID":46,"OrderDate":"2026-07-01","IsNextQuarter":false}]}
+-->
+
+### Example 3: Flag current and next quarter together
+
+Combine IsInCurrentQuarter and IsInNextQuarter for a two-quarter forward view.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "CurrentOrNextQ",
+    each Date.IsInCurrentQuarter([OrderDate]) or Date.IsInNextQuarter([OrderDate]),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"CurrentOrNextQ","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","CurrentOrNextQ":true},{"OrderID":43,"OrderDate":"2026-04-10","CurrentOrNextQ":true},{"OrderID":46,"OrderDate":"2026-07-01","CurrentOrNextQ":false}]}
 -->

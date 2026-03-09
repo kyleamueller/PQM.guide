@@ -32,14 +32,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Mode` returns the single value that appears most frequently in the list. If multiple values are tied for the highest frequency (multiple modes), it returns the first one encountered in the original list order.
+`List.Mode` returns the single value that appears most frequently in the list — the statistical mode. If multiple values are tied for the highest frequency, it returns the first tied value encountered in the original list order. To retrieve all tied modes, use `List.Modes` instead.
 
-To retrieve **all** modes in a tie situation, use `List.Modes` instead.
+Null values are counted as occurrences and can be returned as the mode if null appears more frequently than any other value. Comparison is case-sensitive for text by default; pass `Comparer.OrdinalIgnoreCase` as the optional `equationCriteria` for case-insensitive mode detection. An empty list causes an error — guard with `List.IsEmpty` if needed.
 
-- Null values are counted as occurrences and can be returned as the mode.
-- Comparison is case-sensitive for text by default.
-- Returns a single scalar value, not a list.
-- An empty list causes an error.
+`List.Mode` returns a single scalar value, not a list. This makes it directly usable in expressions without indexing. Common uses include finding the most common category, the most frequent response in survey data, or the most popular product in a transaction log.
 
 ## Examples
 

@@ -35,14 +35,16 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.RenameFields` returns a new record with specified fields renamed. The rename list is a list of two-element lists where the first element is the existing field name and the second is the desired new name.
+`Record.RenameFields` returns a new record with specified fields renamed. The `renames` parameter is a list of two-element lists, each containing `{oldName, newName}`. Multiple renames can be specified in a single call and are applied simultaneously (not sequentially), so renaming A to B and B to A in the same call correctly swaps the field names.
 
-The optional `missingField` parameter controls behavior when an old name is not found:
-- `MissingField.Error` (default, value 0) — raises an error
-- `MissingField.Ignore` (value 1) — silently skips missing fields
-- `MissingField.UseNull` (value 2) — adds the new field with a null value
+Field values and field order are preserved — only the names change. The function returns a new record; the original is unchanged.
 
-Field values and order are preserved; only the names change.
+The optional `missingField` parameter controls behavior when an old field name is not found in the record:
+- `MissingField.Error` (default, `0`) — raises an error; use this when renames must always succeed
+- `MissingField.Ignore` (`1`) — silently skips missing renames; use this for defensive or optional renaming
+- `MissingField.UseNull` (`2`) — adds a new field with a null value even though the old field was absent
+
+For table-level column renaming, use `Table.RenameColumns`, which has an equivalent `missingField` parameter.
 
 ## Examples
 
@@ -56,7 +58,7 @@ Record.RenameFields([Name = "Alice", Age = 30], {{"Name", "FullName"}})
 {"columns":[{"name":"FullName","type":"text"},{"name":"Age","type":"number"}],"rows":[{"FullName":"Alice","Age":30}]}
 -->
 
-### Example 2: Rename multiple fields at once
+### Example 2: Rename multiple fields in a single call
 
 ```powerquery
 Record.RenameFields(
@@ -69,7 +71,7 @@ Record.RenameFields(
 {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Bob","Age":25,"City":"Seattle"}]}
 -->
 
-### Example 3: Ignore a missing field gracefully
+### Example 3: Skip missing fields gracefully with MissingField.Ignore
 
 ```powerquery
 Record.RenameFields(

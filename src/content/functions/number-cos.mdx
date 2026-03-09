@@ -26,15 +26,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Cos` returns the trigonometric cosine of an angle measured in radians. The result is always in the range [-1, 1].
+`Number.Cos` returns the trigonometric cosine of an angle measured in **radians**. The result is always in the range [-1, 1]. This is a fundamental point of confusion: Power Query M (like most programming environments) uses radians, not degrees. To convert a degree value to radians before computing the cosine, multiply by `Number.PI / 180`.
 
-To convert degrees to radians, multiply by `Number.PI / 180`:
+The cosine function is even (`cos(-x) = cos(x)`) and periodic with period 2π. Key reference values: `Number.Cos(0) = 1`, `Number.Cos(Number.PI / 2)` ≈ 0 (not exactly 0 due to floating-point), `Number.Cos(Number.PI) = -1`. Due to floating-point representation, values like `Number.Cos(60 * Number.PI / 180)` may not be exactly `0.5` — expect results like `0.5000000000000001`. Use `Number.Round` if you need a clean value for display.
 
-```powerquery
-Number.Cos(degrees * Number.PI / 180)
-```
-
-`Number.Cos(0)` returns `1` and `Number.Cos(Number.PI)` returns `-1`.
+Common uses in data transformation include rotating 2D coordinates, computing angular similarity between unit vectors, and implementing physics or geometry calculations in Power Query.
 
 ## Examples
 
@@ -48,7 +44,7 @@ Number.Cos(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 2: Cosine of 180 degrees (π radians)
+### Example 2: Cosine of π radians (180 degrees) returns -1
 
 ```powerquery
 Number.Cos(Number.PI)
@@ -58,7 +54,9 @@ Number.Cos(Number.PI)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-1}]}
 -->
 
-### Example 3: Cosine of 60 degrees
+### Example 3: Convert degrees to radians then compute cosine
+
+The cosine of 60 degrees is 0.5. Note the tiny floating-point imprecision.
 
 ```powerquery
 Number.Cos(60 * Number.PI / 180)

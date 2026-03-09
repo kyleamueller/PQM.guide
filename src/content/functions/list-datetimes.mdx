@@ -36,13 +36,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.DateTimes` generates a sequence of `datetime` values, useful for creating time-series data, generating hourly or sub-hourly intervals, or producing datetime-based lookup lists.
+`List.DateTimes` generates a sequence of `datetime` values, useful for creating time-series scaffolding, generating hourly or sub-hourly intervals, or building datetime-based lookup lists for reporting.
 
-- The `step` parameter uses `#duration(days, hours, minutes, seconds)` to specify the interval.
-- For hourly intervals, use `#duration(0, 1, 0, 0)`.
-- For 15-minute intervals, use `#duration(0, 0, 15, 0)`.
-- `count` must be a non-negative integer; 0 returns an empty list.
-- Use `List.Dates` when only date values are needed, or `List.DateTimeZones` when timezone information is required.
+The `step` parameter uses the `#duration(days, hours, minutes, seconds)` literal. For hourly intervals use `#duration(0, 1, 0, 0)`, for 15-minute intervals use `#duration(0, 0, 15, 0)`. Unlike calendar-month steps, duration-based steps are exact and will not drift. A `count` of 0 returns an empty list.
+
+Choose between the related sequence functions based on what your data requires: use `List.Dates` when you only need date values (no time component), `List.DateTimes` for date-and-time without timezone, and `List.DateTimeZones` when timezone offset information must be preserved. Converting the result to a table using `Table.FromList` with a single-column splitter is the standard way to build a datetime dimension.
 
 ## Examples
 

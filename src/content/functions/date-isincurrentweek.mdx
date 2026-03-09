@@ -28,13 +28,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInCurrentWeek` returns `true` if the input date falls within the same Sunday-to-Saturday week as today (`DateTime.LocalNow()`). The week boundary is determined using Sunday as the first day of the week (consistent with the default behavior of `Date.StartOfWeek`). The function is re-evaluated on each query refresh.
+`Date.IsInCurrentWeek` returns `true` if the input date falls within the same Sunday-to-Saturday week as today (`DateTime.LocalNow()`). The week boundary always uses Sunday as the first day, consistent with the default behavior of `Date.StartOfWeek`. There is no parameter to change the first day of the week — if you need Monday-based weeks, build the comparison manually using `Date.StartOfWeek(Date.From(DateTime.LocalNow()), Day.Monday)`.
+
+Like all `Date.IsIn*` functions, the reference point is `DateTime.LocalNow()`. In Power BI Service and cloud Dataflows, this is the server's UTC time, not your local timezone. Week boundaries can shift by a day if your local timezone differs significantly from UTC.
+
+This function matches the entire current week including future days. If you need only dates up to today, add `and [OrderDate] <= Date.From(DateTime.LocalNow())`.
 
 ## Examples
 
 ### Example 1: Filter this week's orders
 
-Keep only rows where OrderDate falls in the current week.
+Keep only rows where OrderDate falls in the current Sunday–Saturday week.
 
 ```powerquery
 Table.SelectRows(
@@ -60,4 +64,24 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentWeek","type":"logical"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01","IsCurrentWeek":false},{"OrderID":41,"OrderDate":"2026-03-05","IsCurrentWeek":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentWeek":true}]}
+-->
+
+### Example 3: Build a Monday-based current week filter manually
+
+When you need a Monday-to-Sunday week boundary instead of the built-in Sunday-to-Saturday.
+
+```powerquery
+let
+    Today = Date.From(DateTime.LocalNow()),
+    WeekStart = Date.StartOfWeek(Today, Day.Monday),
+    WeekEnd = Date.EndOfWeek(Today, Day.Monday)
+in
+    Table.SelectRows(
+        Sales,
+        each [OrderDate] >= WeekStart and DateTime.From([OrderDate]) <= WeekEnd
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-05"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
 -->

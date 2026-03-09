@@ -36,14 +36,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Difference` performs a set-difference operation: it returns all items in `list1` that are not present in `list2`. Duplicate items in `list1` are preserved if they are not in `list2`.
+`List.Difference` performs a set-difference operation: it returns all items from `list1` that do not appear in `list2`. The result preserves the order of items from `list1`. Duplicate values in `list1` that are not in `list2` are kept; duplicates that match something in `list2` are all removed.
 
-This function is useful for finding new or removed items when comparing two lists — for example, finding products that exist in last month's data but not this month's.
+This is the right tool for finding what was added or removed between two snapshots — for example, which product codes appear in last month's inventory but not this month's, or which users were revoked access between two permission exports.
 
-- Comparison is case-sensitive for text values by default.
-- Pass `Comparer.OrdinalIgnoreCase` as `equationCriteria` for case-insensitive text comparison.
-- Order of items in the result follows the order in `list1`.
-- Unlike `List.RemoveItems`, this function works on a full set-difference basis and uses value equality rather than reference equality.
+Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` as the `equationCriteria` argument for case-insensitive matching. Note that `List.Difference` is a set-semantic operation — it deduplicates the exclusion set in `list2` but not in `list1`. If you need to remove individual matched occurrences one-for-one, use `List.RemoveItems` instead.
 
 ## Examples
 

@@ -34,15 +34,27 @@ relatedFunctions:
 
 ## Remarks
 
-`Value.NullableEquals` implements SQL-style three-valued equality: when either operand is `null`, the result is `null` rather than `true` or `false`. This matches the behavior of the M `=` operator for nullable values.
+`Value.NullableEquals` implements **three-valued equality** (also called SQL-style equality): when either operand is `null`, the result is `null` — not `true` or `false`. This matches the behavior of the M `=` operator when applied to nullable values and mirrors SQL's `IS DISTINCT FROM` / `=` null semantics.
 
-This contrasts with `Value.Equals(null, null)` which returns `true` regardless of null inputs.
+The three possible results are:
 
-Use `Value.NullableEquals` when you need standard SQL-style null propagation, such as when building JOIN-like logic or filtering comparisons that must propagate unknown (null) results.
+| value1 | value2 | Result |
+|--------|--------|--------|
+| non-null | non-null (equal) | `true` |
+| non-null | non-null (different) | `false` |
+| null | any | `null` |
+| any | null | `null` |
+
+This contrasts with `Value.Equals(null, null)` which always returns `true` — `Value.Equals` never returns null. Choose between the two based on whether you need null-propagating semantics:
+
+- Use `Value.NullableEquals` when you want comparisons involving null to return null (propagate unknown), as in SQL `WHERE` clauses
+- Use `Value.Equals` when you want `null = null` to be definitively `true`, as in deduplication or record matching
+
+The optional `comparer` parameter allows custom equality logic (e.g., `Comparer.OrdinalIgnoreCase`) just like `Value.Equals`.
 
 ## Examples
 
-### Example 1: Both values are non-null and equal
+### Example 1: Both non-null and equal — returns true
 
 ```powerquery
 Value.NullableEquals(1, 1)
@@ -52,7 +64,7 @@ Value.NullableEquals(1, 1)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: Either value is null — returns null
+### Example 2: One operand is null — returns null
 
 ```powerquery
 Value.NullableEquals(1, null)
@@ -62,7 +74,7 @@ Value.NullableEquals(1, null)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":null}]}
 -->
 
-### Example 3: Null equals null returns null (SQL behavior)
+### Example 3: Both null — returns null (unlike Value.Equals)
 
 ```powerquery
 Value.NullableEquals(null, null)
@@ -72,7 +84,7 @@ Value.NullableEquals(null, null)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":null}]}
 -->
 
-### Example 4: Non-null unequal values
+### Example 4: Both non-null and unequal — returns false
 
 ```powerquery
 Value.NullableEquals("hello", "world")

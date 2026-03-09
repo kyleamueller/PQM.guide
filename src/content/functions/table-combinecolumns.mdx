@@ -38,38 +38,69 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.CombineColumns` merges values from multiple columns into a single new column using a combiner function. The source columns are removed and replaced by the new column. Combiner functions from the `Combiner.*` namespace — such as `Combiner.CombineTextByDelimiter` and `Combiner.CombineTextByLengths` — determine how the values are joined.
+`Table.CombineColumns` merges the values of multiple columns into a single new column using a combiner function, then removes the original source columns. The new column is inserted at the position of the first source column in the column order. Combiner functions from the `Combiner.*` namespace — `Combiner.CombineTextByDelimiter`, `Combiner.CombineTextByLengths`, and `Combiner.CombineTextByRanges` — control how the values are concatenated.
 
-The new combined column is placed where the first source column was.
+All source columns must be convertible to text for delimiter-based combiners. If numeric or other non-text columns are included, they will be implicitly converted. For more control over formatting, consider using `Table.AddColumn` with an explicit text expression and then removing the originals, which avoids implicit conversions and makes the format transparent.
+
+`Table.CombineColumns` is the inverse of `Table.SplitColumn`: split a column into parts, work with them separately, then recombine. When recombining, ensure the delimiter used here matches what was used to split, or the round-trip will produce unexpected results.
 
 ## Examples
 
-### Example 1: Combine first and last name with a space
+### Example 1: Combine first and last name columns from the Employees table
 
 ```powerquery
-Table.CombineColumns(
-    #table({"First", "Last"}, {{"Alice", "Smith"}, {"Bob", "Jones"}}),
-    {"First", "Last"},
-    Combiner.CombineTextByDelimiter(" "),
-    "FullName"
-)
+let
+    Employees = #table(
+        {"EmployeeID", "FirstName", "LastName", "Department"},
+        {{"E001","Alice","Smith","Sales"},{"E002","Bob","Jones","Engineering"},{"E003","Charlie","Brown","Marketing"}}
+    ),
+    Combined = Table.CombineColumns(
+        Employees,
+        {"FirstName", "LastName"},
+        Combiner.CombineTextByDelimiter(" "),
+        "FullName"
+    )
+in
+    Combined
 ```
 
 <!--output
-{"columns":[{"name":"FullName","type":"any"}],"rows":[{"FullName":"Alice Smith"},{"FullName":"Bob Jones"}]}
+{"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"Alice Smith","Department":"Sales"},{"EmployeeID":"E002","FullName":"Bob Jones","Department":"Engineering"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing"}]}
 -->
 
-### Example 2: Combine city and country with a comma
+### Example 2: Build a full address string from city and state
+
+```powerquery
+let
+    Customers = #table(
+        {"CustomerID", "Name", "City", "State"},
+        {{1,"Alice","New York","NY"},{2,"Bob","Chicago","IL"},{3,"Charlie","Houston","TX"}}
+    ),
+    Combined = Table.CombineColumns(
+        Customers,
+        {"City", "State"},
+        Combiner.CombineTextByDelimiter(", "),
+        "Location"
+    )
+in
+    Combined
+```
+
+<!--output
+{"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"Location","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","Location":"New York, NY"},{"CustomerID":"2","Name":"Bob","Location":"Chicago, IL"},{"CustomerID":"3","Name":"Charlie","Location":"Houston, TX"}]}
+-->
+
+### Example 3: Combine fixed-width segments using CombineTextByLengths
 
 ```powerquery
 Table.CombineColumns(
-    #table({"City", "Country"}, {{"Paris", "France"}, {"Tokyo", "Japan"}}),
-    {"City", "Country"},
-    Combiner.CombineTextByDelimiter(", "),
-    "Location"
+    #table({"Part1", "Part2", "Part3"}, {{"AB","123","X"}}),
+    {"Part1", "Part2", "Part3"},
+    Combiner.CombineTextByLengths({2, 3, 1}),
+    "Code"
 )
 ```
 
 <!--output
-{"columns":[{"name":"Location","type":"any"}],"rows":[{"Location":"Paris, France"},{"Location":"Tokyo, Japan"}]}
+{"columns":[{"name":"Code","type":"any"}],"rows":[{"Code":"AB123X"}]}
 -->

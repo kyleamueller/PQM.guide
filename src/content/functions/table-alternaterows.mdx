@@ -38,34 +38,67 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.AlternateRows` applies a repeating keep/drop pattern to the rows of a table. Starting at `offset`, it keeps `keepNext` rows, then drops `dropNext` rows, and repeats. Rows before `offset` are always kept.
+`Table.AlternateRows` applies a repeating keep/drop pattern to the rows of a table. Starting at the zero-based `offset` row, it keeps `keepNext` consecutive rows, then discards `dropNext` consecutive rows, and repeats this pattern until the end of the table. All rows before `offset` are unconditionally kept.
 
-This is useful for parsing data that has a fixed repeating structure, such as every other row being a header or separator.
+This function is primarily useful when consuming data that has a fixed repeating structure — for example, raw exports where every second row is a separator, or flat files where every Nth row contains a record header that should be discarded after parsing. For purely row-count-based skipping or selection, `Table.Skip` and `Table.FirstN` are simpler alternatives.
+
+Be aware that `Table.AlternateRows` does not typically fold to the data source, so it will be evaluated locally. For large datasets, consider pre-filtering at the source before applying this function.
 
 ## Examples
 
-### Example 1: Keep 1 row, drop 1 row, starting at offset 0
+### Example 1: Sample every other row (keep 1, drop 1)
+
+Starting at row 0, keep the odd-indexed rows (0, 2, 4, ...) from an 8-row dataset.
 
 ```powerquery
-Table.AlternateRows(
-    #table({"Row"}, {{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}}),
-    0, 1, 1
-)
+let
+    Source = #table(
+        {"OrderID", "CustomerName", "Product"},
+        {
+            {1, "Alice",   "Widget A"},
+            {2, "Bob",     "Gadget B"},
+            {3, "Charlie", "Widget C"},
+            {4, "Alice",   "Gadget D"},
+            {5, "Diana",   "Widget A"},
+            {6, "Bob",     "Thingamajig E"},
+            {7, "Charlie", "Gadget B"},
+            {8, "Diana",   "Widget C"}
+        }
+    )
+in
+    Table.AlternateRows(Source, 0, 1, 1)
 ```
 
 <!--output
-{"columns":[{"name":"Row","type":"any"}],"rows":[{"Row":"A"},{"Row":"C"},{"Row":"E"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"7","CustomerName":"Charlie","Product":"Gadget B"}]}
 -->
 
-### Example 2: Keep 2 rows, drop 1, starting at offset 1
+### Example 2: Keep first 2 rows, drop 1, then repeat
+
+Useful for structured exports where one out of every three rows is a divider.
 
 ```powerquery
 Table.AlternateRows(
-    #table({"Row"}, {{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}}),
-    1, 2, 1
+    #table({"Row"}, {{"A"}, {"B"}, {"SEP"}, {"C"}, {"D"}, {"SEP"}, {"E"}, {"F"}}),
+    0, 2, 1
 )
 ```
 
 <!--output
-{"columns":[{"name":"Row","type":"any"}],"rows":[{"Row":"A"},{"Row":"B"},{"Row":"C"},{"Row":"E"},{"Row":"F"}]}
+{"columns":[{"name":"Row","type":"any"}],"rows":[{"Row":"A"},{"Row":"B"},{"Row":"C"},{"Row":"D"},{"Row":"E"},{"Row":"F"}]}
+-->
+
+### Example 3: Use offset to preserve a header before the pattern starts
+
+Rows before `offset` are always kept. Use `offset = 1` to protect the first row from the keep/drop cycle.
+
+```powerquery
+Table.AlternateRows(
+    #table({"Row"}, {{"Header"}, {"Data1"}, {"SEP"}, {"Data2"}, {"SEP"}}),
+    1, 1, 1
+)
+```
+
+<!--output
+{"columns":[{"name":"Row","type":"any"}],"rows":[{"Row":"Header"},{"Row":"Data1"},{"Row":"Data2"}]}
 -->

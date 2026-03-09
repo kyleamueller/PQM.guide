@@ -29,15 +29,23 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Combinations` computes the binomial coefficient C(n, k), read as "n choose k". It returns the number of ways to select `combinationSize` items from a collection of `setSize` items when the order of selection does not matter.
+`Number.Combinations` computes the binomial coefficient C(n, k) — read as "n choose k". It returns the number of ways to select `combinationSize` items from a collection of `setSize` items when **order does not matter**. Two selections are considered identical if they contain the same elements regardless of the order chosen.
 
 The formula is: C(n, k) = n! / (k! × (n − k)!)
 
-Common applications include probability calculations, lottery odds, sampling scenarios, and feature selection counts. When `combinationSize` equals 0 or `setSize`, the result is 1. When `combinationSize` > `setSize`, the result is 0.
+Key properties:
+- `C(n, 0) = 1` — there is exactly one way to choose nothing
+- `C(n, n) = 1` — there is exactly one way to choose everything
+- `C(n, 1) = n` — choosing 1 item gives n possibilities
+- `C(n, k) = C(n, n−k)` — symmetry: choosing k is equivalent in count to leaving out k
+
+When `combinationSize` > `setSize`, the result is 0 (impossible selection). Results can grow extremely large for large inputs — `C(100, 50)` exceeds 10^29, which exceeds double-precision integer precision.
+
+For ordered selections (where order matters), use `Number.Permutations` instead. `Number.Permutations(n, k) = Number.Combinations(n, k) × k!`.
 
 ## Examples
 
-### Example 1: How many ways to choose 2 items from 5
+### Example 1: How many 2-item subsets can be chosen from 5 items?
 
 ```powerquery
 Number.Combinations(5, 2)
@@ -47,7 +55,7 @@ Number.Combinations(5, 2)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
 -->
 
-### Example 2: Lottery odds — choose 6 numbers from 49
+### Example 2: Lottery probability — how many ways to choose 6 numbers from 49?
 
 ```powerquery
 Number.Combinations(49, 6)
@@ -57,18 +65,22 @@ Number.Combinations(49, 6)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":13983816}]}
 -->
 
-### Example 3: Edge case — choosing 0 or all items always yields 1
+### Example 3: Edge cases and symmetry property of combinations
 
 ```powerquery
 #table(
     {"k", "C(5,k)"},
     {
         {0, Number.Combinations(5, 0)},
+        {1, Number.Combinations(5, 1)},
+        {2, Number.Combinations(5, 2)},
+        {3, Number.Combinations(5, 3)},
+        {4, Number.Combinations(5, 4)},
         {5, Number.Combinations(5, 5)}
     }
 )
 ```
 
 <!--output
-{"columns":[{"name":"k","type":"number"},{"name":"C(5,k)","type":"number"}],"rows":[{"k":0,"C(5,k)":1},{"k":5,"C(5,k)":1}]}
+{"columns":[{"name":"k","type":"number"},{"name":"C(5,k)","type":"number"}],"rows":[{"k":0,"C(5,k)":1},{"k":1,"C(5,k)":5},{"k":2,"C(5,k)":10},{"k":3,"C(5,k)":10},{"k":4,"C(5,k)":5},{"k":5,"C(5,k)":1}]}
 -->

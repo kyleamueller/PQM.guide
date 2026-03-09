@@ -28,13 +28,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInCurrentQuarter` returns `true` if the input date falls within the same calendar quarter as today (`DateTime.LocalNow()`). Quarters are defined as: Q1 (Jan–Mar), Q2 (Apr–Jun), Q3 (Jul–Sep), Q4 (Oct–Dec). The function is re-evaluated on each query refresh.
+`Date.IsInCurrentQuarter` returns `true` if the input date falls within the same calendar quarter as today (`DateTime.LocalNow()`). Quarters are defined as: Q1 (Jan–Mar), Q2 (Apr–Jun), Q3 (Jul–Sep), Q4 (Oct–Dec). The function is re-evaluated on each query refresh, making it useful for current-quarter KPI dashboards and reports.
+
+Like all `Date.IsIn*` functions, this matches the entire quarter period — including future dates in the current quarter. For a quarter-to-date view (only up to today), combine with an additional date comparison: `Date.IsInCurrentQuarter([OrderDate]) and [OrderDate] <= Date.From(DateTime.LocalNow())`.
+
+In cloud refresh environments (Power BI Service, Dataflows), "today" is determined by the server's UTC clock. If your data is in a local timezone, quarter boundaries may differ from what you expect on your local machine.
 
 ## Examples
 
-### Example 1: Filter this quarter's sales
+### Example 1: Filter this quarter's orders
 
-Keep only rows where OrderDate falls in the current quarter.
+Keep only rows where OrderDate falls in the current calendar quarter.
 
 ```powerquery
 Table.SelectRows(
@@ -60,4 +64,22 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentQuarter","type":"logical"}],"rows":[{"OrderID":36,"OrderDate":"2025-12-15","IsCurrentQuarter":false},{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentQuarter":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentQuarter":true}]}
+-->
+
+### Example 3: Compare current quarter vs. previous quarter
+
+Flag both current and previous quarter rows to support quarter-over-quarter comparison.
+
+```powerquery
+Table.AddColumn(
+    Table.AddColumn(
+        Sales,
+        "IsCurrentQ", each Date.IsInCurrentQuarter([OrderDate]), type logical
+    ),
+    "IsPreviousQ", each Date.IsInPreviousQuarter([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentQ","type":"logical"},{"name":"IsPreviousQ","type":"logical"}],"rows":[{"OrderID":35,"OrderDate":"2025-10-10","IsCurrentQ":false,"IsPreviousQ":true},{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentQ":true,"IsPreviousQ":false},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentQ":true,"IsPreviousQ":false}]}
 -->

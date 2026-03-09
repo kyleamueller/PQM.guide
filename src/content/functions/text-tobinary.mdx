@@ -30,45 +30,47 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.ToBinary` encodes a text value into a binary representation using the specified character encoding. This is the inverse of `Text.FromBinary`.
+`Text.ToBinary` encodes a text value into a binary value using the specified character encoding. This is the inverse of `Text.FromBinary`. The result is a `binary` type value — use it wherever binary data is required, such as when uploading to a web endpoint, storing in a binary column, or hashing with `Binary.Buffer`.
 
 The `encoding` parameter accepts values from the `TextEncoding` enum:
-- `TextEncoding.Utf8` (65001) — default
-- `TextEncoding.Ascii` (20127)
-- `TextEncoding.Unicode` / `TextEncoding.Utf16` (1200)
-- `TextEncoding.Utf16BE` (1201)
+- `TextEncoding.Utf8` (65001) — default; correct for most APIs and modern files
+- `TextEncoding.Ascii` (20127) — 7-bit ASCII; safe for codes and identifiers with no special characters
+- `TextEncoding.Unicode` / `TextEncoding.Utf16` (1200) — little-endian UTF-16
+- `TextEncoding.Utf16BE` (1201) — big-endian UTF-16
 - `TextEncoding.Utf32` (12000)
-- `TextEncoding.Windows` (1252)
+- `TextEncoding.Windows` (1252) — legacy Windows Western European encoding
 
-Common uses include preparing text for binary storage, generating file content, computing checksums or hashes, or creating payloads for web APIs that expect binary-encoded data.
+Always specify the encoding parameter explicitly. The default is `TextEncoding.Utf8`, which is correct for most modern scenarios, but making it explicit ensures the query behaves identically regardless of system locale. When the binary output will later be decoded by another system, ensure both sides use the same encoding — a mismatch will produce garbled output without raising an error.
 
 ## Examples
 
-### Example 1: Encode text as UTF-8
+### Example 1: Encode a text value as UTF-8 binary
 
 ```powerquery
-Text.ToBinary("Hello World")
+Text.ToBinary("Alice Smith", TextEncoding.Utf8)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"SGVsbG8gV29ybGQ="}]}
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"QWxpY2UgU21pdGg="}]}
 -->
 
-### Example 2: Encode text with explicit UTF-8 encoding
+### Example 2: Encode with explicit UTF-8 for API payload preparation
+
+Specify `TextEncoding.Utf8` explicitly to document intent and ensure correct behavior across system locales.
 
 ```powerquery
-Text.ToBinary("Power Query", TextEncoding.Utf8)
+Text.ToBinary("Widget A", TextEncoding.Utf8)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"UG93ZXIgUXVlcnk="}]}
+{"columns":[{"name":"Result","type":"binary"}],"rows":[{"Result":"V2lkZ2V0IEE="}]}
 -->
 
-### Example 3: Round-trip encode and decode
+### Example 3: Round-trip: encode then decode to verify correctness
 
 ```powerquery
 let
-    original = "Hello",
+    original = "charlie smith",
     encoded = Text.ToBinary(original, TextEncoding.Utf8),
     decoded = Text.FromBinary(encoded, TextEncoding.Utf8)
 in
@@ -76,5 +78,5 @@ in
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Hello"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"charlie smith"}]}
 -->

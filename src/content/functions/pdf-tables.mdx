@@ -31,31 +31,26 @@ relatedFunctions:
 
 ## Remarks
 
-`Pdf.Tables` extracts tabular data from PDF documents. It uses heuristic algorithms to detect table structures based on the visual layout of text and lines in the PDF. The function returns a navigation table listing all detected tables across all pages.
+`Pdf.Tables` extracts tabular data from a PDF document and returns a navigation table listing every table detected across all pages. It uses heuristic algorithms that analyze the visual layout of text, lines, and spacing to identify table structures. The function accepts the raw binary content of a PDF — obtained from `File.Contents`, `Web.Contents`, or the `Content` column in `Folder.Files` — and does not require any external PDF libraries.
 
-**Input**: The `pdf` parameter must be a binary value. Obtain it using `File.Contents` for local files or `Web.Contents` for PDF files hosted at a URL.
-
-**Navigation table columns**:
-- `Id` (text) — a unique identifier for the table (e.g., `"Table001"`).
+**Navigation table columns**: The result contains one row per detected table with:
+- `Id` (text) — a unique identifier assigned by the extraction engine (e.g., `"Table001"`, `"Table002"`).
 - `Name` (text) — same as `Id` by default.
-- `Page` (number) — the page number on which the table was found.
+- `Page` (number) — the 1-based page number where the table was found.
 - `Kind` (text) — always `"Table"`.
-- `Data` (table) — the extracted table content.
+- `Data` (table) — the extracted table as a Power Query table. The first row is often treated as a header; promote headers with `Table.PromoteHeaders` if needed.
 
 **Key options**:
-- `StartPage` (number) — the first page to extract from (1-based). Useful for large PDFs.
-- `EndPage` (number) — the last page to extract from. Combine with `StartPage` to target specific page ranges.
-- `MultiPage` (logical) — when `true`, attempts to merge tables that span multiple pages into a single table.
-- `Implementation` (text) — set to `"1.3"` to use a newer extraction implementation.
+- `StartPage` (number) — the first page (1-based) to extract from. Use to skip front matter in large PDFs.
+- `EndPage` (number) — the last page to extract from. Combine with `StartPage` to target a specific range.
+- `MultiPage` (logical) — when `true`, attempts to detect and merge tables that span across multiple pages into a single table.
+- `Implementation` (text) — set to `"1.3"` to use a newer extraction algorithm that may handle some PDFs more accurately.
 
-**Limitations**:
-- Works best on PDFs with well-defined table borders or consistent column alignment. PDFs that are scanned images (not text-based) are not supported — OCR is not applied.
-- Complex merged cells or irregularly structured tables may not extract cleanly.
-- Password-protected PDFs cannot be read.
+**Limitations**: `Pdf.Tables` requires the PDF to contain actual machine-readable text. PDFs that consist of scanned images (image-only PDFs) are not supported — the function does not perform OCR. Password-protected PDFs raise an error. Tables with complex merged cells or highly irregular column alignment may not extract cleanly; in those cases, inspect multiple `Implementation` values or post-process the extracted data.
 
-**Authentication**: Not applicable — authentication is handled by the function that provides the binary (e.g., `Web.Contents`).
+**Authentication**: `Pdf.Tables` does not make HTTP requests — it only parses the binary you provide. Authentication for downloading PDF files is handled by `Web.Contents` or other functions used to obtain the binary.
 
-**Query folding**: Not supported.
+**Query folding**: Not supported. All filtering occurs in Power Query after extraction.
 
 ## Examples
 
@@ -64,12 +59,7 @@ relatedFunctions:
 Pdf.Tables(File.Contents("C:\Reports\AnnualReport.pdf"))
 ```
 
-### Example 2: Extract tables from a PDF hosted at a URL
-```powerquery
-Pdf.Tables(Web.Contents("https://example.com/reports/q4-results.pdf"))
-```
-
-### Example 3: Access the first table found in a PDF
+### Example 2: Access the first detected table in a PDF
 ```powerquery
 let
     Source = Pdf.Tables(File.Contents("C:\Data\SalesReport.pdf")),
@@ -78,7 +68,7 @@ in
     FirstTable
 ```
 
-### Example 4: Extract tables from specific pages only
+### Example 3: Extract tables from a specific page range in a large PDF
 ```powerquery
 let
     Source = Pdf.Tables(
@@ -90,15 +80,15 @@ in
     FirstTable
 ```
 
-### Example 5: Combine PDF files from a folder and extract tables
+### Example 4: Combine all PDFs in a folder, extracting the first table from each
 ```powerquery
 let
     Files = Folder.Files("C:\Reports\PDFs"),
     Pdfs = Table.SelectRows(Files, each [Extension] = ".pdf"),
     AddTables = Table.AddColumn(Pdfs, "Tables", each Pdf.Tables([Content])),
     Expanded = Table.ExpandTableColumn(AddTables, "Tables", {"Name", "Data"}),
-    FirstSheets = Table.SelectRows(Expanded, each [Name] = "Table001"),
-    Combined = Table.Combine(FirstSheets[Data])
+    FirstTables = Table.SelectRows(Expanded, each [Name] = "Table001"),
+    Combined = Table.Combine(FirstTables[Data])
 in
     Combined
 ```

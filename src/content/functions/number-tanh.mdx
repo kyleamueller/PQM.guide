@@ -26,17 +26,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Tanh` returns the hyperbolic tangent, defined as:
+`Number.Tanh` returns the hyperbolic tangent, defined mathematically as:
 
 tanh(x) = sinh(x) / cosh(x) = (e^x − e^(−x)) / (e^x + e^(−x))
 
-The result is always in the open interval (-1, 1), approaching -1 as x → -∞ and 1 as x → +∞. `Number.Tanh(0)` returns `0`.
+The result is always in the open interval (-1, 1). As x approaches +∞, tanh(x) approaches 1 asymptotically; as x approaches -∞, it approaches -1. At x = 0 the result is exactly 0. The function is **odd**: `tanh(-x) = -tanh(x)`.
 
-Hyperbolic tangent is widely used as an activation function in neural networks and for normalizing values to (-1, 1) without a hard cutoff.
+A practical feature of `Number.Tanh` is that it provides a **smooth, bounded normalization** of any real number to the range (-1, 1) without a hard clamp. This makes it useful in Power Query when you need to squash outliers while preserving the ordering and sign of values. Values close to zero change nearly linearly (slope ≈ 1 at x=0), while extreme values get compressed toward ±1. For normalizing to (0, 1) instead, the logistic function `1 / (1 + Number.Exp(-x))` is the standard alternative.
+
+Unlike circular trigonometric functions, hyperbolic functions do not take angles in radians or degrees — they accept any real number.
 
 ## Examples
 
-### Example 1: Hyperbolic tangent of 0
+### Example 1: Hyperbolic tangent of 0 is 0
 
 ```powerquery
 Number.Tanh(0)
@@ -46,7 +48,7 @@ Number.Tanh(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 2: tanh approaches 1 for large values
+### Example 2: Large inputs approach ±1 asymptotically
 
 ```powerquery
 Number.Tanh(10)
@@ -56,12 +58,16 @@ Number.Tanh(10)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.9999999958776927}]}
 -->
 
-### Example 3: tanh of 1
+### Example 3: Normalize revenue z-scores to (-1, 1) using tanh
 
 ```powerquery
-Number.Tanh(1)
+let
+    Scores = {-3.0, -1.0, 0.0, 1.0, 3.0},
+    Normalized = List.Transform(Scores, Number.Tanh)
+in
+    #table({"ZScore", "Tanh"}, List.Zip({Scores, Normalized}))
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.7615941559557649}]}
+{"columns":[{"name":"ZScore","type":"number"},{"name":"Tanh","type":"number"}],"rows":[{"ZScore":-3,"Tanh":-0.9950547536867305},{"ZScore":-1,"Tanh":-0.7615941559557649},{"ZScore":0,"Tanh":0},{"ZScore":1,"Tanh":0.7615941559557649},{"ZScore":3,"Tanh":0.9950547536867305}]}
 -->

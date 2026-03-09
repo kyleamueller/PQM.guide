@@ -27,15 +27,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Ln` computes the natural logarithm — the logarithm to base _e_ (approximately 2.71828). It is the inverse of `Number.Exp`: `Number.Ln(Number.Exp(x)) = x`.
+`Number.Ln` computes the natural logarithm — the logarithm to base e (Euler's number, approximately 2.71828). It is the inverse of `Number.Exp`: `Number.Ln(Number.Exp(x)) = x` for any real x, and `Number.Exp(Number.Ln(x)) = x` for any positive x.
 
-Inputs must be positive real numbers for a defined result. Passing `0` returns negative infinity; passing a negative number returns `NaN`.
+Inputs must be **strictly positive** for a real result. Passing `0` returns negative infinity; passing a negative number returns `NaN` rather than raising an error. Always validate or filter your data for non-positive values before applying `Number.Ln` in a table column.
 
-Common uses include continuous compounding calculations, entropy, normalizing skewed data, and log-scale transformations.
+`Number.Ln` is more efficient and numerically precise than `Number.Log(x)` with no base argument — both compute the natural log, but `Number.Ln` is the dedicated function. For base-10 log use `Number.Log10`; for an arbitrary base use `Number.Log(x, base)`.
+
+Common uses in data transformation: log-normalizing right-skewed distributions (revenue, population), computing entropy or information gain, and implementing continuous compounding formulas. Note that `Number.Ln` of a ratio gives the difference of natural logs: `Number.Ln(a/b) = Number.Ln(a) - Number.Ln(b)`.
 
 ## Examples
 
-### Example 1: Natural log of e
+### Example 1: Natural log of e returns 1
 
 ```powerquery
 Number.Ln(Number.E)
@@ -45,7 +47,7 @@ Number.Ln(Number.E)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 2: Natural log of 1
+### Example 2: Natural log of 1 returns 0
 
 ```powerquery
 Number.Ln(1)
@@ -55,17 +57,21 @@ Number.Ln(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 3: Compute log-transformed revenue
+### Example 3: Add a log-transformed revenue column to Sales
+
+Log transformation is useful for reducing the skewness of revenue or price data before modeling.
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "Revenue"}),
-    "LnRevenue", each Number.Ln([Revenue]), type number
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName", "UnitPrice"}),
+    "LnPrice",
+    each Number.Ln([UnitPrice]),
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Revenue","type":"number"},{"name":"LnRevenue","type":"number"}],"rows":[{"OrderID":1,"Revenue":1000,"LnRevenue":6.907755278982137},{"OrderID":2,"Revenue":5000,"LnRevenue":8.517193191416238},{"OrderID":3,"Revenue":250,"LnRevenue":5.521460917862246},{"OrderID":4,"Revenue":12000,"LnRevenue":9.392661956393784}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"LnPrice","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"LnPrice":3.2188758248682},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"LnPrice":3.912023005428146},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"LnPrice":2.70805020110221},{"OrderID":4,"CustomerName":"Alice","UnitPrice":75,"LnPrice":4.317488114990692}]}
 -->

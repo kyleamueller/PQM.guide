@@ -27,13 +27,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInYearToDate` returns `true` if the input date falls between January 1 of the current year and today's date (inclusive), as determined by `DateTime.LocalNow()`. This differs from `Date.IsInCurrentYear`, which includes the entire year including future dates. Use this function for YTD metrics where you only want to compare the portion of the year that has elapsed. The function is re-evaluated on each query refresh.
+`Date.IsInYearToDate` returns `true` if the input date falls between January 1 of the current year and today's date (inclusive), as determined by `DateTime.LocalNow()`. This differs from `Date.IsInCurrentYear`, which includes the entire year including future dates. Use this function for YTD metrics where you only want to compare the portion of the year that has elapsed.
+
+This is a critical distinction for YTD vs. full-year comparisons. `Date.IsInCurrentYear` would include all of April through December even in March, while `Date.IsInYearToDate` stops at today. Always prefer `Date.IsInYearToDate` when computing KPIs against a YTD target.
+
+The function is re-evaluated on each query refresh. In cloud environments (Power BI Service, Dataflows), "today" is determined by the server's UTC clock, which may cause YTD to cut off at a different point than your local time. For timezone-accurate YTD calculations, compute the boundary explicitly using `DateTimeZone.LocalNow()` and compare dates directly.
 
 ## Examples
 
 ### Example 1: Filter year-to-date sales
 
-Keep only rows where OrderDate falls within the current year up to today.
+Keep only rows where OrderDate falls from January 1 of the current year through today.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
@@ -46,9 +52,11 @@ Table.SelectRows(
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10"},{"OrderID":40,"OrderDate":"2026-02-20"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
 -->
 
-### Example 2: Compare YTD vs. current year rows
+### Example 2: Compare YTD vs. full current year flags
 
-Show the difference between YTD and full current-year flags.
+Show the difference between year-to-date and full current-year filters side by side.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
@@ -62,4 +70,24 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentYear","type":"logical"},{"name":"IsYTD","type":"logical"}],"rows":[{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentYear":true,"IsYTD":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentYear":true,"IsYTD":true},{"OrderID":45,"OrderDate":"2026-06-15","IsCurrentYear":true,"IsYTD":false}]}
+-->
+
+### Example 3: YTD total revenue
+
+Sum all revenue for year-to-date orders using List.Sum.
+
+Input: `Sales`
+
+```powerquery
+let
+    YTDSales = Table.SelectRows(Sales, each Date.IsInYearToDate([OrderDate])),
+    TotalRevenue = List.Sum(
+        Table.AddColumn(YTDSales, "Revenue", each [UnitPrice] * [Quantity], type number)[Revenue]
+    )
+in
+    #table(type table [Metric = text, Value = number], {{"YTD Revenue", TotalRevenue}})
+```
+
+<!--output
+{"columns":[{"name":"Metric","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Metric":"YTD Revenue","Value":100}]}
 -->

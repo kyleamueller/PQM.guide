@@ -29,11 +29,15 @@ relatedFunctions:
 
 `Date.QuarterOfYear` returns 1 for January–March, 2 for April–June, 3 for July–September, and 4 for October–December. It is equivalent to `Number.RoundUp(Date.Month(d) / 3)`. If the input is `null`, the function returns `null`.
 
+This function returns a simple integer (1–4) for use as a sort key or grouping column. To get the formatted quarter label (e.g., "Q1"), concatenate with text: `"Q" & Text.From(Date.QuarterOfYear([OrderDate]))`. For the start or end date of a quarter, use `Date.StartOfQuarter` and `Date.EndOfQuarter`.
+
+Note that `Date.QuarterOfYear` always uses standard calendar quarters. If your organization uses a non-standard fiscal calendar (e.g., fiscal year starting in April), you must calculate fiscal quarters manually based on the fiscal month offset.
+
 ## Examples
 
-### Example 1: Add quarter number to Sales table
+### Example 1: Add quarter number to the Sales table
 
-Add a column showing the fiscal quarter for each order date.
+Add a column showing the calendar quarter number for each order date.
 
 Input: `Sales`
 
@@ -51,9 +55,9 @@ Table.AddColumn(
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Quarter","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","Quarter":1},{"OrderID":2,"OrderDate":"2024-01-18","Quarter":1},{"OrderID":3,"OrderDate":"2024-02-01","Quarter":1},{"OrderID":4,"OrderDate":"2024-02-10","Quarter":1},{"OrderID":5,"OrderDate":"2024-03-05","Quarter":1}]}
 -->
 
-### Example 2: Quarter for each month boundary
+### Example 2: Show quarter number for the first month of each quarter
 
-Show quarter assignment across all four quarters.
+Verify the mapping for all four quarter boundaries.
 
 ```powerquery
 #table(
@@ -69,4 +73,23 @@ Show quarter assignment across all four quarters.
 
 <!--output
 {"columns":[{"name":"Date","type":"date"},{"name":"Quarter","type":"number"}],"rows":[{"Date":"2024-01-01","Quarter":1},{"Date":"2024-04-01","Quarter":2},{"Date":"2024-07-01","Quarter":3},{"Date":"2024-10-01","Quarter":4}]}
+-->
+
+### Example 3: Add a formatted quarter label column
+
+Combine year and quarter into a display label such as "Q1 2024".
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "OrderDate"}),
+    "QuarterLabel",
+    each "Q" & Text.From(Date.QuarterOfYear([OrderDate])) & " " & Text.From(Date.Year([OrderDate])),
+    type text
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"QuarterLabel","type":"text"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","QuarterLabel":"Q1 2024"},{"OrderID":2,"OrderDate":"2024-01-18","QuarterLabel":"Q1 2024"},{"OrderID":3,"OrderDate":"2024-02-01","QuarterLabel":"Q1 2024"},{"OrderID":4,"OrderDate":"2024-02-10","QuarterLabel":"Q1 2024"},{"OrderID":5,"OrderDate":"2024-03-05","QuarterLabel":"Q1 2024"}]}
 -->

@@ -36,17 +36,16 @@ relatedFunctions:
 
 ## Remarks
 
-`List.TransformMany` is the M equivalent of `SelectMany` (LINQ) or `flatMap`. It performs a two-stage transformation:
+`List.TransformMany` is the M equivalent of `SelectMany` (LINQ) or `flatMap` in functional programming. It is used to expand each item in a list into a sub-collection, then flatten all those sub-collections into a single output list while optionally combining each source item with each projected item.
 
-1. **collectionTransform**: Applied to each item in `list`, producing a collection (list) per item.
-2. **resultTransform**: Applied to each `(originalItem, collectionItem)` pair, producing the final output value.
+The function performs a two-stage transformation:
 
-The results are flattened into a single output list.
+1. **collectionTransform**: Applied to each item in `list`, returning a list (the projected sub-collection for that item).
+2. **resultTransform**: A function of two arguments — `(originalItem, subItem)` — that produces the final output value for each pair.
 
-This is useful for cross-joining a list with sub-lists, expanding nested structures, or generating cartesian products.
+If `collectionTransform` returns an empty list for a source item, no output rows are generated for that item (it is effectively filtered out). The output list length equals the sum of the lengths of all projected sub-collections.
 
-- If `collectionTransform` returns an empty list for an item, no output is produced for that item.
-- The output list length equals the total number of elements across all projected collections.
+This function enables cartesian products, nested data expansion, and one-to-many joins within a list context. It is more powerful than a nested `List.Combine(List.Transform(...))` because the `resultTransform` gives you access to the parent item during the final projection.
 
 ## Examples
 

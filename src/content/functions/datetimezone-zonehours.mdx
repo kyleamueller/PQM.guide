@@ -27,27 +27,32 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.ZoneHours` returns the whole-hours component of the UTC offset for a `datetimezone` value. For a value with offset `+05:30`, this returns `5`. For `-08:00`, it returns `-8`. To get the minutes component of the offset, use `DateTimeZone.ZoneMinutes`. Together, these functions let you extract timezone metadata without decomposing the entire value via `DateTimeZone.ToRecord`.
+`DateTimeZone.ZoneHours` returns the whole-hours component of the UTC offset for a `datetimezone` value. For a value with offset `+05:30`, this returns `5`. For `-08:00`, it returns `-8`. For UTC (`+00:00`), it returns `0`. To get the minutes component of the offset, use `DateTimeZone.ZoneMinutes`. Together, these two functions let you extract timezone metadata without fully decomposing the value via `DateTimeZone.ToRecord`.
+
+A common use case is grouping or filtering `datetimezone` values by their source timezone — for example, separating events sourced from US Eastern (`ZoneHours = -5`) vs. UK (`ZoneHours = 0`) vs. India (`ZoneHours = 5`). Note that this only identifies the offset, not the named timezone (e.g., UTC-5 could be EST, CDT, or any other timezone with that offset).
+
+`DateTimeZone.ZoneHours` is most useful when you need only the hours part of the offset quickly. For the complete offset (hours and minutes together), build it from both components: `DateTimeZone.ZoneHours(x) * 60 + DateTimeZone.ZoneMinutes(x)` gives total offset in minutes.
 
 ## Examples
 
-### Example 1: Extract the timezone hour offset from event timestamps
+### Example 1: Extract timezone hour offsets from a set of datetimezone values
 
-Add a column showing the UTC offset hours for each event's timezone.
-
-Input: `Events`
+Show the UTC offset hours for a range of datetimezone values.
 
 ```powerquery
-Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
-    "OffsetHours",
-    each DateTimeZone.ZoneHours([EventTimeZone]),
-    Int64.Type
+#table(
+    type table [DTZ = datetimezone, ZoneHours = number],
+    {
+        {#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0),  DateTimeZone.ZoneHours(#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0))},
+        {#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0),   DateTimeZone.ZoneHours(#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0))},
+        {#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30),  DateTimeZone.ZoneHours(#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30))},
+        {#datetimezone(2024, 3, 16, 17, 45, 0, 0, 0),  DateTimeZone.ZoneHours(#datetimezone(2024, 3, 16, 17, 45, 0, 0, 0))}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetimezone"},{"name":"OffsetHours","type":"number"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00-05:00","OffsetHours":-5},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00+01:00","OffsetHours":1},{"EventID":3,"EventTimeZone":"2024-03-16T09:15:00+05:30","OffsetHours":5},{"EventID":4,"EventTimeZone":"2024-03-16T17:45:00+00:00","OffsetHours":0}]}
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"ZoneHours","type":"number"}],"rows":[{"DTZ":"2024-03-15T08:30:00-05:00","ZoneHours":-5},{"DTZ":"2024-03-15T14:00:00+01:00","ZoneHours":1},{"DTZ":"2024-03-16T09:15:00+05:30","ZoneHours":5},{"DTZ":"2024-03-16T17:45:00+00:00","ZoneHours":0}]}
 -->
 
 ### Example 2: Get the zone hours for a specific datetimezone
@@ -64,4 +69,26 @@ Return the offset hours for a literal datetimezone with a +5:30 offset.
 
 <!--output
 {"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"ZoneHours","type":"number"}],"rows":[{"DTZ":"2024-03-15T14:30:00+05:30","ZoneHours":5}]}
+-->
+
+### Example 3: Build a total offset in minutes from ZoneHours and ZoneMinutes
+
+Compute the full UTC offset in minutes by combining both components.
+
+```powerquery
+#table(
+    type table [DTZ = datetimezone, OffsetMinutes = number],
+    {
+        {#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0),
+         DateTimeZone.ZoneHours(#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0)) * 60
+           + DateTimeZone.ZoneMinutes(#datetimezone(2024, 3, 15, 8, 30, 0, -5, 0))},
+        {#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30),
+         DateTimeZone.ZoneHours(#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30)) * 60
+           + DateTimeZone.ZoneMinutes(#datetimezone(2024, 3, 16, 9, 15, 0, 5, 30))}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"DTZ","type":"datetimezone"},{"name":"OffsetMinutes","type":"number"}],"rows":[{"DTZ":"2024-03-15T08:30:00-05:00","OffsetMinutes":-300},{"DTZ":"2024-03-16T09:15:00+05:30","OffsetMinutes":330}]}
 -->

@@ -31,41 +31,65 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.FromPartitions` combines multiple tables (partitions) into a single table, adding a column to identify which partition each row originated from. Each element of `partitions` is a two-element list: `{partitionValue, table}`.
+`Table.FromPartitions` combines multiple labeled sub-tables into a single table, adding a new column that records which partition each row came from. Each element in the `partitions` list is a two-element list of the form `{partitionValue, table}`. The partition column is prepended to the result.
 
-This function is the logical inverse of `Table.Partition` and is useful for reassembling data that was previously split or for constructing a union of labeled sub-tables.
+This function is the logical inverse of `Table.Partition` — use `Table.Partition` to split one table into a list of sub-tables, and `Table.FromPartitions` to reassemble them. It is also useful for assembling a union of independently loaded or processed datasets where you want to preserve a label indicating the data's origin (e.g., year, month, region, or file name).
+
+All partition tables should share the same schema. If the schemas differ, column values for missing fields will be `null`. The `partitionColumn` name must not conflict with any existing column name in the partition tables.
 
 ## Examples
 
-### Example 1: Combine two partition tables with a Year column
+### Example 1: Combine quarterly sales into a single labeled table
 
 ```powerquery
 Table.FromPartitions(
-    "Year",
+    "Quarter",
     {
-        {2023, #table({"Product", "Sales"}, {{"A", 100}, {"B", 200}})},
-        {2024, #table({"Product", "Sales"}, {{"A", 150}, {"B", 250}})}
+        {"Q1", #table({"CustomerName", "Product", "Revenue"}, {{"Alice","Widget A",100},{"Bob","Gadget B",200}})},
+        {"Q2", #table({"CustomerName", "Product", "Revenue"}, {{"Charlie","Widget C",150},{"Diana","Widget A",300}})},
+        {"Q3", #table({"CustomerName", "Product", "Revenue"}, {{"Alice","Gadget D",250},{"Bob","Thingamajig E",400}})}
     }
 )
 ```
 
 <!--output
-{"columns":[{"name":"Year","type":"any"},{"name":"Product","type":"any"},{"name":"Sales","type":"any"}],"rows":[{"Year":"2023","Product":"A","Sales":"100"},{"Year":"2023","Product":"B","Sales":"200"},{"Year":"2024","Product":"A","Sales":"150"},{"Year":"2024","Product":"B","Sales":"250"}]}
+{"columns":[{"name":"Quarter","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Revenue","type":"any"}],"rows":[{"Quarter":"Q1","CustomerName":"Alice","Product":"Widget A","Revenue":"100"},{"Quarter":"Q1","CustomerName":"Bob","Product":"Gadget B","Revenue":"200"},{"Quarter":"Q2","CustomerName":"Charlie","Product":"Widget C","Revenue":"150"},{"Quarter":"Q2","CustomerName":"Diana","Product":"Widget A","Revenue":"300"},{"Quarter":"Q3","CustomerName":"Alice","Product":"Gadget D","Revenue":"250"},{"Quarter":"Q3","CustomerName":"Bob","Product":"Thingamajig E","Revenue":"400"}]}
 -->
 
-### Example 2: Combine monthly partitions
+### Example 2: Reassemble tables produced by Table.Partition
+
+```powerquery
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Region"},
+        {{1,"Alice","East"},{2,"Bob","West"},{3,"Charlie","East"},{4,"Diana","North"}}
+    ),
+    Partitions = Table.Partition(Sales, "OrderID", 2, 0),
+    Reassembled = Table.FromPartitions(
+        "PartitionIndex",
+        List.Transform({0..List.Count(Partitions)-1}, each {_, Partitions{_}})
+    )
+in
+    Reassembled
+```
+
+<!--output
+{"columns":[{"name":"PartitionIndex","type":"any"},{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"}],"rows":[{"PartitionIndex":"0","OrderID":"2","CustomerName":"Bob","Region":"West"},{"PartitionIndex":"0","OrderID":"4","CustomerName":"Diana","Region":"North"},{"PartitionIndex":"1","OrderID":"1","CustomerName":"Alice","Region":"East"},{"PartitionIndex":"1","OrderID":"3","CustomerName":"Charlie","Region":"East"}]}
+-->
+
+### Example 3: Build a labeled union from separate region datasets
 
 ```powerquery
 Table.FromPartitions(
-    "Month",
+    "Region",
     {
-        {"Jan", #table({"Amount"}, {{500}})},
-        {"Feb", #table({"Amount"}, {{620}})},
-        {"Mar", #table({"Amount"}, {{480}})}
+        {"East",  #table({"OrderID","CustomerName"}, {{1,"Alice"},{3,"Charlie"}})},
+        {"West",  #table({"OrderID","CustomerName"}, {{2,"Bob"},{7,"Charlie"}})},
+        {"North", #table({"OrderID","CustomerName"}, {{4,"Alice"},{8,"Diana"}})}
     }
 )
 ```
 
 <!--output
-{"columns":[{"name":"Month","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"Month":"Jan","Amount":"500"},{"Month":"Feb","Amount":"620"},{"Month":"Mar","Amount":"480"}]}
+{"columns":[{"name":"Region","type":"any"},{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"Region":"East","OrderID":"1","CustomerName":"Alice"},{"Region":"East","OrderID":"3","CustomerName":"Charlie"},{"Region":"West","OrderID":"2","CustomerName":"Bob"},{"Region":"West","OrderID":"7","CustomerName":"Charlie"},{"Region":"North","OrderID":"4","CustomerName":"Alice"},{"Region":"North","OrderID":"8","CustomerName":"Diana"}]}
 -->

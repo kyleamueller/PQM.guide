@@ -33,36 +33,59 @@ relatedFunctions:
 
 `Date.IsInNextNMonths` returns `true` if the input date falls within the next N complete calendar months after the current month. The current month itself is not included; use `Date.IsInCurrentMonth` to also match the current month. The function is re-evaluated on each query refresh.
 
-For example, if today is in March and `months = 3`, it matches any date in April, May, or June.
+For example, if today is in March and `months = 3`, it matches any date in April, May, or June. This function counts whole calendar months, not a rolling 30-day window — so the window always aligns to month boundaries.
+
+To include the current month and the next N months in the same filter, combine with an `or Date.IsInCurrentMonth` expression. For a rolling day-based window instead, use `Date.IsInNextNDays` with an appropriate number of days.
 
 ## Examples
 
-### Example 1: Find renewals due in the next 3 months
+### Example 1: Find orders due in the next 3 months
 
-Keep only rows where RenewalDate falls within the next 3 calendar months.
+Keep only rows where OrderDate falls within the next 3 complete calendar months.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Subscriptions,
-    each Date.IsInNextNMonths([RenewalDate], 3)
+    Sales,
+    each Date.IsInNextNMonths([OrderDate], 3)
 )
 ```
 
 <!--output
-{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"Customer","type":"text"}],"rows":[{"SubID":12,"RenewalDate":"2026-04-10","Customer":"Contoso"},{"SubID":13,"RenewalDate":"2026-05-18","Customer":"Northwind"},{"SubID":15,"RenewalDate":"2026-06-25","Customer":"Fabrikam"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-04-10"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-05-18"},{"OrderID":45,"CustomerName":"Charlie","OrderDate":"2026-06-25"}]}
 -->
 
-### Example 2: Flag renewals in the next 6 months
+### Example 2: Flag orders due in the next 6 months
 
-Add a boolean column for subscriptions renewing within the next 6 months.
+Add a boolean column identifying orders in the next 6 calendar months.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Subscriptions,
-    "RenewsInNext6Months", each Date.IsInNextNMonths([RenewalDate], 6), type logical
+    Sales,
+    "DueInNext6Months", each Date.IsInNextNMonths([OrderDate], 6), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"SubID","type":"number"},{"name":"RenewalDate","type":"date"},{"name":"RenewsInNext6Months","type":"logical"}],"rows":[{"SubID":12,"RenewalDate":"2026-04-10","RenewsInNext6Months":true},{"SubID":16,"RenewalDate":"2026-09-01","RenewsInNext6Months":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DueInNext6Months","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","DueInNext6Months":false},{"OrderID":43,"OrderDate":"2026-04-10","DueInNext6Months":true},{"OrderID":46,"OrderDate":"2026-09-01","DueInNext6Months":false}]}
+-->
+
+### Example 3: Include current month and next 3 months together
+
+Combine IsInCurrentMonth and IsInNextNMonths for a 4-month forward window.
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(
+    Sales,
+    each Date.IsInCurrentMonth([OrderDate]) or Date.IsInNextNMonths([OrderDate], 3)
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":42,"CustomerName":"Charlie","OrderDate":"2026-03-08"},{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-04-10"},{"OrderID":44,"CustomerName":"Bob","OrderDate":"2026-05-18"},{"OrderID":45,"CustomerName":"Diana","OrderDate":"2026-06-25"}]}
 -->

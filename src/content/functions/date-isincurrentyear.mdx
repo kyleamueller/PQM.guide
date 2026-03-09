@@ -30,6 +30,10 @@ relatedFunctions:
 
 `Date.IsInCurrentYear` returns `true` if the input date falls anywhere within the same calendar year as today (`DateTime.LocalNow()`), from January 1 through December 31. The function is re-evaluated on each query refresh. To limit results to dates up to and including today, use `Date.IsInYearToDate` instead.
 
+This is the broadest of the `Date.IsInCurrent*` family and includes all future dates within the current year. This is useful for full-year budget vs. actual comparisons where both historical and planned dates are in the same table.
+
+Like all `Date.IsIn*` functions, the reference year is determined by `DateTime.LocalNow()`. In cloud refresh environments (Power BI Service, Dataflows), this is based on the server's UTC clock. At year boundaries near midnight UTC, the "current year" could differ between your local environment and the cloud refresh.
+
 ## Examples
 
 ### Example 1: Filter this year's orders
@@ -60,4 +64,22 @@ Table.AddColumn(
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentYear","type":"logical"}],"rows":[{"OrderID":36,"OrderDate":"2025-11-15","IsCurrentYear":false},{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentYear":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentYear":true}]}
+-->
+
+### Example 3: Compare current year vs. year-to-date
+
+Show the difference between full-year and YTD flags on the same table.
+
+```powerquery
+Table.AddColumn(
+    Table.AddColumn(
+        Sales,
+        "IsCurrentYear", each Date.IsInCurrentYear([OrderDate]), type logical
+    ),
+    "IsYTD", each Date.IsInYearToDate([OrderDate]), type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentYear","type":"logical"},{"name":"IsYTD","type":"logical"}],"rows":[{"OrderID":36,"OrderDate":"2025-11-15","IsCurrentYear":false,"IsYTD":false},{"OrderID":38,"OrderDate":"2026-01-10","IsCurrentYear":true,"IsYTD":true},{"OrderID":45,"OrderDate":"2026-06-15","IsCurrentYear":true,"IsYTD":false}]}
 -->

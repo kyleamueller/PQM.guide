@@ -26,15 +26,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Exp` computes _e_^x where _e_ is Euler's number (approximately 2.71828). It is the inverse of `Number.Ln`: `Number.Exp(Number.Ln(x)) = x` for any positive x.
+`Number.Exp` computes e^x, where e is Euler's number (approximately 2.71828182845904523). It is the **inverse of `Number.Ln`**: `Number.Exp(Number.Ln(x)) = x` for any positive x, and `Number.Ln(Number.Exp(x)) = x` for any real x.
 
-Common applications include continuous compounding (finance), exponential growth and decay models, and probability density functions.
+`Number.Exp(0) = 1` and `Number.Exp(1) = e`. For large positive x, the result grows extremely rapidly and overflows to infinity around x ≈ 709. For large negative x, the result approaches 0. These limits are inherent to double-precision floating-point.
 
-`Number.Exp(1)` returns the value of _e_ itself. `Number.Exp(0)` returns `1`.
+Common uses in data transformation include continuous compounding in finance (`FV = PV * e^(r*t)`), exponential growth and decay models, and softmax-style normalization. The exponential function is also the building block for `Number.Cosh` and `Number.Sinh`, defined as `(e^x ± e^(-x)) / 2`. Note that `Number.Power(Number.E, x)` is equivalent but less precise and slower than `Number.Exp(x)` for most implementations.
 
 ## Examples
 
-### Example 1: e raised to the power of 1
+### Example 1: e raised to the power of 1 — returns Euler's number
 
 ```powerquery
 Number.Exp(1)
@@ -44,7 +44,7 @@ Number.Exp(1)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2.718281828459045}]}
 -->
 
-### Example 2: e raised to the power of 0
+### Example 2: e raised to the power of 0 always returns 1
 
 ```powerquery
 Number.Exp(0)
@@ -54,16 +54,16 @@ Number.Exp(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
 
-### Example 3: Continuous compounding — final value of a principal
+### Example 3: Continuous compounding — compute final investment value
 
-Compute `P * e^(r*t)` for P=1000, r=0.05, t=3 years.
+Principal of $1,000 at 5% annual rate continuously compounded for 3 years: FV = P × e^(r×t).
 
 ```powerquery
 let
     Principal = 1000,
     Rate = 0.05,
-    Time = 3,
-    FinalValue = Principal * Number.Exp(Rate * Time)
+    Years = 3,
+    FinalValue = Principal * Number.Exp(Rate * Years)
 in
     FinalValue
 ```

@@ -22,9 +22,11 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTime.FixedLocalNow` returns the current local date and time, but unlike `DateTime.LocalNow()`, it returns a consistent value for the entire duration of query evaluation. Multiple calls to `DateTime.FixedLocalNow` within a single query will always return the same timestamp, making it suitable for calculations that require a stable reference point such as age calculations or elapsed-time computations across multiple columns.
+`DateTime.FixedLocalNow` returns the current local date and time, but unlike `DateTime.LocalNow()`, it returns a consistent value for the entire duration of query evaluation. Multiple calls to `DateTime.FixedLocalNow` within a single query always return the same timestamp, making it suitable for calculations that require a stable reference point such as age calculations or elapsed-time computations across multiple columns.
 
-`DateTime.LocalNow()` may return different values if called at different points during a long-running query, whereas `DateTime.FixedLocalNow()` is guaranteed to be consistent.
+`DateTime.LocalNow()` may return different values when called at different points during a long-running query, causing slight inconsistencies in computed columns that both reference "now". `DateTime.FixedLocalNow()` is guaranteed to be the same for every row in a transformation, eliminating this risk. Prefer it over `DateTime.LocalNow()` whenever you need a stable snapshot of the current time.
+
+Note that in Power BI Service and Dataflows, the "local" time reflects the cloud region's system time (typically UTC) rather than your local machine's timezone. For cloud-hosted refreshes, consider using `DateTimeZone.FixedUtcNow()` instead for clarity and consistency.
 
 ## Examples
 
@@ -35,30 +37,53 @@ Use a fixed reference to compute both days-elapsed and hours-elapsed without ris
 ```powerquery
 let
     Now = DateTime.FixedLocalNow(),
-    Source = Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTime"}),
-    WithAge = Table.AddColumn(Source, "DaysOld",
-        each Duration.TotalDays(Now - [EventTime]), type number),
-    WithHours = Table.AddColumn(WithAge, "HoursOld",
-        each Duration.TotalHours(Now - [EventTime]), type number)
+    Source = Table.SelectColumns(
+        Table.SelectRows(OrderLog, each [DurationMinutes] <> null),
+        {"LogID", "Timestamp"}
+    ),
+    WithDays = Table.AddColumn(Source, "DaysOld",
+        each Duration.TotalDays(Now - [Timestamp]), type number),
+    WithHours = Table.AddColumn(WithDays, "HoursOld",
+        each Duration.TotalHours(Now - [Timestamp]), type number)
 in
     WithHours
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"},{"name":"DaysOld","type":"number"},{"name":"HoursOld","type":"number"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00","DaysOld":783.5,"HoursOld":18803.9},{"EventID":2,"EventTime":"2024-03-01T14:00:00","DaysOld":737.2,"HoursOld":17692.4}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DaysOld","type":"number"},{"name":"HoursOld","type":"number"}],"rows":[{"LogID":"L002","Timestamp":"2024-01-16T14:15:00","DaysOld":781.9,"HoursOld":18765.7},{"LogID":"L004","Timestamp":"2024-01-20T08:45:00","DaysOld":778.1,"HoursOld":18675.2},{"LogID":"L006","Timestamp":"2024-02-02T10:05:00","DaysOld":765.8,"HoursOld":18379.9}]}
 -->
 
-### Example 2: Compare FixedLocalNow vs LocalNow behavior
+### Example 2: Stamp rows with a consistent refresh timestamp
 
-Both return the current time, but FixedLocalNow is stable across calls.
+Add a fixed refresh time to all rows so every row shows the same "as-of" timestamp.
+
+Input: `Sales`
 
 ```powerquery
-#table(
-    type table [FixedNow = datetime, Note = text],
-    {{DateTime.FixedLocalNow(), "Consistent across all calls in this query"}}
-)
+let
+    RefreshTime = DateTime.FixedLocalNow(),
+    Source = Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "OrderDate"})
+in
+    Table.AddColumn(Source, "AsOf", each RefreshTime, type datetime)
 ```
 
 <!--output
-{"columns":[{"name":"FixedNow","type":"datetime"},{"name":"Note","type":"text"}],"rows":[{"FixedNow":"2026-03-08T10:00:00","Note":"Consistent across all calls in this query"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"AsOf","type":"datetime"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","AsOf":"2026-03-08T10:00:00"},{"OrderID":2,"OrderDate":"2024-01-18","AsOf":"2026-03-08T10:00:00"},{"OrderID":3,"OrderDate":"2024-02-01","AsOf":"2026-03-08T10:00:00"},{"OrderID":4,"OrderDate":"2024-02-10","AsOf":"2026-03-08T10:00:00"}]}
+-->
+
+### Example 3: Filter orders from the current day using a fixed reference
+
+Use FixedLocalNow to define today's date once and apply it consistently across row filters.
+
+Input: `Sales`
+
+```powerquery
+let
+    Today = Date.From(DateTime.FixedLocalNow())
+in
+    Table.SelectRows(Sales, each [OrderDate] = Today)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
 -->

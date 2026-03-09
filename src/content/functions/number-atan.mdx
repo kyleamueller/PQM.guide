@@ -27,15 +27,17 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Atan` is the inverse of `Number.Tan`. Given any real number, it returns the angle in radians whose tangent equals that value. The result is always in the open interval (-π/2, π/2).
+`Number.Atan` is the inverse of `Number.Tan`. Given any real number, it returns the angle in **radians** whose tangent equals that value. The result is always in the open interval (-π/2, π/2) — that is, between -90 and 90 degrees exclusive. All trigonometric functions in Power Query M work in radians, not degrees.
 
-Unlike `Number.Acos` and `Number.Asin`, `Number.Atan` accepts any real number (not just values in [-1, 1]). For two-argument arctangent that correctly handles all four quadrants, use `Number.Atan2`.
+Unlike `Number.Acos` and `Number.Asin`, which require inputs in [-1, 1], `Number.Atan` accepts any real number and never returns NaN for real inputs. As the input approaches ±∞, the result approaches ±π/2 asymptotically.
 
-To convert the result from radians to degrees, multiply by `180 / Number.PI`.
+The key limitation of `Number.Atan` is that it **loses quadrant information**: given only a ratio y/x, you cannot determine whether the original point was in the first quadrant (x>0, y>0) or the third quadrant (x<0, y<0). For computing angles of points in a 2D plane where quadrant matters — such as compass bearings — use `Number.Atan2(y, x)` instead, which takes the signs of x and y separately.
+
+To convert the radian result to degrees, multiply by `180 / Number.PI`.
 
 ## Examples
 
-### Example 1: Arctangent of 1 (45 degrees)
+### Example 1: Arctangent of 1 is 45 degrees (π/4 radians)
 
 ```powerquery
 Number.Atan(1) * 180 / Number.PI
@@ -45,7 +47,7 @@ Number.Atan(1) * 180 / Number.PI
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":45}]}
 -->
 
-### Example 2: Arctangent of 0
+### Example 2: Arctangent of 0 returns 0
 
 ```powerquery
 Number.Atan(0)
@@ -55,9 +57,9 @@ Number.Atan(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 3: Compute slope angle from rise/run ratio
+### Example 3: Compute slope angle from a rise/run ratio
 
-A slope of 3 (rise) over 4 (run):
+A ramp with 3 units of rise for every 4 units of run has an angle of about 36.87 degrees.
 
 ```powerquery
 Number.Atan(3 / 4) * 180 / Number.PI

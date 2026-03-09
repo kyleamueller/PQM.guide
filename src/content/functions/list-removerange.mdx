@@ -36,12 +36,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.RemoveRange` removes a contiguous block of items from a list, starting at the given zero-based `index`. The `count` parameter specifies how many items to remove; if omitted, a single item is removed.
+`List.RemoveRange` removes a contiguous block of items from a list by position, returning a new list without the removed items. The `index` is zero-based and specifies where removal starts; `count` specifies how many items to remove. If `count` is omitted, a single item is removed.
 
-- An `index` of `0` starts removal from the first item.
-- If `count` extends beyond the end of the list, all items from `index` onward are removed.
-- The original list is not modified; a new list is returned.
-- Use `List.InsertRange` or `List.ReplaceRange` for inserting or replacing ranges.
+An `index` of `0` starts removal from the first item. If `count` extends beyond the end of the list, all items from `index` onward are removed — no error is raised for over-counting. The original list is not modified.
+
+This is a position-based removal function. For value-based removal (remove items matching a certain value), use `List.RemoveMatchingItems` or `List.Select`. For removing from the front, `List.RemoveFirstN` is more readable. For replacing a range rather than just removing it, use `List.ReplaceRange`.
 
 ## Examples
 

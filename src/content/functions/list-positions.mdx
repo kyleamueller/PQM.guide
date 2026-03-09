@@ -28,14 +28,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Positions` returns a list of zero-based integer indices corresponding to each element in the input list. For a list of length `N`, it returns `{0, 1, 2, ..., N-1}`.
+`List.Positions` returns a list of zero-based integer indices, one for each element in the input list. For a list of length `N`, it returns `{0, 1, 2, ..., N-1}`. It is equivalent to `List.Numbers(0, List.Count(list))`.
 
-This is equivalent to `List.Numbers(0, List.Count(list))` or `{0..List.Count(list)-1}`.
+The primary use case is enabling index-aware iteration: by combining the positions list with the original list using `List.Zip`, you get `{{0, item0}, {1, item1}, ...}` pairs that let you know each item's position during a transform. This is the standard M pattern for "transform with index" — something that has no built-in direct syntax.
 
-The primary use case is pairing each element with its index using `List.Zip` or `List.Transform`, enabling index-aware iteration without a custom counter.
-
-- For an empty list, returns an empty list `{}`.
-- The result is always a list of consecutive integers starting at 0.
+For an empty list, returns an empty list `{}`. The result is always consecutive integers starting at 0. If you need indices starting at 1, use `List.Transform(List.Positions(list), each _ + 1)` or `List.Numbers(1, List.Count(list))`.
 
 ## Examples
 

@@ -28,30 +28,34 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.StartOfDay` returns the very first instant of the day (00:00:00) as a `datetime`. When passed a plain `date`, it returns a `datetime` with the time component set to midnight. When passed a `datetimezone`, it preserves the timezone offset. This is useful for building date range filters to capture all events that occurred on a particular day.
+`Date.StartOfDay` returns the very first instant of the day — 00:00:00 — as a `datetime`. When passed a plain `date`, it returns a `datetime` with the time component set to midnight. When passed a `datetimezone`, it preserves the timezone offset and sets only the time components to midnight. This is useful for building inclusive lower-bound date range filters.
+
+A common pattern is combining `Date.StartOfDay` and `Date.EndOfDay` to create an inclusive day range: `[EventTime] >= Date.StartOfDay(start) and [EventTime] <= Date.EndOfDay(end)`. This avoids filtering bugs that arise from comparing a `datetime` column against a bare `date` value.
+
+Note that `Date.StartOfDay` applied to a `datetime` truncates to midnight of that datetime's day. If the input is already 00:00:00, the output is unchanged. To truncate a datetime to a specific hour instead of midnight, use `Time.StartOfHour`.
 
 ## Examples
 
-### Example 1: Filter events from the start of a specific day
+### Example 1: Filter log entries on or after the start of a specific day
 
-Keep only rows where EventTime is on or after the start of January 15, 2024.
+Keep only rows where Timestamp falls on or after January 16, 2024 at midnight.
 
-Input: `Events`
+Input: `OrderLog`
 
 ```powerquery
 Table.SelectRows(
-    Events,
-    each [EventTime] >= Date.StartOfDay(#date(2024, 1, 15))
+    OrderLog,
+    each [Timestamp] >= Date.StartOfDay(#date(2024, 1, 16))
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTime","type":"datetime"}],"rows":[{"EventID":1,"EventTime":"2024-01-15T08:30:00"},{"EventID":2,"EventTime":"2024-01-15T23:59:59"}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L002","OrderID":1,"Action":"Shipped","Timestamp":"2024-01-16T14:15:00","DurationMinutes":1725,"Notes":"Shipped via express"},{"LogID":"L003","OrderID":2,"Action":"Created","Timestamp":"2024-01-18T11:00:00","DurationMinutes":null,"Notes":"New order: Gadget B"},{"LogID":"L004","OrderID":2,"Action":"Shipped","Timestamp":"2024-01-20T08:45:00","DurationMinutes":2745,"Notes":"Standard shipping"},{"LogID":"L005","OrderID":3,"Action":"Created","Timestamp":"2024-02-01T16:20:00","DurationMinutes":null,"Notes":"New order: Widget C"},{"LogID":"L006","OrderID":3,"Action":"Cancelled","Timestamp":"2024-02-02T10:05:00","DurationMinutes":1065,"Notes":"Customer request"},{"LogID":"L007","OrderID":4,"Action":"Created","Timestamp":"2024-02-10T13:00:00","DurationMinutes":null,"Notes":"New order: Gadget D"},{"LogID":"L008","OrderID":4,"Action":"Shipped","Timestamp":"2024-02-12T09:30:00","DurationMinutes":2670,"Notes":"Shipped via express"}]}
 -->
 
-### Example 2: Start of day for a specific date
+### Example 2: Return the start-of-day datetime for March 15, 2024
 
-Return midnight on March 15, 2024.
+Show what midnight looks like as a datetime value.
 
 ```powerquery
 #table(
@@ -62,4 +66,26 @@ Return midnight on March 15, 2024.
 
 <!--output
 {"columns":[{"name":"Result","type":"datetime"}],"rows":[{"Result":"2024-03-15T00:00:00"}]}
+-->
+
+### Example 3: Build an inclusive date range filter using StartOfDay and EndOfDay
+
+Filter log entries to a specific date using both boundaries.
+
+Input: `OrderLog`
+
+```powerquery
+let
+    TargetDate = #date(2024, 1, 15),
+    RangeStart = Date.StartOfDay(TargetDate),
+    RangeEnd = Date.EndOfDay(TargetDate)
+in
+    Table.SelectRows(
+        OrderLog,
+        each [Timestamp] >= RangeStart and [Timestamp] <= RangeEnd
+    )
+```
+
+<!--output
+{"columns":[{"name":"LogID","type":"text"},{"name":"OrderID","type":"number"},{"name":"Action","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"DurationMinutes","type":"number"},{"name":"Notes","type":"text"}],"rows":[{"LogID":"L001","OrderID":1,"Action":"Created","Timestamp":"2024-01-15T09:30:00","DurationMinutes":null,"Notes":"New order: Widget A"}]}
 -->

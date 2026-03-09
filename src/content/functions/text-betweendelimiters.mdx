@@ -43,54 +43,56 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.BetweenDelimiters` extracts the portion of `text` that lies between a `startDelimiter` and an `endDelimiter`. The search for the end delimiter begins immediately after the start delimiter is found.
+`Text.BetweenDelimiters` extracts the portion of `text` that lies between a `startDelimiter` and an `endDelimiter`. The search for the end delimiter begins immediately after the start delimiter position, so the delimiters can be the same character without ambiguity — the function finds the first occurrence of `endDelimiter` after `startDelimiter`.
 
 The optional `startIndex` and `endIndex` parameters control which occurrence of each delimiter to use:
-- A non-negative integer specifies the zero-based occurrence (0 = first)
-- A list `{n, RelativePosition.FromEnd}` counts occurrences from the end of the string
+- A non-negative integer `n` specifies the zero-based occurrence (0 = first, 1 = second, etc.)
+- A two-element list `{n, RelativePosition.FromEnd}` counts occurrences from the end of the string
 
-If either delimiter is not found, an empty string is returned. If `text` is `null`, the function returns `null`.
+If either delimiter is not found, an empty string is returned — not an error. If `text` is `null`, the function returns `null`. The delimiter search is always case-sensitive; there is no comparer parameter.
 
-This function is especially useful for extracting content from structured formats such as XML-like tags, parenthesized values, or bracketed codes.
+This function is the natural choice for extracting content from structured formats with distinct open and close delimiters — such as parentheses, brackets, XML-like tags, or quoted fields. For extracting everything before or after a single delimiter, use `Text.BeforeDelimiter` or `Text.AfterDelimiter`.
 
 ## Examples
 
 ### Example 1: Extract content between parentheses
 
 ```powerquery
-Text.BetweenDelimiters("Product (SKU-123) Details", "(", ")")
+Text.BetweenDelimiters("Widget A (SKU-001) - In Stock", "(", ")")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"SKU-123"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"SKU-001"}]}
 -->
 
-### Example 2: Extract value between brackets
+### Example 2: Extract a year from a bracketed report name
 
 ```powerquery
-Text.BetweenDelimiters("[Start] some content [End]", "[", "]")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Start"}]}
--->
-
-### Example 3: Extract between the second pair of delimiters
-
-```powerquery
-Text.BetweenDelimiters("(first)(second)(third)", "(", ")", 1)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"second"}]}
--->
-
-### Example 4: Extract year from a formatted string
-
-```powerquery
-Text.BetweenDelimiters("Report[2024]_v2", "[", "]")
+Text.BetweenDelimiters("Sales_Report[2024]_Final", "[", "]")
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"2024"}]}
+-->
+
+### Example 3: Extract the second bracketed value using startIndex
+
+Use a `startIndex` of `1` to skip the first occurrence of the start delimiter and extract from the second pair.
+
+```powerquery
+Text.BetweenDelimiters("[East][Alice][Widget A]", "[", "]", 1)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice"}]}
+-->
+
+### Example 4: Extract content from an XML-like string
+
+```powerquery
+Text.BetweenDelimiters("<Product>Widget A</Product>", "<Product>", "</Product>")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Widget A"}]}
 -->

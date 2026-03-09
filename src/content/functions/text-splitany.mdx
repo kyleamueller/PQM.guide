@@ -30,25 +30,39 @@ relatedFunctions:
 
 ## Remarks
 
-`Text.SplitAny` treats each character in the `separators` string as an individual delimiter. The `text` is split at every occurrence of any one of those characters. This differs from `Text.Split`, which treats the entire `separators` argument as a single multi-character delimiter.
+`Text.SplitAny` splits `text` at every occurrence of any character found in the `separators` string. Each character in `separators` is treated as an independent single-character delimiter — not as a multi-character substring to match. This is the key difference from `Text.Split`, which treats the entire second argument as one delimiter.
 
-Consecutive separator characters produce empty strings in the result list, similar to how `Text.Split` behaves.
+For example, `Text.SplitAny("a,b;c", ",;")` splits on both `,` and `;` independently, producing `{"a", "b", "c"}`. In contrast, `Text.Split("a,b;c", ",;")` would look for the exact two-character sequence `",;"` and return the original string unsplit if that sequence does not appear.
 
-To split on a single multi-character delimiter, use `Text.Split`. To use a splitter function in a table transformation, see `Splitter.SplitTextByAnyDelimiter`.
+Consecutive separator characters produce empty strings in the result list. If your source data may have multiple consecutive separators (such as double spaces or mixed delimiters), filter the result with `List.Select(result, each _ <> "")` to remove empty entries.
+
+A notable application of `Text.SplitAny` is collapsing internal spaces: `Text.Combine(Text.SplitAny(text, " "), " ")` splits on spaces and rejoins with a single space, effectively collapsing runs of multiple spaces. `Text.Trim` alone does not remove internal duplicate spaces — this pattern is the standard workaround.
 
 ## Examples
 
-### Example 1: Split on either comma or semicolon
+### Example 1: Split on multiple delimiter characters
 
 ```powerquery
-Text.SplitAny("a,b;c,d", ",;")
+Text.SplitAny("East,West;North", ",;")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["a","b","c","d"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["East","West","North"]}]}
 -->
 
-### Example 2: Split a path on both slash styles
+### Example 2: Normalize multiple internal spaces in a name
+
+`Text.Trim` does not collapse internal spaces — use `Text.SplitAny` and `Text.Combine` to normalize spacing.
+
+```powerquery
+Text.Combine(Text.SplitAny("alice  smith", " "), " ")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"alice smith"}]}
+-->
+
+### Example 3: Split a path that uses mixed separators
 
 ```powerquery
 Text.SplitAny("C:/Users\\Kyle/Documents", "/\\")
@@ -58,22 +72,17 @@ Text.SplitAny("C:/Users\\Kyle/Documents", "/\\")
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["C:","Users","Kyle","Documents"]}]}
 -->
 
-### Example 3: Split on whitespace characters
+### Example 4: Filter empty entries produced by consecutive separators
 
 ```powerquery
-Text.SplitAny("one two	three", " 	")
+let
+    raw = "Sales,,East,,Q1",
+    parts = Text.SplitAny(raw, ","),
+    nonEmpty = List.Select(parts, each _ <> "")
+in
+    nonEmpty
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["one","two","three"]}]}
--->
-
-### Example 4: Split on a single character (equivalent to Text.Split)
-
-```powerquery
-Text.SplitAny("a-b-c", "-")
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["a","b","c"]}]}
+{"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":["Sales","East","Q1"]}]}
 -->

@@ -29,23 +29,21 @@ relatedFunctions:
 
 ## Remarks
 
-`AzureStorage.Tables` connects to Azure Table Storage and returns a navigation table listing all tables in the storage account. Each table's entities (rows) are accessible by drilling into the `Data` column of the corresponding table row.
+`AzureStorage.Tables` connects to Azure Table Storage and returns a navigation table listing all tables in the storage account. Each table's entities are accessible by drilling into the `Data` column of the corresponding row. Azure Table Storage is a NoSQL, schema-less key-value store — unlike relational databases, each entity may have a different set of properties. However, every entity shares the three system properties: `PartitionKey`, `RowKey`, and `Timestamp`.
 
-Azure Table Storage is a NoSQL key-value store that organizes data into tables with entities. Each entity has a `PartitionKey`, `RowKey`, `Timestamp`, and any number of additional typed properties.
+**Navigation table and entity columns**: The top-level result has one row per table, with `Name` and `Data` columns. Drilling into `Data` returns a table of entities where every row has at minimum:
+- `PartitionKey` (text) — the logical partition identifier. Entities with the same `PartitionKey` are stored together and can be queried efficiently.
+- `RowKey` (text) — unique identifier for the entity within its partition. The combination of `PartitionKey` + `RowKey` uniquely identifies every entity.
+- `Timestamp` (datetimezone) — the last-modified timestamp, maintained automatically by Azure.
+- Additional application-defined columns vary by entity and may not be present on all rows.
 
-**Authentication**: Supports Account Key (storage account name + access key) and Shared Access Signature (SAS). Configure the key in the Power Query credentials dialog using the storage account name as the credential scope. Azure Active Directory (Entra ID) authentication is available in recent versions.
+**Authentication**: Supports Account Key (storage account name + access key) and Shared Access Signature (SAS). Configure credentials in the Power Query data source settings dialog. Azure Active Directory (Entra ID) authentication is available in recent versions of Power BI Desktop. Use the storage account name or service URL as the credential scope.
 
-**Query folding**: Limited. Filters on `PartitionKey` and `RowKey` can be pushed to the Table Storage API. Other filters are applied in Power Query after retrieval.
+**Query folding**: Limited. Equality filters on `PartitionKey` and `RowKey` can fold to the Azure Table Storage REST API, significantly reducing the data returned. Other filter conditions and column selections are applied in Power Query after retrieval. For workloads that require heavy filtering, consider using `OData.Feed` against the Table Storage OData endpoint (`https://mystorageaccount.table.core.windows.net`) for finer control over `$filter` parameters.
 
-**Columns in entity tables**: Every entity table includes at minimum:
-- `PartitionKey` (text) — logical partition identifier.
-- `RowKey` (text) — unique row identifier within a partition.
-- `Timestamp` (datetimezone) — last modified timestamp (maintained by Azure).
-- Additional application-defined columns vary by entity.
+**Pagination**: Azure Table Storage returns at most 1,000 entities per API request. Power Query automatically follows continuation tokens to retrieve all entities from large tables.
 
-**Large tables**: Azure Table Storage returns up to 1,000 entities per request. Continuation tokens are handled automatically by Power Query to retrieve all entities.
-
-**OData alternative**: Azure Table Storage exposes an OData interface. `OData.Feed` can also be used to query Table Storage, which may offer more filtering flexibility.
+**Power BI Service**: Direct cloud refresh is supported when using Account Key or SAS authentication and the storage account is network-accessible. For storage accounts behind firewalls or private endpoints, use a VNet gateway or managed identity.
 
 ## Examples
 
@@ -68,7 +66,7 @@ in
     SalesTable
 ```
 
-### Example 4: Filter entities by PartitionKey
+### Example 4: Filter entities by PartitionKey to leverage server-side folding
 ```powerquery
 let
     Account = AzureStorage.Tables("mystorageaccount"),
@@ -76,14 +74,4 @@ let
     NorthAmerica = Table.SelectRows(Events, each [PartitionKey] = "NorthAmerica")
 in
     NorthAmerica
-```
-
-### Example 5: Select specific columns from a Table Storage entity
-```powerquery
-let
-    Account = AzureStorage.Tables("mystorageaccount"),
-    Products = Account{[Name="Products"]}[Data],
-    Selected = Table.SelectColumns(Products, {"PartitionKey", "RowKey", "ProductName", "Price", "InStock"})
-in
-    Selected
 ```

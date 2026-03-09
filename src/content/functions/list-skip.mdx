@@ -31,11 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Skip` is functionally equivalent to `List.RemoveFirstN`. It skips the first `N` items of a list and returns all remaining items.
+`List.Skip` removes items from the beginning of a list and returns all remaining items. It is functionally identical to `List.RemoveFirstN` — the two functions behave the same way. Use whichever reads more naturally in context.
 
-- **Number**: Skips the first `N` items. If `N` is greater than the list length, an empty list is returned.
-- **Condition function**: Skips items from the start while the condition returns `true`. Collection of remaining items begins at the first item that fails the condition.
-- Skipped items at the start that match the condition stop at the first non-matching item — subsequent matching items are not skipped.
+When passed a number `N`, it skips the first `N` items. If `N` is greater than the list length, an empty list is returned. When passed a condition function, items are skipped from the start of the list while the condition returns `true`. Skipping stops permanently at the first item that fails the condition — subsequent items (even if they would satisfy the condition) are not skipped.
+
+The condition mode is useful for advancing past a leading section — for example, skipping all rows before the first non-null value, or advancing past dates before a given date. For pagination, combining `List.Skip` and `List.FirstN` is the standard pattern: skip `pageSize * (page - 1)` items, then take `pageSize`.
 
 ## Examples
 

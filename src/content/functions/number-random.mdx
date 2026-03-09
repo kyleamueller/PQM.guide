@@ -20,15 +20,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Random` returns a pseudo-random floating-point number uniformly distributed in the interval [0, 1). Each invocation returns an independent value.
+`Number.Random` returns a pseudo-random floating-point number uniformly distributed in the interval [0, 1) — meaning 0 is possible but 1 is not. The function takes no arguments.
 
-In Power Query, results may be cached by the engine: if the engine evaluates the expression only once (for example, during a fold or step caching), all rows may receive the same value. To reliably generate a unique random number per row, use `Number.RandomBetween` inside a `Table.AddColumn` call, as the row-by-row evaluation context forces per-row recalculation.
+**Non-determinism warning**: `Number.Random` produces a different value on every call and on every refresh. This means results are not reproducible across runs, and your query will return different data each time it is evaluated. This is by design but must be understood: `Number.Random` is unsuitable for any scenario where reproducibility matters (such as test data, audit trails, or seeded samples). Power Query M has no built-in seed mechanism for random functions.
 
-Random values regenerate on each refresh, making this unsuitable for reproducible results without seeding mechanisms. There is no built-in seed parameter in Power Query M.
+**Caching behavior**: Power Query's engine may cache the result of `Number.Random()` and reuse it across multiple rows if the expression is evaluated at the query level rather than the row level. To guarantee a unique value per row, call `Number.Random()` inside `Table.AddColumn` where the `each` keyword ensures row-by-row evaluation. Even then, caching behavior can vary by host environment (Power BI Desktop vs. Dataflow vs. Excel).
+
+For a random number in a specific range, multiply: `lower + Number.Random() * (upper - lower)`. Or use `Number.RandomBetween(lower, upper)` directly.
 
 ## Examples
 
-### Example 1: Generate a single random number
+### Example 1: Generate a single random number in [0, 1)
+
+The actual value will differ on every evaluation.
 
 ```powerquery
 Number.Random()
@@ -38,9 +42,7 @@ Number.Random()
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0.6472834521098765}]}
 -->
 
-### Example 2: Scale to a custom range using arithmetic
-
-Generate a random number in [0, 100):
+### Example 2: Scale to a custom range [0, 100)
 
 ```powerquery
 Number.Random() * 100
@@ -50,17 +52,19 @@ Number.Random() * 100
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42.381927463819}]}
 -->
 
-### Example 3: Add a random score column to a table
+### Example 3: Add a random priority score per row in a table
 
 Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID"}),
-    "RandomScore", each Number.Random(), type number
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "CustomerName"}),
+    "RandomPriority",
+    each Number.Round(Number.Random() * 100, 2),
+    type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"RandomScore","type":"number"}],"rows":[{"OrderID":1,"RandomScore":0.234},{"OrderID":2,"RandomScore":0.891},{"OrderID":3,"RandomScore":0.512},{"OrderID":4,"RandomScore":0.047}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"RandomPriority","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","RandomPriority":23.4},{"OrderID":2,"CustomerName":"Bob","RandomPriority":89.1},{"OrderID":3,"CustomerName":"Charlie","RandomPriority":51.2},{"OrderID":4,"CustomerName":"Alice","RandomPriority":4.7}]}
 -->

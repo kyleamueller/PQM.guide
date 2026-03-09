@@ -30,11 +30,13 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Atan2(y, x)` computes the angle θ such that the point (x, y) lies on the ray from the origin at angle θ from the positive x-axis. The result is in the range (-π, π].
+`Number.Atan2(y, x)` computes the angle θ (in **radians**) between the positive x-axis and the point (x, y). The result is in the range (-π, π]. This is the two-argument form of the arctangent that correctly handles all four quadrants by considering the signs of both x and y independently.
 
-Note that the parameter order is **(y, x)** — y first, then x. This matches the mathematical convention and matches Excel's `ATAN2` argument order (Excel also takes y first as the numerator).
+**Critical: the parameter order is y first, then x.** This is the standard mathematical convention and matches how `ATAN2` works in Excel. A common mistake is reversing the arguments — `Number.Atan2(x, y)` will give the wrong angle for any non-symmetric point.
 
-Unlike `Number.Atan(y/x)`, which loses quadrant information when both y and x are negative, `Number.Atan2` correctly distinguishes all four quadrants and handles the case where x = 0.
+The advantage over `Number.Atan(y/x)` is quadrant correctness: for the point (-3, -4), `y/x = 4/3` and `Number.Atan(4/3)` gives ~53°, but the correct angle is ~−127° (third quadrant). `Number.Atan2(-4, -3)` correctly returns ~−127°. Additionally, `Number.Atan2` handles the case `x = 0` without division-by-zero — it returns ±π/2 depending on the sign of y.
+
+To convert the radian result to degrees, multiply by `180 / Number.PI`. All Power Query M trigonometric functions work in radians, not degrees.
 
 ## Examples
 
@@ -48,7 +50,7 @@ Number.Atan2(1, 1) * 180 / Number.PI
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":45}]}
 -->
 
-### Example 2: Angle to the point (-1, 0) — 180 degrees
+### Example 2: Angle to a negative-x point (180 degrees)
 
 ```powerquery
 Number.Atan2(0, -1) * 180 / Number.PI
@@ -58,9 +60,9 @@ Number.Atan2(0, -1) * 180 / Number.PI
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":180}]}
 -->
 
-### Example 3: Bearing angle from origin to a map coordinate
+### Example 3: Compute bearing angle in degrees to a 2D coordinate
 
-Compute the compass bearing in degrees to a point at (x=3, y=4):
+Compute the angle from the origin to the point (x=3, y=4) — approximately 53 degrees from the positive x-axis.
 
 ```powerquery
 let

@@ -31,14 +31,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.Modes` returns a **list** of all values that share the maximum frequency. When there is only one mode, it returns a single-element list. When multiple values are tied for the highest frequency, all tied values are returned.
+`List.Modes` returns a **list** of all values that share the maximum frequency in the input list. When there is only one most-frequent value, it returns a single-element list. When multiple values tie for the highest frequency, all tied values are returned.
 
-This is the multi-value counterpart of `List.Mode`. Use `List.Modes` when you need to detect or handle ties in frequency analysis.
+This is the multi-value counterpart of `List.Mode`. Use `List.Modes` when you need to detect whether a dataset is multimodal (has ties) or when downstream logic must handle all equally common values. If you only need one mode and ties are not a concern, `List.Mode` returns a scalar directly, which is simpler to use.
 
-- Returns a list, even when there is only one mode.
-- The order of modes in the result follows their first appearance in the source list.
-- Null values count as occurrences and can be included in the result.
-- An empty list causes an error.
+The order of modes in the result follows their first appearance in the source list. Null values count as occurrences and can be included in the result. An empty list causes an error — guard with `List.IsEmpty` if needed. Comparison is case-sensitive for text by default; pass `Comparer.OrdinalIgnoreCase` as the optional `equationCriteria` argument for case-insensitive frequency grouping.
 
 ## Examples
 

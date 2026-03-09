@@ -27,12 +27,16 @@ relatedFunctions:
 
 ## Remarks
 
-In Power Query M, record types can be either open or closed:
+`Type.IsOpenRecord` tests whether a record type is **open** or **closed**. In Power Query M's type system, record types can be either:
 
-- An **open record type** allows a value to have additional fields not declared in the type. The base `type record` is open.
-- A **closed record type** requires values to have exactly the fields declared — no more.
+- **Open**: the value may have additional fields beyond those declared in the type. The base `type record` is open by default.
+- **Closed**: the value must have exactly the declared fields — no more, no fewer undeclared fields are permitted.
 
-`Type.IsOpenRecord` returns `true` for open record types. Use `Type.OpenRecord` and `Type.ClosedRecord` to convert between the two.
+`Type.IsOpenRecord` returns `true` for open record types and `false` for closed ones. Use this function before calling `Type.OpenRecord` or `Type.ClosedRecord` to avoid unnecessary conversions, or to branch logic based on whether a schema is fully specified.
+
+A practical note: `Type.ForRecord` with `isOpen = false` (or omitted) creates a **closed** type. With `isOpen = true` it creates an open type. The base `type record` written as a literal is always open.
+
+Use `Type.OpenRecord` and `Type.ClosedRecord` to convert between open and closed record types.
 
 ## Examples
 
@@ -46,7 +50,7 @@ Type.IsOpenRecord(type record)
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
-### Example 2: A closed record type is not open
+### Example 2: A closed record type returns false
 
 ```powerquery
 Type.IsOpenRecord(Type.ClosedRecord(type record))
@@ -56,7 +60,7 @@ Type.IsOpenRecord(Type.ClosedRecord(type record))
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
-### Example 3: A ForRecord-constructed type is closed by default
+### Example 3: Type.ForRecord is closed by default (isOpen = false)
 
 ```powerquery
 let

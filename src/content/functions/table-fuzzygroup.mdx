@@ -39,37 +39,82 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.FuzzyGroup` works like `Table.Group` but uses fuzzy string matching to cluster similar key values together. For example, "Micosoft", "Microsoft", and "MICROSOFT" would all be grouped under a single canonical representative value.
+`Table.FuzzyGroup` is a fuzzy-matching counterpart to `Table.Group`. Instead of requiring exact equality on key columns, it clusters rows with similar key values together — handling typos, case differences, extra spaces, and minor spelling variations. For example, `"Micosoft"`, `"Microsoft"`, and `"MICROSOFT"` would all be grouped under a single canonical representative.
 
-The representative value chosen for each cluster is typically the most common form or the first encountered, depending on the data. Use `Table.AddFuzzyClusterColumn` if you want to see the cluster assignments without aggregating.
+The representative value chosen for each cluster is typically the first or most frequent form encountered. The `options` record supports the following fields:
+
+- `Threshold` (number, 0.0–1.0): the minimum similarity score required for a match. Default is `0.8`. Lower values match more loosely; `1.0` requires exact equality.
+- `IgnoreCase` (logical): ignore case differences. Default `true`.
+- `IgnoreSpace` (logical): ignore whitespace differences. Default `true`.
+- `NumberOfMatches` (number): maximum right-side matches per cluster group.
+- `TransformationTable` (table): a custom mapping table with `From` and `To` columns to explicitly map known variants before fuzzy matching.
+
+For inspecting cluster assignments without aggregating, use `Table.AddFuzzyClusterColumn` instead. `Table.FuzzyGroup` does not fold to data sources. On large datasets, consider pre-filtering to reduce the candidate space before applying fuzzy operations.
 
 ## Examples
 
-### Example 1: Group with fuzzy matching on company names
+### Example 1: Consolidate misspelled customer names and sum their orders
 
 ```powerquery
-Table.FuzzyGroup(
-    #table({"Company", "Amount"}, {{"Microsoft", 100}, {"Micosoft", 80}, {"Google", 200}, {"Gogle", 50}}),
-    "Company",
-    {{"TotalAmount", List.Sum, type number}},
-    [Threshold = 0.8]
-)
+let
+    Orders = #table(
+        {"CustomerName", "Amount"},
+        {{"Alice", 250}, {"Alise", 180}, {"Bob", 400}, {"Bobb", 120}, {"Charlie", 300}}
+    )
+in
+    Table.FuzzyGroup(
+        Orders,
+        "CustomerName",
+        {{"TotalAmount", List.Sum, type number}, {"OrderCount", List.Count, type number}},
+        [Threshold = 0.8, IgnoreCase = true]
+    )
 ```
 
 <!--output
-{"columns":[{"name":"Company","type":"any"},{"name":"TotalAmount","type":"number"}],"rows":[{"Company":"Microsoft","TotalAmount":"180"},{"Company":"Google","TotalAmount":"250"}]}
+{"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalAmount","type":"number"},{"name":"OrderCount","type":"number"}],"rows":[{"CustomerName":"Alice","TotalAmount":"430","OrderCount":"2"},{"CustomerName":"Bob","TotalAmount":"520","OrderCount":"2"},{"CustomerName":"Charlie","TotalAmount":"300","OrderCount":"1"}]}
 -->
 
-### Example 2: Count occurrences of similar values
+### Example 2: Use a TransformationTable to handle known brand variants
+
+A `TransformationTable` with `From` and `To` columns maps known aliases before fuzzy scoring.
 
 ```powerquery
-Table.FuzzyGroup(
-    #table({"City"}, {{"New York"}, {"New-York"}, {"Newyork"}, {"London"}}),
-    "City",
-    {{"Count", List.Count, type number}}
-)
+let
+    Orders = #table(
+        {"Vendor", "Spend"},
+        {{"Microsoft", 500}, {"MS Corp", 200}, {"Google", 300}, {"Alphabet", 150}}
+    ),
+    Mapping = #table({"From","To"},{{"MS Corp","Microsoft"},{"Alphabet","Google"}})
+in
+    Table.FuzzyGroup(
+        Orders,
+        "Vendor",
+        {{"TotalSpend", List.Sum, type number}},
+        [Threshold = 0.6, TransformationTable = Mapping]
+    )
 ```
 
 <!--output
-{"columns":[{"name":"City","type":"any"},{"name":"Count","type":"number"}],"rows":[{"City":"New York","Count":"3"},{"City":"London","Count":"1"}]}
+{"columns":[{"name":"Vendor","type":"any"},{"name":"TotalSpend","type":"number"}],"rows":[{"Vendor":"Microsoft","TotalSpend":"700"},{"Vendor":"Google","TotalSpend":"450"}]}
+-->
+
+### Example 3: Lower the threshold to catch more aggressive variations
+
+```powerquery
+let
+    Cities = #table(
+        {"City", "Count"},
+        {{"New York", 10}, {"New-York", 5}, {"Newyork", 3}, {"NY City", 2}, {"London", 8}}
+    )
+in
+    Table.FuzzyGroup(
+        Cities,
+        "City",
+        {{"Total", List.Sum, type number}},
+        [Threshold = 0.6]
+    )
+```
+
+<!--output
+{"columns":[{"name":"City","type":"any"},{"name":"Total","type":"number"}],"rows":[{"City":"New York","Total":"20"},{"City":"London","Total":"8"}]}
 -->

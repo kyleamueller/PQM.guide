@@ -27,27 +27,31 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.RemoveZone` strips the UTC offset from a `datetimezone` value and returns a plain `datetime` with the same date and time components. The time value is not adjusted — only the timezone annotation is removed. This differs from `DateTimeZone.ToUtc`, which first converts the time to UTC before removing the zone.
+`DateTimeZone.RemoveZone` strips the UTC offset from a `datetimezone` value and returns a plain `datetime` with the same date and time components. The time value itself is not adjusted — only the timezone annotation is removed. This is distinct from `DateTimeZone.ToUtc`, which first converts the time to UTC before returning a `datetime`.
 
-Use this function when you need a `datetime` for compatibility with functions or destinations that do not accept `datetimezone` values. If the input is `null`, the function returns `null`.
+Use this function when you need a plain `datetime` for compatibility with functions or data destinations that do not accept `datetimezone` values. A common scenario is converting `DateTimeZone.FixedUtcNow()` or `DateTimeZone.LocalNow()` down to a `datetime` for use in duration arithmetic or comparison with `datetime`-typed columns.
+
+If the input is `null`, the function returns `null`. When your goal is to normalize all timestamps to UTC before removing the zone, pipe through `DateTimeZone.ToUtc` first: `DateTimeZone.RemoveZone(DateTimeZone.ToUtc(myDTZ))`.
 
 ## Examples
 
-### Example 1: Strip timezone from event timestamps
+### Example 1: Strip timezone from timestamps to produce plain datetimes
 
 Remove the timezone offset from datetimezone values, keeping the local time component.
 
-Input: `Events`
-
 ```powerquery
-Table.TransformColumns(
-    Table.SelectColumns(Table.FirstN(Events, 4), {"EventID", "EventTimeZone"}),
-    {{"EventTimeZone", DateTimeZone.RemoveZone, type datetime}}
+#table(
+    type table [WithZone = datetimezone, WithoutZone = datetime],
+    {
+        {#datetimezone(2024, 1, 15, 9, 30, 0, -5, 0),  DateTimeZone.RemoveZone(#datetimezone(2024, 1, 15, 9, 30, 0, -5, 0))},
+        {#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0),   DateTimeZone.RemoveZone(#datetimezone(2024, 3, 15, 14, 0, 0, 1, 0))},
+        {#datetimezone(2024, 6, 1, 9, 0, 0, 5, 30),    DateTimeZone.RemoveZone(#datetimezone(2024, 6, 1, 9, 0, 0, 5, 30))}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"EventID","type":"number"},{"name":"EventTimeZone","type":"datetime"}],"rows":[{"EventID":1,"EventTimeZone":"2024-03-15T08:30:00"},{"EventID":2,"EventTimeZone":"2024-03-15T14:00:00"},{"EventID":3,"EventTimeZone":"2024-03-16T09:15:00"},{"EventID":4,"EventTimeZone":"2024-03-16T17:45:00"}]}
+{"columns":[{"name":"WithZone","type":"datetimezone"},{"name":"WithoutZone","type":"datetime"}],"rows":[{"WithZone":"2024-01-15T09:30:00-05:00","WithoutZone":"2024-01-15T09:30:00"},{"WithZone":"2024-03-15T14:00:00+01:00","WithoutZone":"2024-03-15T14:00:00"},{"WithZone":"2024-06-01T09:00:00+05:30","WithoutZone":"2024-06-01T09:00:00"}]}
 -->
 
 ### Example 2: Remove zone from a specific datetimezone
@@ -64,4 +68,24 @@ Strip the offset from a literal datetimezone value.
 
 <!--output
 {"columns":[{"name":"WithZone","type":"datetimezone"},{"name":"WithoutZone","type":"datetime"}],"rows":[{"WithZone":"2024-03-15T14:30:00-05:00","WithoutZone":"2024-03-15T14:30:00"}]}
+-->
+
+### Example 3: Normalize to UTC then remove zone
+
+Convert to UTC first, then strip the offset to produce a UTC datetime for arithmetic.
+
+```powerquery
+let
+    Input = #datetimezone(2024, 3, 15, 9, 0, 0, -5, 0),
+    AsUTC = DateTimeZone.ToUtc(Input),
+    AsDatetime = DateTimeZone.RemoveZone(AsUTC)
+in
+    #table(
+        type table [Original = datetimezone, UTC = datetimezone, UTCDatetime = datetime],
+        {{Input, AsUTC, AsDatetime}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Original","type":"datetimezone"},{"name":"UTC","type":"datetimezone"},{"name":"UTCDatetime","type":"datetime"}],"rows":[{"Original":"2024-03-15T09:00:00-05:00","UTC":"2024-03-15T14:00:00+00:00","UTCDatetime":"2024-03-15T14:00:00"}]}
 -->

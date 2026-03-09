@@ -34,36 +34,68 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.InsertRows` inserts new rows at a specific position within a table. Existing rows at and after the offset are shifted down. Each record in the `rows` list must have fields matching the column names of the table. Missing fields receive `null`; extra fields are ignored.
+`Table.InsertRows` inserts a list of new row records at a specific zero-based position within a table. All existing rows at and after the `offset` are shifted down to accommodate the new rows. Each record in the `rows` list should have fields corresponding to the table's column names — missing fields default to `null` and extra fields are ignored.
 
-To append rows at the end, set `offset` to `Table.RowCount(table)`.
+To append rows at the end of the table, set `offset` to `Table.RowCount(table)`. To prepend rows at the start, use `offset = 0`. Unlike `Table.Combine`, `Table.InsertRows` gives positional control over where new rows land in the table.
+
+`Table.InsertRows` is a position-based operation and does not fold to data sources. For large tables, prefer `Table.Combine` or source-side UNION operations to avoid loading the full table into memory.
 
 ## Examples
 
-### Example 1: Insert a row in the middle of a table
+### Example 1: Insert a missing order row into its correct position
 
 ```powerquery
-Table.InsertRows(
-    #table({"ID", "Name"}, {{1, "Alice"}, {3, "Carol"}}),
-    1,
-    {[ID = 2, Name = "Bob"]}
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "Amount"},
+        {{1,"Alice","Widget A",100},{3,"Charlie","Widget C",150},{4,"Diana","Widget A",175}}
+    )
+in
+    Table.InsertRows(
+        Sales,
+        1,
+        {[OrderID = 2, CustomerName = "Bob", Product = "Gadget B", Amount = 200]}
+    )
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"},{"name":"Name","type":"any"}],"rows":[{"ID":"1","Name":"Alice"},{"ID":"2","Name":"Bob"},{"ID":"3","Name":"Carol"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Amount":"175"}]}
 -->
 
-### Example 2: Insert multiple rows at the start
+### Example 2: Append a row at the end using RowCount as offset
 
 ```powerquery
-Table.InsertRows(
-    #table({"ID"}, {{3}, {4}}),
-    0,
-    {[ID = 1], [ID = 2]}
-)
+let
+    Customers = #table(
+        {"CustomerID", "Name", "City"},
+        {{1,"Alice","New York"},{2,"Bob","Chicago"},{3,"Charlie","Houston"}}
+    ),
+    NewRow    = [CustomerID = 4, Name = "Diana", City = "Seattle"]
+in
+    Table.InsertRows(Customers, Table.RowCount(Customers), {NewRow})
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"2"},{"ID":"3"},{"ID":"4"}]}
+{"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
+-->
+
+### Example 3: Insert multiple rows at position 0 (prepend)
+
+```powerquery
+let
+    Products = #table(
+        {"ProductID","ProductName","Price"},
+        {{3,"Widget C",15.00},{4,"Gadget D",75.00},{5,"Thingamajig E",120.00}}
+    )
+in
+    Table.InsertRows(
+        Products,
+        0,
+        {[ProductID = 1, ProductName = "Widget A", Price = 25.00],
+         [ProductID = 2, ProductName = "Gadget B", Price = 50.00]}
+    )
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"},{"ProductID":"5","ProductName":"Thingamajig E","Price":"120"}]}
 -->

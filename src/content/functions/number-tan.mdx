@@ -26,11 +26,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Number.Tan` returns the trigonometric tangent of an angle measured in radians. Tangent is defined as sine divided by cosine: tan(x) = sin(x) / cos(x).
+`Number.Tan` returns the trigonometric tangent of an angle measured in **radians**. Tangent is defined as sine divided by cosine: `tan(x) = sin(x) / cos(x)`. Power Query M uses radians throughout — convert degrees to radians by multiplying by `Number.PI / 180`.
 
-The function is undefined at odd multiples of π/2 (90°, 270°, etc.), where cosine equals zero. At these points the result approaches positive or negative infinity. Floating-point representation may return a very large finite number rather than true infinity.
+The tangent function has **asymptotes** at odd multiples of π/2 (90°, 270°, etc.), where cosine equals zero. At these points, the result grows toward ±infinity. Due to floating-point arithmetic, computing `Number.Tan(Number.PI / 2)` returns a very large finite number (approximately 1.633e16) rather than true infinity — because `Number.PI` itself is only an approximation of π. Be aware of this near-singular behavior when computing tangents of angles close to 90°.
 
-To convert degrees to radians, multiply by `Number.PI / 180`.
+The tangent function is odd (`tan(-x) = -tan(x)`) and periodic with period π (not 2π like sine and cosine). `Number.Tan(0) = 0`, `Number.Tan(Number.PI / 4)` ≈ 1 (exactly 1 at 45°, but subject to floating-point imprecision). For computing angles from a rise/run ratio, use `Number.Atan`.
 
 ## Examples
 
@@ -44,7 +44,7 @@ Number.Tan(0)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
 -->
 
-### Example 2: Tangent of 45 degrees (π/4 radians)
+### Example 2: Tangent of 45 degrees — should be 1 but has floating-point imprecision
 
 ```powerquery
 Number.Tan(Number.PI / 4)

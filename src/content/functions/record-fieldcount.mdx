@@ -26,13 +26,19 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.FieldCount` returns the total number of fields in a record. This is equivalent to `List.Count(Record.FieldNames(record))`.
+`Record.FieldCount` returns the number of fields in a record. It is equivalent to `List.Count(Record.FieldNames(record))`. The function accepts any record, including table rows accessed with `table{n}`.
 
-It is useful for validation — checking that a record has the expected number of fields before processing — and for dynamic iteration when you need to enumerate fields without knowing them in advance.
+Common uses:
+
+- **Schema validation**: confirm a record has the expected number of fields before processing
+- **Dynamic introspection**: count fields when the record structure is not known at query design time (e.g., semi-structured JSON data)
+- **Conditional logic**: branch based on whether a record has been enriched with additional fields
+
+Note that `Record.FieldCount` does not accept `null` — it raises an error if passed null. Use the null-coalescing operator `??` to handle potentially-null records safely: `Record.FieldCount(record ?? [])`.
 
 ## Examples
 
-### Example 1: Count fields in a simple record
+### Example 1: Count fields in a literal record
 
 ```powerquery
 Record.FieldCount([Name = "Alice", Age = 30, City = "New York"])
@@ -42,29 +48,30 @@ Record.FieldCount([Name = "Alice", Age = 30, City = "New York"])
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":3}]}
 -->
 
-### Example 2: Count fields in a row from the Customers table
+### Example 2: Count fields in the first row of Sales
 
-Input: `Customers`
+Input: `Sales`
 
 ```powerquery
-Record.FieldCount(Customers{0})
+Record.FieldCount(Sales{0})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":8}]}
 -->
 
-### Example 3: Filter rows where a nested record has more than 3 fields
+### Example 3: Add a field count column to a table of records
 
 ```powerquery
 let
-    Records = {
+    Data = Table.FromRecords({
         [A=1, B=2, C=3],
         [A=1, B=2, C=3, D=4],
         [A=1, B=2]
-    },
-    AsTable = Table.FromRecords(Records),
-    WithCount = Table.AddColumn(AsTable, "FieldCount", each Record.FieldCount(_), type number)
+    }),
+    WithCount = Table.AddColumn(
+        Data, "FieldCount", each Record.FieldCount(_), type number
+    )
 in
     WithCount
 ```

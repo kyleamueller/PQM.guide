@@ -28,32 +28,34 @@ relatedFunctions:
 
 ## Remarks
 
-`Duration.TotalHours` returns the entire duration as a decimal number of hours. For example, 1 day and 6 hours returns `30.0`. This differs from `Duration.Hours`, which returns only the hours component (e.g., `6` for the same input). Use `Duration.TotalHours` when you need elapsed time as a single numeric value, such as for rate or SLA calculations. If the input is `null`, the function returns `null`.
+`Duration.TotalHours` returns the entire duration as a decimal number of hours. For example, 1 day and 6 hours returns `30.0`. This differs from `Duration.Hours`, which returns only the hours component of the duration (e.g., `6` for the same input, not `30`). Use `Duration.TotalHours` when you need elapsed time as a single numeric value — for example, for SLA calculations, hourly billing, or rate computations. If the input is `null`, the function returns `null`.
+
+A common pattern is to subtract two `datetime` values to produce a `duration`, then pass it to `Duration.TotalHours`: `Duration.TotalHours(endTime - startTime)`. The result is a decimal number, so 30 hours and 30 minutes returns `30.5`.
+
+For other total-duration conversions, use `Duration.TotalDays`, `Duration.TotalMinutes`, or `Duration.TotalSeconds`. Use `Duration.ToRecord` when you need the component breakdown (days, hours, minutes, seconds) rather than a cumulative total.
 
 ## Examples
 
-### Example 1: Calculate total hours per order processing time
+### Example 1: Calculate total processing hours from log data
 
-Compute the total hours elapsed between order and ship date.
+Compute the total hours elapsed for each fulfilled order in the log.
 
-Input: `Sales`
+Input: `OrderLog`
 
 ```powerquery
 Table.AddColumn(
     Table.SelectColumns(
-        Table.SelectRows(Sales, each [ShipDate] <> null),
-        {"OrderID", "OrderDate", "ShipDate"}
+        Table.SelectRows(OrderLog, each [DurationMinutes] <> null),
+        {"LogID", "DurationMinutes"}
     ),
-    "ProcessingHours",
-    each Duration.TotalHours(
-        DateTime.From([ShipDate]) - DateTime.From([OrderDate])
-    ),
+    "TotalHours",
+    each Duration.TotalHours(#duration(0, 0, [DurationMinutes], 0)),
     type number
 )
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"ShipDate","type":"date"},{"name":"ProcessingHours","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","ShipDate":"2024-01-17","ProcessingHours":48},{"OrderID":2,"OrderDate":"2024-01-18","ShipDate":"2024-01-21","ProcessingHours":72},{"OrderID":3,"OrderDate":"2024-02-01","ShipDate":"2024-02-03","ProcessingHours":48}]}
+{"columns":[{"name":"LogID","type":"text"},{"name":"DurationMinutes","type":"number"},{"name":"TotalHours","type":"number"}],"rows":[{"LogID":"L002","DurationMinutes":1725,"TotalHours":28.75},{"LogID":"L004","DurationMinutes":2745,"TotalHours":45.75},{"LogID":"L006","DurationMinutes":1065,"TotalHours":17.75},{"LogID":"L008","DurationMinutes":2670,"TotalHours":44.5}]}
 -->
 
 ### Example 2: Total hours for a mixed duration
@@ -69,4 +71,23 @@ Return the total hours for a duration spanning 1 day and 6 hours.
 
 <!--output
 {"columns":[{"name":"Duration","type":"duration"},{"name":"TotalHours","type":"number"}],"rows":[{"Duration":"1.06:00:00","TotalHours":30}]}
+-->
+
+### Example 3: Compute elapsed hours between two datetime values
+
+Subtract log Timestamps to get elapsed hours between the Created and Shipped actions for the same order.
+
+```powerquery
+let
+    Created = #datetime(2024, 1, 15, 9, 30, 0),
+    Shipped = #datetime(2024, 1, 16, 14, 15, 0)
+in
+    #table(
+        type table [Created = datetime, Shipped = datetime, ElapsedHours = number],
+        {{Created, Shipped, Duration.TotalHours(Shipped - Created)}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Created","type":"datetime"},{"name":"Shipped","type":"datetime"},{"name":"ElapsedHours","type":"number"}],"rows":[{"Created":"2024-01-15T09:30:00","Shipped":"2024-01-16T14:15:00","ElapsedHours":28.75}]}
 -->

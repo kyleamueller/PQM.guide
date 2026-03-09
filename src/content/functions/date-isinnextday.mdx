@@ -27,36 +27,63 @@ relatedFunctions:
 
 ## Remarks
 
-`Date.IsInNextDay` returns `true` if the input date falls on the calendar day immediately following today's date (`DateTime.LocalNow() + 1 day`). It does not include today itself. The function is re-evaluated on each query refresh, making it useful for highlighting upcoming deadlines or scheduled items.
+`Date.IsInNextDay` returns `true` if the input date falls on the calendar day immediately following today's date (`DateTime.LocalNow() + 1 day`). It does not include today itself. The function is re-evaluated on each query refresh, making it useful for highlighting tomorrow's deadlines, scheduled deliveries, or upcoming events.
+
+This function checks only a single day. To check a range of upcoming days, use `Date.IsInNextNDays`. For a broader window that includes today, combine `Date.IsInCurrentDay` and `Date.IsInNextDay` with an `or` expression.
+
+As with all `Date.IsIn*` functions, the reference point is `DateTime.LocalNow()`. In cloud refresh environments, this is UTC-based and may not match your local "tomorrow" if you are in a different timezone.
 
 ## Examples
 
-### Example 1: Filter tomorrow's scheduled tasks
+### Example 1: Filter upcoming orders due tomorrow
 
-Keep only rows where DueDate is tomorrow.
+Keep only rows where OrderDate is tomorrow.
+
+Input: `Sales`
 
 ```powerquery
 Table.SelectRows(
-    Tasks,
-    each Date.IsInNextDay([DueDate])
+    Sales,
+    each Date.IsInNextDay([OrderDate])
 )
 ```
 
 <!--output
-{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"TaskName","type":"text"}],"rows":[{"TaskID":5,"DueDate":"2026-03-09","TaskName":"Submit report"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":43,"CustomerName":"Alice","OrderDate":"2026-03-09"}]}
 -->
 
-### Example 2: Flag tomorrow's rows
+### Example 2: Flag tomorrow's orders in a boolean column
 
-Add a boolean column identifying rows due tomorrow.
+Add a boolean column to identify rows scheduled for tomorrow.
+
+Input: `Sales`
 
 ```powerquery
 Table.AddColumn(
-    Tasks,
-    "DueTomorrow", each Date.IsInNextDay([DueDate]), type logical
+    Sales,
+    "DueTomorrow", each Date.IsInNextDay([OrderDate]), type logical
 )
 ```
 
 <!--output
-{"columns":[{"name":"TaskID","type":"number"},{"name":"DueDate","type":"date"},{"name":"DueTomorrow","type":"logical"}],"rows":[{"TaskID":4,"DueDate":"2026-03-08","DueTomorrow":false},{"TaskID":5,"DueDate":"2026-03-09","DueTomorrow":true},{"TaskID":6,"DueDate":"2026-03-15","DueTomorrow":false}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DueTomorrow","type":"logical"}],"rows":[{"OrderID":42,"OrderDate":"2026-03-08","DueTomorrow":false},{"OrderID":43,"OrderDate":"2026-03-09","DueTomorrow":true},{"OrderID":44,"OrderDate":"2026-03-15","DueTomorrow":false}]}
+-->
+
+### Example 3: Flag today or tomorrow (two-day alert window)
+
+Combine IsInCurrentDay and IsInNextDay to create a two-day alert.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Sales,
+    "AlertWindow",
+    each Date.IsInCurrentDay([OrderDate]) or Date.IsInNextDay([OrderDate]),
+    type logical
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"AlertWindow","type":"logical"}],"rows":[{"OrderID":41,"OrderDate":"2026-03-07","AlertWindow":false},{"OrderID":42,"OrderDate":"2026-03-08","AlertWindow":true},{"OrderID":43,"OrderDate":"2026-03-09","AlertWindow":true},{"OrderID":44,"OrderDate":"2026-03-15","AlertWindow":false}]}
 -->

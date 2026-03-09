@@ -30,47 +30,58 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.MatchesAnyRows` applies a predicate function to each row and returns `true` as soon as any row passes the condition. If no row matches, it returns `false`. An empty table returns `false`.
+`Table.MatchesAnyRows` applies a predicate function to each row and returns `true` as soon as any row satisfies the condition. Evaluation short-circuits on the first match. If no row satisfies the condition, it returns `false`. An empty table always returns `false`.
 
-Use this function to quickly check whether a dataset contains at least one row satisfying a criterion, without returning the matching rows themselves.
+This is the "exists" complement to `Table.MatchesAllRows`'s "for all" semantics. Use it to check whether a dataset contains at least one row meeting a criterion before triggering downstream logic — for example, checking whether any out-of-stock products exist before sending an alert, or confirming at least one East-region order is present before generating a regional report.
+
+`Table.MatchesAnyRows` does not fold to data sources. For large database tables, `Table.MatchesAnyRows` materializes all rows locally, which can be slow. Prefer a `Table.SelectRows` + `Table.IsEmpty` pattern with a `TOP 1`-style folded query, or use source-side `EXISTS` logic via a native query.
 
 ## Examples
 
-### Example 1: At least one row has a large amount
+### Example 1: Check whether any products are out of stock
 
 ```powerquery
-Table.MatchesAnyRows(
-    #table({"Amount"}, {{10}, {500}, {7}}),
-    each [Amount] > 100
-)
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Price = number, InStock = logical],
+        {{1,"Widget A",25.00,true},{2,"Gadget B",50.00,true},{3,"Widget C",15.00,false},{4,"Gadget D",75.00,true},{5,"Thingamajig E",120.00,false}}
+    )
+in
+    Table.MatchesAnyRows(Products, each [InStock] = false)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
-### Example 2: No row meets the condition
+### Example 2: Check whether any high-value orders exist
 
 ```powerquery
-Table.MatchesAnyRows(
-    #table({"Amount"}, {{10}, {25}, {7}}),
-    each [Amount] > 100
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "UnitPrice", "Quantity"},
+        {{1,"Alice",25.00,4},{2,"Bob",50.00,2},{3,"Charlie",15.00,10},{6,"Bob",120.00,1}}
+    )
+in
+    Table.MatchesAnyRows(Sales, each [UnitPrice] * [Quantity] > 200)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+### Example 3: No row meets the threshold — returns false
+
+```powerquery
+let
+    Employees = #table(
+        type table [EmployeeID = text, FullName = text, Salary = number],
+        {{"E001","alice smith",55000},{"E003","Charlie Brown",72000},{"E006","frank lee",52000}}
+    )
+in
+    Table.MatchesAnyRows(Employees, each [Salary] > 100000)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
--->
-
-### Example 3: Check for a specific status value
-
-```powerquery
-Table.MatchesAnyRows(
-    #table({"Status"}, {{"Pending"}, {"Approved"}, {"Rejected"}}),
-    each [Status] = "Approved"
-)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->

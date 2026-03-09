@@ -35,46 +35,61 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.Min` returns the entire row (as a record) that contains the minimum value for the given comparison criteria. Field values can be accessed using record field access: `Table.Min(t, "Date")[Date]`. If the table is empty, it returns the `default` value (or `null` if no default is provided).
+`Table.Min` returns the entire row (as a record) that contains the minimum value for the given comparison criteria. If multiple rows share the minimum value, the first one encountered is returned. Access individual fields from the result with record field syntax: `Table.Min(t, "OrderDate")[CustomerName]`.
+
+`Table.Min` is the counterpart of `Table.Max`. It is useful when you need the full row context for the minimum — for example, finding the cheapest product's name and category, or the earliest order's customer information. If you only need the minimum scalar value, chain field access directly: `Table.Min(t, "Price")[Price]`.
+
+If the table is empty, `Table.Min` returns `null` by default, or the specified `default` value. Always provide a default when the table may be empty to prevent null-propagation errors in dependent steps.
 
 ## Examples
 
-### Example 1: Get the row with the lowest score
+### Example 1: Find the lowest-priced product
 
 ```powerquery
-Table.Min(
-    #table({"Name", "Score"}, {{"Alice", 95}, {"Bob", 82}, {"Carol", 99}}),
-    "Score"
-)
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Category = text, Price = number, InStock = logical],
+        {{1,"Widget A","Widgets",25.00,true},{2,"Gadget B","Gadgets",50.00,true},
+         {3,"Widget C","Widgets",15.00,false},{4,"Gadget D","Gadgets",75.00,true},{5,"Thingamajig E","Misc",120.00,false}}
+    )
+in
+    Table.Min(Products, "Price")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"Bob\", Score = 82]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[ProductID = 3, ProductName = \"Widget C\", Category = \"Widgets\", Price = 15, InStock = false]"}]}
 -->
 
-### Example 2: Get the earliest date
+### Example 2: Extract the earliest order date as a scalar
 
 ```powerquery
-Table.Min(
-    #table({"Event", "Date"}, {{"Launch", #date(2024,3,15)}, {"Review", #date(2024,1,10)}}),
-    "Date"
-)[Date]
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Product", "OrderDate"},
+        {{1,"Alice","Widget A",#date(2024,1,15)},{2,"Bob","Gadget B",#date(2024,1,18)},
+         {3,"Charlie","Widget C",#date(2024,2,1)},{8,"Diana","Widget C",#date(2024,4,15)}}
+    )
+in
+    Table.Min(Sales, "OrderDate")[OrderDate]
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-10"}]}
+{"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-15"}]}
 -->
 
-### Example 3: Return a default for an empty table
+### Example 3: Return a safe default when the filtered table is empty
 
 ```powerquery
-Table.Min(
-    #table({"Name", "Score"}, {}),
-    "Score",
-    [Name = "N/A", Score = 0]
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName", "Region", "UnitPrice"},
+        {{1,"Alice","East",25.00},{3,"Charlie","East",15.00}}
+    ),
+    WestSales = Table.SelectRows(Sales, each [Region] = "West")
+in
+    Table.Min(WestSales, "UnitPrice", [OrderID = 0, CustomerName = "N/A", Region = "West", UnitPrice = 0])
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Name = \"N/A\", Score = 0]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 0, CustomerName = \"N/A\", Region = \"West\", UnitPrice = 0]"}]}
 -->

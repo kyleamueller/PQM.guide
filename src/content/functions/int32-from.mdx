@@ -35,15 +35,15 @@ relatedFunctions:
 
 ## Remarks
 
-`Int32.From` converts a value to a signed 32-bit integer, the most common integer size in databases and programming. It covers the range -2,147,483,648 to 2,147,483,647. Values outside this range raise an error. Fractional numbers are rounded (default: round-toward-even).
+`Int32.From` converts a value to a signed 32-bit integer — the most widely used integer size in relational databases and programming languages. It covers the range -2,147,483,648 to 2,147,483,647. Values outside this range cause a runtime error; use `Int64.From` if your data may contain larger integers (for example, large primary key sequences or Unix timestamps in milliseconds).
 
-Text values are parsed numerically. `true` converts to `1`, `false` to `0`, `null` to `null`.
+The default rounding mode when converting fractional values is round-half-to-even (banker's rounding), not the conventional "round half up." This matches the IEEE 754 standard and avoids systematic bias when rounding large datasets, but may surprise users accustomed to spreadsheet arithmetic. To get conventional rounding, pass `RoundingMode.AwayFromZero`.
 
-This maps to `int` in SQL Server, `INTEGER` in SQLite, and similar types across many systems. Use `Int64.From` for larger integers.
+This type maps to `INT` or `INTEGER` in SQL Server, SQLite, and most other databases. In Power BI Desktop, it is labeled "Whole Number" — the same label shared with `Int64`, so the distinction is primarily relevant when building custom connector schemas or when memory efficiency of 32 vs. 64 bits matters. Text values are parsed numerically; logical `true` converts to `1`, `false` to `0`, and `null` returns `null`.
 
 ## Examples
 
-### Example 1: Convert a number to Int32
+### Example 1: Convert the maximum Int32 value
 
 ```powerquery
 Int32.From(2147483647)
@@ -53,7 +53,7 @@ Int32.From(2147483647)
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2147483647}]}
 -->
 
-### Example 2: Convert text
+### Example 2: Convert a negative text value
 
 ```powerquery
 Int32.From("-100000")
@@ -63,12 +63,18 @@ Int32.From("-100000")
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":-100000}]}
 -->
 
-### Example 3: Round and convert a decimal
+### Example 3: Rounding — default banker's rounding vs. away-from-zero
 
 ```powerquery
-Int32.From(99.5)
+#table(
+    {"Input", "Default (Banker's)", "AwayFromZero"},
+    {
+        {99.5, Int32.From(99.5), Int32.From(99.5, null, RoundingMode.AwayFromZero)},
+        {100.5, Int32.From(100.5), Int32.From(100.5, null, RoundingMode.AwayFromZero)}
+    }
+)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":100}]}
+{"columns":[{"name":"Input","type":"number"},{"name":"Default (Banker's)","type":"number"},{"name":"AwayFromZero","type":"number"}],"rows":[{"Input":99.5,"Default (Banker's)":100,"AwayFromZero":100},{"Input":100.5,"Default (Banker's)":100,"AwayFromZero":101}]}
 -->

@@ -23,7 +23,11 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.FixedUtcNow` returns the current UTC date and time as a `datetimezone` value with a `+00:00` offset, fixed to the moment query evaluation began. Unlike `DateTimeZone.UtcNow()`, all calls within a single query will return the same value. This makes it ideal for audit timestamps, consistent age calculations, or any scenario requiring a stable UTC reference point.
+`DateTimeZone.FixedUtcNow` returns the current UTC date and time as a `datetimezone` value with a `+00:00` offset, fixed to the moment query evaluation began. Unlike `DateTimeZone.UtcNow()`, all calls within a single query return the same value. This makes it ideal for audit timestamps, consistent age calculations, or any scenario requiring a stable, timezone-unambiguous reference point.
+
+Prefer `DateTimeZone.FixedUtcNow()` over `DateTime.FixedLocalNow()` in Power BI Service and Dataflows cloud refreshes. Because cloud environments run on UTC, using UTC explicitly removes any ambiguity about what "local" time means across different refresh environments. The fixed variant ensures all computed columns based on "now" use an identical reference instant, eliminating subtle time-skew bugs in long-running queries.
+
+For the non-fixed variant that may advance between calls, use `DateTimeZone.UtcNow()`. To convert the UTC datetimezone to a specific local timezone for display, pipe through `DateTimeZone.SwitchZone`.
 
 ## Examples
 
@@ -60,4 +64,25 @@ Show the current UTC datetimezone value.
 
 <!--output
 {"columns":[{"name":"FixedUTCNow","type":"datetimezone"}],"rows":[{"FixedUTCNow":"2026-03-08T16:00:00+00:00"}]}
+-->
+
+### Example 3: Convert UTC refresh time to a local display timezone
+
+Stamp with UTC, then show the Eastern US equivalent for display purposes.
+
+Input: `Sales`
+
+```powerquery
+let
+    UTCNow = DateTimeZone.FixedUtcNow(),
+    EasternNow = DateTimeZone.SwitchZone(UTCNow, -5),
+    Source = Table.SelectColumns(Table.FirstN(Sales, 3), {"OrderID"}),
+    WithStamp = Table.AddColumn(Source, "RefreshedAtEST",
+        each EasternNow, type datetimezone)
+in
+    WithStamp
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAtEST","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":2,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"},{"OrderID":3,"RefreshedAtEST":"2026-03-08T11:00:00-05:00"}]}
 -->

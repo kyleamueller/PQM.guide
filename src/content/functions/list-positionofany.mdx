@@ -39,13 +39,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.PositionOfAny` searches a list for the position of the first item that matches **any** of the values provided in the `values` list. It is a multi-target version of `List.PositionOf`.
+`List.PositionOfAny` searches a list for the first item that matches **any** value from a second list of targets. It is the multi-target version of `List.PositionOf` — useful when you need to find where any of several values first appears in a sequence.
 
-- Returns `-1` if none of the values in `values` are found in `list`.
-- Use `Occurrence.First` (default) to find the earliest match.
-- Use `Occurrence.Last` to find the last item from `list` that matches any value.
-- Use `Occurrence.All` to return a list of all positions where any of the target values appear.
-- Comparison is case-sensitive for text by default.
+Returns `-1` if none of the target values are found. The `occurrence` parameter controls which match to return: `Occurrence.First` (default) for the earliest match, `Occurrence.Last` for the latest, and `Occurrence.All` to return a list of all positions where any target appears. When using `Occurrence.All`, the return type changes from a number to a list of numbers.
+
+Comparison is case-sensitive for text by default. This function is particularly useful for finding the position of the first delimiter or separator in a list, or for locating the first occurrence of any of a set of sentinel values. For checking presence without needing position, `List.ContainsAny` is simpler.
 
 ## Examples
 

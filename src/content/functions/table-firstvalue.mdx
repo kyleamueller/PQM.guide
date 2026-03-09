@@ -30,48 +30,64 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.FirstValue` is a shortcut to extract a single scalar value from the first row and first column of a table. It is commonly used after filtering a table to a single expected row, to read a configuration setting or lookup result without needing to unpack a record.
+`Table.FirstValue` extracts a single scalar value from the first row and first column of a table. It is a convenience shorthand for `Table.First(table)[firstColumnName]` and is most commonly used to read a single expected result after filtering — such as a configuration parameter from a settings table, a count from a summarized dataset, or a lookup result from a reference table.
 
-If the table is empty, the function returns `null` by default, or the specified `default` value. This is safer than chaining `Table.First(...)[Column]` when the table might be empty.
+When the table is empty, `Table.FirstValue` returns `null` by default, or the specified `default` value if provided. This makes it safer than `Table.First(table)[Column]` in scenarios where the filter might yield no rows, because chaining field access on `null` would raise an error.
+
+The function always reads the value from the first column. If you need a value from a specific column that is not first, use `Table.First(table)[ColumnName]` instead. Alternatively, project the table to only the target column with `Table.SelectColumns` before calling `Table.FirstValue`.
 
 ## Examples
 
-### Example 1: Get the first value from a single-column table
+### Example 1: Read a configuration value from a parameters table
 
 ```powerquery
-Table.FirstValue(
-    #table({"MaxRows"}, {{1000}})
-)
+let
+    Parameters = #table(
+        {"Name", "Value"},
+        {{"StartDate", "2024-01-01"}, {"EndDate", "2024-12-31"}, {"MaxRows", "1000"}}
+    ),
+    Filtered   = Table.SelectRows(Parameters, each [Name] = "MaxRows"),
+    Projected  = Table.SelectColumns(Filtered, {"Value"})
+in
+    Table.FirstValue(Projected)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"1000"}]}
 -->
 
-### Example 2: Return a default when the table is empty
-
-```powerquery
-Table.FirstValue(
-    #table({"Setting"}, {}),
-    "DefaultValue"
-)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"DefaultValue"}]}
--->
-
-### Example 3: Look up a parameter value
+### Example 2: Return a default when no match is found
 
 ```powerquery
 let
-    Params  = #table({"Name", "Value"}, {{"StartDate", "2024-01-01"}, {"EndDate", "2024-12-31"}}),
-    Filtered = Table.SelectRows(Params, each [Name] = "StartDate"),
+    Parameters = #table(
+        {"Name", "Value"},
+        {{"StartDate", "2024-01-01"}}
+    ),
+    Filtered  = Table.SelectRows(Parameters, each [Name] = "Threshold"),
     Projected = Table.SelectColumns(Filtered, {"Value"})
 in
-    Table.FirstValue(Projected)
+    Table.FirstValue(Projected, "100")
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"2024-01-01"}]}
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":"100"}]}
+-->
+
+### Example 3: Extract the lowest unit price from the Products table
+
+```powerquery
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Price = number, InStock = logical],
+        {{1,"Widget A",25.00,true},{2,"Gadget B",50.00,true},{3,"Widget C",15.00,false}}
+    ),
+    Sorted   = Table.Sort(Products, {{"Price", Order.Ascending}}),
+    PriceCol = Table.SelectColumns(Sorted, {"Price"})
+in
+    Table.FirstValue(PriceCol)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"15"}]}
 -->

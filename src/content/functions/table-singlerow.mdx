@@ -27,48 +27,65 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.SingleRow` asserts that a table contains exactly one row and returns that row as a record. If the table has zero rows or more than one row, an error is raised. This makes it useful as a deliberate assertion — a "fail loud" approach when you expect exactly one match, such as when looking up a configuration record or a unique key.
+`Table.SingleRow` asserts that a table contains exactly one row and returns that row as a record. If the table has zero rows or more than one row, an error is raised at runtime. This "fail loud" behavior makes it a deliberate assertion — use it when your query logic guarantees exactly one match and you want an explicit error rather than a silent null or the wrong row if the assumption is violated.
 
-Use `Table.First` instead if you only want the first row without enforcing that exactly one row exists.
+Typical use cases include: reading a unique configuration parameter after filtering by name, extracting a uniquely-identified record after a key lookup, or validating that a pre-filtered dataset contains exactly one result before processing it.
+
+Choose `Table.SingleRow` over `Table.First` when the one-row constraint must be enforced. Choose `Table.First` with a default value when zero rows is an acceptable outcome. Choose `Table.FirstValue` when you only need the top-left scalar and don't need to guard against row count.
 
 ## Examples
 
-### Example 1: Return a single row as a record
-
-```powerquery
-Table.SingleRow(
-    #table({"Key", "Value"}, {{"Environment", "Production"}})
-)
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[Key = \"Environment\", Value = \"Production\"]"}]}
--->
-
-### Example 2: Access a field from the single row
+### Example 1: Look up a specific customer by CustomerID
 
 ```powerquery
 let
-    Config = #table({"Setting", "Value"}, {{"MaxRows", "1000"}}),
-    Row = Table.SingleRow(Config)
-in
-    Row[Value]
-```
-
-<!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"1000"}]}
--->
-
-### Example 3: Filter then assert single result
-
-```powerquery
-let
-    Source  = #table({"ID", "Name"}, {{1, "Alice"}, {2, "Bob"}}),
-    Filtered = Table.SelectRows(Source, each [ID] = 1)
+    Customers = #table(
+        {"CustomerID","Name","Email","City","State"},
+        {{1,"Alice","alice@example.com","New York","NY"},
+         {2,"Bob","bob@example.com","Chicago","IL"},
+         {3,"Charlie","charlie@example.com","Houston","TX"},
+         {4,"Diana","diana@example.com","Seattle","WA"}}
+    ),
+    Filtered = Table.SelectRows(Customers, each [CustomerID] = 3)
 in
     Table.SingleRow(Filtered)
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[ID = 1, Name = \"Alice\"]"}]}
+{"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[CustomerID = 3, Name = \"Charlie\", Email = \"charlie@example.com\", City = \"Houston\", State = \"TX\"]"}]}
+-->
+
+### Example 2: Read a configuration value using field access on the single row
+
+```powerquery
+let
+    Config = #table(
+        {"Parameter","Value"},
+        {{"DefaultRegion","East"},{"MaxOrders","500"},{"CurrencyCode","USD"}}
+    ),
+    Filtered = Table.SelectRows(Config, each [Parameter] = "CurrencyCode")
+in
+    Table.SingleRow(Filtered)[Value]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"USD"}]}
+-->
+
+### Example 3: Assert a product lookup returns exactly one result
+
+```powerquery
+let
+    Products = #table(
+        type table [ProductID = number, ProductName = text, Category = text, Price = number, InStock = logical],
+        {{1,"Widget A","Widgets",25.00,true},{2,"Gadget B","Gadgets",50.00,true},
+         {3,"Widget C","Widgets",15.00,false},{4,"Gadget D","Gadgets",75.00,true}}
+    ),
+    Filtered = Table.SelectRows(Products, each [ProductID] = 4)
+in
+    Table.SingleRow(Filtered)[Price]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"75"}]}
 -->

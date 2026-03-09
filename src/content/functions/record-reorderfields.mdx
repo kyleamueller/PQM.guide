@@ -34,16 +34,20 @@ relatedFunctions:
 
 ## Remarks
 
-`Record.ReorderFields` returns a new record with fields placed in the order specified by `fieldOrder`. Fields not listed appear at the end, maintaining their relative order from the original record. Field values are unchanged.
+`Record.ReorderFields` returns a new record with fields placed in the order specified by `fieldOrder`. Fields not listed in `fieldOrder` are appended at the end, maintaining their original relative order from the source record. Field names and values are unchanged.
 
-The optional `missingField` parameter controls behavior when a name in `fieldOrder` is not found in the record:
-- `MissingField.Error` (default) — raises an error
-- `MissingField.Ignore` — skips the missing name silently
-- `MissingField.UseNull` — adds the field with a null value
+Record field order matters in Power Query because it affects the column order when records are expanded into table columns, and the order in which fields appear in `Record.ToTable` output. `Record.ReorderFields` is the record-level equivalent of `Table.ReorderColumns`.
+
+The optional `missingField` parameter controls behavior when a name in `fieldOrder` does not exist in the record:
+- `MissingField.Error` (default, `0`) — raises an error
+- `MissingField.Ignore` (`1`) — skips missing names silently
+- `MissingField.UseNull` (`2`) — inserts the specified field with a null value
+
+A common pattern is to reorder fields before converting a record to a table with `Record.ToTable` or before using `Table.FromRecords`, to control the column order of the resulting table.
 
 ## Examples
 
-### Example 1: Reorder a record's fields
+### Example 1: Reorder all fields explicitly
 
 ```powerquery
 Record.ReorderFields(
@@ -56,7 +60,7 @@ Record.ReorderFields(
 {"columns":[{"name":"Name","type":"text"},{"name":"Age","type":"number"},{"name":"City","type":"text"}],"rows":[{"Name":"Alice","Age":30,"City":"New York"}]}
 -->
 
-### Example 2: Unlisted fields appear at the end
+### Example 2: Unlisted fields are appended at the end in original order
 
 ```powerquery
 Record.ReorderFields(
@@ -69,21 +73,18 @@ Record.ReorderFields(
 {"columns":[{"name":"A","type":"number"},{"name":"B","type":"number"},{"name":"D","type":"number"},{"name":"C","type":"number"}],"rows":[{"A":1,"B":2,"D":4,"C":3}]}
 -->
 
-### Example 3: Reorder fields from the first Customers row
+### Example 3: Reorder a Sales row to put OrderID and CustomerName first
 
-Input: `Customers`
+Input: `Sales`
 
 ```powerquery
 let
-    Row = Customers{0},
-    Reordered = Record.ReorderFields(
-        Record.SelectFields(Row, {"CustomerID", "Name", "City", "Country"}),
-        {"Name", "CustomerID", "Country", "City"}
-    )
+    Row = Sales{0},
+    Reordered = Record.ReorderFields(Row, {"OrderID", "CustomerName", "Product"})
 in
     Record.ToTable(Reordered)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Name","Value":"Alice"},{"Name":"CustomerID","Value":1},{"Name":"Country","Value":"USA"},{"Name":"City","Value":"New York"}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4},{"Name":"OrderDate","Value":"2024-01-15"},{"Name":"Region","Value":"East"}]}
 -->

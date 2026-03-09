@@ -35,46 +35,57 @@ relatedFunctions:
 
 ## Remarks
 
-`Lines.ToText` joins a list of text values into a single multi-line string, inserting a line feed character (`#(lf)`) between each element. This is the inverse of `Lines.FromText`.
+`Lines.ToText` joins a list of text values into a single multi-line string by inserting a line feed character (`#(lf)`) between each element. This is the inverse of `Lines.FromText`, making the two functions natural companions for round-trip text processing: split a text into lines, transform or filter them, then rejoin with `Lines.ToText`.
 
-The function is commonly used to reconstruct text content from a list of lines — for example, after filtering, transforming, or reordering lines that were split from a source file.
+The function is most useful when you have manipulated a list of lines and need to produce a single text output — for example, after filtering out blank or comment lines from a source file, reordering lines, or applying transformations to each line.
 
-Unlike `Text.Combine`, which requires you to explicitly specify a delimiter, `Lines.ToText` automatically uses the standard line separator. Use `Text.Combine` when you need a custom separator.
+Unlike `Text.Combine`, which requires you to explicitly provide a delimiter, `Lines.ToText` automatically uses the standard line separator. This makes intent clearer when the goal is to reconstruct line-oriented text. Use `Text.Combine` when you need a custom separator such as a comma or tab. For binary output (e.g., writing to a file or API), use `Lines.ToBinary` instead.
 
 ## Examples
 
-### Example 1: Join a list of lines into a single string
+### Example 1: Join a list of lines into multi-line text
 
 ```powerquery
-Lines.ToText({"First line", "Second line", "Third line"})
+Lines.ToText({"CustomerName,Product", "Alice,Widget A", "Bob,Gadget B"})
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"First line\nSecond line\nThird line"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"CustomerName,Product\nAlice,Widget A\nBob,Gadget B"}]}
 -->
 
-### Example 2: Round-trip with Lines.FromText
+### Example 2: Filter lines then rejoin
+
+Split a text into lines, keep only the non-empty ones, then reassemble into a clean text value.
 
 ```powerquery
 let
-    source = "apple#(lf)banana#(lf)cherry",
+    source = "Alice,Widget A#(lf)#(lf)Bob,Gadget B#(lf)#(lf)Charlie,Widget C",
     lines = Lines.FromText(source),
-    filtered = List.Select(lines, each Text.StartsWith(_, "b")),
-    result = Lines.ToText(filtered)
+    nonEmpty = List.Select(lines, each _ <> ""),
+    result = Lines.ToText(nonEmpty)
 in
     result
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"banana"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice,Widget A\nBob,Gadget B\nCharlie,Widget C"}]}
 -->
 
-### Example 3: Build a CSV-like text from rows
+### Example 3: Reconstruct a modified text file
+
+Transform each line individually then reassemble — here, uppercasing the product name in each row.
 
 ```powerquery
-Lines.ToText({"Name,Age", "Alice,30", "Bob,25"})
+let
+    lines = {"Alice,Widget A", "Bob,Gadget B", "Charlie,Widget C"},
+    transformed = List.Transform(lines, each
+        Text.BeforeDelimiter(_, ",") & "," & Text.Upper(Text.AfterDelimiter(_, ","))
+    ),
+    result = Lines.ToText(transformed)
+in
+    result
 ```
 
 <!--output
-{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Name,Age\nAlice,30\nBob,25"}]}
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Alice,WIDGET A\nBob,GADGET B\nCharlie,WIDGET C"}]}
 -->

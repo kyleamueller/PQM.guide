@@ -35,15 +35,11 @@ relatedFunctions:
 
 ## Remarks
 
-`List.RemoveMatchingItems` removes **all occurrences** of any value in `list2` from `list1`. Unlike `List.Difference` (which is a set operation returning distinct values), this function preserves duplicates in `list1` that are not in `list2`.
+`List.RemoveMatchingItems` removes all occurrences of any value in `list2` from `list1`. It scans through `list1` and filters out any item that appears anywhere in `list2`. Duplicates in `list1` are both removed if the value appears in `list2`; duplicates in `list1` that are not in `list2` are preserved.
 
-The key distinction from `List.RemoveItems`:
-- `List.RemoveMatchingItems` removes **every** occurrence of matching values.
-- `List.RemoveItems` removes one occurrence per matched item.
+The key distinction from related functions: `List.RemoveMatchingItems` removes **every occurrence** of each matching value; `List.RemoveItems` removes only one occurrence per entry in `list2` (one-for-one removal); `List.Difference` performs a set-difference and deduplicates the result. Choose based on whether you want value-based filtering (this function), occurrence counting (`List.RemoveItems`), or a set operation (`List.Difference`).
 
-- Comparison is case-sensitive for text by default.
-- Pass `Comparer.OrdinalIgnoreCase` for case-insensitive removal.
-- Returns a new list; the original is not modified.
+Comparison is case-sensitive for text by default. Pass `Comparer.OrdinalIgnoreCase` as the `equationCriteria` argument for case-insensitive removal. Returns a new list; the originals are not modified.
 
 ## Examples
 

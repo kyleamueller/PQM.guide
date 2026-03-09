@@ -31,41 +31,64 @@ relatedFunctions:
 
 ## Remarks
 
-`DateTimeZone.FromText` parses a text value into a `datetimezone`. Without options, it attempts ISO 8601 formats with timezone offsets (e.g., `"2024-03-15T14:30:00+00:00"` or `"2024-03-15T14:30:00Z"`). Use the `options` record to supply a custom `Format` pattern or `Culture`. Format strings follow .NET custom datetime format conventions.
+`DateTimeZone.FromText` parses a text value into a `datetimezone`. Without options, it attempts ISO 8601 formats with timezone offsets such as `"2024-03-15T14:30:00+00:00"`, `"2024-03-15T14:30:00-05:00"`, or `"2024-03-15T14:30:00Z"`. Use the `options` record to supply a custom `Format` pattern or `Culture` for non-standard text representations. Format strings follow .NET custom datetime format conventions, and `zzz` produces the UTC offset in `±HH:mm` notation.
 
-If the text is `null`, the function returns `null`. If parsing fails, the function raises an error.
+Always specify both `Format` and `Culture` when parsing locale-specific strings. Without an explicit `Culture`, parsing behavior depends on the host machine's locale and may produce inconsistent results between Power BI Desktop and Power BI Service. If the source system emits UTC (indicated by a `Z` suffix or `+00:00` offset), the parsed value will carry a `+00:00` offset and can be used directly for UTC comparisons.
+
+If the text is `null`, the function returns `null`. If parsing fails, the function raises an error. Use `try DateTimeZone.FromText(...) otherwise null` to handle malformed rows gracefully without stopping the entire query.
 
 ## Examples
 
 ### Example 1: Parse ISO 8601 datetimezone strings
 
-Convert timezone-aware text timestamps in a log table to datetimezone values.
-
-Input: `Logs`
+Convert timezone-aware text timestamps to typed datetimezone values.
 
 ```powerquery
-Table.TransformColumns(
-    Table.SelectColumns(Table.FirstN(Logs, 4), {"LogID", "TimestampText"}),
-    {{"TimestampText", each DateTimeZone.FromText(_), type datetimezone}}
+#table(
+    type table [TextValue = text, Parsed = datetimezone],
+    {
+        {"2024-01-15T08:30:00+00:00", DateTimeZone.FromText("2024-01-15T08:30:00+00:00")},
+        {"2024-03-15T14:30:00-05:00", DateTimeZone.FromText("2024-03-15T14:30:00-05:00")},
+        {"2024-06-01T09:00:00Z",      DateTimeZone.FromText("2024-06-01T09:00:00Z")}
+    }
 )
 ```
 
 <!--output
-{"columns":[{"name":"LogID","type":"text"},{"name":"TimestampText","type":"datetimezone"}],"rows":[{"LogID":"L001","TimestampText":"2024-01-15T08:30:00+00:00"},{"LogID":"L002","TimestampText":"2024-01-15T09:45:00-05:00"},{"LogID":"L003","TimestampText":"2024-01-16T14:00:00+05:30"},{"LogID":"L004","TimestampText":"2024-01-16T17:30:00Z"}]}
+{"columns":[{"name":"TextValue","type":"text"},{"name":"Parsed","type":"datetimezone"}],"rows":[{"TextValue":"2024-01-15T08:30:00+00:00","Parsed":"2024-01-15T08:30:00+00:00"},{"TextValue":"2024-03-15T14:30:00-05:00","Parsed":"2024-03-15T14:30:00-05:00"},{"TextValue":"2024-06-01T09:00:00Z","Parsed":"2024-06-01T09:00:00+00:00"}]}
 -->
 
 ### Example 2: Parse a specific datetimezone format
 
-Parse a text value with a custom format and culture.
+Parse a non-ISO text value with a custom format and culture.
 
 ```powerquery
 #table(
     type table [TextValue = text, Parsed = datetimezone],
     {{"2024-03-15 14:30:00 +0530",
-      DateTimeZone.FromText("2024-03-15 14:30:00 +0530", [Format="yyyy-MM-dd HH:mm:ss zzz"])}}
+      DateTimeZone.FromText("2024-03-15 14:30:00 +0530", [Format="yyyy-MM-dd HH:mm:ss zzz", Culture="en-US"])}}
 )
 ```
 
 <!--output
 {"columns":[{"name":"TextValue","type":"text"},{"name":"Parsed","type":"datetimezone"}],"rows":[{"TextValue":"2024-03-15 14:30:00 +0530","Parsed":"2024-03-15T14:30:00+05:30"}]}
+-->
+
+### Example 3: Safe parsing with try...otherwise for mixed data
+
+Handle rows with invalid or missing timezone text without erroring the query.
+
+```powerquery
+#table(
+    type table [TextValue = text, Parsed = datetimezone],
+    {
+        {"2024-01-15T08:30:00+00:00", try DateTimeZone.FromText("2024-01-15T08:30:00+00:00") otherwise null},
+        {"not a date",               try DateTimeZone.FromText("not a date") otherwise null},
+        {"2024-03-15T14:30:00Z",     try DateTimeZone.FromText("2024-03-15T14:30:00Z") otherwise null}
+    }
+)
+```
+
+<!--output
+{"columns":[{"name":"TextValue","type":"text"},{"name":"Parsed","type":"datetimezone"}],"rows":[{"TextValue":"2024-01-15T08:30:00+00:00","Parsed":"2024-01-15T08:30:00+00:00"},{"TextValue":"not a date","Parsed":null},{"TextValue":"2024-03-15T14:30:00Z","Parsed":"2024-03-15T14:30:00+00:00"}]}
 -->

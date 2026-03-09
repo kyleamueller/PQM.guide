@@ -35,35 +35,66 @@ relatedFunctions:
 
 ## Remarks
 
-`Table.RemoveRows` removes rows from a specific position in the table. The `offset` parameter is zero-based. If `count` is omitted, only the single row at `offset` is removed. If `count` exceeds the number of remaining rows, all rows from `offset` to the end of the table are removed.
+`Table.RemoveRows` removes a contiguous block of rows starting at a zero-based `offset`. If `count` is omitted, exactly one row is removed (the row at `offset`). If `count` exceeds the number of rows remaining from `offset`, all rows from `offset` to the end are removed.
 
-Use `Table.RemoveFirstN` or `Table.RemoveLastN` for simpler removal from the start or end of the table.
+`Table.RemoveRows` is a positional operation — you need to know the row index in advance. For removing rows from the start or end of the table by count, `Table.RemoveFirstN` and `Table.RemoveLastN` are more expressive. For removing rows that match a condition, use `Table.RemoveMatchingRows` or `Table.SelectRows` with a negated predicate. For replacing rows at a position, use `Table.ReplaceRows`.
+
+`Table.RemoveRows` does not fold to data sources. Combine it with `Table.PositionOf` to dynamically locate rows before removing them.
 
 ## Examples
 
-### Example 1: Remove one row at a given offset
+### Example 1: Remove a single row at a known position
+
+Remove the second row (offset 1) from the Customers table.
 
 ```powerquery
-Table.RemoveRows(
-    #table({"ID"}, {{1}, {2}, {3}, {4}}),
-    1
-)
+let
+    Customers = #table(
+        {"CustomerID", "Name", "City"},
+        {{1,"Alice","New York"},{2,"Bob","Chicago"},{3,"Charlie","Houston"},{4,"Diana","Seattle"}}
+    )
+in
+    Table.RemoveRows(Customers, 1)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"3"},{"ID":"4"}]}
+{"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
 -->
 
-### Example 2: Remove multiple rows
+### Example 2: Remove a block of rows in the middle
+
+Remove 3 rows starting at offset 2 from an 8-row Sales table.
 
 ```powerquery
-Table.RemoveRows(
-    #table({"ID"}, {{1}, {2}, {3}, {4}, {5}}),
-    1,
-    3
-)
+let
+    Sales = #table(
+        {"OrderID", "CustomerName"},
+        {{1,"Alice"},{2,"Bob"},{3,"Charlie"},{4,"Alice"},{5,"Diana"},{6,"Bob"},{7,"Charlie"},{8,"Diana"}}
+    )
+in
+    Table.RemoveRows(Sales, 2, 3)
 ```
 
 <!--output
-{"columns":[{"name":"ID","type":"any"}],"rows":[{"ID":"1"},{"ID":"5"}]}
+{"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Charlie"},{"OrderID":"8","CustomerName":"Diana"}]}
+-->
+
+### Example 3: Dynamically locate a row by content, then remove it
+
+Use `Table.PositionOf` to find the row position before removing it.
+
+```powerquery
+let
+    Products = #table(
+        {"ProductID","ProductName","Price"},
+        {{1,"Widget A",25.00},{2,"Gadget B",50.00},{3,"Widget C",15.00},{4,"Gadget D",75.00}}
+    ),
+    Pos    = Table.PositionOf(Products, [ProductID = 3], Occurrence.First, "ProductID"),
+    Result = if Pos >= 0 then Table.RemoveRows(Products, Pos) else Products
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"}]}
 -->
