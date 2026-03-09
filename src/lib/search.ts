@@ -6,6 +6,7 @@ export function createSearchIndex(functions: FunctionIndexEntry[]) {
     keys: [
       { name: "title", weight: 2 },
       { name: "description", weight: 1 },
+      { name: "keywords", weight: 0.8 },
       { name: "category", weight: 0.5 },
     ],
     threshold: 0.3,

@@ -67,6 +67,7 @@ export interface FunctionIndexEntry {
   slug: string;
   category: string;
   description: string;
+  keywords?: string;
 }
 
 export interface ConceptFrontmatter {
