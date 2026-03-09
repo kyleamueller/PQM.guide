@@ -1,6 +1,7 @@
 import {
   getFunctionBySlug,
   getAllFunctions,
+  getFunctionsByCategory,
   buildSearchIndex,
   getConceptBySlug,
   getAllConcepts,
@@ -145,6 +146,22 @@ const TOOLS = [
         },
       },
       required: ["name"],
+    },
+  },
+  {
+    name: "list_functions_by_category",
+    description:
+      "List all Power Query M functions in a specific category. Use list_categories first to get valid category slugs.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        category: {
+          type: "string",
+          description:
+            "Category slug (e.g. 'list', 'table', 'text', 'date'). Use list_categories to see all valid slugs.",
+        },
+      },
+      required: ["category"],
     },
   },
 ];
@@ -373,6 +390,17 @@ async function callTool(
           "",
           formatTableData(table.data),
         ].join("\n");
+      }
+
+      case "list_functions_by_category": {
+        const categorySlug = String(args.category ?? "").toLowerCase();
+        const functions = getFunctionsByCategory(categorySlug);
+        if (functions.length === 0) {
+          return `No functions found in category "${args.category}". Use list_categories to see all valid category slugs.`;
+        }
+        return functions
+          .map((f) => `- **${f.title}**: ${f.description}\n  → /functions/${f.slug}`)
+          .join("\n");
       }
 
       default:
