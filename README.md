@@ -2,15 +2,15 @@
 
 A community-driven Power Query M language reference, hosted at [pqm.guide](https://pqm.guide).
 
-PQM.guide documents 161 Power Query M functions across 27 categories with clear syntax references, visual output examples, and practical best practices. It also includes concept guides, practical patterns, and an MCP server so AI assistants can query M documentation directly. Think of it as [DAX.guide](https://dax.guide) for the M language.
+PQM.guide documents 512 Power Query M functions across 24 categories with clear syntax references, visual output examples, and practical best practices. It also includes concept guides, practical patterns, and an MCP server so AI assistants can query M documentation directly. Think of it as [DAX.guide](https://dax.guide) for the M language.
 
 ## What's on the Site
 
 | Section | URL | Description |
 |---|---|---|
-| Functions | `/functions/[slug]` | 161 functions across 27 categories with syntax, parameters, examples, and best practices |
-| Concepts | `/concepts/[slug]` | 16 concept guides covering M fundamentals (lazy evaluation, query folding, type system, etc.) |
-| Patterns | `/patterns/[slug]` | Practical M recipes grouped by difficulty (beginner → advanced) |
+| Functions | `/functions/[slug]` | 512 functions across 24 categories with syntax, parameters, examples, and best practices |
+| Concepts | `/concepts/[slug]` | 17 concept guides covering M fundamentals (lazy evaluation, query folding, type system, etc.) |
+| Patterns | `/patterns/[slug]` | 18 practical M recipes grouped by difficulty (beginner → advanced) |
 | Start Here | `/learn` | A curated 8-step learning path for developers new to M |
 | Sample Tables | `/sample-tables` | Reference data used in function examples (Sales, Customers, Products, Employees, OrderLog) |
 | Resources | `/resources` | Curated tools, books, YouTube channels, blogs, and community links |
@@ -22,12 +22,14 @@ PQM.guide exposes several machine-readable endpoints:
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/functions` | All 161 functions (metadata) |
-| `GET /api/functions/[slug]` | Single function with full content |
+| `GET /api/functions` | All 512 functions (metadata) |
+| `GET /api/functions/[slug]` | Single function with full content, remarks, and parsed examples |
 | `GET /api/concepts` | All concept guides |
 | `GET /api/concepts/[slug]` | Single concept with full content |
 | `GET /api/patterns` | All patterns |
+| `GET /api/patterns/[slug]` | Single pattern with full content |
 | `GET /api/search?q=` | Fuzzy search across all functions |
+| `GET /api/tables/[id]` | Sample table data as JSON (Sales, Customers, Products, Employees, OrderLog) |
 | `GET /llms.txt` | Plain-text index (llmstxt.org format) for LLM crawlers |
 | `POST /api/mcp` | MCP JSON-RPC 2.0 endpoint (Streamable HTTP transport) |
 
