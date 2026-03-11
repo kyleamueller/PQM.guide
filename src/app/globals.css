@@ -452,6 +452,7 @@ code {
   border-radius: 6px;
   padding: 16px 20px;
   overflow-x: auto;
+  overflow-y: visible;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -1192,6 +1193,9 @@ code {
 [data-theme="dark"] .token.punctuation { color: #808080; }
 [data-theme="dark"] .token.function { color: #dcdcaa; }
 [data-theme="dark"] .token.quoted-identifier { color: #9cdcfe; }
+
+a.fn-link { text-decoration: none; }
+a.fn-link:hover { text-decoration: underline; }
 
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
