@@ -1,0 +1,181 @@
+---
+title: "From the UI to M Code"
+slug: "ui-to-m-bridge"
+description: "The ten most common Power Query UI operations and the M code each one generates — a translation guide for users making the switch from clicks to code."
+relatedConcepts:
+  - "getting-started"
+  - "each-keyword"
+  - "let-in-expressions"
+relatedFunctions:
+  - "table-selectrows"
+  - "table-addcolumn"
+  - "table-removecolumns"
+  - "table-renamecolumns"
+  - "table-transformcolumntypes"
+  - "table-sort"
+  - "table-group"
+---
+
+When you apply a transformation in the Power Query UI, it writes M code on your behalf. The examples below show each UI operation alongside the M it generates. All examples use a `Sales` table with columns `Region`, `Product`, `Quantity`, `UnitPrice`, and `Date`.
+
+### Filter Rows
+
+**UI path:** Right-click a column value → **Keep** → **Equals**, or **Home → Keep Rows → Keep Rows Where**
+
+```powerquery
+Table.SelectRows(Sales, each [Region] = "East")
+```
+
+`Table.SelectRows` keeps rows where the function returns `true`. The `each [Region] = "East"` part runs once per row — `[Region]` is shorthand for "the value in the Region column of the current row." See [The each Keyword](/concepts/each-keyword) for how this works.
+
+To filter for multiple values:
+
+```powerquery
+Table.SelectRows(Sales, each [Region] = "East" or [Region] = "West")
+```
+
+### Add a Custom Column
+
+**UI path:** **Add Column → Custom Column**
+
+```powerquery
+Table.AddColumn(Sales, "Total", each [Quantity] * [UnitPrice], type number)
+```
+
+Arguments: source table, new column name, function to compute the value (runs once per row), return type. The type annotation is optional but tells the engine what type to expect, which avoids a schema inspection pass.
+
+### Remove Columns
+
+**UI path:** Select columns → right-click → **Remove Columns**, or **Home → Remove Columns**
+
+```powerquery
+Table.RemoveColumns(Sales, {"Discount", "InternalCode"})
+```
+
+Pass a list of column names to drop. Order inside the list doesn't matter.
+
+If you want to **keep** specific columns and drop everything else, use `Table.SelectColumns` instead:
+
+```powerquery
+Table.SelectColumns(Sales, {"Region", "Product", "UnitPrice"})
+```
+
+### Rename Columns
+
+**UI path:** Double-click a column header
+
+```powerquery
+Table.RenameColumns(Sales, {{"UnitPrice", "Price"}, {"Quantity", "Qty"}})
+```
+
+Each inner list is `{"OldName", "NewName"}`. Multiple renames can be done in one call.
+
+### Change Column Type
+
+**UI path:** Click the type icon to the left of a column header, or **Transform → Data Type**
+
+```powerquery
+Table.TransformColumnTypes(Sales, {
+    {"Date",      type date},
+    {"Quantity",  Int64.Type},
+    {"UnitPrice", type number}
+})
+```
+
+Each pair is `{"ColumnName", Type}`. `Int64.Type` is the whole-number (integer) type. `type number` covers decimals. This step is usually the most common source of `DataFormat.Error` — if a column contains values that don't match the target type, the conversion will error. See [Common M Errors](/concepts/common-errors) for how to handle that.
+
+### Promote First Row as Headers
+
+**UI path:** **Home → Use First Row as Headers**
+
+```powerquery
+Table.PromoteHeaders(Source)
+```
+
+Moves the first row's values into the column names. If the generated code includes `[PromoteAllScalars=true]`, that option coerces non-text values (numbers, dates) to text when they appear in headers.
+
+### Sort Rows
+
+**UI path:** Click the dropdown arrow on a column header → **Sort Ascending** or **Sort Descending**
+
+```powerquery
+Table.Sort(Sales, {{"UnitPrice", Order.Descending}, {"Region", Order.Ascending}})
+```
+
+Each pair is `{"ColumnName", Order.Ascending}` or `{"ColumnName", Order.Descending}`. Multiple columns are sorted left to right, matching the behavior of the UI's multi-column sort.
+
+### Remove Duplicate Rows
+
+**UI path:** **Home → Remove Rows → Remove Duplicates**
+
+```powerquery
+Table.Distinct(Sales)
+```
+
+To deduplicate based on specific columns only — keeping the first row when those columns match, regardless of other columns:
+
+```powerquery
+Table.Distinct(Sales, {"Region", "Product"})
+```
+
+### Group By
+
+**UI path:** **Home → Group By**
+
+```powerquery
+Table.Group(
+    Sales,
+    {"Region"},
+    {
+        {"TotalSales", each List.Sum([UnitPrice] * [Quantity]), type number},
+        {"RowCount",   each Table.RowCount(_), Int64.Type}
+    }
+)
+```
+
+Arguments: source table, columns to group by, list of aggregations. Each aggregation is `{"NewColumnName", aggregationFunction, returnType}`. Inside the function, `_` refers to the sub-table of rows that belong to that group.
+
+For a simple count, `Table.RowCount(_)` counts the rows in the group. For a sum, `List.Sum([ColumnName])` sums the values in that column across the group.
+
+### Merge Queries (Join)
+
+**UI path:** **Home → Merge Queries**
+
+```powerquery
+let
+    Merged = Table.NestedJoin(
+        Orders,  {"ProductID"},
+        Products, {"ID"},
+        "ProductDetails",
+        JoinKind.LeftOuter
+    ),
+    Expanded = Table.ExpandTableColumn(
+        Merged, "ProductDetails",
+        {"Name", "Category"},
+        {"ProductName", "Category"}
+    )
+in
+    Expanded
+```
+
+`Table.NestedJoin` adds a new column to the left table where each cell contains a nested table of matching rows from the right table. `Table.ExpandTableColumn` then flattens it by pulling specific columns out into the main table. The UI generates both steps automatically when you click through the merge dialog.
+
+Common join kinds: `JoinKind.LeftOuter`, `JoinKind.Inner`, `JoinKind.RightOuter`, `JoinKind.FullOuter`. The UI defaults to `LeftOuter` — you can change it by editing the M directly.
+
+---
+
+### About Step Names
+
+The UI generates steps with human-readable names like `"Filtered Rows"` and `"Added Custom"`. Because these names contain spaces, they use the `#"..."` quoting syntax:
+
+```powerquery
+#"Filtered Rows" = Table.SelectRows(Source, each [Region] = "East")
+```
+
+When you write M by hand, you can skip the spaces and use plain identifiers:
+
+```powerquery
+FilteredRows = Table.SelectRows(Source, each [Region] = "East")
+```
+
+Both are valid M. Quoted names match what the UI generates and preserve the Applied Steps labels; unquoted names are cleaner for hand-written queries.
