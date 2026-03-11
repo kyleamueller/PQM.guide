@@ -13,7 +13,14 @@ export default function SyntaxBlock({ code, language = "powerquery" }: SyntaxBlo
   const [copied, setCopied] = useState(false);
 
   const grammar = Prism.languages[language];
-  const html = grammar ? Prism.highlight(code, grammar, language) : code;
+  const rawHtml = grammar ? Prism.highlight(code, grammar, language) : code;
+  const html = rawHtml.replace(
+    /<span class="token builtin">([^<]+)<\/span>/g,
+    (_, funcName: string) => {
+      const slug = funcName.toLowerCase().replace(".", "-");
+      return `<a href="/functions/${slug}" class="token builtin fn-link" title="View ${funcName}">${funcName}</a>`;
+    }
+  );
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -44,6 +51,7 @@ export default function SyntaxBlock({ code, language = "powerquery" }: SyntaxBlo
       <pre className={`language-${language}`} tabIndex={0}>
         <code
           className={`language-${language}`}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </pre>
