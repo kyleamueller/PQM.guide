@@ -1,0 +1,26 @@
+name: Content Freshness Reminder
+
+on:
+  schedule:
+    # First day of every month at 9am UTC
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+jobs:
+  create-review-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create monthly review issue
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          gh issue create \
+            --title "Monthly content review ($TODAY)" \
+            --body-file .github/content-review-template.md \
+            --label "content-review"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

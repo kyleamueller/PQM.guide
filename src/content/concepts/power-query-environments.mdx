@@ -1,0 +1,88 @@
+---
+title: "Where Power Query Runs"
+slug: "power-query-environments"
+description: "A complete map of every environment where Power Query M can be executed — from desktop tools to cloud dataflows to the new Fabric programmatic API."
+relatedConcepts:
+  - "query-folding"
+  - "lazy-evaluation"
+relatedFunctions: []
+---
+
+Power Query M runs in more places than most users realize. What started as a desktop data import tool in Excel and Power BI has expanded into a cloud execution engine, a pipeline activity, and — as of February 2026 — a callable REST API. The engine is the same across all of these surfaces, but each environment has different capabilities, limits, and licensing requirements.
+
+### Microsoft Fabric Dataflows Gen2
+
+Dataflows Gen2 is the most capable Power Query environment as of 2026. It runs in the cloud on the Modern Evaluator engine (rebuilt on .NET 8), supports 80+ connectors at GA, and stores results as Delta tables in OneLake. Output destinations include Fabric Lakehouse, Fabric Warehouse, Azure SQL, ADLS Gen2, and more.
+
+Requires a Fabric capacity (not just Power BI Pro). Supports on-premises sources via gateway.
+
+### The Fabric Execute Query REST API (Preview, February 2026)
+
+Microsoft announced in February 2026 that Power Query M can now be executed programmatically through a public REST API:
+
+```powerquery
+// API endpoint:
+// POST https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/dataflows/{dataflowId}/executeQuery
+```
+
+The API executes a query within a Dataflow Gen2 artifact, which provides the execution context — connections, credentials, and gateway routing. Results are returned as an Apache Arrow stream, consumable as Pandas or Spark DataFrames in Fabric Notebooks or any HTTP client.
+
+Key constraints in the current preview:
+
+- Queries must complete within **90 seconds**
+- **Read-only** — no write operations
+- Requires a Dataflow Gen2 artifact as the execution context
+- Requires Fabric capacity
+- Billed as "Dataflows Gen2 Run Query API" in capacity metrics
+
+This is a foundational shift: Power Query is now a callable data transformation service, not just an authoring UI.
+
+### Power BI Desktop
+
+The original Power Query environment. Runs fully local on Windows (or Mac with limitations). Supports all connector types including local files, has a full Advanced Editor for M code, and supports custom connectors (.mez files). Data stays local until the model is published to the Power BI Service. No scheduled refresh without publishing.
+
+Mac users have a reduced connector set and some M functions are unavailable.
+
+### Power BI Service — Dataflows Gen1
+
+Cloud-only dataflows available with Power BI Pro, PPU, or Premium. Stores data in CDM format (CSV files in ADLS Gen2 or internal Power BI storage). Supports scheduled refresh and on-premises sources via gateway. Limited to 50 tables per dataflow and a 512 KB mashup script size.
+
+Dataflows Gen1 **does not support** the new executeQuery API — that is exclusive to Fabric Dataflows Gen2.
+
+### Excel Desktop
+
+The same Power Query engine as Power BI Desktop — both use the Mashup Engine under the hood. Available in Excel for Windows via **Get & Transform Data**. Full M language support, custom connectors, local files, databases, web sources, and SharePoint. The Advanced Editor exposes raw M code.
+
+Mac users face the same limitations as Power BI Desktop on Mac: fewer connectors, some functions unavailable.
+
+### Excel Online (Rolling Out)
+
+Power Query is rolling out to Excel for the web as of 2024–2025. Viewing and refreshing existing queries is available to all Microsoft 365 subscribers. **Creating and editing queries requires a Microsoft 365 Business or Enterprise plan** — Personal and Family plans do not have the editor.
+
+Local file sources are not yet available in the web version. The feature is still rolling out and is not at full parity with Excel Desktop.
+
+### Power Automate and Power Apps Dataflows
+
+Both Power Automate and Power Apps include Power Platform Dataflows — a cloud execution of Power Query Online that loads data into Dataverse, ADLS Gen2, or Power BI workspaces. On-premises sources are supported via gateway. Subject to the same 50-table and 512 KB limits as Power BI Dataflows Gen1. Dataverse has a 5-minute per-query timeout.
+
+These are separate from Fabric Dataflows Gen2 and do not support the executeQuery API.
+
+### Azure Data Factory — Wrangling Data Flows
+
+ADF embeds Power Query Online for transformation authoring in its "Wrangling Data Flows" feature. However, the M code you write is **translated into Spark** for distributed cloud execution — it does not run on the native M engine. This translation enables cloud scale but means not all M functions are supported. Unsupported functions produce: `"Expression.Error: The transformation logic is not supported as it requires dynamic access to rows of data, which cannot be scaled out."`
+
+Use ADF wrangling flows when you need Power Query's authoring experience at Spark scale; be aware that behavior may differ from native M execution.
+
+### Analysis Services (SSAS / Azure AS)
+
+Tabular models in SQL Server Analysis Services 2017+ and Azure Analysis Services use Power Query M as the data source definition language for partitions. M is authored in Visual Studio (Analysis Services Projects extension) and executed at model processing time. Not all connectors are available in this context, and execution is triggered by model processing — not on-demand.
+
+### Environment Summary
+
+- **Full local M engine:** Power BI Desktop, Excel Desktop (Windows)
+- **Cloud M engine (UI-driven):** Fabric Dataflows Gen2, Power BI Dataflows Gen1, Excel Online, Power Automate/Apps Dataflows
+- **Cloud M engine + programmatic API:** Fabric Dataflows Gen2 only (as of Feb 2026 preview)
+- **M-to-Spark translation:** Azure Data Factory Wrangling Data Flows
+- **Model processing context:** SQL Server / Azure Analysis Services
+
+The On-Premises Data Gateway works across all cloud environments to route queries to on-premises or private network data sources — it does not execute M; execution always happens in the cloud, with the gateway acting as a relay.
