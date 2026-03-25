@@ -16,10 +16,11 @@
 
 ## P2 — High impact, moderate effort
 
-- [ ] **Search: include concepts** — Upgrade the search functionality to also return results from concept pages, not just functions.
-- [ ] **Patterns homepage prominence** — Find a way to make the Patterns section shine more on the home page. *(Alex)*
+- [x] **Search: include concepts and patterns** — Upgraded search to return results from functions, concepts, and patterns with type badges.
+- [x] **Patterns homepage prominence** — Added third action card and spotlight grid of up to 4 featured patterns (beginner-first) with difficulty badges.
+- [x] **GitHub contributor attribution** — Shows contributor avatars/usernames on each page based on git history, similar to MS Docs.
+- [ ] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
 - [ ] **Sample tables: surface the M code** — The M code on the sample tables page is too hidden; make it more discoverable/visible. *(Alex)*
-- [ ] **GitHub contributor attribution** — Similar to MS Docs, show contributors on each page based on git history. Display avatars/usernames of people who have edited that file.
 
 ---
 
