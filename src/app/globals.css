@@ -693,6 +693,36 @@ code {
   line-height: 1.6;
 }
 
+/* ===== Markdown Tables ===== */
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: 16px 0;
+}
+
+.markdown-table th,
+.markdown-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px solid var(--border-color);
+}
+
+.markdown-table thead th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.markdown-table tbody tr:nth-child(even) {
+  background: var(--bg-secondary);
+}
+
+.markdown-table td code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
 /* ===== Search Dialog ===== */
 .search-overlay {
   position: fixed;
