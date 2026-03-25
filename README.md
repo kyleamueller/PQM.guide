@@ -127,6 +127,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to preview the site. New MDX content is picked up automatically — restart the dev server if a brand-new content directory isn't appearing.
 
+## License
+
+- **Code** (the Next.js app, components, API routes): [MIT](LICENSE)
+- **Content** (function references, concept guides, patterns in `src/content/`): [CC BY 4.0](LICENSE-CONTENT)
+
+If you republish or build on the documentation content, attribution to [pqm.guide](https://pqm.guide) is required.
+
 ## Tech Stack
 
 - [Next.js 16](https://nextjs.org) with App Router

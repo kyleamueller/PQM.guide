@@ -106,7 +106,7 @@ export default function ExampleSection({
         </div>
       ) : outputTable ? (
         <div className="example-output">
-          <div className="result-label">Result</div>
+          <div className="result-label">Output</div>
           <div className="example-table">
             <PQTable data={outputTable} />
           </div>

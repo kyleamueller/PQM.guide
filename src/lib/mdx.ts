@@ -9,7 +9,7 @@ const CONCEPTS_DIR = path.join(process.cwd(), "src/content/concepts");
 
 export function getFunctionBySlug(slug: string) {
   const filePath = path.join(CONTENT_DIR, `${slug}.mdx`);
-  const raw = fs.readFileSync(filePath, "utf-8");
+  const raw = fs.readFileSync(filePath, "utf-8").replace(/\r\n/g, "\n");
   const { data, content } = matter(raw);
   return {
     frontmatter: data as FunctionFrontmatter,
@@ -59,7 +59,7 @@ export function buildSearchIndex(): FunctionIndexEntry[] {
 
 export function getConceptBySlug(slug: string) {
   const filePath = path.join(CONCEPTS_DIR, `${slug}.mdx`);
-  const raw = fs.readFileSync(filePath, "utf-8");
+  const raw = fs.readFileSync(filePath, "utf-8").replace(/\r\n/g, "\n");
   const { data, content } = matter(raw);
   return {
     frontmatter: data as ConceptFrontmatter,
@@ -89,7 +89,7 @@ const PATTERNS_DIR = path.join(process.cwd(), "src/content/patterns");
 
 export function getPatternBySlug(slug: string) {
   const filePath = path.join(PATTERNS_DIR, `${slug}.mdx`);
-  const raw = fs.readFileSync(filePath, "utf-8");
+  const raw = fs.readFileSync(filePath, "utf-8").replace(/\r\n/g, "\n");
   const { data, content } = matter(raw);
   return {
     frontmatter: data as PatternFrontmatter,
