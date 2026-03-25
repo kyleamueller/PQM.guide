@@ -1,4 +1,3 @@
-import React from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -100,86 +99,6 @@ function parseRemarks(content: string): string | null {
   return remarksMatch ? remarksMatch[1].trim() : null;
 }
 
-function parseInlineMarkdown(text: string): string {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/`([^`]+)`/g, "<code>$1</code>");
-}
-
-function renderRemarks(remarks: string) {
-  const elements: React.ReactElement[] = [];
-  const lines = remarks.split("\n");
-  let i = 0;
-  let key = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-
-    if (line.startsWith("|")) {
-      const tableLines: string[] = [];
-      while (i < lines.length && lines[i].startsWith("|")) {
-        tableLines.push(lines[i]);
-        i++;
-      }
-      const nonSep = tableLines.filter((l) => !/^\|[\s\-:|]+\|$/.test(l.trim()));
-      const toCell = (l: string) => l.split("|").map((s) => s.trim()).filter(Boolean);
-      const headers = toCell(nonSep[0] ?? "");
-      const rows = nonSep.slice(1).map(toCell);
-      elements.push(
-        <table key={key++} className="markdown-table">
-          <thead>
-            <tr>{headers.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(h) }} />)}</tr>
-          </thead>
-          <tbody>
-            {rows.map((row, ri) => (
-              <tr key={ri}>{row.map((cell, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(cell) }} />)}</tr>
-            ))}
-          </tbody>
-        </table>
-      );
-      continue;
-    }
-
-    if (line.startsWith("- ")) {
-      const listItems: string[] = [];
-      while (i < lines.length && lines[i].startsWith("- ")) {
-        listItems.push(lines[i].slice(2));
-        i++;
-      }
-      elements.push(
-        <ul key={key++} className="concept-list">
-          {listItems.map((item, j) => (
-            <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item) }} />
-          ))}
-        </ul>
-      );
-      continue;
-    }
-
-    if (line.trim() === "") {
-      i++;
-      continue;
-    }
-
-    const paraLines: string[] = [];
-    while (
-      i < lines.length &&
-      lines[i].trim() !== "" &&
-      !lines[i].startsWith("|") &&
-      !lines[i].startsWith("- ")
-    ) {
-      paraLines.push(lines[i]);
-      i++;
-    }
-    elements.push(
-      <p key={key++} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(paraLines.join(" ")) }} />
-    );
-  }
-
-  return elements;
-}
-
 export default async function FunctionPage({ params }: PageProps) {
   const { slug } = await params;
 
@@ -231,7 +150,11 @@ export default async function FunctionPage({ params }: PageProps) {
       {remarks && (
         <section className="remarks-section" style={{ margin: "24px 0" }}>
           <h2>Remarks</h2>
-          {renderRemarks(remarks)}
+          {remarks.split("\n\n").map((para, i) => (
+            <p key={i} dangerouslySetInnerHTML={{
+              __html: para.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>').replace(/`([^`]+)`/g, "<code>$1</code>")
+            }} />
+          ))}
         </section>
       )}
 
