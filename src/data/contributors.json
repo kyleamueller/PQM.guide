@@ -1,0 +1,4410 @@
+{
+  "functions/activedirectory-domains": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/analysisservices-database": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/azurestorage-blobs": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/azurestorage-tables": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/binary-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/binary-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/binary-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/byte-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/character-fromnumber": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/character-tonumber": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/combiner-combinetextbydelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/combiner-combinetextbyeachdelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/combiner-combinetextbylengths": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/combiner-combinetextbypositions": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/combiner-combinetextbyranges": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/comparer-equals": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/comparer-fromculture": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/comparer-ordinal": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/comparer-ordinalignorecase": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/csv-document": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/currency-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-adddays": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-addmonths": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-addquarters": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-addweeks": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-addyears": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-day": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-dayofweek": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-dayofweekname": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-dayofyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-daysinmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-endofday": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-endofmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-endofquarter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-endofweek": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-endofyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isincurrentday": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isincurrentmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isincurrentquarter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isincurrentweek": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isincurrentyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextday": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextndays": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextnmonths": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextnquarters": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextnweeks": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextnyears": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextquarter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextweek": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinnextyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousday": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousndays": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousnmonths": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousnquarters": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousnweeks": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousnyears": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousquarter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousweek": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinpreviousyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isinyeartodate": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-isleapyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-month": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-monthname": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-quarterofyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-startofday": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-startofmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-startofquarter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-startofweek": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-startofyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-torecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-weekofmonth": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-weekofyear": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/date-year": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-addzone": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-date": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-fixedlocalnow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-fromfiletime": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isincurrenthour": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isincurrentminute": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isincurrentsecond": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinnexthour": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinnextminute": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinnextnhours": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinnextnminutes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinnextnseconds": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinnextsecond": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinprevioushour": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinpreviousminute": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinpreviousnhours": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinpreviousnminutes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinpreviousnseconds": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-isinprevioussecond": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-localnow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-time": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-torecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetime-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-fixedlocalnow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-fixedutcnow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-fromfiletime": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-localnow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-removezone": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-switchzone": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-tolocal": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-torecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-toutc": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-utcnow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-zonehours": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/datetimezone-zoneminutes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/decimal-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/double-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-days": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-hours": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-minutes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-seconds": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-torecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-totaldays": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-totalhours": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-totalminutes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-totalseconds": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/duration-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/excel-currentworkbook": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/excel-workbook": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/expression-evaluate": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/file-contents": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/folder-contents": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/folder-files": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/function-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/function-invoke": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/guid-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/html-table": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/int16-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/int32-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/int64-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/int8-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/json-document": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/json-fromvalue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/lines-frombinary": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/lines-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/lines-tobinary": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/lines-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-accumulate": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-alltrue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-alternate": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-anytrue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-average": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-buffer": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-combine": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-contains": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-containsall": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-containsany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-count": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-covariance": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-dates": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-datetimes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-datetimezones": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-difference": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-distinct": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-durations": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-findtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-first": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-firstn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-generate": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-insertrange": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-intersect": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-isdistinct": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-isempty": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-last": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-lastn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-matchesall": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-matchesany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-max": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-maxn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-median": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-min": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-minn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-mode": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-modes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-nonnullcount": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-numbers": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-percentile": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-positionof": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-positionofany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-positions": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-product": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-random": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-range": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-removefirstn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-removeitems": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-removelastn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-removematchingitems": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-removenulls": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-removerange": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-repeat": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-replacematchingitems": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-replacerange": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-replacevalue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-reverse": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-select": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-single": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-singleordefault": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-skip": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-sort": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-split": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-standarddeviation": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-sum": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-times": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-transform": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-transformmany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-union": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/list-zip": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/logical-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/logical-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/logical-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/mysql-database": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-abs": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-acos": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-asin": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-atan": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-atan2": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-bitwiseand": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-bitwisenot": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-bitwiseor": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-bitwiseshiftleft": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-bitwiseshiftright": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-bitwisexor": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-combinations": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-cos": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-cosh": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-exp": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-factorial": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-integerdivide": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-iseven": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-isnan": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-isodd": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-ln": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-log": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-log10": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-mod": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-permutations": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-power": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-random": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-randombetween": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-round": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-roundawayfromzero": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-rounddown": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-roundtowardzero": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-roundup": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-sign": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-sin": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-sinh": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-sqrt": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-tan": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-tanh": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/number-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/odata-feed": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/odbc-datasource": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/odbc-query": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/oracle-database": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/pdf-tables": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/percentage-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/postgresql-database": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-addfield": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-combine": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-field": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-fieldcount": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-fieldnames": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-fieldordefault": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-fieldvalues": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-fromlist": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-fromtable": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-hasfields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-removefields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-renamefields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-reorderfields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-selectfields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-tolist": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-totable": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/record-transformfields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/replacer-replacetext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/replacer-replacevalue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharepoint-contents": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharepoint-files": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharepoint-tables": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharpbinary": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharpdate": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharpdatetime": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharpdatetimezone": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharpduration": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharptable": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sharptime": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/single-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splitbynothing": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbyanydelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbycharactertransition": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbydelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbyeachdelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbylengths": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbypositions": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbyranges": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbyrepeatedlengths": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/splitter-splittextbywhitespace": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sql-database": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/sql-databases": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-addcolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-addfuzzyclustercolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-addindexcolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-addjoincolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-addkey": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-addrankcolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-aggregatetablecolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-alternaterows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-approximaterowcount": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-buffer": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-column": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-columncount": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-columnnames": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-columnsoftype": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-combine": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-combinecolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-combinecolumnstorecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-contains": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-containsall": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-containsany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-demoteheaders": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-distinct": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-duplicatecolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-expandlistcolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-expandrecordcolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-expandtablecolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-filldown": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fillup": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-findtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-first": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-firstn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-firstvalue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fromcolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fromlist": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-frompartitions": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fromrecords": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fromrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fromvalue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fuzzygroup": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fuzzyjoin": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-fuzzynestedjoin": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-group": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-hascolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-insertrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-isdistinct": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-isempty": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-join": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-keys": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-last": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-lastn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-matchesallrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-matchesanyrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-max": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-maxn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-min": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-minn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-nestedjoin": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-partition": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-partitionvalues": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-pivot": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-positionof": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-positionofany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-prefixcolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-profile": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-promoteheaders": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-range": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-removecolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-removefirstn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-removelastn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-removematchingrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-removerows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-removerowswitherrors": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-renamecolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-reordercolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-repeat": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-replaceerrorvalues": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-replacematchingrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-replacerows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-replacevalue": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-reverserows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-rowcount": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-schema": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-selectcolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-selectrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-selectrowswitherrors": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-singlerow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-skip": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-sort": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-split": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-splitat": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-splitcolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-stopfolding": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-tocolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-tolist": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-torecords": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-transformcolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-transformcolumntypes": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-transformrows": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-transpose": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-unpivot": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/table-unpivotothercolumns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-afterdelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-at": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-beforedelimiter": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-betweendelimiters": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-clean": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-combine": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-contains": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-end": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-endswith": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-frombinary": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-infernumbertype": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-insert": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-length": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-lower": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-middle": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-newguid": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-padend": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-padstart": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-positionof": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-positionofany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-proper": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-range": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-remove": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-removerange": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-repeat": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-replace": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-replacerange": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-reverse": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-select": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-split": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-splitany": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-start": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-startswith": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-tobinary": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-tolist": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-trim": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-trimend": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-trimstart": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/text-upper": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-endofhour": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-from": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-hour": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-minute": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-second": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-startofhour": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-torecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/time-totext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-addtablekey": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-closedrecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-facets": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-forfunction": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-forrecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-functionparameters": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-functionrequiredparameters": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-functionreturn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-is": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-isnullable": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-isopenrecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-listitem": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-nonnullable": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-openrecord": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-recordfields": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-replacefacets": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-replacetablekeys": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-tablecolumn": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-tablekeys": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-tablerow": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-tableschema": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/type-union": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/uri-buildquerystring": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/uri-combine": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/uri-escapedatastring": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/uri-parts": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-as": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-compare": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-equals": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-expression": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-fromtext": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-is": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-metadata": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-nativequery": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-nullableequals": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-optimize": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-removemetadata": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-replacemetadata": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-replacetype": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/value-type": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/web-browsercontents": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/web-contents": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/web-headers": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/web-page": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "functions/xml-document": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/common-errors": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/control-structures": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/custom-functions": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/datetime-types": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/each-keyword": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/error-handling": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/getting-started": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/identifiers-and-scoping": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/lazy-evaluation": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/let-in-expressions": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/literal-constructors": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/m-paradigm": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/metadata": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/missingfield-handling": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/null-handling": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/power-query-environments": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/query-folding": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/sections-and-shared": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/structured-data": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/type-system": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "concepts/ui-to-m-bridge": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/api-authentication": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/conditional-column-logic": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/cross-query-lookup": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/custom-function-reuse": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/date-dimension-table": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/dynamic-column-selection": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/error-recovery-table": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/fuzzy-text-matching": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/nested-json-xml": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/null-safe-operations": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/pagination-web-contents": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/parameterized-queries": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/pivot-unpivot": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/query-performance": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/recursive-list-flattening": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/running-totals": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/table-joins": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ],
+  "patterns/text-parsing-patterns": [
+    {
+      "name": "kyleamueller",
+      "login": "kyleamueller",
+      "avatar": "https://github.com/kyleamueller.png?size=40",
+      "url": "https://github.com/kyleamueller"
+    }
+  ]
+}

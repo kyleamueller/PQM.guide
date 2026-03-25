@@ -8,6 +8,8 @@ import {
   buildSearchIndex,
 } from "@/lib/mdx";
 import SyntaxBlock from "@/components/function-page/SyntaxBlock";
+import ContributorAvatars from "@/components/ContributorAvatars";
+import { getContributors } from "@/lib/contributors";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -144,6 +146,7 @@ export default async function ConceptPage({ params }: PageProps) {
   const bodyElements = renderConceptBody(content);
   const allConcepts = getAllConcepts();
   const allFunctions = buildSearchIndex();
+  const contributors = getContributors("concepts", slug);
 
   const conceptTitleMap = new Map(allConcepts.map((c) => [c.slug, c.title]));
   const functionTitleMap = new Map(allFunctions.map((f) => [f.slug, f.title]));
@@ -259,6 +262,7 @@ export default async function ConceptPage({ params }: PageProps) {
           </ul>
         </div>
       )}
+      <ContributorAvatars contributors={contributors} />
     </article>
   );
 }

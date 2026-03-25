@@ -11,6 +11,8 @@ import ExampleSection from "@/components/function-page/ExampleSection";
 import RelatedFunctions from "@/components/function-page/RelatedFunctions";
 import CompatibilityBadges from "@/components/function-page/CompatibilityBadges";
 import SampleTablesBanner from "@/components/function-page/SampleTablesBanner";
+import ContributorAvatars from "@/components/ContributorAvatars";
+import { getContributors } from "@/lib/contributors";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -194,6 +196,7 @@ export default async function FunctionPage({ params }: PageProps) {
   const examples = parseExamples(content);
   const remarks = parseRemarks(content);
   const allFunctions = buildSearchIndex();
+  const contributors = getContributors("functions", slug);
 
   const categorySlug = frontmatter.category.toLowerCase().replace(/\s+/g, "-");
 
@@ -255,6 +258,7 @@ export default async function FunctionPage({ params }: PageProps) {
 
       <RelatedFunctions slugs={frontmatter.relatedFunctions} allFunctions={allFunctions} />
       <CompatibilityBadges compatibility={frontmatter.compatibility} />
+      <ContributorAvatars contributors={contributors} />
     </article>
   );
 }
