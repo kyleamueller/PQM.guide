@@ -5,7 +5,7 @@
 - **NEVER work directly on `main`.** All changes — no matter how small — must be made on a feature branch and submitted via a pull request.
 - Branch naming: `feature/<short-description>` or `fix/<short-description>`
 - After pushing a feature branch, always create a PR using `gh pr create`
-- Only merge PRs when explicitly asked to by the repo owner (`gh pr merge <number> --merge --delete-branch`)
+- Only merge PRs when explicitly asked to by the repo owner (`gh pr merge <number> --merge --delete-branch --admin`)
 
 ## Session startup
 
