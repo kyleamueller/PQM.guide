@@ -4,14 +4,15 @@ import { useState, useEffect, useCallback } from "react";
 import Sidebar from "./Sidebar";
 import SearchDialog from "@/components/search/SearchDialog";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { FunctionIndexEntry } from "@/lib/types";
+import { FunctionIndexEntry, SearchIndexEntry } from "@/lib/types";
 
 interface AppShellProps {
   functions: FunctionIndexEntry[];
+  searchItems: SearchIndexEntry[];
   children: React.ReactNode;
 }
 
-export default function AppShell({ functions, children }: AppShellProps) {
+export default function AppShell({ functions, searchItems, children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -50,7 +51,7 @@ export default function AppShell({ functions, children }: AppShellProps) {
         </main>
       </div>
       <SearchDialog
-        functions={functions}
+        items={searchItems}
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
       />

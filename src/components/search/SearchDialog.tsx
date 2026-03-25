@@ -3,26 +3,38 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Fuse from "fuse.js";
-import { FunctionIndexEntry } from "@/lib/types";
+import { SearchIndexEntry } from "@/lib/types";
 
 interface SearchDialogProps {
-  functions: FunctionIndexEntry[];
+  items: SearchIndexEntry[];
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function SearchDialog({ functions, isOpen, onClose }: SearchDialogProps) {
+const TYPE_LABEL: Record<string, string> = {
+  concept: "Concept",
+  pattern: "Pattern",
+};
+
+function itemUrl(item: SearchIndexEntry): string {
+  if (item.type === "concept") return `/concepts/${item.slug}`;
+  if (item.type === "pattern") return `/patterns/${item.slug}`;
+  return `/functions/${item.slug}`;
+}
+
+export default function SearchDialog({ items, isOpen, onClose }: SearchDialogProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<FunctionIndexEntry[]>([]);
+  const [results, setResults] = useState<SearchIndexEntry[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const fuse = useRef(
-    new Fuse(functions, {
+    new Fuse(items, {
       keys: [
         { name: "title", weight: 2 },
         { name: "description", weight: 1 },
+        { name: "keywords", weight: 0.8 },
         { name: "category", weight: 0.5 },
       ],
       threshold: 0.3,
@@ -31,40 +43,41 @@ export default function SearchDialog({ functions, isOpen, onClose }: SearchDialo
   );
 
   useEffect(() => {
-    fuse.current = new Fuse(functions, {
+    fuse.current = new Fuse(items, {
       keys: [
         { name: "title", weight: 2 },
         { name: "description", weight: 1 },
+        { name: "keywords", weight: 0.8 },
         { name: "category", weight: 0.5 },
       ],
       threshold: 0.3,
       includeScore: true,
     });
-  }, [functions]);
+  }, [items]);
 
   useEffect(() => {
     if (isOpen) {
       setQuery("");
-      setResults(functions.slice(0, 10));
+      setResults(items.slice(0, 10));
       setSelectedIndex(0);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [isOpen, functions]);
+  }, [isOpen, items]);
 
   useEffect(() => {
     if (!query.trim()) {
-      setResults(functions.slice(0, 10));
+      setResults(items.slice(0, 10));
       return;
     }
     const hits = fuse.current.search(query, { limit: 15 });
     setResults(hits.map((h) => h.item));
     setSelectedIndex(0);
-  }, [query, functions]);
+  }, [query, items]);
 
   const navigate = useCallback(
-    (slug: string) => {
+    (item: SearchIndexEntry) => {
       onClose();
-      router.push(`/functions/${slug}`);
+      router.push(itemUrl(item));
     },
     [onClose, router]
   );
@@ -78,7 +91,7 @@ export default function SearchDialog({ functions, isOpen, onClose }: SearchDialo
         e.preventDefault();
         setSelectedIndex((i) => Math.max(i - 1, 0));
       } else if (e.key === "Enter" && results[selectedIndex]) {
-        navigate(results[selectedIndex].slug);
+        navigate(results[selectedIndex]);
       } else if (e.key === "Escape") {
         onClose();
       }
@@ -100,7 +113,7 @@ export default function SearchDialog({ functions, isOpen, onClose }: SearchDialo
             ref={inputRef}
             type="text"
             className="search-input"
-            placeholder="Search functions..."
+            placeholder="Search functions, concepts, and patterns..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -108,22 +121,24 @@ export default function SearchDialog({ functions, isOpen, onClose }: SearchDialo
         </div>
         {results.length > 0 && (
           <ul className="search-results">
-            {results.map((fn, i) => (
-              <li key={fn.slug}>
+            {results.map((item, i) => (
+              <li key={`${item.type}:${item.slug}`}>
                 <button
                   className={`search-result-item ${i === selectedIndex ? "selected" : ""}`}
-                  onClick={() => navigate(fn.slug)}
+                  onClick={() => navigate(item)}
                   onMouseEnter={() => setSelectedIndex(i)}
                 >
-                  <span className="search-result-title">{fn.title}</span>
-                  <span className="search-result-category">{fn.category}</span>
+                  <span className="search-result-title">{item.title}</span>
+                  <span className="search-result-category">
+                    {TYPE_LABEL[item.type] ?? item.category}
+                  </span>
                 </button>
               </li>
             ))}
           </ul>
         )}
         {results.length === 0 && query && (
-          <div className="search-no-results">No functions found for &ldquo;{query}&rdquo;</div>
+          <div className="search-no-results">No results found for &ldquo;{query}&rdquo;</div>
         )}
       </div>
     </div>

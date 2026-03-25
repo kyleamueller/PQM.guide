@@ -1,8 +1,8 @@
 import Fuse from "fuse.js";
-import { FunctionIndexEntry } from "./types";
+import { SearchIndexEntry } from "./types";
 
-export function createSearchIndex(functions: FunctionIndexEntry[]) {
-  return new Fuse(functions, {
+export function createSearchIndex(items: SearchIndexEntry[]) {
+  return new Fuse(items, {
     keys: [
       { name: "title", weight: 2 },
       { name: "description", weight: 1 },

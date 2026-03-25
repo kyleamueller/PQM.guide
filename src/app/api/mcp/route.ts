@@ -241,7 +241,7 @@ async function callTool(
       case "search_functions": {
         const query = String(args.query ?? "");
         const limit = Math.min(Number(args.limit ?? 10), 20);
-        const index = createSearchIndex(buildSearchIndex());
+        const index = createSearchIndex(buildSearchIndex().map((f) => ({ ...f, type: "function" as const })));
         const results = index.search(query, { limit });
         if (results.length === 0) return `No functions found matching "${query}". Try rephrasing with M function name fragments (e.g. "Table", "List", "Text"), or use search_concepts or search_patterns to find topic guides instead.`;
         return results
