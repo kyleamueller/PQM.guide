@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { FunctionFrontmatter, FunctionIndexEntry, ConceptFrontmatter, PatternFrontmatter } from "./types";
+import { FunctionFrontmatter, FunctionIndexEntry, ConceptFrontmatter, PatternFrontmatter, SearchIndexEntry } from "./types";
 import { functionSynonyms } from "@/data/search-synonyms";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/functions");
@@ -110,4 +110,32 @@ export function getAllPatterns(): (PatternFrontmatter & { slug: string })[] {
     const { frontmatter } = getPatternBySlug(slug);
     return { ...frontmatter, slug };
   });
+}
+
+export function buildUnifiedSearchIndex(): SearchIndexEntry[] {
+  const functions: SearchIndexEntry[] = getAllFunctions().map((f) => ({
+    type: "function",
+    title: f.title,
+    slug: f.slug,
+    description: f.description,
+    category: f.category,
+    keywords: functionSynonyms[f.slug],
+  }));
+
+  const concepts: SearchIndexEntry[] = getAllConcepts().map((c) => ({
+    type: "concept",
+    title: c.title,
+    slug: c.slug,
+    description: c.description,
+  }));
+
+  const patterns: SearchIndexEntry[] = getAllPatterns().map((p) => ({
+    type: "pattern",
+    title: p.title,
+    slug: p.slug,
+    description: p.description,
+    difficulty: p.difficulty,
+  }));
+
+  return [...functions, ...concepts, ...patterns];
 }

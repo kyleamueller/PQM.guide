@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import AppShell from "@/components/layout/AppShell";
-import { buildSearchIndex } from "@/lib/mdx";
+import { buildSearchIndex, buildUnifiedSearchIndex } from "@/lib/mdx";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,12 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const functions = buildSearchIndex();
+  const searchItems = buildUnifiedSearchIndex();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
-          <AppShell functions={functions}>{children}</AppShell>
+          <AppShell functions={functions} searchItems={searchItems}>{children}</AppShell>
         </ThemeProvider>
       </body>
     </html>

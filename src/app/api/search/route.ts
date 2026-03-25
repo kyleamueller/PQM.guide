@@ -1,4 +1,4 @@
-import { buildSearchIndex } from "@/lib/mdx";
+import { buildUnifiedSearchIndex } from "@/lib/mdx";
 import { createSearchIndex } from "@/lib/search";
 
 const CORS_HEADERS = {
@@ -22,8 +22,8 @@ export function GET(req: Request) {
     );
   }
 
-  const functions = buildSearchIndex();
-  const index = createSearchIndex(functions);
+  const items = buildUnifiedSearchIndex();
+  const index = createSearchIndex(items);
   const results = index.search(query, { limit: 10 });
 
   return Response.json(

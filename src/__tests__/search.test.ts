@@ -1,13 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { createSearchIndex } from "@/lib/search";
-import type { FunctionIndexEntry } from "@/lib/types";
+import type { SearchIndexEntry } from "@/lib/types";
 
-const DATA: FunctionIndexEntry[] = [
-  { title: "List.Accumulate", slug: "list-accumulate", category: "List", description: "Fold over a list with a seed value." },
-  { title: "Table.AddColumn", slug: "table-addcolumn", category: "Table", description: "Add a computed column to a table." },
-  { title: "List.Sum", slug: "list-sum", category: "List", description: "Sum all numeric values in a list." },
-  { title: "Number.Round", slug: "number-round", category: "Number", description: "Round a number to a given precision." },
-  { title: "Text.Length", slug: "text-length", category: "Text", description: "Returns the number of characters in a text value." },
+const DATA: SearchIndexEntry[] = [
+  { type: "function", title: "List.Accumulate", slug: "list-accumulate", category: "List", description: "Fold over a list with a seed value." },
+  { type: "function", title: "Table.AddColumn", slug: "table-addcolumn", category: "Table", description: "Add a computed column to a table." },
+  { type: "function", title: "List.Sum", slug: "list-sum", category: "List", description: "Sum all numeric values in a list." },
+  { type: "function", title: "Number.Round", slug: "number-round", category: "Number", description: "Round a number to a given precision." },
+  { type: "function", title: "Text.Length", slug: "text-length", category: "Text", description: "Returns the number of characters in a text value." },
+];
+
+const MIXED_DATA: SearchIndexEntry[] = [
+  ...DATA,
+  { type: "concept", title: "Query Folding", slug: "query-folding", description: "How Power Query pushes transformations back to the data source." },
+  { type: "concept", title: "Error Handling", slug: "error-handling", description: "Techniques for catching and recovering from M errors." },
+  { type: "pattern", title: "Conditional Column", slug: "conditional-column", description: "Add a column whose value depends on another column.", difficulty: "beginner" },
 ];
 
 describe("createSearchIndex", () => {
@@ -40,7 +47,8 @@ describe("createSearchIndex", () => {
   });
 
   it("respects the limit option", () => {
-    const large: FunctionIndexEntry[] = Array.from({ length: 50 }, (_, i) => ({
+    const large: SearchIndexEntry[] = Array.from({ length: 50 }, (_, i) => ({
+      type: "function" as const,
       title: `List.Function${i}`,
       slug: `list-function-${i}`,
       category: "List",
@@ -58,9 +66,10 @@ describe("createSearchIndex", () => {
   });
 
   it("keyword synonyms surface results for non-M vocabulary", () => {
-    const withKeywords: FunctionIndexEntry[] = [
+    const withKeywords: SearchIndexEntry[] = [
       ...DATA,
       {
+        type: "function",
         title: "Table.SelectRows",
         slug: "table-selectrows",
         category: "Table",
@@ -71,5 +80,23 @@ describe("createSearchIndex", () => {
     const results = createSearchIndex(withKeywords).search("sql where");
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].item.slug).toBe("table-selectrows");
+  });
+
+  it("concepts appear in mixed search results", () => {
+    const results = createSearchIndex(MIXED_DATA).search("query folding");
+    const slugs = results.map((r) => r.item.slug);
+    expect(slugs).toContain("query-folding");
+  });
+
+  it("patterns appear in mixed search results", () => {
+    const results = createSearchIndex(MIXED_DATA).search("conditional column");
+    const slugs = results.map((r) => r.item.slug);
+    expect(slugs).toContain("conditional-column");
+  });
+
+  it("result items carry their type field", () => {
+    const results = createSearchIndex(MIXED_DATA).search("error");
+    const types = results.map((r) => r.item.type);
+    expect(types).toContain("concept");
   });
 });

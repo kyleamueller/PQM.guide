@@ -70,6 +70,18 @@ export interface FunctionIndexEntry {
   keywords?: string;
 }
 
+export type SearchResultType = "function" | "concept" | "pattern";
+
+export interface SearchIndexEntry {
+  type: SearchResultType;
+  title: string;
+  slug: string;
+  description: string;
+  category?: string;
+  keywords?: string;
+  difficulty?: PatternDifficulty;
+}
+
 export interface ExampleStep {
   name: string;
   description?: string;
