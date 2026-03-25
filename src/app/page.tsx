@@ -2,7 +2,8 @@ import Link from "next/link";
 import path from "path";
 import { execSync } from "child_process";
 import { categories } from "@/data/categories";
-import { getAllFunctions, getFunctionBySlug } from "@/lib/mdx";
+import { getAllFunctions, getFunctionBySlug, getAllPatterns } from "@/lib/mdx";
+import { PatternDifficulty } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -44,9 +45,27 @@ function getRecentlyAdded(limit = 6) {
   }
 }
 
+const DIFFICULTY_COLOR: Record<PatternDifficulty, string> = {
+  beginner: "var(--pq-logical-true)",
+  intermediate: "var(--accent)",
+  advanced: "#e67e22",
+};
+
+const DIFFICULTY_LABEL: Record<PatternDifficulty, string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
+
 export default function Home() {
   const allFunctions = getAllFunctions();
   const recentlyAdded = getRecentlyAdded();
+  const allPatterns = getAllPatterns();
+  // Show beginner patterns first, then fill with intermediate up to 4 total
+  const featuredPatterns = [
+    ...allPatterns.filter((p) => p.difficulty === "beginner"),
+    ...allPatterns.filter((p) => p.difficulty === "intermediate"),
+  ].slice(0, 4);
 
   const categoryCounts = categories.map((cat) => ({
     ...cat,
@@ -71,7 +90,7 @@ export default function Home() {
         <Link
           href="/learn"
           style={{
-            flex: "1 1 200px",
+            flex: "1 1 160px",
             display: "block",
             background: "var(--accent)",
             color: "#fff",
@@ -85,9 +104,26 @@ export default function Home() {
             An 8-step learning path from the M paradigm to query folding.
           </div>
         </Link>
+        <Link
+          href="/patterns"
+          style={{
+            flex: "1 1 160px",
+            display: "block",
+            background: "var(--bg-secondary)",
+            border: "2px solid var(--accent)",
+            borderRadius: 8,
+            padding: "20px 24px",
+            textDecoration: "none",
+          }}
+        >
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4, color: "var(--accent)" }}>Practical Patterns →</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+            Real-world M recipes: joins, pagination, fuzzy matching, and more.
+          </div>
+        </Link>
         <div
           style={{
-            flex: "1 1 200px",
+            flex: "1 1 160px",
             background: "var(--bg-secondary)",
             border: "1px solid var(--border-color)",
             borderRadius: 8,
@@ -125,6 +161,53 @@ export default function Home() {
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {fn.description}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {featuredPatterns.length > 0 && (
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
+              Patterns
+            </h2>
+            <Link href="/patterns" style={{ fontSize: 13, color: "var(--accent)", textDecoration: "none" }}>
+              View all {allPatterns.length} →
+            </Link>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 }}>
+            {featuredPatterns.map((pattern) => (
+              <Link
+                key={pattern.slug}
+                href={`/patterns/${pattern.slug}`}
+                style={{
+                  display: "block",
+                  background: "var(--bg-secondary)",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: 6,
+                  padding: "12px 14px",
+                  textDecoration: "none",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{pattern.title}</span>
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                    color: DIFFICULTY_COLOR[pattern.difficulty],
+                    flexShrink: 0,
+                    marginLeft: 8,
+                  }}>
+                    {DIFFICULTY_LABEL[pattern.difficulty]}
+                  </span>
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                  {pattern.description}
                 </div>
               </Link>
             ))}
