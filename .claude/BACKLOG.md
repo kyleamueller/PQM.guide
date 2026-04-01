@@ -34,4 +34,4 @@
 ## P4 — Strategic / needs a decision first
 
 - [ ] **TMDL script for sample tables** — In addition to the M/Power Query code, provide a TMDL script so users can load sample tables directly via that path. *(Kerski)*
-- [ ] **MCP + Skills** — Supplement the MCP server with Skills. Reference: https://medium.com/@dan.avila7/separation-of-responsibilities-mcp-vs-skills-70a0d197f5d3 *(Kerski)*
+- [x] **MCP + Skills** — Supplement the MCP server with Skills. Reference: https://medium.com/@dan.avila7/separation-of-responsibilities-mcp-vs-skills-70a0d197f5d3 *(Kerski)*
