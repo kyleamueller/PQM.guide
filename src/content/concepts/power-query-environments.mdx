@@ -12,7 +12,7 @@ Power Query M runs in more places than most users realize. What started as a des
 
 ### Microsoft Fabric Dataflows Gen2
 
-Dataflows Gen2 is the most capable Power Query environment as of 2026. It runs in the cloud on the Modern Evaluator engine (rebuilt on .NET 8), supports 80+ connectors at GA, and stores results as Delta tables in OneLake. Output destinations include Fabric Lakehouse, Fabric Warehouse, Azure SQL, ADLS Gen2, and more.
+Dataflows Gen2 is the most capable Power Query environment as of 2026. It runs in the cloud on the Modern Evaluator engine (rebuilt on .NET 8, **generally available as of February 2026**), supports 80+ connectors at GA, and stores results as Delta tables in OneLake. Output destinations include Fabric Lakehouse (Tables and Files), Fabric Warehouse, Fabric SQL database, Azure SQL, Azure Data Explorer (Kusto), Azure Data Lake Storage Gen2, Fabric KQL database, SharePoint Files, and Snowflake.
 
 Requires a Fabric capacity (not just Power BI Pro). Supports on-premises sources via gateway.
 
@@ -43,11 +43,13 @@ The original Power Query environment. Runs fully local on Windows (or Mac with l
 
 Mac users have a reduced connector set and some M functions are unavailable.
 
-### Power BI Service — Dataflows Gen1
+### Power BI Service — Dataflows Gen1 (Legacy)
+
+> **Retirement notice:** Microsoft has announced Dataflows Gen1 is moving to **Legacy** status. No new features will be developed. Existing dataflows continue to work for now, but Microsoft is finalizing retirement dates and will provide at least 12 months' notice before any capacity-level shutdown. Migration is strongly recommended. See the [official announcement](https://powerbi.microsoft.com/en-us/blog/dataflows-thank-you-for-eight-years-of-gen1-and-why-gen2-is-the-future/).
 
 Cloud-only dataflows available with Power BI Pro, PPU, or Premium. Stores data in CDM format (CSV files in ADLS Gen2 or internal Power BI storage). Supports scheduled refresh and on-premises sources via gateway. Limited to 50 tables per dataflow and a 512 KB mashup script size.
 
-Dataflows Gen1 **does not support** the new executeQuery API — that is exclusive to Fabric Dataflows Gen2.
+Dataflows Gen1 **does not support** the new executeQuery API — that is exclusive to Fabric Dataflows Gen2. To migrate, use the **Save as Dataflow Gen2** feature in the product, or the Save As API for bulk/CI-CD workflows.
 
 ### Excel Desktop
 
@@ -80,7 +82,7 @@ Tabular models in SQL Server Analysis Services 2017+ and Azure Analysis Services
 ### Environment Summary
 
 - **Full local M engine:** Power BI Desktop, Excel Desktop (Windows)
-- **Cloud M engine (UI-driven):** Fabric Dataflows Gen2, Power BI Dataflows Gen1, Excel Online, Power Automate/Apps Dataflows
+- **Cloud M engine (UI-driven):** Fabric Dataflows Gen2, Power BI Dataflows Gen1 *(Legacy — migration recommended)*, Excel Online, Power Automate/Apps Dataflows
 - **Cloud M engine + programmatic API:** Fabric Dataflows Gen2 only (as of Feb 2026 preview)
 - **M-to-Spark translation:** Azure Data Factory Wrangling Data Flows
 - **Model processing context:** SQL Server / Azure Analysis Services
