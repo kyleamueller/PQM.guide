@@ -52,80 +52,49 @@ Any client supporting Streamable HTTP can also connect directly to `https://pqm.
 
 ## Contributing
 
-PQM.guide is open to contributions from the Power Query community. All content lives in MDX files — no special build knowledge required for most edits.
+PQM.guide is open to contributions from the Power Query community. Most content is MDX (Markdown + YAML frontmatter) — no React, TypeScript, or Next.js knowledge required for typical edits.
 
-### Quick edits (typos, wording, examples)
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for full details: frontmatter schemas, example output format, slug rules, sample table usage, and PR guidelines.
 
-1. Fork this repository
-2. Find the file you want to edit:
-   - Functions: `src/content/functions/[slug].mdx`
-   - Concepts: `src/content/concepts/[slug].mdx`
-   - Patterns: `src/content/patterns/[slug].mdx`
-3. Make your changes and submit a pull request
+**Quick ways to help:**
 
-### Adding a new function page
+- Fix a typo or improve a function's remarks
+- Add a missing function (149 of the official spec are still undocumented)
+- Write a new concept guide or pattern recipe
+- [Open an issue](https://github.com/kyleamueller/PQM.guide/issues) or [start a discussion](https://github.com/kyleamueller/PQM.guide/discussions) if you'd rather suggest changes without code
 
-Function pages are MDX files in `src/content/functions/` with YAML frontmatter. Use any existing file as a template.
+### Claude Code commands
 
-**File naming:** `category-functionname.mdx` in lowercase (e.g., `text-contains.mdx`)
+If you use [Claude Code](https://claude.com/claude-code), the repo includes slash commands that automate content scaffolding and publishing:
 
-**Rules:**
-- Examples must use the shared sample tables (Sales, Customers, Products, Employees, OrderLog) — never `Table.FromRecords` for sample data
-- Wrap expected output in `<!--output ... -->` HTML comments as JSON with `columns` and `rows`
-- See the [Sample Tables](https://pqm.guide/sample-tables) page for available data
+| Command | What it does |
+|---|---|
+| `/add-function` | Scaffold a new function page — prompts for the function name, researches the official spec, generates the MDX file with correct frontmatter, and runs tests |
+| `/add-concept` | Scaffold a new concept guide |
+| `/add-pattern` | Scaffold a new pattern recipe |
+| `/publish` | Package uncommitted changes into a pull request |
+| `/refresh-site` | Full content freshness review — scans Microsoft blogs, checks for new M functions, verifies compatibility flags, and updates stale content |
 
-### Adding a new concept guide
-
-Concept guides live in `src/content/concepts/`. Use any existing concept as a template.
-
-**Frontmatter:**
-```yaml
----
-title: "Your Concept Title"
-slug: "your-concept-slug"
-description: "One sentence description shown in listings and meta tags."
-relatedConcepts:
-  - "other-concept-slug"
-relatedFunctions:
-  - "function-slug"
----
-```
-
-Body is standard Markdown with fenced code blocks using the `powerquery` language identifier.
-
-### Adding a new pattern
-
-Patterns live in `src/content/patterns/`. Use any existing pattern as a template.
-
-**Frontmatter:**
-```yaml
----
-title: "Pattern Title"
-slug: "pattern-slug"
-description: "One sentence description."
-difficulty: "beginner"   # beginner | intermediate | advanced
-relatedFunctions:
-  - "function-slug"
-relatedConcepts:
-  - "concept-slug"
----
-```
-
-Patterns should follow a problem → solution → explanation structure with working code examples.
-
-### Suggesting changes without code
-
-- [Open an issue](https://github.com/kyleamueller/PQM.guide/issues) to report errors or suggest improvements
-- [Start a discussion](https://github.com/kyleamueller/PQM.guide/discussions) to propose new content or features
+These commands live in `.claude/commands/` and are loaded automatically when you open the project in Claude Code.
 
 ## Running Locally
 
 ```bash
+git clone https://github.com/kyleamueller/PQM.guide.git
+cd PQM.guide
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to preview the site. New MDX content is picked up automatically — restart the dev server if a brand-new content directory isn't appearing.
+Open [http://localhost:3000](http://localhost:3000) to preview the site. `npm install` also sets up a pre-push hook that runs type checking and tests automatically.
+
+Other useful commands:
+
+```bash
+npm run typecheck   # TypeScript type check
+npm run test        # Vitest test suite (45 tests)
+npm run build       # Full production build (593 pages)
+```
 
 ## License
 
