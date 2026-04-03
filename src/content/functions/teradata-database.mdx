@@ -1,0 +1,95 @@
+---
+title: "Teradata.Database"
+slug: "teradata-database"
+category: "Accessing Data"
+description: "Returns a table of SQL tables and views from a Teradata database."
+syntax: "Teradata.Database(server as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of SQL tables and views from the specified Teradata database server."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The Teradata server hostname or IP address. The port may be optionally specified with the server, separated by a colon (e.g., \"teradataserver:1025\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control connection and query behavior. Supported fields: CreateNavigationProperties, NavigationPropertyNameGenerator, Query, CommandTimeout, ConnectionTimeout, HierarchicalNavigation."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "odbc-datasource"
+  - "odbc-query"
+---
+
+## Remarks
+
+`Teradata.Database` connects to a Teradata database server and returns a navigation table of the SQL tables and views available to the authenticated user. Objects can be grouped by database/schema name when hierarchical navigation is enabled.
+
+**Option record fields**:
+
+| Field | Type | Description |
+|---|---|---|
+| `CreateNavigationProperties` | logical | Sets whether to generate navigation properties on the returned values based on foreign key relationships. Default is `true`. |
+| `NavigationPropertyNameGenerator` | function | A function used for the creation of names for navigation properties. |
+| `Query` | text | A native SQL query used to retrieve data. If the query produces multiple result sets, only the first will be returned. |
+| `CommandTimeout` | duration | Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes. |
+| `ConnectionTimeout` | duration | Controls how long to wait before abandoning an attempt to make a connection to the server. The default value is driver-dependent. |
+| `HierarchicalNavigation` | logical | Sets whether to view the tables grouped by their schema names. Default is `false`. |
+
+The record parameter is specified as `[option1 = value1, option2 = value2...]` or `[Query = "select ..."]` for example.
+
+**Authentication**: Teradata uses database username/password authentication (Teradata Directory, TD2 mechanism), configured in the Power Query data source credentials dialog. Windows authentication (LDAP) may also be supported depending on the Teradata server configuration. Do not embed credentials in the M query.
+
+**Driver requirements**: The Teradata .NET Data Provider (or Teradata ODBC driver) must be installed on the machine running Power Query. Download the driver from the Teradata website. Ensure the driver bitness matches the Power Query host (64-bit for Power BI Desktop).
+
+**Query folding**: Teradata supports query folding. Filters, column selections, sorting, joins, groupings, and aggregations applied in Power Query are translated into Teradata SQL and executed on the server. When using the `Query` option with a native SQL statement, additional folding does not occur on top of the native query.
+
+**Power BI Service**: Teradata is not supported for direct cloud refresh. An on-premises data gateway with the Teradata driver installed is required for scheduled refresh.
+
+## Examples
+
+### Example 1: Connect to a Teradata server
+```powerquery
+Teradata.Database("teradataserver")
+```
+
+### Example 2: Connect with an explicit port
+```powerquery
+Teradata.Database("teradataserver:1025")
+```
+
+### Example 3: Run a native SQL query
+```powerquery
+Teradata.Database(
+    "teradataserver",
+    [Query = "SELECT TOP 100 order_id, customer_id, order_date FROM sales.orders"]
+)
+```
+
+### Example 4: Enable hierarchical navigation and set a command timeout
+```powerquery
+Teradata.Database(
+    "teradataserver",
+    [
+        HierarchicalNavigation = true,
+        CommandTimeout = #duration(0, 0, 5, 0)
+    ]
+)
+```
+
+### Example 5: Navigate to a specific table in a database
+```powerquery
+let
+    Source = Teradata.Database("teradataserver", [HierarchicalNavigation = true]),
+    SalesDB = Source{[Name = "Sales"]}[Data],
+    Orders = SalesDB{[Name = "Orders"]}[Data]
+in
+    Orders
+```

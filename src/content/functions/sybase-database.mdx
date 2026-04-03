@@ -1,0 +1,100 @@
+---
+title: "Sybase.Database"
+slug: "sybase-database"
+category: "Accessing Data"
+description: "Returns a table of SQL tables and views available in a Sybase database."
+syntax: "Sybase.Database(server as text, database as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of SQL tables and views from the specified Sybase database instance."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The Sybase server hostname or IP address. The port may be optionally specified with the server, separated by a colon (e.g., \"myserver:5000\")."
+  - name: "database"
+    type: "text"
+    required: true
+    description: "The name of the database instance to connect to on the Sybase server."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control connection and query behavior. Supported fields: CreateNavigationProperties, NavigationPropertyNameGenerator, Query, CommandTimeout, ConnectionTimeout, HierarchicalNavigation."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "odbc-datasource"
+  - "odbc-query"
+---
+
+## Remarks
+
+`Sybase.Database` connects to a SAP Sybase ASE (Adaptive Server Enterprise) database and returns a navigation table of the SQL tables and views in the specified database. Objects are organized by owner/schema when hierarchical navigation is enabled.
+
+**Option record fields**:
+
+| Field | Type | Description |
+|---|---|---|
+| `CreateNavigationProperties` | logical | Sets whether to generate navigation properties on the returned values based on foreign key relationships. Default is `true`. |
+| `NavigationPropertyNameGenerator` | function | A function used for the creation of names for navigation properties. |
+| `Query` | text | A native SQL query used to retrieve data. If the query produces multiple result sets, only the first will be returned. |
+| `CommandTimeout` | duration | Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes. |
+| `ConnectionTimeout` | duration | Controls how long to wait before abandoning an attempt to make a connection to the server. The default value is driver-dependent. |
+| `HierarchicalNavigation` | logical | Sets whether to view the tables grouped by their schema names. Default is `false`. |
+
+The record parameter is specified as `[option1 = value1, option2 = value2...]` or `[Query = "select ..."]` for example.
+
+**Authentication**: Sybase uses database username/password authentication, configured in the Power Query data source credentials dialog. Do not embed credentials in the M query.
+
+**Driver requirements**: The SAP Sybase ASE ADO.NET provider or an appropriate ODBC driver for Sybase must be installed on the machine running Power Query. Ensure the driver bitness matches the Power Query host (64-bit for Power BI Desktop, 32-bit or 64-bit for Excel depending on version).
+
+**Query folding**: Sybase supports query folding. Filters, column selections, sorting, and other transformations applied in Power Query are translated into SQL and executed on the Sybase server. When using the `Query` option with a native SQL statement, additional folding does not occur on top of the native query.
+
+**Power BI Service**: Sybase is not supported for direct cloud refresh. An on-premises data gateway with the appropriate Sybase driver installed is required for scheduled refresh.
+
+## Examples
+
+### Example 1: Connect to a Sybase database
+```powerquery
+Sybase.Database("sybaseserver", "SalesDB")
+```
+
+### Example 2: Connect with an explicit port
+```powerquery
+Sybase.Database("sybaseserver:5000", "SalesDB")
+```
+
+### Example 3: Run a native SQL query
+```powerquery
+Sybase.Database(
+    "sybaseserver",
+    "SalesDB",
+    [Query = "SELECT TOP 100 order_id, customer_id, order_date FROM dbo.orders"]
+)
+```
+
+### Example 4: Enable hierarchical navigation and set a command timeout
+```powerquery
+Sybase.Database(
+    "sybaseserver",
+    "SalesDB",
+    [
+        HierarchicalNavigation = true,
+        CommandTimeout = #duration(0, 0, 5, 0)
+    ]
+)
+```
+
+### Example 5: Navigate to a specific table
+```powerquery
+let
+    Source = Sybase.Database("sybaseserver", "SalesDB"),
+    Orders = Source{[Schema="dbo", Item="orders"]}[Data]
+in
+    Orders
+```

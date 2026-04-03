@@ -1,0 +1,79 @@
+---
+title: "SapBusinessWarehouse.Cubes"
+slug: "sapbusinesswarehouse-cubes"
+category: "Accessing Data"
+description: "Returns a table of InfoCubes and queries grouped by InfoArea from an SAP Business Warehouse instance."
+syntax: "SapBusinessWarehouse.Cubes(server as text, systemNumberOrSystemId as text, clientId as text, optional optionsOrLogonGroup as any, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of InfoCubes and queries grouped by InfoArea from the specified SAP BW instance."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The SAP Business Warehouse server hostname or IP address to connect to."
+  - name: "systemNumberOrSystemId"
+    type: "text"
+    required: true
+    description: "The SAP system number (two-digit, e.g., \"00\") when connecting to an application server, or the system ID (three-character SID) when connecting via a logon group/message server."
+  - name: "clientId"
+    type: "text"
+    required: true
+    description: "The SAP client ID (three-digit, e.g., \"100\") used for authentication on the SAP BW system."
+  - name: "optionsOrLogonGroup"
+    type: "any"
+    required: false
+    description: "When connecting via a message server (load-balanced connection), this specifies the logon group name as text. Otherwise, this can be a record of additional connection options."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control additional connection behaviors. Used when the fourth parameter is a logon group name (text) and you still need to pass option fields."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "saphana-database"
+  - "odbc-datasource"
+---
+
+## Remarks
+
+`SapBusinessWarehouse.Cubes` connects to an SAP Business Warehouse (BW) instance and returns a navigation table of InfoCubes and BEx queries, organized (grouped) by InfoArea. This allows browsing the BW metadata hierarchy to select which cube or query to load data from.
+
+**Connection modes**: SAP BW supports two connection topologies:
+
+- **Application server (direct)** -- provide the server hostname and a two-digit system number (e.g., `"00"`). The fourth parameter (`optionsOrLogonGroup`) can be omitted or set to a record of options.
+- **Message server (load-balanced)** -- provide the message server hostname and the three-character system ID (SID). The fourth parameter should be the logon group name (text, e.g., `"PUBLIC"`), and additional options can go in the fifth parameter.
+
+**Authentication**: SAP BW uses SAP username/password authentication, configured in the Power Query data source credentials dialog. Do not embed credentials in the M query. Windows single sign-on (SSO) via Kerberos/SAML may be available when using an on-premises data gateway configured for SSO to SAP.
+
+**Driver requirements**: The SAP .NET Connector 3.0 (NCo 3.0) must be installed on the machine running Power Query. For Power BI Desktop (64-bit), install the 64-bit version of the connector. For 32-bit Excel, install the 32-bit version.
+
+**Query folding**: SAP BW queries are executed on the SAP server, and filters applied in Power Query are sent to BW as characteristic restrictions where possible. However, full query folding (in the relational SQL sense) does not apply since BW uses an OLAP/MDX-style interface.
+
+**Power BI Service**: SAP BW is not supported for direct cloud refresh. An on-premises data gateway with the SAP .NET Connector installed and configured is required for scheduled refresh.
+
+## Examples
+
+### Example 1: Connect to an SAP BW application server
+```powerquery
+SapBusinessWarehouse.Cubes("sapbwserver", "00", "100")
+```
+
+### Example 2: Connect via a message server with a logon group
+```powerquery
+SapBusinessWarehouse.Cubes("sapmsgserver", "BWP", "100", "PUBLIC")
+```
+
+### Example 3: Navigate to a specific InfoCube
+```powerquery
+let
+    Source = SapBusinessWarehouse.Cubes("sapbwserver", "00", "100"),
+    InfoArea = Source{[Name = "Sales"]}[Data],
+    Cube = InfoArea{[Name = "0SD_C03"]}[Data]
+in
+    Cube
+```

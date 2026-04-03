@@ -1,0 +1,64 @@
+---
+title: "DeltaLake.Table"
+slug: "deltalake-table"
+category: "Accessing Data"
+description: "Returns the contents of a Delta Lake table from a specified directory."
+syntax: "DeltaLake.Table(directory as table, optional options as nullable record) as any"
+returnType: "any"
+returnDescription: "The contents of the Delta Lake table located in the specified directory."
+parameters:
+  - name: "directory"
+    type: "table"
+    required: true
+    description: "The directory (as a table/folder path) containing the Delta Lake table files, including the _delta_log subfolder. Typically an Azure Data Lake Storage Gen2 path, ADLS path, or local folder reference."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control how the Delta Lake table is read, including version and timestamp options."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "deltalake-metadata"
+---
+
+## Remarks
+
+`DeltaLake.Table` reads the contents of a Delta Lake table from the specified directory location. Delta Lake is an open-source storage layer that brings ACID transactions, schema enforcement, and time travel to data lakes. The function reads the Delta transaction log to determine which Parquet files comprise the current version of the table, then returns the combined data as a Power Query table.
+
+**Directory parameter**: The `directory` parameter points to the root folder of a Delta Lake table. This folder must contain a `_delta_log` subfolder with the JSON/Parquet transaction log files. The path is typically an Azure Data Lake Storage Gen2 URL (e.g., `"https://myaccount.dfs.core.windows.net/mycontainer/delta-table"`), but can also be a local file system path or other supported storage location.
+
+**Authentication**: Authentication depends on the underlying storage system. For Azure Data Lake Storage Gen2, supported methods include Account Key, Shared Access Signature (SAS), Service Principal, or Microsoft Account (Azure AD). Configure credentials in the Power Query data source credentials dialog.
+
+**Query folding**: Delta Lake supports partition pruning — if the Delta table is partitioned and you filter on a partition column, Power Query reads only the relevant Parquet files rather than the entire table. Column pruning (projection pushdown) is also supported, reading only the required columns from the underlying Parquet files.
+
+**Platform availability**: The Delta Lake connector is available in Power BI Desktop, Power BI Service (via supported lakehouse/storage connections), Dataflows, and Fabric Notebooks. It is not currently available in Excel.
+
+## Examples
+
+### Example 1: Read a Delta Lake table from Azure Data Lake Storage Gen2
+```powerquery
+DeltaLake.Table("https://myaccount.dfs.core.windows.net/mycontainer/delta-table")
+```
+
+### Example 2: Read a Delta Lake table and select specific columns
+```powerquery
+let
+    Source = DeltaLake.Table("https://myaccount.dfs.core.windows.net/mycontainer/sales-data"),
+    Selected = Table.SelectColumns(Source, {"OrderID", "OrderDate", "TotalAmount"})
+in
+    Selected
+```
+
+### Example 3: Filter a partitioned Delta Lake table
+```powerquery
+let
+    Source = DeltaLake.Table("https://myaccount.dfs.core.windows.net/mycontainer/events"),
+    Filtered = Table.SelectRows(Source, each [Year] = 2025)
+in
+    Filtered
+```
