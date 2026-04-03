@@ -9,7 +9,7 @@ PQM.guide documents 512 Power Query M functions across 24 categories with clear 
 | Section | URL | Description |
 |---|---|---|
 | Functions | `/functions/[slug]` | 512 functions across 24 categories with syntax, parameters, examples, and best practices |
-| Concepts | `/concepts/[slug]` | 17 concept guides covering M fundamentals (lazy evaluation, query folding, type system, etc.) |
+| Concepts | `/concepts/[slug]` | 21 concept guides covering M fundamentals (lazy evaluation, query folding, type system, etc.) |
 | Patterns | `/patterns/[slug]` | 18 practical M recipes grouped by difficulty (beginner → advanced) |
 | Start Here | `/learn` | A curated 8-step learning path for developers new to M |
 | Sample Tables | `/sample-tables` | Reference data used in function examples (Sales, Customers, Products, Employees, OrderLog) |
