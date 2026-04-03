@@ -1,0 +1,46 @@
+---
+title: "Table.PartitionKey"
+slug: "table-partitionkey"
+category: "Table"
+description: "Returns the partition key of the specified table."
+syntax: "Table.PartitionKey(table as table) as nullable list"
+returnType: "list"
+returnDescription: "A list of column names that form the partition key, or null if no partition key is defined."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose partition key to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-replacepartitionkey"
+  - "table-partitionvalues"
+  - "table-partition"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Table.PartitionKey` returns the partition key metadata attached to a table as a list of column names, or `null` if no partition key has been defined. Partition keys indicate how a table's data is physically or logically segmented — for example, by date or region.
+
+This is the getter counterpart to `Table.ReplacePartitionKey`. Use `Table.PartitionValues` to see the actual partition segments.
+
+Partition keys are primarily relevant when working with partitioned data sources or building custom connectors that expose partitioned data to the Power Query engine for parallel evaluation.
+
+## Examples
+
+### Example 1: Check whether a table has a partition key
+
+```powerquery
+let
+    Source = Sales,
+    Key = Table.PartitionKey(Source)
+in
+    if Key = null then "No partition key" else Text.Combine(Key, ", ")
+```

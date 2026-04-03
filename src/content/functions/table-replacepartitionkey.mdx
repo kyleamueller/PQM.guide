@@ -1,0 +1,48 @@
+---
+title: "Table.ReplacePartitionKey"
+slug: "table-replacepartitionkey"
+category: "Table"
+description: "Replaces the partition key of the specified table."
+syntax: "Table.ReplacePartitionKey(table as table, partitionKey as nullable list) as table"
+returnType: "table"
+returnDescription: "A table with the partition key replaced by the specified column list."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose partition key to replace."
+  - name: "partitionKey"
+    type: "list"
+    required: false
+    description: "A list of column names to set as the new partition key, or null to clear the partition key."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-partitionkey"
+  - "table-partitionvalues"
+  - "table-partition"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Table.ReplacePartitionKey` sets or replaces the partition key metadata on a table. The partition key is a list of column names that define how the table's data is logically segmented. Pass `null` to clear an existing partition key.
+
+This is the setter counterpart to `Table.PartitionKey`. Partition keys are primarily used by custom connectors and the Power Query engine to enable parallel evaluation of partitioned data sources.
+
+## Examples
+
+### Example 1: Set a partition key on a table
+
+```powerquery
+let
+    Partitioned = Table.ReplacePartitionKey(Sales, {"Category"}),
+    Key = Table.PartitionKey(Partitioned)
+in
+    Key
+```

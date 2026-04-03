@@ -1,0 +1,67 @@
+---
+title: "Table.ToRows"
+slug: "table-torows"
+category: "Table"
+description: "Converts a table into a list of lists, where each inner list contains the row values."
+syntax: "Table.ToRows(table as table) as list"
+returnType: "list"
+returnDescription: "A list of lists, where each inner list contains the values of one row in column order."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to convert into a list of row-value lists."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-fromrows"
+  - "table-torecords"
+  - "table-tolist"
+  - "table-tocolumns"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Table.ToRows` converts a table into a list of lists. Each inner list contains the cell values for one row, ordered by the table's column sequence. Column names are discarded — only the values are kept.
+
+This is the inverse of `Table.FromRows`. Use it when you need positional access to row data rather than named field access (which `Table.ToRecords` provides).
+
+Common uses include building custom serialization formats, passing row data to functions that expect flat lists, or interoperating with APIs that accept arrays of arrays.
+
+## Examples
+
+### Example 1: Convert Sales rows to nested lists
+
+Input: `Sales`
+
+```powerquery
+let
+    Subset = Table.SelectColumns(
+        Table.FirstN(Sales, 3),
+        {"OrderID", "Product", "Quantity"}
+    )
+in
+    Table.ToRows(Subset)
+```
+
+### Example 2: Round-trip with Table.FromRows
+
+Demonstrate that `Table.ToRows` and `Table.FromRows` are inverses.
+
+```powerquery
+let
+    Source = Table.FromRecords({
+        [Name = "Alice", Age = 30],
+        [Name = "Bob", Age = 25]
+    }),
+    Rows = Table.ToRows(Source),
+    Rebuilt = Table.FromRows(Rows, Table.ColumnNames(Source))
+in
+    Rebuilt
+```

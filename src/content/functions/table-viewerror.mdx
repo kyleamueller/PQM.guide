@@ -1,0 +1,54 @@
+---
+title: "Table.ViewError"
+slug: "table-viewerror"
+category: "Table"
+description: "Creates a modified error record that prevents fallback behavior when raised inside a Table.View handler."
+syntax: "Table.ViewError(errorRecord as record) as record"
+returnType: "record"
+returnDescription: "A modified error record that will propagate to the caller instead of triggering fallback behavior."
+parameters:
+  - name: "errorRecord"
+    type: "record"
+    required: true
+    description: "An error record to modify so that it bypasses the normal fallback mechanism in Table.View handlers."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-view"
+  - "table-viewfunction"
+  - "error-record"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`Table.ViewError` is a companion to `Table.View` used in custom connector development. Normally, when a handler function in a `Table.View` raises an error, the Power Query engine falls back to executing the operation against the base table using default in-memory behavior. This fallback is usually desirable — it means partial folding still works.
+
+However, there are cases where you want an error to propagate directly to the user instead of silently falling back. For example, if a data source returns an authentication error or a query syntax error, falling back would mask the real problem. Wrapping the error record with `Table.ViewError` ensures the error reaches the caller.
+
+This function is primarily used by connector developers, not in ad-hoc M queries.
+
+## Examples
+
+### Example 1: Raise a non-fallback error from a view handler
+
+```powerquery
+let
+    View = Table.View(
+        null,
+        [
+            GetType = () => type table [ID = number, Name = text],
+            GetRows = () => error Table.ViewError(
+                [Reason = "DataSource.Error", Message = "Authentication expired"]
+            )
+        ]
+    )
+in
+    View
+```

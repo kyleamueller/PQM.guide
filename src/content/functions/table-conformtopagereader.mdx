@@ -1,0 +1,54 @@
+---
+title: "Table.ConformToPageReader"
+slug: "table-conformtopagereader"
+category: "Table"
+description: "Conforms a table for page-based reading using a shaping function. Intended for internal use only."
+syntax: "Table.ConformToPageReader(table as table, shapingFunction as function) as table"
+returnType: "table"
+returnDescription: "A table conformed to the page reader's expected structure."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table to conform for page-based reading."
+  - name: "shapingFunction"
+    type: "function"
+    required: true
+    description: "A function that transforms the table to match the page reader's expected structure."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-view"
+  - "list-conformtopagereader"
+relatedConcepts: []
+---
+
+## Remarks
+
+This function is intended for internal use only. It is part of the Power Query engine's pagination infrastructure, used by connectors that implement paginated data retrieval (e.g., REST APIs that return data in pages). The `shapingFunction` parameter transforms a table's structure to conform to what the page reader expects.
+
+This function is used at the connector SDK level and is not intended for user-authored M queries. Its behavior may change without notice between Power Query versions.
+
+## Examples
+
+### Example 1: Paginated data retrieval (recommended approach)
+
+For paginated API access in user-authored queries, use `Web.Contents` with manual pagination logic instead of this internal function. See the [Pagination pattern](/patterns/pagination-web-contents) for a complete walkthrough.
+
+```powerquery
+let
+    GetPage = (url as text) =>
+        let
+            Response = Web.Contents(url),
+            Body = Json.Document(Response)
+        in
+            Body,
+    FirstPage = GetPage("https://api.example.com/data?page=1")
+in
+    FirstPage
+```

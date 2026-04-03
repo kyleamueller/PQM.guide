@@ -1,0 +1,52 @@
+---
+title: "Table.ViewFunction"
+slug: "table-viewfunction"
+category: "Table"
+description: "Creates a view function that can be intercepted by a Table.View handler."
+syntax: "Table.ViewFunction(function as function) as function"
+returnType: "function"
+returnDescription: "A wrapped function that can be handled by the OnInvoke handler in Table.View."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "The function to wrap so it can be intercepted by a Table.View OnInvoke handler."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-view"
+  - "table-viewerror"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`Table.ViewFunction` wraps a function so that it can be intercepted by the `OnInvoke` handler in a `Table.View`. This enables custom connectors to define their own foldable operations beyond the built-in set (filtering, sorting, column selection, etc.).
+
+When the wrapped function is called on a view:
+
+1. If the view has an `OnInvoke` handler and it handles the function, the handler's result is used.
+2. If no `OnInvoke` handler exists, or it does not handle the function, or the handler raises an error, the original `function` is applied on top of the view as a fallback.
+
+This function is primarily used by connector developers building advanced custom connectors. See the [Power Query SDK Table.View documentation](https://learn.microsoft.com/en-us/power-query/samples/trippin/10-tableview1/readme) for examples.
+
+## Examples
+
+### Example 1: Define a custom foldable operation
+
+Create a custom "top N by column" function that a connector can fold to a native query.
+
+```powerquery
+let
+    TopNByColumn = Table.ViewFunction((table as table, column as text, n as number) =>
+        Table.FirstN(Table.Sort(table, {column, Order.Descending}), n)
+    )
+in
+    TopNByColumn
+```

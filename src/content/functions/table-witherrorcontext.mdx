@@ -1,0 +1,46 @@
+---
+title: "Table.WithErrorContext"
+slug: "table-witherrorcontext"
+category: "Table"
+description: "Associates an error context string with a value. Intended for internal use only."
+syntax: "Table.WithErrorContext(value as any, context as text) as any"
+returnType: "any"
+returnDescription: "The value with the specified error context attached."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to associate with the error context."
+  - name: "context"
+    type: "text"
+    required: true
+    description: "A text string providing error context information."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-view"
+  - "table-viewerror"
+relatedConcepts: []
+---
+
+## Remarks
+
+This function is intended for internal use only. It is part of the Power Query engine's error-handling infrastructure and is not designed for use in user-authored queries.
+
+`Table.WithErrorContext` attaches a context string to a value, which the engine uses to provide more informative error messages when operations fail. The behavior and parameters of this function may change without notice between Power Query versions.
+
+## Examples
+
+### Example 1: Basic usage (internal function)
+
+```powerquery
+let
+    Result = Table.WithErrorContext(Sales, "Loading sales data")
+in
+    Result
+```

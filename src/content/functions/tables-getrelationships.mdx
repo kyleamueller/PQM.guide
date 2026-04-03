@@ -1,0 +1,50 @@
+---
+title: "Tables.GetRelationships"
+slug: "tables-getrelationships"
+category: "Table"
+description: "Returns the relationships among a set of tables structured like a navigation table."
+syntax: "Tables.GetRelationships(tables as table, optional dataColumn as nullable text) as table"
+returnType: "table"
+returnDescription: "A table describing the relationships between the input tables."
+parameters:
+  - name: "tables"
+    type: "table"
+    required: true
+    description: "A set of tables with a navigation-table-like structure."
+  - name: "dataColumn"
+    type: "text"
+    required: false
+    description: "The name of the column that contains the actual data tables. Defaults to the standard navigation table data column."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-keys"
+  - "table-replacekeys"
+  - "table-nestedjoin"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Tables.GetRelationships` inspects a set of tables (typically a navigation table returned by a data source connector) and returns a table describing the relationships between them. The `tables` parameter is expected to have the structure of a navigation table — the kind of table returned by functions like `Sql.Database`, `AnalysisServices.Database`, or `Excel.Workbook`.
+
+The optional `dataColumn` parameter specifies which column in the navigation table holds the actual table values. If omitted, the function uses the default navigation table data column.
+
+This function is most useful when working programmatically with relational data sources where you need to discover foreign key relationships between tables — for example, when building a data model dynamically or validating relationship integrity.
+
+## Examples
+
+### Example 1: Discover relationships from a SQL Server database
+
+```powerquery
+let
+    NavTable = Sql.Database("localhost", "AdventureWorks"),
+    Relationships = Tables.GetRelationships(NavTable)
+in
+    Relationships
+```

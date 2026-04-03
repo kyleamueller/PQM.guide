@@ -21,6 +21,7 @@
 - [x] **GitHub contributor attribution** — Shows contributor avatars/usernames on each page based on git history, similar to MS Docs.
 - [ ] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
 - [ ] **Sample tables: surface the M code** — The M code on the sample tables page is too hidden; make it more discoverable/visible. *(Alex)*
+- [ ] **Full relatedFunctions reference audit** — Once all 661 functions are documented, tighten the content-integrity test back to only allow references to existing documented slugs (currently allows forward references to official spec slugs). Run a full scan to verify every relatedFunctions entry resolves to a real page.
 
 ---
 
