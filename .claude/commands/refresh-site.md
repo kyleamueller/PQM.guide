@@ -2,23 +2,28 @@ Perform a full content freshness review of the docs site. Work through each sect
 
 Use WebFetch to retrieve live content from all URLs listed below. Do not rely on training data for anything that could have changed — only act on what you read directly from official Microsoft sources or the live page.
 
+**When a URL returns a 404 or error:** Do not silently skip it. Try one alternate URL pattern (e.g. drop a trailing path segment, try the parent page). If that also fails, note the broken URL in the Summary under "Could not verify" so the next run can try updated URLs. Never treat a 404 as confirmation that nothing changed.
+
 ---
 
 ## 0. Blog & Announcement Scan (run this first)
 
 Fetch all of the following pages and scan for any Power Query-related announcements — especially deprecations, retirements, preview-to-GA transitions, new environments, connector changes, or breaking changes:
 
-- **Power BI blog**: `https://powerbi.microsoft.com/en-us/blog/`
-- **Fabric blog**: `https://blog.fabric.microsoft.com/en-us/blog/`
+- **Power BI blog index**: `https://powerbi.microsoft.com/en-us/blog/`
+- **Fabric blog index**: `https://blog.fabric.microsoft.com/en-us/blog/`
 - **Power BI monthly release notes**: `https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-latest-update`
 - **Fabric Data Factory what's new**: `https://learn.microsoft.com/en-us/fabric/data-factory/whats-new`
+- **Power Query connector release notes**: `https://learn.microsoft.com/en-us/power-query/connectors/`
+
+**Important:** The blog index pages only show titles and excerpts. Most Power Query changes are buried inside monthly "Feature Summary" posts. After scanning the index, also fetch the **latest 2–3 monthly feature summary posts** — they follow a predictable URL pattern (e.g. `https://powerbi.microsoft.com/en-us/blog/power-bi-march-2026-feature-summary/`). Adjust the month/year to match the current date and the two preceding months.
 
 On each page, look for:
 - Retirement or deprecation announcements (e.g. "Gen1 is retiring", "connector X is being removed")
 - Preview → GA transitions for any Power Query feature, API, or connector
 - New products or environments that now support Power Query M
 - Removal of products or environments that previously supported Power Query M
-- Connector additions or removals
+- Connector additions, removals, or behavior changes (new auth methods, deprecated options, new parameters)
 - Limit or quota changes (timeouts, table counts, script sizes)
 
 Capture all relevant findings — they feed into every section below.
@@ -47,6 +52,8 @@ Using the findings from Section 0, check whether any environments have changed t
 - Functions newly supported in Power BI Service (cloud)
 - Any functions deprecated or removed
 
+Also check the connector release notes (from Section 0) for connector-specific behavior changes that affect function MDX Remarks sections — not just compatibility flags. For example, if `Sql.Database` gains a new authentication option or `Web.Contents` changes its timeout behavior, the corresponding MDX page's Remarks should be updated.
+
 Find all function MDX files in `src/content/functions/` that have any `false` compatibility flags — these are the ones most likely to need updating:
 
 ```bash
@@ -61,7 +68,9 @@ For any function where availability has confirmed changed, update the correspond
 
 ### 3a. Fetch the current official function list
 
-Fetch `https://learn.microsoft.com/en-us/powerquery-m/power-query-m-function-reference` and each of the category pages linked from it to build a complete list of all function slugs in the current official spec. Derive slugs using the same convention the site uses: lowercase the function name, replace `.` with `-` (e.g. `Table.AddColumn` → `table-addcolumn`).
+Fetch `https://learn.microsoft.com/en-us/powerquery-m/power-query-m-function-reference` to get the category index. Then prioritize fetching the categories most likely to have new functions — **Accessing Data** and **Table** are where Microsoft most frequently adds functions. Also fetch any other categories that Section 0 flagged as having changes.
+
+You do not need to fetch all 24 category pages every run. Derive slugs using the same convention the site uses: lowercase the function name, replace `.` with `-` (e.g. `Table.AddColumn` → `table-addcolumn`).
 
 ### 3b. Update `official-spec-slugs.json`
 
@@ -99,7 +108,7 @@ Apply updates only if you find confirmed changes from official Microsoft sources
 
 ## 5. Resources Page Link Check
 
-Read `src/app/resources/page.tsx` and extract every external URL listed. Use WebFetch to verify each one still resolves (returns content, not a 404 or redirect to a generic homepage).
+Read `src/app/resources/page.tsx` and extract every external URL listed. Use WebFetch to verify each one still resolves (returns content, not a 404 or redirect to a generic homepage). These checks can be run in parallel.
 
 For any URL that is broken or redirects somewhere unexpected:
 - Note it in the Summary
@@ -121,11 +130,27 @@ Do not mark existing items as done unless the work was actually completed in thi
 
 ---
 
+## 7. Verify & Publish
+
+Run both checks and fix any failures before proceeding:
+
+```bash
+npm run typecheck
+npm test
+```
+
+Then invoke `/publish` to create a feature branch, commit, and open a PR.
+
+Never commit directly to `main`.
+
+---
+
 ## Summary
 
 After completing all sections, provide a summary of:
 - What was updated and why (include the source URL for each change)
 - What was verified as still accurate
+- URLs that returned 404 or could not be verified
 - New function slugs added to `official-spec-slugs.json` (if any)
 - Functions flagged for future documentation (not yet documented on the site)
 - Any retirement or deprecation notices found, even if already reflected in the site
