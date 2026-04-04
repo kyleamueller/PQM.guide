@@ -1,0 +1,64 @@
+---
+title: "ItemExpression.From"
+slug: "itemexpression-from"
+category: "Expression"
+description: "Returns the abstract syntax tree (AST) for the body of a function, normalized into an item expression."
+syntax: "ItemExpression.From(function as function) as record"
+returnType: "record"
+returnDescription: "A record representing the abstract syntax tree (AST) of the function body as an item expression."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "A single-argument lambda function whose body will be converted to an AST."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "rowexpression-from"
+  - "rowexpression-column"
+relatedConcepts: []
+---
+
+## Remarks
+
+`ItemExpression.From` returns the abstract syntax tree (AST) for the body of `function`, normalized into an *item expression*. This is an **advanced/internal function** used by the Power Query engine and custom connector infrastructure, particularly for query folding.
+
+### Requirements
+
+- The function must be a single-argument lambda (e.g., an `each` expression).
+- All references to the function parameter are replaced with `ItemExpression.Item`.
+- The AST is simplified to contain only these node kinds: `Constant`, `Invocation`, `Unary`, `Binary`, `If`, and `FieldAccess`.
+
+An error is raised if the function body cannot be represented as a valid item expression AST.
+
+This function is identical to `RowExpression.From`. The difference is semantic: `ItemExpression.From` is used in list contexts (where the parameter represents a list item), while `RowExpression.From` is used in table contexts (where the parameter represents a row).
+
+### Use cases
+
+- Custom connectors that need to inspect filter or transformation expressions for query folding.
+- Building expression trees that can be translated to native query languages (SQL, OData, etc.).
+
+## Examples
+
+### Example 1: Get the AST for a null check
+
+Extract the AST for `each _ <> null`.
+
+```powerquery
+let
+    AST = ItemExpression.From(each _ <> null)
+in
+    #table(
+        {"Kind", "Operator"},
+        {{AST[Kind], AST[Operator]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"}],"rows":[{"Kind":"Binary","Operator":"NotEquals"}]}
+-->

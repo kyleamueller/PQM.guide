@@ -1,0 +1,47 @@
+---
+title: "Diagnostics.CorrelationId"
+slug: "diagnostics-correlationid"
+category: "Expression"
+description: "Returns an opaque identifier to correlate incoming requests with outgoing ones."
+syntax: "Diagnostics.CorrelationId() as nullable text"
+returnType: "text"
+returnDescription: "A text identifier used to correlate incoming and outgoing requests, or null if unavailable."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "diagnostics-activityid"
+  - "diagnostics-trace"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Diagnostics.CorrelationId` returns an opaque text identifier that can be used to correlate incoming requests with outgoing ones. This is useful in distributed tracing scenarios where the Power Query engine communicates with external services and you need to track a request chain end-to-end.
+
+This is an **internal/advanced function** primarily relevant in:
+
+- Custom connector development where correlation IDs must be passed to downstream APIs for distributed tracing.
+- Diagnostic logging to connect Power Query's evaluation context with external service logs.
+
+The function takes no parameters. It returns `null` if no correlation ID is available in the current context.
+
+Like `Diagnostics.ActivityId`, the returned value is opaque — do not parse or depend on its format.
+
+## Examples
+
+### Example 1: Retrieve the correlation ID
+
+Capture the correlation identifier for request tracing.
+
+```powerquery
+let
+    CorrelationId = Diagnostics.CorrelationId()
+in
+    #table({"CorrelationId"}, {{CorrelationId}})
+```

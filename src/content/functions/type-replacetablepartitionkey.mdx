@@ -1,0 +1,60 @@
+---
+title: "Type.ReplaceTablePartitionKey"
+slug: "type-replacetablepartitionkey"
+category: "Type"
+description: "Returns a new table type with the partition key replaced by the specified partition key."
+syntax: "Type.ReplaceTablePartitionKey(tableType as type, partitionKey as nullable list) as type"
+returnType: "type"
+returnDescription: "A new table type with the partition key replaced by the specified column list."
+parameters:
+  - name: "tableType"
+    type: "type"
+    required: true
+    description: "The table type whose partition key to replace."
+  - name: "partitionKey"
+    type: "list"
+    required: false
+    description: "A list of column names to set as the new partition key, or null to clear the partition key."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-tablepartitionkey"
+  - "table-replacepartitionkey"
+  - "table-partitionkey"
+  - "type-tablerow"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Type.ReplaceTablePartitionKey` returns a new table type with the partition key metadata replaced by the specified `partitionKey` list. Pass `null` as the `partitionKey` to clear an existing partition key from the type.
+
+This is the type-system counterpart to `Table.ReplacePartitionKey`. While `Table.ReplacePartitionKey` operates on table values (setting partition key metadata on an actual table), `Type.ReplaceTablePartitionKey` operates on table types (setting partition key metadata on a type definition).
+
+### Use cases
+
+- Custom connector development where table types need partition key metadata before the actual data is loaded.
+- Building typed table definitions with partition information for parallel evaluation.
+- Working with the Power Query SDK to define partitioned data source schemas.
+
+Partition keys indicate how a table's data is logically segmented and are used by the Power Query engine to enable parallel evaluation of partitioned data sources.
+
+## Examples
+
+### Example 1: Set a partition key on a table type
+
+Replace the partition key on a table type and verify it was set.
+
+```powerquery
+let
+    OriginalType = type table [Region = text, Sales = number],
+    PartitionedType = Type.ReplaceTablePartitionKey(OriginalType, {"Region"}),
+    Key = Type.TablePartitionKey(PartitionedType)
+in
+    #table({"PartitionKey"}, {{Text.Combine(Key, ", ")}})
+```

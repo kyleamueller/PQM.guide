@@ -1,0 +1,67 @@
+---
+title: "List.ConformToPageReader"
+slug: "list-conformtopagereader"
+category: "List"
+description: "Conforms a list to a page reader table format. Intended for internal use only."
+syntax: "List.ConformToPageReader(list as list, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table representing the list data conformed to the page reader format."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "The list to conform to the page reader format."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record of options that control the page reader behavior."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "list-generate"
+  - "list-transform"
+relatedConcepts: []
+---
+
+## Remarks
+
+`List.ConformToPageReader` is an **internal-only function** as stated in the official Microsoft documentation. It is part of the Power Query engine's internal pagination infrastructure, used to convert a list into the engine's internal page reader table format.
+
+### Background
+
+The Power Query engine uses a page reader pattern internally to handle streaming and pagination of large data sets. When data is loaded from sources that provide data in pages (such as REST APIs with paginated responses), the engine uses page readers to efficiently stream data without loading everything into memory at once.
+
+`List.ConformToPageReader` adapts a plain M list to this internal page reader format, making it compatible with the engine's streaming infrastructure.
+
+### Important
+
+This function is not intended for use in user-written M queries. For pagination patterns in user code, use:
+
+- `List.Generate` to implement manual pagination loops.
+- `Table.GenerateByPage` (a common helper pattern) for page-by-page API consumption.
+- The `Web.Contents` function with appropriate pagination logic.
+
+## Examples
+
+### Example 1: Conceptual usage
+
+This function is internal to the Power Query engine. The standard approach for pagination in user code is `List.Generate`.
+
+```powerquery
+let
+    // List.ConformToPageReader is used internally by the Power Query engine
+    // for pagination infrastructure. In user code, use List.Generate instead:
+    Pages = List.Generate(
+        () => [Page = 0, Data = GetPage(0)],
+        each [Data] <> null,
+        each [Page = [Page] + 1, Data = GetPage([Page] + 1)],
+        each [Data]
+    )
+in
+    Pages
+```

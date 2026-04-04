@@ -1,0 +1,65 @@
+---
+title: "Expression.Constant"
+slug: "expression-constant"
+category: "Expression"
+description: "Returns the M source code representation of a constant value."
+syntax: "Expression.Constant(value as any) as text"
+returnType: "text"
+returnDescription: "A text string containing the M source code representation of the constant value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The constant value to convert to its M source code representation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "expression-evaluate"
+  - "expression-identifier"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Expression.Constant` returns the M source code text representation of a constant value. This is useful for building M expressions dynamically as text strings that can later be passed to `Expression.Evaluate`.
+
+The function handles all M literal types including numbers, text (with proper quote escaping), dates, times, datetimes, datetimezones, durations, logicals, and null. For text values, double quotes are escaped by doubling them in the output.
+
+This function is the counterpart to `Expression.Identifier` — while `Expression.Identifier` serializes identifiers (variable names), `Expression.Constant` serializes literal values.
+
+### Common use cases
+
+- Building dynamic M expressions from runtime values for use with `Expression.Evaluate`.
+- Code generation or meta-programming scenarios in custom connectors.
+- Serializing M values to their source code form for logging or display.
+
+## Examples
+
+### Example 1: Get the M representation of different value types
+
+Convert number, date, and text values to their M source code representations.
+
+```powerquery
+let
+    NumRepr = Expression.Constant(123),
+    DateRepr = Expression.Constant(#date(2035, 1, 2)),
+    TextRepr = Expression.Constant("abc")
+in
+    #table(
+        {"Value Type", "M Representation"},
+        {
+            {"Number (123)", NumRepr},
+            {"Date (2035-01-02)", DateRepr},
+            {"Text (abc)", TextRepr}
+        }
+    )
+```
+
+<!--output
+{"columns":[{"name":"Value Type","type":"text"},{"name":"M Representation","type":"text"}],"rows":[{"Value Type":"Number (123)","M Representation":"123"},{"Value Type":"Date (2035-01-02)","M Representation":"#date(2035, 1, 2)"},{"Value Type":"Text (abc)","M Representation":"\"abc\""}]}
+-->

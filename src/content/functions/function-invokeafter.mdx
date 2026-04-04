@@ -1,0 +1,77 @@
+---
+title: "Function.InvokeAfter"
+slug: "function-invokeafter"
+category: "Function"
+description: "Returns the result of invoking a function after a specified duration delay has passed."
+syntax: "Function.InvokeAfter(function as function, delay as duration) as any"
+returnType: "any"
+returnDescription: "The result of invoking the function after the specified delay."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "A zero-argument function to invoke after the delay."
+  - name: "delay"
+    type: "duration"
+    required: true
+    description: "The duration to wait before invoking the function."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "function-invoke"
+  - "function-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Function.InvokeAfter` pauses execution for the specified `delay` duration, then invokes the provided zero-argument `function` and returns its result. This is useful for introducing deliberate delays into query execution.
+
+### Common use cases
+
+- **API rate limiting** — adding a delay between paginated API calls to avoid hitting rate limits.
+- **Retry patterns** — waiting before retrying a failed operation.
+- **Testing and debugging** — simulating slow data sources.
+
+The `delay` parameter is a standard M `duration` value. For example:
+
+- `#duration(0, 0, 0, 5)` — 5 seconds
+- `#duration(0, 0, 1, 0)` — 1 minute
+- `#duration(0, 0, 0, 0.5)` — 500 milliseconds
+
+Note that the delay blocks the query evaluation thread. Use with care in production scenarios, as excessive delays will slow down refresh times.
+
+## Examples
+
+### Example 1: Invoke a function after a 5-second delay
+
+Wait 5 seconds before returning the current time.
+
+```powerquery
+let
+    Result = Function.InvokeAfter(
+        () => DateTime.LocalNow(),
+        #duration(0, 0, 0, 5)
+    )
+in
+    #table({"Invoked At"}, {{Result}})
+```
+
+### Example 2: Simulate rate limiting between API pages
+
+Use a delay to pause between function calls.
+
+```powerquery
+let
+    DelayedCall = Function.InvokeAfter(
+        () => "Page loaded after delay",
+        #duration(0, 0, 0, 1)
+    )
+in
+    #table({"Result"}, {{DelayedCall}})
+```

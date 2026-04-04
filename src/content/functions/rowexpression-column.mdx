@@ -1,0 +1,56 @@
+---
+title: "RowExpression.Column"
+slug: "rowexpression-column"
+category: "Expression"
+description: "Returns an abstract syntax tree (AST) representing access to a column within a row expression."
+syntax: "RowExpression.Column(columnName as text) as record"
+returnType: "record"
+returnDescription: "A record representing a FieldAccess AST node for the specified column name."
+parameters:
+  - name: "columnName"
+    type: "text"
+    required: true
+    description: "The name of the column to create an access expression for."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "rowexpression-from"
+  - "itemexpression-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`RowExpression.Column` returns an abstract syntax tree (AST) record that represents accessing a named column within a row expression. The returned record has the `Kind` field set to `"FieldAccess"`, with `Expression` set to `RowExpression.Row` and `MemberName` set to the provided column name.
+
+This is an **advanced/internal function** used by the Power Query engine's expression tree infrastructure. It is primarily relevant for:
+
+- Custom connector development where query folding logic needs to construct or inspect column access expressions programmatically.
+- Building row expression ASTs that can be translated to native query languages.
+
+In normal M query development, you access columns using `[ColumnName]` syntax inside `each` expressions. `RowExpression.Column` is the lower-level programmatic equivalent used in the expression tree representation.
+
+## Examples
+
+### Example 1: Create a column access AST node
+
+Create an AST node representing access to the "CustomerName" column.
+
+```powerquery
+let
+    AST = RowExpression.Column("CustomerName")
+in
+    #table(
+        {"Kind", "MemberName"},
+        {{AST[Kind], AST[MemberName]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Kind","type":"text"},{"name":"MemberName","type":"text"}],"rows":[{"Kind":"FieldAccess","MemberName":"CustomerName"}]}
+-->

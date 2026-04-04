@@ -1,0 +1,67 @@
+---
+title: "Function.IsDataSource"
+slug: "function-isdatasource"
+category: "Function"
+description: "Returns whether or not a function is considered a data source."
+syntax: "Function.IsDataSource(function as function) as logical"
+returnType: "logical"
+returnDescription: "True if the function is considered a data source, false otherwise."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "The function to check for data source status."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "function-invoke"
+  - "function-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Function.IsDataSource` returns `true` if the provided `function` is considered a data source function by the Power Query engine, and `false` otherwise. Data source functions are functions that connect to external data — such as `Sql.Database`, `Web.Contents`, `Excel.Workbook`, `OData.Feed`, etc.
+
+The Power Query engine treats data source functions specially for:
+
+- **Credential management** — data source functions trigger credential prompts and have their credentials managed by the engine.
+- **Privacy levels** — data source functions are subject to data privacy firewall rules.
+- **Query folding** — the engine knows to attempt query folding against data source functions.
+- **Refresh behavior** — data source functions determine when and how data is refreshed.
+
+This function is useful in advanced scenarios such as:
+
+- Custom connector development to verify that a function has been properly registered as a data source.
+- Diagnostic or introspection utilities that analyze the functions used in a query.
+
+User-defined functions created with `let` or `(x) => ...` syntax will return `false`.
+
+## Examples
+
+### Example 1: Check built-in functions for data source status
+
+Test whether various functions are considered data sources.
+
+```powerquery
+let
+    IsDS_SqlDb = Function.IsDataSource(Sql.Database),
+    IsDS_TextUpper = Function.IsDataSource(Text.Upper)
+in
+    #table(
+        {"Function", "IsDataSource"},
+        {
+            {"Sql.Database", IsDS_SqlDb},
+            {"Text.Upper", IsDS_TextUpper}
+        }
+    )
+```
+
+<!--output
+{"columns":[{"name":"Function","type":"text"},{"name":"IsDataSource","type":"logical"}],"rows":[{"Function":"Sql.Database","IsDataSource":true},{"Function":"Text.Upper","IsDataSource":false}]}
+-->

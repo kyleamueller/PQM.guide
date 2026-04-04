@@ -1,0 +1,62 @@
+---
+title: "Function.InvokeWithErrorContext"
+slug: "function-invokewitherrorcontext"
+category: "Function"
+description: "Invokes a function and attaches additional error context text to any error raised during execution. Intended for internal use only."
+syntax: "Function.InvokeWithErrorContext(function as function, context as text) as any"
+returnType: "any"
+returnDescription: "The result of invoking the function, with any errors enriched with the provided context text."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "The function to invoke."
+  - name: "context"
+    type: "text"
+    required: true
+    description: "The error context text to attach to any errors raised during the function's execution."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "function-invoke"
+  - "function-invokeafter"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Function.InvokeWithErrorContext` is an **internal-only function** as stated in the official Microsoft documentation. It invokes the provided `function` and enriches any error raised during execution with the specified `context` text.
+
+This function is similar in purpose to `Action.WithErrorContext`, but operates on regular functions rather than action values. The Power Query engine uses it internally to provide richer error messages by annotating function calls with descriptive context about what operation was being attempted.
+
+### How it works
+
+1. The `function` is invoked normally.
+2. If the function succeeds, its return value is passed through unchanged.
+3. If the function raises an error, the error record is enriched with the `context` text before being propagated.
+
+This is useful in the engine's internals and custom connectors to produce more informative error messages. For example, a connector might wrap a data retrieval call with context like `"Loading rows from table Customers"`.
+
+For standard M query development, error context should be managed using `try ... catch` expressions and `Error.Record` to construct meaningful error messages.
+
+## Examples
+
+### Example 1: Conceptual usage
+
+This function is internal to the Power Query engine. The equivalent pattern in user code uses `try ... catch`.
+
+```powerquery
+let
+    // Function.InvokeWithErrorContext is used internally to add context to errors.
+    // In user code, the equivalent pattern is:
+    SafeCall = try SomeFunction() catch (e) =>
+        error Error.Record(e[Reason], e[Message] & " (Context: Loading data)", e[Detail]),
+    Result = "See try...catch for error context patterns"
+in
+    Result
+```
