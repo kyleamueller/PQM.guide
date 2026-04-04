@@ -1,0 +1,58 @@
+---
+title: "BinaryFormat.Single"
+slug: "binaryformat-single"
+category: "Binary"
+description: "A binary format that reads a 4-byte IEEE single-precision floating point value."
+syntax: "BinaryFormat.Single(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 4-byte IEEE 754 single-precision floating point value from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 4-byte single-precision floating point value from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-double"
+  - "binaryformat-decimal"
+  - "binaryformat-byte"
+  - "binaryformat-record"
+  - "binaryformat-byteorder"
+relatedConcepts:
+  - "Binary data parsing"
+  - "IEEE 754 floating point"
+  - "Single-precision numbers"
+---
+
+## Remarks
+
+`BinaryFormat.Single` is a binary format specifier that reads a 4-byte (32-bit) IEEE 754 single-precision floating point value from binary data. Single-precision floats provide approximately 6-9 significant decimal digits of precision and can represent values in the range of approximately +/-1.5 x 10^-45 to +/-3.4 x 10^38.
+
+The default byte order is little-endian. Use `BinaryFormat.ByteOrder` to change the byte order if the source data uses big-endian encoding.
+
+For higher precision, consider using `BinaryFormat.Double` (8 bytes, ~15-17 significant digits) or `BinaryFormat.Decimal` (16 bytes, 28-29 significant digits).
+
+## Examples
+
+### Example 1: Read a single-precision floating point value
+
+Read a 4-byte IEEE 754 single-precision value representing 1.0.
+
+```powerquery
+let
+    // IEEE 754 single-precision representation of 1.0 (little-endian)
+    binaryData = #binary({0x00, 0x00, 0x80, 0x3F}),
+    result = BinaryFormat.Single(binaryData)
+in
+    result
+```
+
+<!--output
+1
+-->

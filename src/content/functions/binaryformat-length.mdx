@@ -1,0 +1,86 @@
+---
+title: "BinaryFormat.Length"
+slug: "binaryformat-length"
+category: "Binary"
+description: "Returns a binary format that limits the amount of data that can be read."
+syntax: "BinaryFormat.Length(binaryFormat as function, length as any) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads data up to the specified byte limit."
+parameters:
+  - name: "binaryFormat"
+    type: "function"
+    required: true
+    description: "The binary format to limit."
+  - name: "length"
+    type: "any"
+    required: true
+    description: "The number of bytes to read, or a binary format value that reads the length from the stream before the data."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-list"
+  - "binaryformat-binary"
+  - "binaryformat-byte"
+  - "binaryformat-text"
+  - "binaryformat-record"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Length-prefixed data"
+  - "Byte limiting"
+---
+
+## Remarks
+
+`BinaryFormat.Length` returns a binary format that restricts how many bytes a given binary format can consume. This is useful when a binary format like `BinaryFormat.List` or `BinaryFormat.Binary` would otherwise read to the end of the stream.
+
+The `length` parameter can be:
+
+- A **number** -- Limits the read to exactly that many bytes.
+- A **binary format** -- Reads the length value from the stream first (using the specified format), then limits the subsequent read to that many bytes.
+
+This is particularly useful for parsing binary structures where a length field precedes a variable-length payload, or when you need to read only a fixed portion of a stream with a format that would normally consume all remaining data.
+
+## Examples
+
+### Example 1: Limit the number of bytes read
+
+Limit a list read to only 2 bytes, even though 3 bytes are available.
+
+```powerquery
+let
+    binaryData = #binary({1, 2, 3}),
+    listFormat = BinaryFormat.Length(
+        BinaryFormat.List(BinaryFormat.Byte),
+        2
+    )
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{1, 2}
+-->
+
+### Example 2: Use a length prefix from the stream
+
+Read the length as a byte from the stream, then read that many bytes.
+
+```powerquery
+let
+    binaryData = #binary({1, 2, 3}),
+    listFormat = BinaryFormat.Length(
+        BinaryFormat.List(BinaryFormat.Byte),
+        BinaryFormat.Byte
+    )
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{2}
+-->

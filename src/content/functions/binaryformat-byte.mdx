@@ -1,0 +1,70 @@
+---
+title: "BinaryFormat.Byte"
+slug: "binaryformat-byte"
+category: "Binary"
+description: "A binary format that reads an 8-bit unsigned integer."
+syntax: "BinaryFormat.Byte(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a single byte (8-bit unsigned integer) from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read a single byte from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-unsignedinteger16"
+  - "binaryformat-unsignedinteger32"
+  - "binaryformat-signedinteger16"
+  - "binaryformat-list"
+  - "binaryformat-record"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Unsigned integers"
+---
+
+## Remarks
+
+`BinaryFormat.Byte` is a binary format specifier that reads a single byte (8-bit unsigned integer, range 0-255) from binary data. It is one of the most fundamental building blocks for parsing binary data in Power Query.
+
+This format is commonly used as a component within `BinaryFormat.Record`, `BinaryFormat.List`, and `BinaryFormat.Choice` to read individual byte values from structured binary streams. It also serves as a length prefix reader when passed to functions like `BinaryFormat.Binary`, `BinaryFormat.Text`, or `BinaryFormat.List`.
+
+## Examples
+
+### Example 1: Read a single byte from binary data
+
+Read the first byte from a binary value.
+
+```powerquery
+let
+    binaryData = #binary({42, 100, 200}),
+    result = BinaryFormat.Byte(binaryData)
+in
+    result
+```
+
+<!--output
+42
+-->
+
+### Example 2: Read a list of bytes
+
+Use `BinaryFormat.Byte` with `BinaryFormat.List` to read all bytes from a binary value.
+
+```powerquery
+let
+    binaryData = #binary({10, 20, 30}),
+    listFormat = BinaryFormat.List(BinaryFormat.Byte)
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{10, 20, 30}
+-->

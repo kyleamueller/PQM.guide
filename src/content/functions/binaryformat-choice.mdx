@@ -1,0 +1,98 @@
+---
+title: "BinaryFormat.Choice"
+slug: "binaryformat-choice"
+category: "Binary"
+description: "Returns a binary format that chooses the next binary format based on a value that has already been read."
+syntax: "BinaryFormat.Choice(binaryFormat as function, chooseFunction as function, optional type as nullable type, optional combineFunction as nullable function) as function"
+returnType: "function"
+returnDescription: "A binary format function that dynamically selects parsing logic based on a previously read value."
+parameters:
+  - name: "binaryFormat"
+    type: "function"
+    required: true
+    description: "The binary format used to read the initial value that determines the choice."
+  - name: "chooseFunction"
+    type: "function"
+    required: true
+    description: "A function that receives the initial value and returns a second binary format to use for reading the next value."
+  - name: "type"
+    type: "nullable type"
+    required: false
+    description: "The expected type of binary format returned by the choice function. Can be type any, type list, or type binary. Using type list or type binary may enable streaming."
+  - name: "combineFunction"
+    type: "nullable function"
+    required: false
+    description: "A function that receives both the first and second values and returns a combined result. If not specified, the second value is returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-record"
+  - "binaryformat-list"
+  - "binaryformat-byte"
+  - "binaryformat-length"
+  - "binaryformat-group"
+relatedConcepts:
+  - "Conditional binary parsing"
+  - "Dynamic format selection"
+---
+
+## Remarks
+
+`BinaryFormat.Choice` returns a binary format that dynamically determines how to parse binary data based on an initial value. It works in stages:
+
+1. The `binaryFormat` parameter reads an initial value from the binary stream.
+2. That value is passed to `chooseFunction`, which inspects it and returns a second binary format.
+3. The second binary format reads the next value from the stream.
+4. If `combineFunction` is provided, both values are passed to it and the combined result is returned. Otherwise, only the second value is returned.
+
+The optional `type` parameter (`type any`, `type list`, or `type binary`) hints at the return type of the choice function. Using `type list` or `type binary` may allow the system to return streaming values instead of buffered ones, reducing memory usage.
+
+This is essential for parsing binary formats where the structure depends on header values, type tags, or length prefixes.
+
+## Examples
+
+### Example 1: Read a list of bytes with a length prefix
+
+Read a list of bytes where the first byte determines how many items follow.
+
+```powerquery
+let
+    binaryData = #binary({2, 3, 4, 5}),
+    listFormat = BinaryFormat.Choice(
+        BinaryFormat.Byte,
+        (length) => BinaryFormat.List(BinaryFormat.Byte, length)
+    )
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{3, 4}
+-->
+
+### Example 2: Preserve the first value using a record
+
+Read a length-prefixed list and keep both the length and the list in a record.
+
+```powerquery
+let
+    binaryData = #binary({2, 3, 4, 5}),
+    listFormat = BinaryFormat.Choice(
+        BinaryFormat.Byte,
+        (length) => BinaryFormat.Record([
+            length = length,
+            list = BinaryFormat.List(BinaryFormat.Byte, length)
+        ])
+    )
+in
+    listFormat(binaryData)
+```
+
+<!--output
+[length = 2, list = {3, 4}]
+-->

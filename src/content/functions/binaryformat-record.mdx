@@ -1,0 +1,83 @@
+---
+title: "BinaryFormat.Record"
+slug: "binaryformat-record"
+category: "Binary"
+description: "Returns a binary format that reads a record from binary data."
+syntax: "BinaryFormat.Record(record as record) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads fields sequentially from binary data and returns them as a record."
+parameters:
+  - name: "record"
+    type: "record"
+    required: true
+    description: "A record where each field specifies a binary format for reading that field's value. Fields with non-format values are echoed as-is without reading data."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-list"
+  - "binaryformat-byte"
+  - "binaryformat-unsignedinteger16"
+  - "binaryformat-unsignedinteger32"
+  - "binaryformat-choice"
+  - "binaryformat-group"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Structured binary records"
+  - "Binary file headers"
+---
+
+## Remarks
+
+`BinaryFormat.Record` returns a binary format that reads a record with named fields from binary data. The `record` parameter defines the structure: each field name maps to a binary format specifier that determines how to read that field's data from the stream.
+
+Fields are read in the order they appear in the record definition, and each binary format reads consecutive bytes from the stream. If a field's value is not a binary format function (e.g., a constant number or text), no data is read for that field, and the value is passed through directly to the result record.
+
+This is one of the most important composite binary format functions, as it enables you to define structured layouts for parsing binary file headers, network packets, and other binary data with named fields.
+
+## Examples
+
+### Example 1: Read a record with 16-bit and 32-bit integers
+
+Read a record with a 16-bit unsigned integer field and a 32-bit unsigned integer field.
+
+```powerquery
+let
+    binaryData = #binary({
+        0x00, 0x01,
+        0x00, 0x00, 0x00, 0x02
+    }),
+    recordFormat = BinaryFormat.Record([
+        A = BinaryFormat.UnsignedInteger16,
+        B = BinaryFormat.UnsignedInteger32
+    ])
+in
+    recordFormat(binaryData)
+```
+
+<!--output
+[A = 1, B = 2]
+-->
+
+### Example 2: Include a constant field in the record
+
+Use a non-format value to embed a constant in the resulting record alongside parsed binary data.
+
+```powerquery
+let
+    binaryData = #binary({0x2A}),
+    recordFormat = BinaryFormat.Record([
+        Version = 1,
+        Value = BinaryFormat.Byte
+    ])
+in
+    recordFormat(binaryData)
+```
+
+<!--output
+[Version = 1, Value = 42]
+-->

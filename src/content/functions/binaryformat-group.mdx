@@ -1,0 +1,116 @@
+---
+title: "BinaryFormat.Group"
+slug: "binaryformat-group"
+category: "Binary"
+description: "Returns a binary format that reads a group of items with a key-value structure."
+syntax: "BinaryFormat.Group(binaryFormat as function, group as list, optional extra as nullable function, optional lastKey as any) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads key-value pairs and returns a list of the item values in the order they were defined."
+parameters:
+  - name: "binaryFormat"
+    type: "function"
+    required: true
+    description: "The binary format of the key value."
+  - name: "group"
+    type: "list"
+    required: true
+    description: "A list of item definitions. Each item is a list of 3-5 values: key value, item format, BinaryOccurrence type, optional default value, and optional transform function."
+  - name: "extra"
+    type: "nullable function"
+    required: false
+    description: "A function that returns a binary format for values following unexpected keys. If not specified, unexpected keys raise an error."
+  - name: "lastKey"
+    type: "any"
+    required: false
+    description: "The key value of the last item in the group."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-record"
+  - "binaryformat-list"
+  - "binaryformat-choice"
+  - "binaryformat-byte"
+  - "binaryformat-length"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Key-value binary formats"
+  - "Tagged binary structures"
+---
+
+## Remarks
+
+`BinaryFormat.Group` returns a binary format that reads a group of keyed items from binary data. Each item in the stream is preceded by a key, and the group definition maps keys to their binary formats and occurrence rules.
+
+The `group` parameter is a list of item definitions. Each definition is itself a list with 3-5 elements:
+
+1. **Key value** -- The expected key that identifies this item. Must be unique within the group.
+2. **Item format** -- The binary format used to read the item's value.
+3. **Occurrence** -- A `BinaryOccurrence.Type` value: `BinaryOccurrence.Required`, `BinaryOccurrence.Optional`, or `BinaryOccurrence.Repeating`.
+4. **Default value** (optional) -- Used when the item is not found. Defaults to `null` for optional items and `{}` for repeating items.
+5. **Transform function** (optional) -- Applied to the item's value before returning. Only called when the item is actually read, never on defaults.
+
+The optional `extra` function handles unexpected keys. It receives the unexpected key value and should return a binary format to read and discard the associated data. If omitted, unexpected keys raise an error.
+
+## Examples
+
+### Example 1: Read a group of keyed byte values
+
+Read a group with required, repeating, and optional items identified by single-byte keys.
+
+```powerquery
+let
+    b = #binary({
+        1, 11,
+        2, 22,
+        2, 22,
+        5, 55,
+        1, 11
+    }),
+    f = BinaryFormat.Group(
+        BinaryFormat.Byte,
+        {
+            {1, BinaryFormat.Byte, BinaryOccurrence.Required},
+            {2, BinaryFormat.Byte, BinaryOccurrence.Repeating},
+            {3, BinaryFormat.Byte, BinaryOccurrence.Optional},
+            {4, BinaryFormat.Byte, BinaryOccurrence.Repeating}
+        },
+        (extra) => BinaryFormat.Byte
+    )
+in
+    f(b)
+```
+
+<!--output
+{11, {22, 22}, null, {}}
+-->
+
+### Example 2: Use default values and transforms
+
+Read a group where a repeating item is summed via a transform, and an optional item uses a custom default value.
+
+```powerquery
+let
+    b = #binary({
+        1, 101,
+        1, 102
+    }),
+    f = BinaryFormat.Group(
+        BinaryFormat.Byte,
+        {
+            {1, BinaryFormat.Byte, BinaryOccurrence.Repeating,
+              0, (list) => List.Sum(list)},
+            {2, BinaryFormat.Byte, BinaryOccurrence.Optional, 123}
+        }
+    )
+in
+    f(b)
+```
+
+<!--output
+{203, 123}
+-->

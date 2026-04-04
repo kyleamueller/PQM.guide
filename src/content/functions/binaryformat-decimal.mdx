@@ -1,0 +1,64 @@
+---
+title: "BinaryFormat.Decimal"
+slug: "binaryformat-decimal"
+category: "Binary"
+description: "A binary format that reads a .NET 16-byte decimal value."
+syntax: "BinaryFormat.Decimal(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 16-byte .NET decimal value from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 16-byte decimal value from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-double"
+  - "binaryformat-single"
+  - "binaryformat-byte"
+  - "binaryformat-signedinteger32"
+  - "binaryformat-record"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Decimal number representation"
+  - ".NET decimal format"
+---
+
+## Remarks
+
+`BinaryFormat.Decimal` is a binary format specifier that reads a .NET 16-byte decimal value from binary data. The .NET decimal type uses 128 bits (16 bytes) and can represent values with up to 28-29 significant digits without rounding errors, making it suitable for financial and monetary calculations.
+
+The 16 bytes are laid out in .NET decimal format: the first 12 bytes hold the 96-bit integer mantissa, and the last 4 bytes contain the sign bit and scaling factor (number of decimal places).
+
+Use this format within `BinaryFormat.Record` or other composite formats when parsing binary files that contain .NET-serialized decimal values.
+
+## Examples
+
+### Example 1: Read a decimal value from binary data
+
+Read a .NET decimal value representing 1.0 from 16 bytes of binary data.
+
+```powerquery
+let
+    // .NET decimal representation of 1.0:
+    // 96-bit integer = 10, scale factor = 1, sign = positive
+    binaryData = #binary({
+        0x0A, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x01, 0x00
+    }),
+    result = BinaryFormat.Decimal(binaryData)
+in
+    result
+```
+
+<!--output
+1.0
+-->

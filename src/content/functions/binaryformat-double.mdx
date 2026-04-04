@@ -1,0 +1,61 @@
+---
+title: "BinaryFormat.Double"
+slug: "binaryformat-double"
+category: "Binary"
+description: "A binary format that reads an 8-byte IEEE double-precision floating point value."
+syntax: "BinaryFormat.Double(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads an 8-byte IEEE 754 double-precision floating point value from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 8-byte double-precision floating point value from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-single"
+  - "binaryformat-decimal"
+  - "binaryformat-byte"
+  - "binaryformat-record"
+  - "binaryformat-list"
+relatedConcepts:
+  - "Binary data parsing"
+  - "IEEE 754 floating point"
+  - "Double-precision numbers"
+---
+
+## Remarks
+
+`BinaryFormat.Double` is a binary format specifier that reads an 8-byte (64-bit) IEEE 754 double-precision floating point value from binary data. This is the standard representation for floating point numbers in most binary file formats and network protocols.
+
+A double-precision value provides approximately 15-17 significant decimal digits of precision and can represent values in the range of approximately +/-5.0 x 10^-324 to +/-1.7 x 10^308.
+
+The byte order defaults to little-endian. Use `BinaryFormat.ByteOrder` to change the byte order if the source data uses big-endian encoding.
+
+## Examples
+
+### Example 1: Read a double-precision floating point value
+
+Read an 8-byte IEEE 754 double value representing 1.0.
+
+```powerquery
+let
+    // IEEE 754 double-precision representation of 1.0 (little-endian)
+    binaryData = #binary({
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0xF0, 0x3F
+    }),
+    result = BinaryFormat.Double(binaryData)
+in
+    result
+```
+
+<!--output
+1
+-->

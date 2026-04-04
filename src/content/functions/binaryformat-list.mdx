@@ -1,0 +1,98 @@
+---
+title: "BinaryFormat.List"
+slug: "binaryformat-list"
+category: "Binary"
+description: "Returns a binary format that reads a sequence of items and returns a list."
+syntax: "BinaryFormat.List(binaryFormat as function, optional countOrCondition as any) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads a sequence of items and returns them as a list."
+parameters:
+  - name: "binaryFormat"
+    type: "function"
+    required: true
+    description: "The binary format of each item in the list."
+  - name: "countOrCondition"
+    type: "any"
+    required: false
+    description: "The number of items to read, a function that returns true to continue or false to stop, or a binary format that reads the count preceding the list. If omitted, reads until end of data."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-byte"
+  - "binaryformat-record"
+  - "binaryformat-length"
+  - "binaryformat-choice"
+  - "binaryformat-binary"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Repeated binary structures"
+  - "List parsing"
+---
+
+## Remarks
+
+`BinaryFormat.List` returns a binary format that reads a sequence of items from binary data and returns them as a list. The `binaryFormat` parameter defines how each individual item is read.
+
+The `countOrCondition` parameter controls how many items are read:
+
+- **Not specified** -- Reads items until there is no more data.
+- **A number** -- Reads exactly that many items.
+- **A function** -- Called for each item read; returns `true` to continue reading or `false` to stop. The final item (the one that caused `false`) is included in the list.
+- **A binary format** -- The item count is read from the stream first using that format, then that many items are read.
+
+This is one of the most commonly used composite binary formats, enabling you to read arrays or sequences of identically-formatted values from binary data.
+
+## Examples
+
+### Example 1: Read all bytes until end of data
+
+Read bytes until no more data remains.
+
+```powerquery
+let
+    binaryData = #binary({1, 2, 3}),
+    listFormat = BinaryFormat.List(BinaryFormat.Byte)
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{1, 2, 3}
+-->
+
+### Example 2: Read a fixed number of items
+
+Read exactly two bytes from the binary data.
+
+```powerquery
+let
+    binaryData = #binary({1, 2, 3}),
+    listFormat = BinaryFormat.List(BinaryFormat.Byte, 2)
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{1, 2}
+-->
+
+### Example 3: Read until a condition is met
+
+Read bytes until the value is greater than or equal to 2.
+
+```powerquery
+let
+    binaryData = #binary({1, 2, 3}),
+    listFormat = BinaryFormat.List(BinaryFormat.Byte, (x) => x < 2)
+in
+    listFormat(binaryData)
+```
+
+<!--output
+{1, 2}
+-->
