@@ -1,0 +1,48 @@
+---
+title: "IdentityProvider.Default"
+slug: "identityprovider-default"
+category: "Accessing Data"
+description: "Returns the default identity provider for the current Power Query host environment."
+syntax: "IdentityProvider.Default() as any"
+returnType: "any"
+returnDescription: "The default identity provider function for the current host, used to resolve user identities."
+parameters: []
+compatibility:
+  pbiDesktop: false
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+---
+
+## Remarks
+
+`IdentityProvider.Default` is an **internal function** that returns the default identity provider for the current Power Query host environment. The identity provider is used by functions such as `Identity.From` and `Identity.IsMemberOf` to construct and evaluate identity records.
+
+**Internal use only**: This function is part of the internal identity infrastructure in Power Query. It is not intended for direct use in user-authored queries. The returned identity provider is host-specific and typically backed by Azure Active Directory (Entra ID) in Power BI Service and Microsoft Fabric environments.
+
+**No parameters**: This function takes no arguments. It returns whatever identity provider the host has configured as the default.
+
+**Authentication**: This function does not perform authentication. It returns a reference to the identity provider that the host uses to resolve identity records. The actual authentication is handled by the host environment.
+
+**Query folding**: Not applicable. This function returns an in-memory identity provider reference.
+
+**Platform availability**: The function is available in the Power Query runtime but only returns a meaningful result when executed within a host that provides an identity context (e.g., Power BI Service, Microsoft Fabric). In desktop environments, calling this function may return null or produce an error.
+
+**Recommended alternatives**: For user-authored queries that need to work with the current user's identity, rely on the host's built-in authentication mechanisms through data connectors rather than calling identity functions directly.
+
+## Examples
+
+### Example 1: Retrieve the default identity provider (conceptual)
+
+This example illustrates the function signature. In practice, this value is consumed internally by `Identity.From`.
+
+```powerquery
+let
+    provider = IdentityProvider.Default()
+in
+    provider
+```

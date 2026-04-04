@@ -1,0 +1,82 @@
+---
+title: "AzureStorage.DataLakeContents"
+slug: "azurestorage-datalakecontents"
+category: "Accessing Data"
+description: "Returns the content of a file from Azure Data Lake Storage as binary."
+syntax: "AzureStorage.DataLakeContents(url as text, optional options as nullable record) as binary"
+returnType: "binary"
+returnDescription: "The binary content of the specified file from an Azure Data Lake Storage filesystem."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The full URL of the file in Azure Data Lake Storage Gen2 (e.g., \"https://myaccount.dfs.core.windows.net/myfilesystem/path/file.csv\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control download behavior. Supported fields include BlockSize, RequestSize, and ConcurrentRequests."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "azurestorage-blobs"
+  - "file-contents"
+  - "csv-document"
+  - "json-document"
+---
+
+## Remarks
+
+`AzureStorage.DataLakeContents` downloads a single file from Azure Data Lake Storage Gen2 and returns its content as a `binary` value. This is the Data Lake equivalent of `AzureStorage.BlobContents` and is designed for ADLS Gen2 endpoints that use the `dfs.core.windows.net` domain. The binary result is typically passed to a parser function such as `Csv.Document`, `Json.Document`, or `Excel.Workbook`.
+
+**Key options** (passed in the `options` record):
+- `BlockSize` (number) -- the number of bytes to read before waiting on the data consumer. Defaults to 4 MB.
+- `RequestSize` (number) -- the number of bytes to try to read in a single HTTP request to the server. Defaults to 4 MB.
+- `ConcurrentRequests` (number) -- the number of requests to make in parallel for faster downloads. Memory required is approximately ConcurrentRequests multiplied by RequestSize. Defaults to `16`.
+
+**Authentication**: Supports Account Key, Shared Access Signature (SAS), Microsoft Account (Azure AD / Entra ID), and service principal authentication. Configure the credential type in the data source credentials dialog. Do not embed keys or tokens in the M query.
+
+**Query folding**: Not applicable. This function downloads the entire file as a single binary stream. Any filtering or transformation is performed locally after the data is downloaded and parsed.
+
+**Platform availability**: Available across all Power Query environments including Power BI Desktop, Power BI Service, Excel Desktop, Excel Online, Dataflows, and Fabric Notebooks. No gateway is required for cloud-to-cloud access.
+
+## Examples
+
+### Example 1: Download a CSV file from Azure Data Lake Storage
+
+```powerquery
+let
+    Source = AzureStorage.DataLakeContents("https://myaccount.dfs.core.windows.net/myfilesystem/data/sales.csv"),
+    Parsed = Csv.Document(Source, [Delimiter = ",", Encoding = TextEncoding.Utf8]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```
+
+### Example 2: Download a JSON file with custom request settings
+
+```powerquery
+let
+    Source = AzureStorage.DataLakeContents(
+        "https://myaccount.dfs.core.windows.net/myfilesystem/data/config.json",
+        [ConcurrentRequests = 8, RequestSize = 2097152]
+    ),
+    Parsed = Json.Document(Source)
+in
+    Parsed
+```
+
+### Example 3: Download an Excel workbook from Data Lake Storage
+
+```powerquery
+let
+    Source = AzureStorage.DataLakeContents("https://myaccount.dfs.core.windows.net/myfilesystem/reports/monthly.xlsx"),
+    Workbook = Excel.Workbook(Source, true),
+    Sheet1 = Workbook{[Item = "Sheet", Name = "Sheet1"]}[Data]
+in
+    Sheet1
+```

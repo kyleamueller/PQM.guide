@@ -1,0 +1,57 @@
+---
+title: "AccessControlEntry.ConditionToIdentities"
+slug: "accesscontrolentry-conditiontoidentities"
+category: "Accessing Data"
+description: "Converts an access control condition into a list of identities for which the condition would return true."
+syntax: "AccessControlEntry.ConditionToIdentities(identityProvider as function, condition as function) as list"
+returnType: "list"
+returnDescription: "A list of identities for which the specified condition would return true in all authorization contexts with the given identity provider."
+parameters:
+  - name: "identityProvider"
+    type: "function"
+    required: true
+    description: "The identity provider function used to interpret the condition and resolve identities (user or group)."
+  - name: "condition"
+    type: "function"
+    required: true
+    description: "The access control condition function to convert into a list of identities."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions: []
+---
+
+## Remarks
+
+`AccessControlEntry.ConditionToIdentities` converts a `condition` function into a list of identities for which that condition would return `true` in all authorization contexts using the specified `identityProvider`. This is a utility function used when working with access control entries (ACEs) programmatically.
+
+**Key behavior**:
+- An error is raised if it is not possible to convert the `condition` into a list of identities. For example, if the `condition` consults attributes other than user or group identities to make a decision, the conversion will fail.
+- The list of identities represents the identities as they appear in `condition`. No normalization (such as group expansion) is performed on them.
+
+**Authentication**: This function does not directly access external data sources. It operates on in-memory access control structures. Authentication is handled by the identity provider function passed as a parameter.
+
+**Query folding**: Not applicable. This function operates entirely in memory on access control entry structures.
+
+**Platform availability**: This function is primarily used in advanced connector development and Power BI dataset security scenarios. It is not commonly used in standard Power Query desktop or online authoring.
+
+## Examples
+
+### Example 1: Convert a condition to identities
+
+```powerquery
+let
+    // This is a conceptual example; identityProvider and condition
+    // are typically supplied by a connector or security framework.
+    result = AccessControlEntry.ConditionToIdentities(
+        myIdentityProvider,
+        myConditionFunction
+    )
+in
+    result
+```
+This returns a list of user or group identity values for which the condition evaluates to `true`.

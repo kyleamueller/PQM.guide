@@ -1,0 +1,63 @@
+---
+title: "Exchange.Contents"
+slug: "exchange-contents"
+category: "Accessing Data"
+description: "Returns a table of contents from a Microsoft Exchange account mailbox."
+syntax: "Exchange.Contents(optional mailboxAddress as nullable text) as table"
+returnType: "table"
+returnDescription: "A table of contents from the specified Microsoft Exchange mailbox, including mail, calendar, and contacts."
+parameters:
+  - name: "mailboxAddress"
+    type: "text"
+    required: false
+    description: "The email address of the Exchange mailbox to connect to. If not specified, the default account for the current credential is used."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "odata-feed"
+  - "web-contents"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Exchange.Contents` connects to a Microsoft Exchange account and returns a table of the mailbox contents. It provides access to mail messages, calendar events, and contacts from the specified mailbox.
+
+**Authentication**: Requires Microsoft Account (OAuth 2.0) or organizational account credentials to access Exchange Online (Office 365) mailboxes. Credentials are configured in the Power Query data source settings dialog. Exchange on-premises may require Windows authentication.
+
+**Mailbox address**: If the optional `mailboxAddress` parameter is omitted, the function connects to the default mailbox associated with the authenticated credential. To access a shared mailbox or a specific user's mailbox (with appropriate permissions), pass the full email address as a text value.
+
+**Query folding**: Not supported. All filtering and transformations are performed in Power Query after data is retrieved from Exchange.
+
+**Platform availability**: This connector is available only in **Power BI Desktop**. It is not supported in Power BI Service, Excel, Dataflows, or Fabric notebooks. For cloud-based mail data access, consider using `OData.Feed` with the Microsoft Graph API or a custom connector.
+
+**Deprecation note**: The Exchange connector has limited support and may not be actively maintained. For production scenarios, Microsoft recommends using the Microsoft Graph API via `OData.Feed` or `Web.Contents` for more reliable and feature-rich access to Exchange data.
+
+## Examples
+
+### Example 1: Connect to the default Exchange mailbox
+
+```powerquery
+Exchange.Contents()
+```
+
+### Example 2: Connect to a specific Exchange mailbox by email address
+
+```powerquery
+Exchange.Contents("user@contoso.com")
+```
+
+### Example 3: Retrieve mail from a specific mailbox
+
+```powerquery
+let
+    Source = Exchange.Contents("user@contoso.com"),
+    Mail = Source{[Name = "Mail"]}[Data]
+in
+    Mail
+```

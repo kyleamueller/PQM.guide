@@ -1,0 +1,79 @@
+---
+title: "WebAction.Request"
+slug: "webaction-request"
+category: "Accessing Data"
+description: "Creates an action that, when executed, returns the results of performing an HTTP request against a URL as a binary value."
+syntax: "WebAction.Request(method as text, url as text, optional options as nullable record) as action"
+returnType: "action"
+returnDescription: "An action value that, when executed by the host, performs the specified HTTP request and returns the response as a binary value."
+parameters:
+  - name: "method"
+    type: "text"
+    required: true
+    description: "The HTTP method to use for the request (e.g., \"GET\", \"POST\", \"PUT\", \"DELETE\"). Can also use WebMethod.Get, WebMethod.Post, etc."
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The target URL for the HTTP request."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record specifying additional request properties such as Query, ApiKeyName, Headers, Timeout, ExcludedFromCacheKey, IsRetry, ManualStatusHandling, RelativePath, and Content."
+compatibility:
+  pbiDesktop: false
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+  - "web-headers"
+---
+
+## Remarks
+
+`WebAction.Request` creates an action that performs an HTTP request when executed. Unlike `Web.Contents`, which returns data directly, this function returns an `action` value -- a deferred operation that the Power Query host must explicitly execute. **This function is disabled in most contexts.**
+
+**Disabled by default**: As noted in the official documentation, this function is disabled in most contexts. Attempting to use it in Power BI Desktop, Excel, or other standard environments will produce an error. It is intended for specialized host scenarios where write operations (POST, PUT, DELETE) are permitted.
+
+**Options record fields**:
+- `Query` (record) -- Programmatically add query parameters to the URL without having to worry about escaping.
+- `ApiKeyName` (text) -- If the target site has a notion of an API key, specifies the name (not the value) of the key parameter in the URL. The actual key value is provided in the credential.
+- `Headers` (record) -- Specifying this value as a record supplies additional headers to the HTTP request.
+- `Timeout` (duration) -- Changes the timeout for the HTTP request. The default value is 100 seconds.
+- `ExcludedFromCacheKey` (list) -- Excludes the specified HTTP header keys from being part of the calculation for caching data.
+- `IsRetry` (logical) -- When true, ignores any existing response in the cache when fetching data.
+- `ManualStatusHandling` (list) -- Prevents any built-in handling for HTTP requests whose response has one of the specified status codes.
+- `RelativePath` (text) -- Appends the specified text to the base URL before making the request.
+- `Content` (binary) -- Specifying this value causes its contents to become the body of the HTTP request (for POST/PUT operations).
+
+**Authentication**: Credentials are managed through the Power Query credential system, similar to `Web.Contents`. The `ApiKeyName` option allows API key authentication where the key value is stored securely in credentials.
+
+**Query folding**: Not applicable. This function constructs and executes HTTP requests; there is no query folding.
+
+**Platform availability**: Disabled in most Power Query host environments. Not available for general use in Power BI Desktop, Power BI Service, Excel, Dataflows, or Fabric Notebooks.
+
+**Recommended alternatives**: Use `Web.Contents` for GET requests that retrieve data. For scenarios requiring POST requests, `Web.Contents` also supports sending a request body via the `Content` option field. `Web.Headers` can be used to inspect response headers.
+
+## Examples
+
+### Example 1: Perform a GET request against Bing
+
+This example demonstrates the syntax but will return an `Action` value that is disabled in most environments.
+
+```powerquery
+WebAction.Request(WebMethod.Get, "https://bing.com")
+```
+
+### Example 2: Alternative using Web.Contents (recommended)
+
+Since `WebAction.Request` is disabled in most contexts, use `Web.Contents` instead:
+
+```powerquery
+let
+    Response = Web.Contents("https://api.example.com/data"),
+    Parsed = Json.Document(Response)
+in
+    Parsed
+```

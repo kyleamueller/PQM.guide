@@ -1,0 +1,51 @@
+---
+title: "Identity.From"
+slug: "identity-from"
+category: "Accessing Data"
+description: "Creates an identity record from an identity provider and a value."
+syntax: "Identity.From(identityProvider as function, value as any) as record"
+returnType: "record"
+returnDescription: "An identity record representing the specified user or principal within the given identity provider context."
+parameters:
+  - name: "identityProvider"
+    type: "function"
+    required: true
+    description: "The identity provider function (e.g., IdentityProvider.Default()) used to resolve the identity."
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value that identifies the user or principal (e.g., an email address or user identifier)."
+compatibility:
+  pbiDesktop: false
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+---
+
+## Remarks
+
+`Identity.From` is an **internal function** used by the Power Query infrastructure to construct identity records for use in row-level security (RLS) and identity-based data filtering scenarios within Microsoft Fabric and Power BI.
+
+**Internal use only**: This function is part of the identity pipeline used internally by Power Query hosts (such as Power BI Service and Fabric) to represent the current user's identity. It is not intended for direct use in user-authored queries, and calling it outside of a supported host context will typically produce an error.
+
+**Authentication**: This function does not perform authentication itself. It relies on the host environment to supply the identity provider and the authenticated user context.
+
+**Query folding**: Not applicable. This function constructs an in-memory identity record and does not interact with external data sources.
+
+**Platform availability**: This function is resolved by the Power Query host runtime. It is not available for interactive use in Power BI Desktop, Excel, or other end-user environments. It is used internally in Power BI Service and Microsoft Fabric for identity propagation.
+
+**Recommended alternatives**: For accessing data with user credentials, use the built-in authentication mechanisms of data connectors such as `Web.Contents`, `Sql.Database`, or `OData.Feed`, which handle identity through the Power Query credential manager.
+
+## Examples
+
+### Example 1: Construct an identity record (conceptual)
+
+This example illustrates the function signature. In practice, this call is made internally by the Power Query host.
+
+```powerquery
+Identity.From(IdentityProvider.Default(), "user@contoso.com")
+```

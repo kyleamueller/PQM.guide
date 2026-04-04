@@ -1,0 +1,94 @@
+---
+title: "Informix.Database"
+slug: "informix-database"
+category: "Accessing Data"
+description: "Returns a table of SQL tables and views available in an IBM Informix database."
+syntax: "Informix.Database(server as text, database as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table listing the SQL tables and views available in the specified Informix database."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The Informix server name or address. The port may be optionally specified with the server, separated by a colon (e.g., \"myserver:9088\")."
+  - name: "database"
+    type: "text"
+    required: true
+    description: "The name of the database instance to connect to on the Informix server."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control connection behavior, including CreateNavigationProperties, NavigationPropertyNameGenerator, Query, CommandTimeout, ConnectionTimeout, and HierarchicalNavigation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "odbc-datasource"
+  - "odata-feed"
+---
+
+## Remarks
+
+`Informix.Database` connects to an IBM Informix database server and returns a navigation table of the available SQL tables and views. The function uses an ODBC-based connector and requires the IBM Informix ODBC driver to be installed on the machine running Power Query.
+
+**Options record fields**:
+- `CreateNavigationProperties` (logical) -- When true, generates navigation properties on the returned values for exploring related tables. Default is true.
+- `NavigationPropertyNameGenerator` (function) -- A function used for the creation of names for navigation properties.
+- `Query` (text) -- A native SQL query used to retrieve data. If the query produces multiple result sets, only the first is returned.
+- `CommandTimeout` (duration) -- Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes.
+- `ConnectionTimeout` (duration) -- Controls how long to wait before abandoning an attempt to make a connection to the server. The default value is driver-dependent.
+- `HierarchicalNavigation` (logical) -- When true, tables are grouped by their schema names in the navigation table. Default is false.
+
+The record parameter is specified as `[option1 = value1, option2 = value2...]` or `[Query = "select ..."]`.
+
+**Authentication**: Supports database authentication (username and password) and Windows authentication. Credentials are configured through the Power Query data source settings dialog. An on-premises data gateway is required for Power BI Service refresh.
+
+**Query folding**: Supported for standard SQL transformations when not using a native query. Power Query will attempt to push filter, column selection, and other operations down to the Informix SQL engine. Using the `Query` option disables folding for subsequent steps.
+
+**Platform availability**: Available in Power BI Desktop and Excel Desktop when the IBM Informix ODBC driver is installed. Supported in Power BI Service with an on-premises data gateway. Not available in Excel Online, Dataflows, or Fabric Notebooks.
+
+**Driver requirement**: The IBM Informix Client SDK or IBM Informix ODBC Driver must be installed on the machine (or gateway machine) running the query. The driver is available from IBM's download site.
+
+## Examples
+
+### Example 1: Connect to an Informix database
+
+```powerquery
+Informix.Database("myserver:9088", "salesdb")
+```
+
+### Example 2: Execute a native SQL query
+
+```powerquery
+Informix.Database(
+    "myserver",
+    "salesdb",
+    [Query = "SELECT customer_id, name, balance FROM customers WHERE balance > 1000"]
+)
+```
+
+### Example 3: Connect with a custom command timeout
+
+```powerquery
+Informix.Database(
+    "myserver:9088",
+    "inventory",
+    [CommandTimeout = #duration(0, 0, 5, 0)]
+)
+```
+
+### Example 4: Navigate to a specific table with hierarchical navigation
+
+```powerquery
+let
+    Source = Informix.Database("myserver", "salesdb", [HierarchicalNavigation = true]),
+    Schema = Source{[Name = "informix"]}[Data],
+    CustomersTable = Schema{[Name = "customers"]}[Data]
+in
+    CustomersTable
+```

@@ -1,0 +1,99 @@
+---
+title: "HdInsight.Files"
+slug: "hdinsight-files"
+category: "Accessing Data"
+description: "Returns a table of blob files from a specific container in an Azure HDInsight storage account."
+syntax: "HdInsight.Files(account as text, containerName as text) as table"
+returnType: "table"
+returnDescription: "A table containing one row for each blob file found in the specified container, with file properties and a link to its content."
+parameters:
+  - name: "account"
+    type: "text"
+    required: true
+    description: "The Azure storage account URL associated with the HDInsight cluster (e.g., \"https://mystorageaccount.blob.core.windows.net\")."
+  - name: "containerName"
+    type: "text"
+    required: true
+    description: "The name of the blob container to retrieve files from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "hdinsight-containers"
+  - "hdinsight-contents"
+  - "azurestorage-blobs"
+  - "folder-contents"
+  - "file-contents"
+relatedConcepts: []
+---
+
+## Remarks
+
+`HdInsight.Files` connects to a specific blob container in the Azure storage account associated with an Azure HDInsight cluster and returns a table listing all blob files in that container. Each row represents a blob file with its properties and a lazy-loaded binary `Content` column.
+
+**Columns returned**: Each row in the result includes:
+- `Name` (text) -- the blob file name, including any virtual folder prefix.
+- `Folder Path` (text) -- the virtual folder path derived from the blob name.
+- `Date modified` (datetime) -- the last modification timestamp.
+- `Date created` (datetime) -- the creation timestamp.
+- `Date accessed` (datetime) -- the last access timestamp.
+- `Extension` (text) -- the file extension including the leading dot.
+- `Attributes` (record) -- blob metadata attributes.
+- `Content` (binary) -- the binary content of the blob file.
+
+**Authentication**: Requires the Azure storage account key for the storage account backing the HDInsight cluster. Configure the account key credential in the Power Query data source settings dialog using the storage account URL as the credential scope. Shared Access Signature (SAS) tokens may also be supported.
+
+**Two-parameter design**: Unlike `HdInsight.Containers` and `HdInsight.Contents` (which list containers), `HdInsight.Files` takes both the account URL and a specific container name, going directly to the file listing within that container. This is more efficient when you already know which container holds the data you need.
+
+**Content column**: The `Content` column is lazy-loaded. Blob data is not downloaded until the `Content` binary is accessed. Filter to the specific files you need (by `Name`, `Extension`, or `Folder Path`) before accessing `Content` to minimize data transfer from Azure Storage.
+
+**Query folding**: Not supported. Blob enumeration and all filtering are performed in Power Query after the blob list is retrieved from Azure Storage.
+
+**Platform availability**: Available in **Power BI Desktop**, **Power BI Service**, **Excel Desktop**, and **Dataflows**. Not available in Excel Online or Fabric notebooks. In Power BI Service, the storage account key credential must be configured in the dataset's data source settings for scheduled refresh.
+
+**Combining files pattern**: Use the standard combine-files pattern: list blobs, filter by extension, parse each blob's `Content` with the appropriate function (`Csv.Document`, `Excel.Workbook`, `Json.Document`, etc.), then combine with `Table.Combine`.
+
+## Examples
+
+### Example 1: List all files in an HDInsight storage container
+
+```powerquery
+HdInsight.Files("https://mystorageaccount.blob.core.windows.net", "hdinsight-data")
+```
+
+### Example 2: Filter to CSV files in the container
+
+```powerquery
+let
+    Source = HdInsight.Files("https://mystorageaccount.blob.core.windows.net", "hdinsight-data"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv")
+in
+    CsvFiles
+```
+
+### Example 3: Combine all CSV blobs from an HDInsight container into one table
+
+```powerquery
+let
+    Source = HdInsight.Files("https://mystorageaccount.blob.core.windows.net", "hdinsight-data"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv"),
+    Parsed = Table.AddColumn(CsvFiles, "Data", each Csv.Document([Content], [Delimiter = ",", Encoding = 65001])),
+    Combined = Table.Combine(Parsed[Data])
+in
+    Combined
+```
+
+### Example 4: Read a specific blob file from the container
+
+```powerquery
+let
+    Source = HdInsight.Files("https://mystorageaccount.blob.core.windows.net", "output-data"),
+    File = Source{[Name = "results/summary.json"]}[Content],
+    Parsed = Json.Document(File)
+in
+    Parsed
+```

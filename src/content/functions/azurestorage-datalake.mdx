@@ -1,0 +1,87 @@
+---
+title: "AzureStorage.DataLake"
+slug: "azurestorage-datalake"
+category: "Accessing Data"
+description: "Returns a navigational table of documents from an Azure Data Lake Storage filesystem."
+syntax: "AzureStorage.DataLake(endpoint as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigational table listing the files and folders found in the specified Azure Data Lake Storage container and its subfolders."
+parameters:
+  - name: "endpoint"
+    type: "text"
+    required: true
+    description: "The account URL or container endpoint of the Azure Data Lake Storage Gen2 filesystem (e.g., \"https://myaccount.dfs.core.windows.net/myfilesystem\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control behavior. Supported fields include BlockSize, RequestSize, ConcurrentRequests, and HierarchicalNavigation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "azurestorage-blobs"
+  - "folder-contents"
+  - "csv-document"
+  - "json-document"
+---
+
+## Remarks
+
+`AzureStorage.DataLake` connects to an Azure Data Lake Storage Gen2 (ADLS Gen2) endpoint and returns a navigational table of the files and folders in the specified container. The result table includes columns for file name, path, content (as binary), and file metadata. Individual file contents can be accessed and passed to parser functions such as `Csv.Document`, `Json.Document`, or `Excel.Workbook`.
+
+**Key options** (passed in the `options` record):
+- `BlockSize` (number) -- the number of bytes to read before waiting on the data consumer. Defaults to 4 MB.
+- `RequestSize` (number) -- the number of bytes to try to read in a single HTTP request to the server. Defaults to 4 MB.
+- `ConcurrentRequests` (number) -- the number of requests to make in parallel for faster downloads. Memory required is approximately ConcurrentRequests multiplied by RequestSize. Defaults to `16`.
+- `HierarchicalNavigation` (logical) -- when `true`, files are returned in a tree-like directory view. When `false`, files are returned in a flat list. Defaults to `false`.
+
+**Authentication**: Supports Account Key, Shared Access Signature (SAS), Microsoft Account (Azure AD / Entra ID), and service principal authentication. Configure the credential type in the data source credentials dialog. Do not embed keys or tokens in the M query.
+
+**Query folding**: Not applicable. The function retrieves the file listing from the Data Lake storage. Filtering and transformation of file contents are performed locally by the Power Query engine.
+
+**Platform availability**: Available across all Power Query environments including Power BI Desktop, Power BI Service, Excel Desktop, Excel Online, Dataflows, and Fabric Notebooks. No gateway is required for cloud-to-cloud access.
+
+## Examples
+
+### Example 1: List all files in an ADLS Gen2 container
+
+```powerquery
+AzureStorage.DataLake("https://myaccount.dfs.core.windows.net/myfilesystem")
+```
+
+### Example 2: List files with hierarchical (tree) navigation
+
+```powerquery
+AzureStorage.DataLake(
+    "https://myaccount.dfs.core.windows.net/myfilesystem",
+    [HierarchicalNavigation = true]
+)
+```
+
+### Example 3: Read a specific CSV file from Data Lake Storage
+
+```powerquery
+let
+    Source = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net/myfilesystem"),
+    File = Source{[Name = "sales-2024.csv"]}[Content],
+    Parsed = Csv.Document(File, [Delimiter = ",", Encoding = TextEncoding.Utf8]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```
+
+### Example 4: Combine all CSV files from a Data Lake folder
+
+```powerquery
+let
+    Source = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net/myfilesystem/data/"),
+    FilteredCSV = Table.SelectRows(Source, each Text.EndsWith([Name], ".csv")),
+    ParsedFiles = Table.AddColumn(FilteredCSV, "Tables", each Csv.Document([Content], [Delimiter = ","])),
+    Combined = Table.Combine(ParsedFiles[Tables])
+in
+    Combined
+```

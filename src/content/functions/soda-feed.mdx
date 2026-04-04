@@ -1,0 +1,79 @@
+---
+title: "Soda.Feed"
+slug: "soda-feed"
+category: "Accessing Data"
+description: "Returns a table from the contents at the specified URL formatted according to the Socrata Open Data API (SODA) 2.0."
+syntax: "Soda.Feed(url as text) as table"
+returnType: "table"
+returnDescription: "A table containing the data retrieved from the SODA 2.0 API endpoint."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of a SODA 2.0-compliant data source endpoint. The URL must point to a valid SODA-compliant source that ends in a .csv extension."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "odata-feed"
+  - "web-contents"
+  - "csv-document"
+---
+
+## Remarks
+
+`Soda.Feed` connects to a Socrata Open Data API (SODA) 2.0 endpoint and returns the data as a Power Query table. SODA is the API standard used by many government and public-sector open data portals (such as those powered by Socrata/Tyler Data & Insights) to publish datasets.
+
+**URL format**: The URL must point to a valid SODA-compliant resource and should end with a `.csv` extension. Typical SODA dataset URLs follow the pattern:
+```
+https://data.cityname.gov/resource/xxxx-xxxx.csv
+```
+where `xxxx-xxxx` is the dataset identifier. The `.csv` extension tells the SODA API to return the data in CSV format, which Power Query then parses into a table.
+
+**Authentication**: Most SODA-based open data portals serve data anonymously (no authentication required). Some portals may require an application token for higher rate limits, but `Soda.Feed` uses anonymous access by default. If the endpoint requires authentication, consider using `Web.Contents` with appropriate headers instead.
+
+**Query folding**: Not supported. The function retrieves the full dataset from the SODA endpoint and all subsequent transformations are applied in-memory by Power Query.
+
+**Pagination**: SODA APIs typically have a default row limit (often 1,000 rows). `Soda.Feed` may not automatically paginate through all rows of large datasets. For large datasets, consider using `Web.Contents` with SODA query parameters (`$limit`, `$offset`) to implement manual pagination, or use the OData endpoint if the portal supports it.
+
+**Platform availability**: Available in Power BI Desktop and Excel Desktop. Supported in Power BI Service for scheduled refresh. Available in Dataflows. Not available in Excel Online or Fabric Notebooks.
+
+**Alternative approach**: For more control over filtering, pagination, and authentication, use `Web.Contents` to call the SODA API directly and parse the response with `Csv.Document` or `Json.Document`.
+
+## Examples
+
+### Example 1: Load a dataset from a Socrata open data portal
+
+```powerquery
+Soda.Feed("https://data.cityofchicago.org/resource/xzkq-xp2w.csv")
+```
+
+### Example 2: Load and filter a SODA dataset
+
+```powerquery
+let
+    Source = Soda.Feed("https://data.cityofchicago.org/resource/xzkq-xp2w.csv"),
+    Filtered = Table.SelectRows(Source, each [status] = "Open")
+in
+    Filtered
+```
+
+### Example 3: Alternative approach using Web.Contents for large datasets
+
+For datasets exceeding the SODA default row limit, use `Web.Contents` with explicit pagination parameters:
+
+```powerquery
+let
+    Source = Web.Contents(
+        "https://data.cityofchicago.org/resource/xzkq-xp2w.csv",
+        [Query = [#"$limit" = "50000"]]
+    ),
+    Parsed = Csv.Document(Source, [Delimiter = ",", Encoding = 65001]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```

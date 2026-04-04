@@ -1,0 +1,82 @@
+---
+title: "AnalysisServices.Databases"
+slug: "analysisservices-databases"
+category: "Accessing Data"
+description: "Returns the databases on a SQL Server Analysis Services instance."
+syntax: "AnalysisServices.Databases(server as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table listing the databases available on the specified Analysis Services instance."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The hostname or connection string of the Analysis Services instance (e.g., \"localhost\" or \"asazure://region.asazure.windows.net/myserver\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control connection behavior. Supported fields include TypedMeasureColumns, Culture, CommandTimeout, ConnectionTimeout, SubQueries, and Implementation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "analysisservices-database"
+  - "sql-database"
+---
+
+## Remarks
+
+`AnalysisServices.Databases` connects to a SQL Server Analysis Services (SSAS) instance and returns a navigation table of the databases hosted on that server. This works with both on-premises SSAS instances (Multidimensional and Tabular models) and Azure Analysis Services.
+
+**Key options** (passed in the `options` record):
+- `TypedMeasureColumns` (logical) -- when `true`, the types specified in the multidimensional or tabular model are used for the added measure columns. When `false`, the type `number` is used for all measure columns. Defaults to `false`.
+- `Culture` (text) -- a culture name specifying the locale for the data (corresponds to the Locale Identifier connection string property).
+- `CommandTimeout` (duration) -- maximum time the server-side query is allowed to run before cancellation. The default value is driver-dependent.
+- `ConnectionTimeout` (duration) -- maximum time to wait when establishing a connection to the server. The default value is driver-dependent.
+- `SubQueries` (number) -- a value of 0, 1, or 2 that sets the SubQueries property in the connection string, controlling the behavior of calculated members on subselects or subcubes. Defaults to `2`.
+- `Implementation` (text) -- connector implementation version.
+
+**Authentication**: Supports Windows authentication (on-premises), Microsoft Account / Azure AD (Azure Analysis Services), and service principal authentication. Configure credentials in the data source credentials dialog. Do not embed credentials in the M query.
+
+**Query folding**: Analysis Services is a fully foldable data source for MDX and DAX queries. Filter, column selection, and aggregation operations are translated into appropriate MDX or DAX and executed server-side.
+
+**Platform availability**: Available in Power BI Desktop, Power BI Service, Excel Desktop, and Dataflows. On-premises SSAS instances require an on-premises data gateway for refresh in the Power BI Service. Azure Analysis Services supports direct cloud refresh. Not available in Excel Online or Fabric Notebooks.
+
+## Examples
+
+### Example 1: List databases on a local Analysis Services instance
+
+```powerquery
+AnalysisServices.Databases("localhost")
+```
+
+### Example 2: List databases on Azure Analysis Services
+
+```powerquery
+AnalysisServices.Databases("asazure://westus.asazure.windows.net/myserver")
+```
+
+### Example 3: Navigate to a specific database and model
+
+```powerquery
+let
+    Source = AnalysisServices.Databases("localhost"),
+    AdventureWorks = Source{[Name = "AdventureWorks"]}[Data]
+in
+    AdventureWorks
+```
+
+### Example 4: Connect with typed measure columns and a culture setting
+
+```powerquery
+AnalysisServices.Databases(
+    "localhost",
+    [
+        TypedMeasureColumns = true,
+        Culture = "en-US"
+    ]
+)
+```

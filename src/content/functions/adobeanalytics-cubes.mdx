@@ -1,0 +1,65 @@
+---
+title: "AdobeAnalytics.Cubes"
+slug: "adobeanalytics-cubes"
+category: "Accessing Data"
+description: "Returns a table of multidimensional packages from Adobe Analytics."
+syntax: "AdobeAnalytics.Cubes(optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of multidimensional packages (report suites) from Adobe Analytics."
+parameters:
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control behavior. Supported fields include HierarchicalNavigation, MaxRetryCount, RetryInterval, and Implementation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions: []
+---
+
+## Remarks
+
+`AdobeAnalytics.Cubes` connects to Adobe Analytics and returns a navigation table of multidimensional packages (report suites). These packages expose dimensions and metrics as a multidimensional cube structure that can be navigated and queried in Power Query.
+
+**Key options** (passed in the `options` record):
+- `HierarchicalNavigation` (logical) -- when `true`, tables are grouped by their schema names in the navigation table. Defaults to `false`.
+- `MaxRetryCount` (number) -- the number of retries to perform when polling for the result of a query. Defaults to `120`.
+- `RetryInterval` (duration) -- the duration of time between retry attempts. Defaults to 1 second.
+- `Implementation` (text) -- specifies the Adobe Analytics API version. Valid values are `"2.0"`. When not specified, the default API version 1.4 is used.
+
+**Authentication**: Adobe Analytics uses OAuth 2.0 authentication. When connecting for the first time, Power BI Desktop will prompt you to sign in with your Adobe ID credentials. The OAuth token is managed by the connector and refreshed automatically. Do not embed credentials in the M query.
+
+**Query folding**: Limited. The connector sends dimension and metric selections to the Adobe Analytics API, but most Power Query transformations (filtering, sorting, grouping) are applied locally after data retrieval.
+
+**Platform availability**: This connector is available in **Power BI Desktop** and **Power BI Service**. It is not available in Excel, Excel Online, Dataflows, or Fabric Notebooks. In Power BI Service, scheduled refresh is supported with stored OAuth credentials.
+
+## Examples
+
+### Example 1: Retrieve all Adobe Analytics report suites
+
+```powerquery
+AdobeAnalytics.Cubes()
+```
+
+### Example 2: Retrieve report suites with hierarchical navigation and API v2.0
+
+```powerquery
+AdobeAnalytics.Cubes([
+    HierarchicalNavigation = true,
+    Implementation = "2.0"
+])
+```
+
+### Example 3: Navigate to a specific report suite
+
+```powerquery
+let
+    Source = AdobeAnalytics.Cubes(),
+    ReportSuite = Source{[Name = "my-report-suite"]}[Data]
+in
+    ReportSuite
+```
