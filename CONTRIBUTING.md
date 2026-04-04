@@ -17,10 +17,11 @@ PQM.guide is a community-driven Power Query M reference. Contributions are welco
 git clone https://github.com/kyleamueller/PQM.guide.git
 cd PQM.guide
 npm install
+cp .env.example .env.local   # optional — enables Google Analytics locally
 npm run dev
 ```
 
-The site runs at `http://localhost:3000`.
+The site runs at `http://localhost:3000`. Google Analytics is optional — the site works fully without it.
 
 ## File Structure
 
