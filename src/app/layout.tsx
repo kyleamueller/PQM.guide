@@ -18,7 +18,21 @@ export const metadata: Metadata = {
     locale: "en_US",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+  },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "PQM.guide",
+  url: "https://pqm.guide",
+  description:
+    "Community-driven Power Query M language reference with visual table examples.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://pqm.guide/?q={search_term_string}",
+    "query-input": "required name=search_term_string",
   },
 };
 
@@ -33,6 +47,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <AppShell functions={functions} searchItems={searchItems}>{children}</AppShell>
         </ThemeProvider>

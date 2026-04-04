@@ -1,16 +1,20 @@
 ---
-title: "BinaryFormat.7BitEncodedSignedInteger"
-slug: "binaryformat-7bitencodedsignedinteger"
-category: "Binary"
-description: "A binary format that reads a 64-bit signed integer encoded using a 7-bit variable-length encoding."
-syntax: "BinaryFormat.7BitEncodedSignedInteger(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads a 7-bit variable-length encoded signed integer from binary data."
+title: BinaryFormat.7BitEncodedSignedInteger
+slug: binaryformat-7bitencodedsignedinteger
+category: Binary
+description: >-
+  A binary format that reads a 64-bit signed integer encoded using a 7-bit
+  variable-length encoding.
+syntax: BinaryFormat.7BitEncodedSignedInteger(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads a 7-bit variable-length encoded signed
+  integer from binary data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 7-bit encoded signed integer from."
+    description: The binary data to read the 7-bit encoded signed integer from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,14 +23,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-7bitencodedunsignedinteger"
-  - "binaryformat-byte"
-  - "binaryformat-signedinteger16"
-  - "binaryformat-signedinteger32"
-  - "binaryformat-signedinteger64"
-relatedConcepts:
-  - "Variable-length encoding"
-  - "Binary data parsing"
+  - binaryformat-7bitencodedunsignedinteger
+  - binaryformat-byte
+  - binaryformat-signedinteger16
+  - binaryformat-signedinteger32
+  - binaryformat-signedinteger64
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -52,6 +54,4 @@ in
     result
 ```
 
-<!--output
-5
--->
+

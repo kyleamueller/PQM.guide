@@ -1,16 +1,16 @@
 ---
-title: "BinaryFormat.Null"
-slug: "binaryformat-null"
-category: "Binary"
-description: "A binary format that reads zero bytes and returns null."
-syntax: "BinaryFormat.Null(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads zero bytes and returns null."
+title: BinaryFormat.Null
+slug: binaryformat-null
+category: Binary
+description: A binary format that reads zero bytes and returns null.
+syntax: BinaryFormat.Null(binary as binary) as any
+returnType: function
+returnDescription: A binary format function that reads zero bytes and returns null.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data (no bytes are consumed)."
+    description: The binary data (no bytes are consumed).
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,13 +19,11 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-byte"
-  - "binaryformat-record"
-  - "binaryformat-choice"
-  - "binaryformat-group"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Placeholder formats"
+  - binaryformat-byte
+  - binaryformat-record
+  - binaryformat-choice
+  - binaryformat-group
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -52,6 +50,4 @@ in
     format(binaryData)
 ```
 
-<!--output
-[First = 1, Padding = null, Second = 2]
--->
+

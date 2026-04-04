@@ -1,16 +1,18 @@
 ---
-title: "BinaryFormat.Binary"
-slug: "binaryformat-binary"
-category: "Binary"
-description: "Returns a binary format that reads a binary value."
-syntax: "BinaryFormat.Binary(optional length as any) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads a binary value of the specified length."
+title: BinaryFormat.Binary
+slug: binaryformat-binary
+category: Binary
+description: Returns a binary format that reads a binary value.
+syntax: BinaryFormat.Binary(optional length as any) as function
+returnType: function
+returnDescription: A binary format function that reads a binary value of the specified length.
 parameters:
-  - name: "length"
-    type: "any"
+  - name: length
+    type: any
     required: false
-    description: "The number of bytes to read, or a binary format that reads the length preceding the binary data. If not specified, reads the remaining bytes."
+    description: >-
+      The number of bytes to read, or a binary format that reads the length
+      preceding the binary data. If not specified, reads the remaining bytes.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,14 +21,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-text"
-  - "binaryformat-list"
-  - "binaryformat-length"
-  - "binaryformat-byte"
-  - "binary-from"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Raw byte extraction"
+  - binaryformat-text
+  - binaryformat-list
+  - binaryformat-length
+  - binaryformat-byte
+  - binary-from
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -53,9 +53,7 @@ in
     format(binaryData)
 ```
 
-<!--output
-#binary({0x48, 0x65})
--->
+
 
 ### Example 2: Read binary data with a length prefix
 
@@ -69,6 +67,4 @@ in
     format(binaryData)
 ```
 
-<!--output
-#binary({0x41, 0x42, 0x43})
--->
+

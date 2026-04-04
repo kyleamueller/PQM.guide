@@ -1,20 +1,24 @@
 ---
-title: "Cube.CollapseAndRemoveColumns"
-slug: "cube-collapseandremovecolumns"
-category: "Table"
-description: "Collapses dimension attributes mapped to specified columns, removing them from the cube's tabular view and changing its granularity."
-syntax: "Cube.CollapseAndRemoveColumns(cube as table, columnNames as list) as table"
-returnType: "table"
-returnDescription: "The cube table with the specified columns removed and the dimensional granularity collapsed accordingly."
+title: Cube.CollapseAndRemoveColumns
+slug: cube-collapseandremovecolumns
+category: Table
+description: >-
+  Collapses dimension attributes mapped to specified columns, removing them from
+  the cube's tabular view and changing its granularity.
+syntax: 'Cube.CollapseAndRemoveColumns(cube as table, columnNames as list) as table'
+returnType: table
+returnDescription: >-
+  The cube table with the specified columns removed and the dimensional
+  granularity collapsed accordingly.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to collapse columns from."
-  - name: "columnNames"
-    type: "list"
+    description: The cube table to collapse columns from.
+  - name: columnNames
+    type: list
     required: true
-    description: "A list of column names to collapse and remove from the tabular view."
+    description: A list of column names to collapse and remove from the tabular view.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,17 +27,13 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-addandexpanddimensioncolumn"
-  - "cube-dimensions"
-  - "cube-transform"
-  - "cube-replacedimensions"
-  - "analysisservices-database"
-  - "table-removecolumns"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP dimensions"
-  - "Dimensional granularity"
-  - "Filter context"
+  - cube-addandexpanddimensioncolumn
+  - cube-dimensions
+  - cube-transform
+  - cube-replacedimensions
+  - analysisservices-database
+  - table-removecolumns
+relatedConcepts: []
 ---
 
 ## Remarks

@@ -1,20 +1,22 @@
 ---
-title: "Cube.ReplaceDimensions"
-slug: "cube-replacedimensions"
-category: "Table"
-description: "Replaces the set of dimensions returned by Cube.Dimensions for a cube."
-syntax: "Cube.ReplaceDimensions(cube as table, dimensions as any) as table"
-returnType: "table"
-returnDescription: "The cube table with the modified set of dimensions."
+title: Cube.ReplaceDimensions
+slug: cube-replacedimensions
+category: Table
+description: Replaces the set of dimensions returned by Cube.Dimensions for a cube.
+syntax: 'Cube.ReplaceDimensions(cube as table, dimensions as any) as table'
+returnType: table
+returnDescription: The cube table with the modified set of dimensions.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table whose dimensions are to be replaced."
-  - name: "dimensions"
-    type: "any"
+    description: The cube table whose dimensions are to be replaced.
+  - name: dimensions
+    type: any
     required: true
-    description: "The replacement dimensions to use. Typically a modified version of the table returned by Cube.Dimensions."
+    description: >-
+      The replacement dimensions to use. Typically a modified version of the
+      table returned by Cube.Dimensions.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,16 +25,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-dimensions"
-  - "cube-addandexpanddimensioncolumn"
-  - "cube-collapseandremovecolumns"
-  - "cube-transform"
-  - "analysisservices-database"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP dimensions"
-  - "Dimension customization"
-  - "Cube metadata"
+  - cube-dimensions
+  - cube-addandexpanddimensioncolumn
+  - cube-collapseandremovecolumns
+  - cube-transform
+  - analysisservices-database
+relatedConcepts: []
 ---
 
 ## Remarks

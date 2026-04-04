@@ -1,28 +1,39 @@
 ---
-title: "BinaryFormat.Group"
-slug: "binaryformat-group"
-category: "Binary"
-description: "Returns a binary format that reads a group of items with a key-value structure."
-syntax: "BinaryFormat.Group(binaryFormat as function, group as list, optional extra as nullable function, optional lastKey as any) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads key-value pairs and returns a list of the item values in the order they were defined."
+title: BinaryFormat.Group
+slug: binaryformat-group
+category: Binary
+description: >-
+  Returns a binary format that reads a group of items with a key-value
+  structure.
+syntax: >-
+  BinaryFormat.Group(binaryFormat as function, group as list, optional extra as
+  nullable function, optional lastKey as any) as function
+returnType: function
+returnDescription: >-
+  A binary format function that reads key-value pairs and returns a list of the
+  item values in the order they were defined.
 parameters:
-  - name: "binaryFormat"
-    type: "function"
+  - name: binaryFormat
+    type: function
     required: true
-    description: "The binary format of the key value."
-  - name: "group"
-    type: "list"
+    description: The binary format of the key value.
+  - name: group
+    type: list
     required: true
-    description: "A list of item definitions. Each item is a list of 3-5 values: key value, item format, BinaryOccurrence type, optional default value, and optional transform function."
-  - name: "extra"
-    type: "nullable function"
+    description: >-
+      A list of item definitions. Each item is a list of 3-5 values: key value,
+      item format, BinaryOccurrence type, optional default value, and optional
+      transform function.
+  - name: extra
+    type: nullable function
     required: false
-    description: "A function that returns a binary format for values following unexpected keys. If not specified, unexpected keys raise an error."
-  - name: "lastKey"
-    type: "any"
+    description: >-
+      A function that returns a binary format for values following unexpected
+      keys. If not specified, unexpected keys raise an error.
+  - name: lastKey
+    type: any
     required: false
-    description: "The key value of the last item in the group."
+    description: The key value of the last item in the group.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -31,15 +42,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-record"
-  - "binaryformat-list"
-  - "binaryformat-choice"
-  - "binaryformat-byte"
-  - "binaryformat-length"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Key-value binary formats"
-  - "Tagged binary structures"
+  - binaryformat-record
+  - binaryformat-list
+  - binaryformat-choice
+  - binaryformat-byte
+  - binaryformat-length
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -85,9 +93,7 @@ in
     f(b)
 ```
 
-<!--output
-{11, {22, 22}, null, {}}
--->
+
 
 ### Example 2: Use default values and transforms
 
@@ -111,6 +117,4 @@ in
     f(b)
 ```
 
-<!--output
-{203, 123}
--->
+

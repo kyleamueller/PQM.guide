@@ -1,16 +1,22 @@
 ---
-title: "BinaryFormat.Single"
-slug: "binaryformat-single"
-category: "Binary"
-description: "A binary format that reads a 4-byte IEEE single-precision floating point value."
-syntax: "BinaryFormat.Single(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads a 4-byte IEEE 754 single-precision floating point value from binary data."
+title: BinaryFormat.Single
+slug: binaryformat-single
+category: Binary
+description: >-
+  A binary format that reads a 4-byte IEEE single-precision floating point
+  value.
+syntax: BinaryFormat.Single(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads a 4-byte IEEE 754 single-precision
+  floating point value from binary data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 4-byte single-precision floating point value from."
+    description: >-
+      The binary data to read the 4-byte single-precision floating point value
+      from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,15 +25,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-double"
-  - "binaryformat-decimal"
-  - "binaryformat-byte"
-  - "binaryformat-record"
-  - "binaryformat-byteorder"
-relatedConcepts:
-  - "Binary data parsing"
-  - "IEEE 754 floating point"
-  - "Single-precision numbers"
+  - binaryformat-double
+  - binaryformat-decimal
+  - binaryformat-byte
+  - binaryformat-record
+  - binaryformat-byteorder
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -53,6 +56,4 @@ in
     result
 ```
 
-<!--output
-1
--->
+

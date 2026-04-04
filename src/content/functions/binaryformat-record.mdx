@@ -1,16 +1,21 @@
 ---
-title: "BinaryFormat.Record"
-slug: "binaryformat-record"
-category: "Binary"
-description: "Returns a binary format that reads a record from binary data."
-syntax: "BinaryFormat.Record(record as record) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads fields sequentially from binary data and returns them as a record."
+title: BinaryFormat.Record
+slug: binaryformat-record
+category: Binary
+description: Returns a binary format that reads a record from binary data.
+syntax: BinaryFormat.Record(record as record) as function
+returnType: function
+returnDescription: >-
+  A binary format function that reads fields sequentially from binary data and
+  returns them as a record.
 parameters:
-  - name: "record"
-    type: "record"
+  - name: record
+    type: record
     required: true
-    description: "A record where each field specifies a binary format for reading that field's value. Fields with non-format values are echoed as-is without reading data."
+    description: >-
+      A record where each field specifies a binary format for reading that
+      field's value. Fields with non-format values are echoed as-is without
+      reading data.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,16 +24,13 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-list"
-  - "binaryformat-byte"
-  - "binaryformat-unsignedinteger16"
-  - "binaryformat-unsignedinteger32"
-  - "binaryformat-choice"
-  - "binaryformat-group"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Structured binary records"
-  - "Binary file headers"
+  - binaryformat-list
+  - binaryformat-byte
+  - binaryformat-unsignedinteger16
+  - binaryformat-unsignedinteger32
+  - binaryformat-choice
+  - binaryformat-group
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -59,9 +61,7 @@ in
     recordFormat(binaryData)
 ```
 
-<!--output
-[A = 1, B = 2]
--->
+
 
 ### Example 2: Include a constant field in the record
 
@@ -78,6 +78,4 @@ in
     recordFormat(binaryData)
 ```
 
-<!--output
-[Version = 1, Value = 42]
--->
+

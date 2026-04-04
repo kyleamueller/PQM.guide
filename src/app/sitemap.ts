@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getAllFunctionSlugs, getAllConceptSlugs, getAllPatternSlugs } from "@/lib/mdx";
+import { categories } from "@/data/categories";
 
 const BASE_URL = "https://pqm.guide";
 
@@ -13,10 +14,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/learn`, priority: 0.95, changeFrequency: "monthly" },
     { url: `${BASE_URL}/concepts`, priority: 0.9, changeFrequency: "weekly" },
     { url: `${BASE_URL}/patterns`, priority: 0.9, changeFrequency: "weekly" },
+    { url: `${BASE_URL}/categories`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/mcp`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/resources`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/sample-tables`, priority: 0.6, changeFrequency: "monthly" },
   ];
+
+  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
+    url: `${BASE_URL}/categories/${cat.slug}`,
+    priority: 0.7,
+    changeFrequency: "monthly" as const,
+  }));
 
   const conceptPages: MetadataRoute.Sitemap = conceptSlugs.map((slug) => ({
     url: `${BASE_URL}/concepts/${slug}`,
@@ -36,5 +44,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
   }));
 
-  return [...staticPages, ...conceptPages, ...patternPages, ...functionPages];
+  return [...staticPages, ...categoryPages, ...conceptPages, ...patternPages, ...functionPages];
 }

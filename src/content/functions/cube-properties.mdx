@@ -1,16 +1,20 @@
 ---
-title: "Cube.Properties"
-slug: "cube-properties"
-category: "Table"
-description: "Returns a table containing the set of available properties for dimensions that are expanded in the cube."
-syntax: "Cube.Properties(cube as table) as table"
-returnType: "table"
-returnDescription: "A table listing the available dimension properties for dimensions expanded in the cube."
+title: Cube.Properties
+slug: cube-properties
+category: Table
+description: >-
+  Returns a table containing the set of available properties for dimensions that
+  are expanded in the cube.
+syntax: Cube.Properties(cube as table) as table
+returnType: table
+returnDescription: >-
+  A table listing the available dimension properties for dimensions expanded in
+  the cube.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to retrieve dimension properties from."
+    description: The cube table to retrieve dimension properties from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,16 +23,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-propertykey"
-  - "cube-dimensions"
-  - "cube-attributememberproperty"
-  - "cube-attributememberid"
-  - "cube-measureproperties"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP dimension properties"
-  - "Member properties"
-  - "Cube metadata"
+  - cube-propertykey
+  - cube-dimensions
+  - cube-attributememberproperty
+  - cube-attributememberid
+  - cube-measureproperties
+relatedConcepts: []
 ---
 
 ## Remarks

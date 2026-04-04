@@ -19,6 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${category.name} Functions`,
     description: category.description,
+    openGraph: {
+      title: `${category.name} Functions`,
+      description: category.description,
+      url: `/categories/${slug}`,
+    },
   };
 }
 

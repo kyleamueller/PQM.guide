@@ -1,28 +1,44 @@
 ---
-title: "BinaryFormat.Choice"
-slug: "binaryformat-choice"
-category: "Binary"
-description: "Returns a binary format that chooses the next binary format based on a value that has already been read."
-syntax: "BinaryFormat.Choice(binaryFormat as function, chooseFunction as function, optional type as nullable type, optional combineFunction as nullable function) as function"
-returnType: "function"
-returnDescription: "A binary format function that dynamically selects parsing logic based on a previously read value."
+title: BinaryFormat.Choice
+slug: binaryformat-choice
+category: Binary
+description: >-
+  Returns a binary format that chooses the next binary format based on a value
+  that has already been read.
+syntax: >-
+  BinaryFormat.Choice(binaryFormat as function, chooseFunction as function,
+  optional type as nullable type, optional combineFunction as nullable function)
+  as function
+returnType: function
+returnDescription: >-
+  A binary format function that dynamically selects parsing logic based on a
+  previously read value.
 parameters:
-  - name: "binaryFormat"
-    type: "function"
+  - name: binaryFormat
+    type: function
     required: true
-    description: "The binary format used to read the initial value that determines the choice."
-  - name: "chooseFunction"
-    type: "function"
+    description: >-
+      The binary format used to read the initial value that determines the
+      choice.
+  - name: chooseFunction
+    type: function
     required: true
-    description: "A function that receives the initial value and returns a second binary format to use for reading the next value."
-  - name: "type"
-    type: "nullable type"
+    description: >-
+      A function that receives the initial value and returns a second binary
+      format to use for reading the next value.
+  - name: type
+    type: nullable type
     required: false
-    description: "The expected type of binary format returned by the choice function. Can be type any, type list, or type binary. Using type list or type binary may enable streaming."
-  - name: "combineFunction"
-    type: "nullable function"
+    description: >-
+      The expected type of binary format returned by the choice function. Can be
+      type any, type list, or type binary. Using type list or type binary may
+      enable streaming.
+  - name: combineFunction
+    type: nullable function
     required: false
-    description: "A function that receives both the first and second values and returns a combined result. If not specified, the second value is returned."
+    description: >-
+      A function that receives both the first and second values and returns a
+      combined result. If not specified, the second value is returned.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -31,14 +47,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-record"
-  - "binaryformat-list"
-  - "binaryformat-byte"
-  - "binaryformat-length"
-  - "binaryformat-group"
-relatedConcepts:
-  - "Conditional binary parsing"
-  - "Dynamic format selection"
+  - binaryformat-record
+  - binaryformat-list
+  - binaryformat-byte
+  - binaryformat-length
+  - binaryformat-group
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -71,9 +85,7 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{3, 4}
--->
+
 
 ### Example 2: Preserve the first value using a record
 
@@ -93,6 +105,4 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-[length = 2, list = {3, 4}]
--->
+

@@ -1,28 +1,38 @@
 ---
-title: "Cube.AddAndExpandDimensionColumn"
-slug: "cube-addandexpanddimensioncolumn"
-category: "Table"
-description: "Merges a dimension into the cube's filter context and expands specified dimension attributes as new columns."
-syntax: "Cube.AddAndExpandDimensionColumn(cube as table, dimensionSelector as any, attributeNames as list, optional newColumnNames as any) as table"
-returnType: "table"
-returnDescription: "The cube table with the specified dimension attributes added as new columns and the filter context updated to the expanded granularity."
+title: Cube.AddAndExpandDimensionColumn
+slug: cube-addandexpanddimensioncolumn
+category: Table
+description: >-
+  Merges a dimension into the cube's filter context and expands specified
+  dimension attributes as new columns.
+syntax: >-
+  Cube.AddAndExpandDimensionColumn(cube as table, dimensionSelector as any,
+  attributeNames as list, optional newColumnNames as any) as table
+returnType: table
+returnDescription: >-
+  The cube table with the specified dimension attributes added as new columns
+  and the filter context updated to the expanded granularity.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to add the dimension column to."
-  - name: "dimensionSelector"
-    type: "any"
+    description: The cube table to add the dimension column to.
+  - name: dimensionSelector
+    type: any
     required: true
-    description: "The dimension to merge into the cube's filter context. Typically a value from Cube.Dimensions."
-  - name: "attributeNames"
-    type: "list"
+    description: >-
+      The dimension to merge into the cube's filter context. Typically a value
+      from Cube.Dimensions.
+  - name: attributeNames
+    type: list
     required: true
-    description: "A list of dimension attribute names to expand as columns in the tabular view."
-  - name: "newColumnNames"
-    type: "any"
+    description: >-
+      A list of dimension attribute names to expand as columns in the tabular
+      view.
+  - name: newColumnNames
+    type: any
     required: false
-    description: "Optional list of new column names to use instead of the attribute names."
+    description: Optional list of new column names to use instead of the attribute names.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -31,18 +41,14 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-collapseandremovecolumns"
-  - "cube-dimensions"
-  - "cube-addmeasurecolumn"
-  - "cube-transform"
-  - "cube-replacedimensions"
-  - "analysisservices-database"
-  - "table-expandtablecolumn"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP dimensions"
-  - "Dimension attributes"
-  - "Filter context"
+  - cube-collapseandremovecolumns
+  - cube-dimensions
+  - cube-addmeasurecolumn
+  - cube-transform
+  - cube-replacedimensions
+  - analysisservices-database
+  - table-expandtablecolumn
+relatedConcepts: []
 ---
 
 ## Remarks

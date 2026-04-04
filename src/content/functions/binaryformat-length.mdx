@@ -1,20 +1,22 @@
 ---
-title: "BinaryFormat.Length"
-slug: "binaryformat-length"
-category: "Binary"
-description: "Returns a binary format that limits the amount of data that can be read."
-syntax: "BinaryFormat.Length(binaryFormat as function, length as any) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads data up to the specified byte limit."
+title: BinaryFormat.Length
+slug: binaryformat-length
+category: Binary
+description: Returns a binary format that limits the amount of data that can be read.
+syntax: 'BinaryFormat.Length(binaryFormat as function, length as any) as function'
+returnType: function
+returnDescription: A binary format function that reads data up to the specified byte limit.
 parameters:
-  - name: "binaryFormat"
-    type: "function"
+  - name: binaryFormat
+    type: function
     required: true
-    description: "The binary format to limit."
-  - name: "length"
-    type: "any"
+    description: The binary format to limit.
+  - name: length
+    type: any
     required: true
-    description: "The number of bytes to read, or a binary format value that reads the length from the stream before the data."
+    description: >-
+      The number of bytes to read, or a binary format value that reads the
+      length from the stream before the data.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,15 +25,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-list"
-  - "binaryformat-binary"
-  - "binaryformat-byte"
-  - "binaryformat-text"
-  - "binaryformat-record"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Length-prefixed data"
-  - "Byte limiting"
+  - binaryformat-list
+  - binaryformat-binary
+  - binaryformat-byte
+  - binaryformat-text
+  - binaryformat-record
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -62,9 +61,7 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{1, 2}
--->
+
 
 ### Example 2: Use a length prefix from the stream
 
@@ -81,6 +78,4 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{2}
--->
+

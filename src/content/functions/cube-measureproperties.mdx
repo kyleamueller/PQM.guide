@@ -1,16 +1,18 @@
 ---
-title: "Cube.MeasureProperties"
-slug: "cube-measureproperties"
-category: "Table"
-description: "Returns a table containing the set of available properties for measures that are expanded in the cube."
-syntax: "Cube.MeasureProperties(cube as table) as table"
-returnType: "table"
-returnDescription: "A table listing the available properties for measures expanded in the cube."
+title: Cube.MeasureProperties
+slug: cube-measureproperties
+category: Table
+description: >-
+  Returns a table containing the set of available properties for measures that
+  are expanded in the cube.
+syntax: Cube.MeasureProperties(cube as table) as table
+returnType: table
+returnDescription: A table listing the available properties for measures expanded in the cube.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to retrieve measure properties from."
+    description: The cube table to retrieve measure properties from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,16 +21,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-measureproperty"
-  - "cube-measures"
-  - "cube-addmeasurecolumn"
-  - "cube-properties"
-  - "cube-displayfolders"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP measure properties"
-  - "Cube metadata"
-  - "Measure formatting"
+  - cube-measureproperty
+  - cube-measures
+  - cube-addmeasurecolumn
+  - cube-properties
+  - cube-displayfolders
+relatedConcepts: []
 ---
 
 ## Remarks

@@ -1,20 +1,20 @@
 ---
-title: "Cube.Transform"
-slug: "cube-transform"
-category: "Table"
-description: "Applies a list of cube functions as transforms to a cube."
-syntax: "Cube.Transform(cube as table, transforms as list) as table"
-returnType: "table"
-returnDescription: "The cube table with all specified transforms applied in sequence."
+title: Cube.Transform
+slug: cube-transform
+category: Table
+description: Applies a list of cube functions as transforms to a cube.
+syntax: 'Cube.Transform(cube as table, transforms as list) as table'
+returnType: table
+returnDescription: The cube table with all specified transforms applied in sequence.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to apply transforms to."
-  - name: "transforms"
-    type: "list"
+    description: The cube table to apply transforms to.
+  - name: transforms
+    type: list
     required: true
-    description: "A list of cube functions to apply to the cube in sequence."
+    description: A list of cube functions to apply to the cube in sequence.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,18 +23,14 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-addandexpanddimensioncolumn"
-  - "cube-addmeasurecolumn"
-  - "cube-collapseandremovecolumns"
-  - "cube-applyparameter"
-  - "cube-replacedimensions"
-  - "analysisservices-database"
-  - "table-transformcolumns"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "Cube operations"
-  - "Transform pipeline"
-  - "Functional composition"
+  - cube-addandexpanddimensioncolumn
+  - cube-addmeasurecolumn
+  - cube-collapseandremovecolumns
+  - cube-applyparameter
+  - cube-replacedimensions
+  - analysisservices-database
+  - table-transformcolumns
+relatedConcepts: []
 ---
 
 ## Remarks

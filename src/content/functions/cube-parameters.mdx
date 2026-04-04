@@ -1,16 +1,20 @@
 ---
-title: "Cube.Parameters"
-slug: "cube-parameters"
-category: "Table"
-description: "Returns a table containing the set of parameters that can be applied to a cube."
-syntax: "Cube.Parameters(cube as table) as table"
-returnType: "table"
-returnDescription: "A table listing the available parameters for the cube, where each parameter is a function that can be invoked."
+title: Cube.Parameters
+slug: cube-parameters
+category: Table
+description: >-
+  Returns a table containing the set of parameters that can be applied to a
+  cube.
+syntax: Cube.Parameters(cube as table) as table
+returnType: table
+returnDescription: >-
+  A table listing the available parameters for the cube, where each parameter is
+  a function that can be invoked.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to retrieve parameters from."
+    description: The cube table to retrieve parameters from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,16 +23,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-applyparameter"
-  - "cube-dimensions"
-  - "cube-measures"
-  - "cube-transform"
-  - "analysisservices-database"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP parameters"
-  - "Cube parameterization"
-  - "Dynamic filtering"
+  - cube-applyparameter
+  - cube-dimensions
+  - cube-measures
+  - cube-transform
+  - analysisservices-database
+relatedConcepts: []
 ---
 
 ## Remarks

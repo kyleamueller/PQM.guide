@@ -151,8 +151,33 @@ export default async function ConceptPage({ params }: PageProps) {
   const conceptTitleMap = new Map(allConcepts.map((c) => [c.slug, c.title]));
   const functionTitleMap = new Map(allFunctions.map((f) => [f.slug, f.title]));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://pqm.guide" },
+          { "@type": "ListItem", position: 2, name: "Concepts", item: "https://pqm.guide/concepts" },
+          { "@type": "ListItem", position: 3, name: frontmatter.title },
+        ],
+      },
+      {
+        "@type": "TechArticle",
+        headline: frontmatter.title,
+        description: frontmatter.description,
+        url: `https://pqm.guide/concepts/${slug}`,
+        isPartOf: { "@type": "WebSite", url: "https://pqm.guide" },
+      },
+    ],
+  };
+
   return (
     <article style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div style={{ marginBottom: 24 }}>
         <div style={{ marginBottom: 8 }}>
           <Link
