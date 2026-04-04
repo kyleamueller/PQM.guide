@@ -22,6 +22,7 @@
 - [ ] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
 - [ ] **Sample tables: surface the M code** — The M code on the sample tables page is too hidden; make it more discoverable/visible. *(Alex)*
 - [ ] **Full relatedFunctions reference audit** — Once all 661 functions are documented, tighten the content-integrity test back to only allow references to existing documented slugs (currently allows forward references to official spec slugs). Run a full scan to verify every relatedFunctions entry resolves to a real page.
+- [ ] **Internal-only function tagging + concept page** — (1) Add an `internal: true` frontmatter flag to all internal-only function pages and surface it in the UI (e.g., a badge or banner on the function page). (2) Create a concept guide (`src/content/concepts/internal-functions.mdx`) explaining what internal-only functions are, why Microsoft exposes them in the spec without full documentation, why PQM.guide still documents them (completeness, discoverability, preventing confusion when users encounter them), and guidance on when it's safe to ignore them vs. when connector developers may need them.
 
 ---
 
