@@ -9,6 +9,9 @@ import {
 } from "@/lib/mdx";
 import officialSpecSlugs from "./fixtures/official-spec-slugs.json";
 
+// All 661 official spec slugs are now documented — relatedFunctions must
+// reference existing documented slugs only (no forward-reference fallback).
+
 // ---------------------------------------------------------------------------
 // Functions
 // ---------------------------------------------------------------------------
@@ -70,17 +73,16 @@ describe("Function MDX integrity", () => {
     }
   });
 
-  it("every function relatedFunctions is an array of strings referencing existing or spec slugs", () => {
+  it("every function relatedFunctions is an array of strings referencing existing documented slugs", () => {
     const allSlugs = new Set(slugs);
-    const specSlugs = new Set(officialSpecSlugs as string[]);
     for (const slug of slugs) {
       const { frontmatter } = getFunctionBySlug(slug);
       expect(Array.isArray(frontmatter.relatedFunctions), slug).toBe(true);
       for (const ref of frontmatter.relatedFunctions) {
         expect(typeof ref, `${slug}: relatedFunctions item`).toBe("string");
         expect(
-          allSlugs.has(ref) || specSlugs.has(ref),
-          `${slug} references unknown slug: "${ref}" (not documented and not in official spec)`
+          allSlugs.has(ref),
+          `${slug} references unknown slug: "${ref}" (not a documented function)`
         ).toBe(true);
       }
     }

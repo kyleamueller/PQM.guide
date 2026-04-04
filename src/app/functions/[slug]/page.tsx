@@ -213,6 +213,7 @@ export default async function FunctionPage({ params }: PageProps) {
         title={frontmatter.title}
         category={frontmatter.category}
         description={frontmatter.description}
+        internal={frontmatter.internal}
       />
 
       <SampleTablesBanner />

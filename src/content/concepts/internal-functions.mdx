@@ -1,0 +1,89 @@
+---
+title: "Internal Functions"
+slug: "internal-functions"
+description: "What internal-only Power Query M functions are, why Microsoft includes them in the spec, and why PQM.guide documents them."
+relatedConcepts:
+  - "query-folding"
+  - "type-system"
+relatedFunctions:
+  - "table-view"
+  - "table-viewerror"
+  - "table-viewfunction"
+  - "value-firewall"
+  - "value-lineage"
+  - "value-traits"
+---
+
+The Power Query M language specification includes a number of functions marked as **intended for internal use only**. These functions are real, callable parts of the M standard library, but they are not designed for everyday use in user-authored queries. PQM.guide documents all of them for completeness and discoverability.
+
+### What Makes a Function "Internal"
+
+Internal functions are part of the Power Query engine's infrastructure. They support capabilities like:
+
+- **Query folding** — translating M operations into source-native queries (e.g., `SqlExpression.ToExpression`, `SqlExpression.SchemaFrom`)
+- **View infrastructure** — enabling custom connectors to define foldable operations (e.g., `Value.ViewFunction`, `Value.ViewError`)
+- **Data privacy / firewall** — enforcing data source isolation rules (e.g., `Value.Firewall`)
+- **Lineage and traits** — tracking data provenance and value capabilities (e.g., `Value.Lineage`, `Value.Traits`)
+- **Pagination** — managing page-based data retrieval for connectors (e.g., `Table.ConformToPageReader`, `List.ConformToPageReader`)
+- **Identity and security** — resolving user identities for row-level security (e.g., `Identity.From`, `Identity.IsMemberOf`, `IdentityProvider.Default`)
+- **Progress reporting** — communicating loading status to the host UI (e.g., `Progress.DataSourceProgress`)
+- **Error context** — enriching errors with additional diagnostic information (e.g., `Table.WithErrorContext`, `Function.InvokeWithErrorContext`)
+
+### Why Microsoft Includes Them in the Spec
+
+Microsoft publishes these functions in the official Power Query M function reference even though they are not intended for direct use. This is because:
+
+- **Connectors need them** — Custom connector developers (using the Power Query SDK) rely on these functions to build data sources that integrate with the engine's folding, pagination, and security infrastructure.
+- **Transparency** — Including them in the spec means the full surface area of the M standard library is documented, even if most users will never call these functions directly.
+- **IntelliSense visibility** — These functions appear in the Power Query editor's autocomplete, so users may encounter them and wonder what they do.
+
+### Why PQM.guide Documents Them
+
+PQM.guide aims to be a **complete reference** for the Power Query M language. We document internal functions because:
+
+- **Preventing confusion** — When a user encounters `Value.Firewall` or `Graph.Nodes` in autocomplete or in generated code, they should be able to look it up and understand it is not meant for their use case.
+- **Connector developers** — Developers building custom connectors need documentation for these functions. The official Microsoft docs are often sparse for internal functions, so PQM.guide fills the gap with context and practical guidance.
+- **Completeness** — A reference that omits functions creates gaps. If a function exists in the spec, it belongs in the reference.
+
+Internal function pages on PQM.guide are tagged with an **Internal** badge so you can immediately identify them.
+
+### When to Use Internal Functions
+
+**Almost never in user-authored queries.** If you are writing M code in the Power Query editor for data transformation, you should not need any internal function. There is always a user-facing alternative:
+
+- Instead of `Table.ConformToPageReader`, use `Web.Contents` with manual pagination logic
+- Instead of `Table.ReplaceRelationshipIdentity`, use `Table.NestedJoin` to combine related tables
+- Instead of `SqlExpression.ToExpression`, let the engine handle query folding automatically
+- Instead of `Value.Firewall`, configure data privacy levels in Power Query options
+
+**The exception is custom connector development.** If you are building a connector using the Power Query SDK, you may need `Table.View`, `Table.ViewFunction`, `Table.ViewError`, and related infrastructure functions to implement foldable operations. In that context, these functions are essential.
+
+### List of Internal Functions
+
+PQM.guide currently tags 21 functions as internal:
+
+- `DirectQueryCapabilities.From`
+- `Embedded.Value`
+- `Excel.ShapeTable`
+- `Function.InvokeWithErrorContext`
+- `Graph.Nodes`
+- `Identity.From`
+- `Identity.IsMemberOf`
+- `IdentityProvider.Default`
+- `List.ConformToPageReader`
+- `Progress.DataSourceProgress`
+- `SqlExpression.SchemaFrom`
+- `SqlExpression.ToExpression`
+- `Table.ConformToPageReader`
+- `Table.FilterWithDataTable`
+- `Table.ReplaceRelationshipIdentity`
+- `Table.WithErrorContext`
+- `Value.Firewall`
+- `Value.Lineage`
+- `Value.Traits`
+- `Value.ViewError`
+- `Value.ViewFunction`
+
+### Stability Warning
+
+Internal functions may change behavior or be removed between Power Query versions without notice. Microsoft does not guarantee backward compatibility for these functions. If you use them in production queries, you accept the risk that a future update could break your code.
