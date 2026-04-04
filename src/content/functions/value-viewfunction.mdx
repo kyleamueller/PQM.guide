@@ -1,0 +1,60 @@
+---
+title: "Value.ViewFunction"
+slug: "value-viewfunction"
+category: "Value"
+description: "Creates a view-aware wrapper around a function for use in the view infrastructure. Intended for internal use only."
+syntax: "Value.ViewFunction(function as function) as function"
+returnType: "function"
+returnDescription: "A view-aware wrapper function that integrates with the Power Query view infrastructure."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "The function to wrap for view-aware execution."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-viewfunction"
+  - "table-view"
+  - "table-viewerror"
+relatedConcepts: []
+---
+
+## Remarks
+
+This function is intended for **internal use only** and is not designed to be called directly in user-written M queries.
+
+`Value.ViewFunction` is part of the Power Query **view infrastructure**. It wraps a function so that when the function is invoked within a view context (such as inside a `Table.View` handler), the engine can intercept and potentially fold the function call into the data source's native query language, or fall back to local evaluation.
+
+The view infrastructure allows custom connectors to override how standard M operations (like filtering, sorting, or aggregating) are handled. When a connector's `Table.View` implementation references functions, those functions may be wrapped with `Value.ViewFunction` to signal to the engine that they participate in the view's query folding pipeline.
+
+The related function `Table.ViewFunction` provides similar functionality specifically for table-level view operations. `Value.ViewFunction` is the general-purpose counterpart that works with any function, not just those operating on tables.
+
+Key behavioral notes:
+
+- The returned function is semantically equivalent to the input function — it produces the same results when called with the same arguments.
+- The wrapping adds metadata or internal markers that the view evaluation pipeline uses to route execution.
+- Calling `Value.ViewFunction` outside of a view context has no observable effect on function behavior.
+
+## Examples
+
+### Example 1: Wrapping a simple function
+
+The wrapped function behaves identically to the original when called directly.
+
+```powerquery
+let
+    Original = (x as number) => x * 2,
+    Wrapped = Value.ViewFunction(Original)
+in
+    Wrapped(21)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+-->

@@ -1,0 +1,80 @@
+---
+title: "Value.Versions"
+slug: "value-versions"
+category: "Value"
+description: "Returns a navigation table containing the available versions of the given value."
+syntax: "Value.Versions(value as any) as table"
+returnType: "table"
+returnDescription: "A navigation table listing the available versions of the value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose available versions to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-versionidentity"
+  - "value-type"
+  - "value-metadata"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Value.Versions` returns a **navigation table** containing the available versions of the given `value`. This function is useful in scenarios where a data source supports **versioning** — such as historical snapshots, change tracking, or temporal queries — and you need to enumerate or navigate between different versions of the same data.
+
+A navigation table is a special table recognized by the Power Query UI that allows hierarchical browsing of data sources. The table returned by `Value.Versions` follows this convention, enabling users to interactively select a specific version from the navigator pane.
+
+### When versions are available
+
+- Data sources that support versioning (e.g., OneLake lakehouses with time travel, version-controlled datasets, or connectors that expose historical snapshots) may attach version information to the values they produce.
+- `Value.Versions` reads that version information and returns a table where each row represents a distinct version of the data.
+
+### When versions are not available
+
+- For plain in-memory values (numbers, text, lists, records) and data sources that do not support versioning, `Value.Versions` will either return an empty table or raise an error, since there are no versions to enumerate.
+
+This function complements `Value.VersionIdentity`, which returns the current version identifier of a value rather than listing all available versions.
+
+## Examples
+
+### Example 1: Attempting to get versions of an in-memory value
+
+In-memory values do not carry version information, so there are no versions to list.
+
+```powerquery
+try Value.Versions(42) otherwise "No versions available for this value"
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"No versions available for this value"}]}
+-->
+
+### Example 2: Conceptual usage with a versioned data source
+
+In a real scenario with a versioned data source, the result would be a navigation table with rows for each version.
+
+```powerquery
+// Conceptual example — requires a versioned data source
+// let
+//     Source = SomeVersionedConnector.GetData(),
+//     Versions = Value.Versions(Source)
+// in
+//     Versions
+// Would return a navigation table like:
+#table({"Name", "Data", "ItemKind"}, {
+    {"v1.0", null, "Table"},
+    {"v2.0", null, "Table"},
+    {"v3.0", null, "Table"}
+})
+```
+
+<!--output
+{"columns":[{"name":"Name","type":"text"},{"name":"Data","type":"any"},{"name":"ItemKind","type":"text"}],"rows":[{"Name":"v1.0","Data":null,"ItemKind":"Table"},{"Name":"v2.0","Data":null,"ItemKind":"Table"},{"Name":"v3.0","Data":null,"ItemKind":"Table"}]}
+-->

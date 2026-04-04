@@ -1,0 +1,61 @@
+---
+title: "Action.WithErrorContext"
+slug: "action-witherrorcontext"
+category: "Value"
+description: "Wraps an action with additional error context text that is included in any error raised during the action's execution."
+syntax: "Action.WithErrorContext(action as action, context as text) as action"
+returnType: "action"
+returnDescription: "An action that, when executed, includes the specified context text in any raised errors."
+parameters:
+  - name: "action"
+    type: "action"
+    required: true
+    description: "The action to wrap with error context."
+  - name: "context"
+    type: "text"
+    required: true
+    description: "The error context text to attach, which will be included in error details if the action fails."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-metadata"
+  - "value-type"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Action.WithErrorContext` is an **internal-only function** as stated in the official Microsoft documentation. It wraps an `action` value with additional contextual text so that if the action raises an error during execution, the error record includes the specified `context` string. This provides richer diagnostic information when debugging failures in complex evaluation pipelines.
+
+The `action` type in M is an internal engine type representing side-effecting operations (such as data source access, credential prompts, or diagnostics reporting). Actions are not directly constructible in user-written M code — they are produced and consumed by the engine and custom connectors.
+
+This function is used internally by the Power Query engine and custom connectors to annotate actions with human-readable context. For example, a connector might wrap a data retrieval action with `"Fetching rows from table Customers"` so that if the operation fails, the error message provides meaningful context about what was being attempted.
+
+For standard M query development, this function has no practical use. Error handling in user code should use `try ... catch` expressions and `error` expressions to manage and annotate errors.
+
+## Examples
+
+### Example 1: Conceptual usage — wrapping an action with error context
+
+This illustrates the concept. The `action` type is not directly available in user M code.
+
+```powerquery
+let
+    // Conceptually:
+    // wrappedAction = Action.WithErrorContext(someAction, "Loading sales data")
+    // If someAction fails, the error would include "Loading sales data" as context.
+    //
+    // In user code, the equivalent pattern is:
+    Result = try error "Loading sales data failed" otherwise "fallback"
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"fallback"}]}
+-->

@@ -1,0 +1,59 @@
+---
+title: "Graph.Nodes"
+slug: "graph-nodes"
+category: "Value"
+description: "Returns the nodes from a graph value represented as a record. Intended for internal use only."
+syntax: "Graph.Nodes(graph as record) as list"
+returnType: "list"
+returnDescription: "A list of nodes contained in the graph."
+parameters:
+  - name: "graph"
+    type: "record"
+    required: true
+    description: "A record representing a graph structure whose nodes to extract."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+relatedConcepts: []
+---
+
+## Remarks
+
+This function is intended for **internal use only** and is not designed to be called directly in user-written M queries.
+
+`Graph.Nodes` extracts the **nodes** (vertices) from a graph data structure represented as an M record. Graphs in Power Query are an internal data structure used by the engine for dependency analysis, query plan representation, and data lineage tracking — they are not exposed as a standard M data type for user-level data transformation.
+
+### How graphs are used internally
+
+The Power Query engine uses graph structures in several internal subsystems:
+
+- **Query dependency graphs** — tracking which queries depend on which other queries or data sources.
+- **Expression graphs** — representing the structure of optimized query plans after the engine's optimization passes.
+- **Lineage and firewall graphs** — mapping data flow between sources to enforce privacy rules.
+
+A graph record typically contains fields for nodes (entities) and edges (relationships between entities). `Graph.Nodes` returns just the node portion as a list, allowing internal code to enumerate or inspect the entities in the graph.
+
+### Structure of the graph record
+
+The exact schema of the `graph` record parameter is not publicly documented. It is produced by other engine-internal functions and is not intended to be constructed manually. Passing an arbitrary record will likely raise an error or return unexpected results.
+
+## Examples
+
+### Example 1: Understanding the function conceptually
+
+Since `Graph.Nodes` requires an engine-internal graph record, direct invocation with a plain record is not meaningful. This example demonstrates what happens when the input is not a valid graph structure.
+
+```powerquery
+try Graph.Nodes([]) otherwise "Error: input is not a valid graph record"
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Error: input is not a valid graph record"}]}
+-->

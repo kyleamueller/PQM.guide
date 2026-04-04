@@ -1,0 +1,58 @@
+---
+title: "DirectQueryCapabilities.From"
+slug: "directquerycapabilities-from"
+category: "Value"
+description: "Returns a table describing the DirectQuery capabilities of the specified value. Intended for internal use only."
+syntax: "DirectQueryCapabilities.From(value as any) as table"
+returnType: "table"
+returnDescription: "A table describing the DirectQuery capabilities of the given value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value (typically a data source or table) whose DirectQuery capabilities to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-view"
+  - "table-stopfolding"
+  - "value-optimize"
+relatedConcepts: []
+---
+
+## Remarks
+
+`DirectQueryCapabilities.From` is an **internal-only function** as stated in the official Microsoft documentation. It extracts and returns a table describing the **DirectQuery capabilities** of a given value — typically a table or data source reference.
+
+DirectQuery is a Power BI connectivity mode where data is not imported into the model but instead queried live from the source at report interaction time. Different data sources support different subsets of query operations in DirectQuery mode — for example, some sources may support query folding for filters and aggregations but not for certain join types or custom transformations.
+
+This function is used by the Power Query engine and Power BI internals to introspect what operations a data source can handle in DirectQuery mode. The returned table describes capabilities such as supported transformations, filter types, aggregation functions, and join strategies that the source can process natively.
+
+For standard M query development, this function is not usable. DirectQuery capability negotiation is handled automatically by the engine and connector infrastructure. Custom connector authors working with DirectQuery should refer to the Power Query SDK documentation for the proper APIs to declare connector capabilities.
+
+## Examples
+
+### Example 1: Conceptual usage — inspecting DirectQuery capabilities
+
+This function is internal-only and cannot be demonstrated in user M code. Conceptually, calling it on a DirectQuery-enabled table would return capability metadata.
+
+```powerquery
+let
+    // Conceptually:
+    // Capabilities = DirectQueryCapabilities.From(SomeSqlTable)
+    // Would return a table of supported DirectQuery operations.
+    //
+    // In user code, query folding behavior can be observed via:
+    Result = "DirectQuery capabilities are managed internally by the engine"
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"DirectQuery capabilities are managed internally by the engine"}]}
+-->
