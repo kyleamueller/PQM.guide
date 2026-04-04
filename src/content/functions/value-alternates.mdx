@@ -1,0 +1,52 @@
+---
+title: "Value.Alternates"
+slug: "value-alternates"
+category: "Value"
+description: "Expresses alternate query plans within a query plan expression. Not intended for general use."
+syntax: "Value.Alternates(alternates as list) as any"
+returnType: "any"
+returnDescription: "A value representing the selected alternate query plan."
+parameters:
+  - name: "alternates"
+    type: "list"
+    required: true
+    description: "A list of alternate query plan expressions to choose from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-optimize"
+  - "value-expression"
+---
+
+## Remarks
+
+`Value.Alternates` expresses **alternate query plans** within a query plan expression obtained through `Value.Expression(Value.Optimize(...))`. It is an advanced, engine-internal function and is **not intended for general use** in user-written M queries.
+
+When the Power Query engine optimizes a query via `Value.Optimize`, it may produce multiple possible execution strategies (e.g., different query folding paths, join strategies, or filter push-down approaches). `Value.Alternates` encodes these alternatives into the expression tree so the engine can select the most efficient plan at evaluation time.
+
+This function is primarily relevant to **custom connector development** and **engine internals**. Calling `Value.Alternates` directly in a standard data transformation query has no practical benefit and may produce unexpected results. The `alternates` list is expected to contain valid query plan nodes as produced by the engine's optimization pipeline.
+
+If you encounter `Value.Alternates` in a query plan expression returned by `Value.Expression(Value.Optimize(...))`, it indicates the engine identified multiple execution strategies for that portion of the query.
+
+## Examples
+
+### Example 1: Inspect an optimized expression that may contain alternates
+
+Use `Value.Expression` and `Value.Optimize` together to observe how the engine structures query plans.
+
+```powerquery
+let
+    Optimized = Value.Optimize(42),
+    Expr = Value.Expression(Optimized)
+in
+    Expr
+```
+
+<!--output
+{"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
+-->

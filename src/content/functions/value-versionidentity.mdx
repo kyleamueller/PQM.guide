@@ -1,0 +1,68 @@
+---
+title: "Value.VersionIdentity"
+slug: "value-versionidentity"
+category: "Value"
+description: "Returns the version identity of a value, or null if the value has no version."
+syntax: "Value.VersionIdentity(value as any) as any"
+returnType: "any"
+returnDescription: "The version identity of the value, or null if it does not have one."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose version identity to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+---
+
+## Remarks
+
+`Value.VersionIdentity` returns the **version identity** associated with a value, or `null` if the value does not carry version information. Version identities are opaque tokens used by the Power Query engine and data sources to track **change detection** and **incremental refresh** scenarios.
+
+In practice, version identities are attached to values originating from data sources that support versioning — such as OData feeds, SQL Server change tracking, or other connectors that expose entity versioning (e.g., ETags). The version identity allows the engine to determine whether a value has changed since it was last retrieved, enabling efficient incremental loads without re-fetching unchanged data.
+
+For most user-written M queries, `Value.VersionIdentity` returns `null` because in-memory values and most common data sources do not carry version metadata. This function is primarily useful in **custom connector development** and **advanced incremental refresh** scenarios where version tracking is explicitly supported.
+
+The returned value, when non-null, is typically a record or text token whose structure depends on the data source. It should be treated as opaque — compared for equality to detect changes, but not parsed or interpreted directly.
+
+## Examples
+
+### Example 1: Version identity of a plain value returns null
+
+Simple in-memory values do not carry version information.
+
+```powerquery
+Value.VersionIdentity(42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":null}]}
+-->
+
+### Example 2: Version identity of a text value returns null
+
+```powerquery
+Value.VersionIdentity("hello")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":null}]}
+-->
+
+### Example 3: Version identity of a record returns null
+
+```powerquery
+Value.VersionIdentity([Name = "Alice", Age = 30])
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"any"}],"rows":[{"Result":null}]}
+-->

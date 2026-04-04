@@ -1,0 +1,67 @@
+---
+title: "Geography.FromWellKnownText"
+slug: "geography-fromwellknowntext"
+category: "Value"
+description: "Translates text representing a geographic value in Well-Known Text (WKT) format into a structured record."
+syntax: "Geography.FromWellKnownText(input as nullable text) as nullable record"
+returnType: "record"
+returnDescription: "A structured record representing the geographic value parsed from the WKT string, or null if the input is null."
+parameters:
+  - name: "input"
+    type: "text"
+    required: true
+    description: "A text value containing a geographic value in Well-Known Text (WKT) format."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "geography-towellknowntext"
+  - "geographypoint-from"
+  - "geometry-fromwellknowntext"
+  - "geometry-towellknowntext"
+  - "geometrypoint-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Geography.FromWellKnownText` parses a Well-Known Text (WKT) string and returns a structured record representing a geographic value. WKT is a standard text format defined by the Open Geospatial Consortium (OGC) for representing spatial reference system objects. It is the typical serialization format used by databases including SQL Server.
+
+Geographic values use a round-earth coordinate system based on latitude and longitude (as opposed to geometric values which use a flat Cartesian plane). The default spatial reference identifier (SRID) for geography types is 4326 (WGS 84), which is the standard used by GPS.
+
+Common WKT geometry types include `POINT`, `LINESTRING`, `POLYGON`, `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`, and `GEOMETRYCOLLECTION`. For example, a point in Seattle might be represented as `"POINT(-122.3321 47.6062)"`.
+
+If the input is null, the function returns null.
+
+## Examples
+
+### Example 1: Parse a WKT point into a record
+
+Convert a Well-Known Text point representing a geographic location into a structured record.
+
+```powerquery
+let
+    WKT = "POINT(-122.3321 47.6062)",
+    Result = Geography.FromWellKnownText(WKT)
+in
+    Record.ToTable(Result)
+```
+
+### Example 2: Parse WKT geography values from a column
+
+Parse a column of WKT strings into structured geography records.
+
+```powerquery
+let
+    Source = #table({"City", "WKT"}, {
+        {"Seattle", "POINT(-122.3321 47.6062)"},
+        {"New York", "POINT(-74.006 40.7128)"}
+    }),
+    Parsed = Table.AddColumn(Source, "Geography", each Geography.FromWellKnownText([WKT]))
+in
+    Parsed
+```

@@ -1,0 +1,71 @@
+---
+title: "Geometry.ToWellKnownText"
+slug: "geometry-towellknowntext"
+category: "Value"
+description: "Translates a structured geometric point value into its Well-Known Text (WKT) representation."
+syntax: "Geometry.ToWellKnownText(input as nullable record, optional omitSRID as nullable logical) as nullable text"
+returnType: "text"
+returnDescription: "A text value containing the WKT representation of the geometric value, or null if the input is null."
+parameters:
+  - name: "input"
+    type: "record"
+    required: true
+    description: "A structured record representing a geometric value to convert to WKT format."
+  - name: "omitSRID"
+    type: "logical"
+    required: false
+    description: "When true, omits the SRID (Spatial Reference Identifier) prefix from the output. Defaults to false."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "geometry-fromwellknowntext"
+  - "geometrypoint-from"
+  - "geography-towellknowntext"
+  - "geography-fromwellknowntext"
+  - "geographypoint-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Geometry.ToWellKnownText` converts a structured geometric record into its Well-Known Text (WKT) string representation as defined by the Open Geospatial Consortium (OGC). WKT is the standard serialization format used by many databases including SQL Server.
+
+The optional `omitSRID` parameter controls whether the Spatial Reference Identifier (SRID) prefix is included in the output. By default, the SRID is included (e.g., `"SRID=0;POINT(10 20)"`). When `omitSRID` is set to `true`, only the WKT portion is returned (e.g., `"POINT(10 20)"`).
+
+This function is the inverse of `Geometry.FromWellKnownText`. It is useful for serializing geometric values back to text for storage in databases or for interoperability with systems that consume WKT.
+
+Geometry types use a flat Cartesian (planar) coordinate system. For round-earth geographic data (latitude/longitude), use `Geography.ToWellKnownText` instead.
+
+If the input is null, the function returns null.
+
+## Examples
+
+### Example 1: Convert a geometric point record to WKT
+
+Create a geometric point using `GeometryPoint.From` and convert it to its WKT text representation.
+
+```powerquery
+let
+    Point = GeometryPoint.From(10, 20),
+    WKT = Geometry.ToWellKnownText(Point)
+in
+    #table({"WKT"}, {{WKT}})
+```
+
+### Example 2: Convert to WKT without SRID prefix
+
+Omit the SRID prefix from the WKT output.
+
+```powerquery
+let
+    Point = GeometryPoint.From(100, 200),
+    WKTWithSRID = Geometry.ToWellKnownText(Point),
+    WKTWithoutSRID = Geometry.ToWellKnownText(Point, true)
+in
+    #table({"With SRID", "Without SRID"}, {{WKTWithSRID, WKTWithoutSRID}})
+```

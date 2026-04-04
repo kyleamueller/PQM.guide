@@ -1,0 +1,98 @@
+---
+title: "Value.Add"
+slug: "value-add"
+category: "Value"
+description: "Returns the sum of two values, with support for numbers, durations, and date/time types."
+syntax: "Value.Add(value1 as any, value2 as any, optional precision as nullable number) as any"
+returnType: "any"
+returnDescription: "The sum of value1 and value2."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The first value (number, duration, datetime, etc.)."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The second value to add."
+  - name: "precision"
+    type: "number"
+    required: false
+    description: "Controls floating-point precision. Defaults to Precision.Double."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-subtract"
+  - "value-multiply"
+  - "value-divide"
+  - "value-equals"
+  - "number-from"
+---
+
+## Remarks
+
+`Value.Add` returns the sum of `value1` and `value2`. It is the **functional equivalent of the `+` operator** in M — `Value.Add(a, b)` produces the same result as `a + b`.
+
+This function supports **type coercion** across compatible types:
+
+- **number + number** — standard numeric addition, returning a number.
+- **duration + duration** — adds two durations together, returning a duration.
+- **datetime + duration** — shifts a datetime forward by the given duration, returning a datetime.
+- **date + duration** — shifts a date forward by the given duration, returning a date.
+- **time + duration** — shifts a time forward by the given duration, returning a time.
+- **datetimezone + duration** — shifts a datetimezone forward by the given duration, returning a datetimezone.
+
+The optional `precision` parameter controls floating-point precision for numeric operations. By default, `Precision.Double` is used. You can specify `Precision.Decimal` for higher-precision decimal arithmetic.
+
+If the two values are of incompatible types (e.g., text + number), an error is raised.
+
+## Examples
+
+### Example 1: Add numeric columns
+
+Add unit price and a flat shipping fee to compute total cost per order.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "Product", "UnitPrice"}),
+    "WithShipping", each Value.Add([UnitPrice], 5), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"WithShipping","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","UnitPrice":25,"WithShipping":30},{"OrderID":2,"Product":"Gadget B","UnitPrice":50,"WithShipping":55},{"OrderID":3,"Product":"Widget C","UnitPrice":15,"WithShipping":20},{"OrderID":4,"Product":"Gadget D","UnitPrice":75,"WithShipping":80},{"OrderID":5,"Product":"Widget A","UnitPrice":25,"WithShipping":30}]}
+-->
+
+### Example 2: Add a duration to a date
+
+Shift each order date forward by 30 days to calculate a follow-up date.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 4), {"OrderID", "OrderDate"}),
+    "FollowUpDate", each Value.Add([OrderDate], #duration(30, 0, 0, 0)), type date
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"FollowUpDate","type":"date"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","FollowUpDate":"2024-02-14"},{"OrderID":2,"OrderDate":"2024-01-20","FollowUpDate":"2024-02-19"},{"OrderID":3,"OrderDate":"2024-02-01","FollowUpDate":"2024-03-02"},{"OrderID":4,"OrderDate":"2024-02-15","FollowUpDate":"2024-03-16"}]}
+-->
+
+### Example 3: Simple addition of two numbers
+
+```powerquery
+Value.Add(10, 25)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":35}]}
+-->
