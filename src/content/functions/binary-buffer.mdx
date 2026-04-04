@@ -1,0 +1,72 @@
+---
+title: "Binary.Buffer"
+slug: "binary-buffer"
+category: "Binary"
+description: "Buffers a binary value in memory, producing a stable value with deterministic length and byte order."
+syntax: "Binary.Buffer(binary as nullable binary) as nullable binary"
+returnType: "binary"
+returnDescription: "A stable, fully materialized copy of the binary value in memory."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to buffer in memory."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-length"
+  - "binary-from"
+  - "binary-fromlist"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Buffer` loads a binary value entirely into memory, producing a stable binary with a deterministic length and byte order. Streaming binary values from external sources (such as files or HTTP responses) may be lazily evaluated and can change between reads. Buffering ensures the value is read once and reused consistently.
+
+Use this function when a binary value is accessed multiple times in a query and you want to avoid redundant reads from the source. However, be mindful of memory usage for large binary values.
+
+## Examples
+
+### Example 1: Create a stable version of a binary value
+
+Buffer a binary constructed from a list of bytes.
+
+```powerquery
+let
+    Source = Binary.FromList({0..10}),
+    Buffered = Binary.Buffer(Source),
+    AsList = Binary.ToList(Buffered)
+in
+    AsList
+```
+
+<!--output
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a binary value from a list of bytes 0 through 10.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Buffered",
+      "description": "Buffers the binary value in memory, producing a stable copy with deterministic length and byte order.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsList",
+      "description": "Converts the buffered binary back to a list of numbers to verify the content.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}"}]}
+    }
+  ]
+}
+-->

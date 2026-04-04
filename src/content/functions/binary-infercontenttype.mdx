@@ -1,0 +1,78 @@
+---
+title: "Binary.InferContentType"
+slug: "binary-infercontenttype"
+category: "Binary"
+description: "Infers the MIME content type and optional encoding information from a binary stream."
+syntax: "Binary.InferContentType(source as binary) as record"
+returnType: "record"
+returnDescription: "A record containing Content.Type (MIME type) and optionally Content.Encoding and Csv.PotentialDelimiter or Csv.PotentialPositions."
+parameters:
+  - name: "source"
+    type: "binary"
+    required: true
+    description: "The binary stream to inspect for content type inference."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-from"
+  - "binary-buffer"
+  - "binary-length"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.InferContentType` inspects a binary stream and returns a record with a `Content.Type` field containing the inferred MIME type (e.g., `"text/csv"`, `"application/json"`).
+
+Additional fields may be present depending on the inferred type:
+
+- If the content type is `text/*` and an encoding code page is detected, the record includes a `Content.Encoding` field with the encoding.
+- If the content type is `text/csv` with a delimited format, the record includes a `Csv.PotentialDelimiter` field containing a table of potential delimiter characters for further analysis.
+- If the content type is `text/csv` with a fixed-width format, the record includes a `Csv.PotentialPositions` field containing a list of potential column positions.
+
+This function is useful when processing binary data from unknown sources and you need to determine the format before parsing.
+
+## Examples
+
+### Example 1: Infer the content type of a CSV-like binary
+
+Create a binary from CSV text and inspect its inferred content type.
+
+```powerquery
+let
+    CsvData = Text.ToBinary("Name,Age#(lf)Alice,30#(lf)Bob,25"),
+    Inferred = Binary.InferContentType(CsvData),
+    ContentType = Inferred[Content.Type]
+in
+    ContentType
+```
+
+<!--output
+"text/csv"
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "CsvData",
+      "description": "Converts a CSV text string into a binary value.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Inferred",
+      "description": "Inspects the binary stream and infers its MIME content type, returning a record with Content.Type and potentially additional fields.",
+      "output": {"columns":[{"name":"Value","type":"record"}],"rows":[{"Value":"Record"}]}
+    },
+    {
+      "name": "ContentType",
+      "description": "Extracts the Content.Type field from the inferred record, yielding \"text/csv\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"text/csv"}]}
+    }
+  ]
+}
+-->

@@ -1,0 +1,76 @@
+---
+title: "Binary.ViewError"
+slug: "binary-viewerror"
+category: "Binary"
+description: "Creates a modified error record that prevents fallback to default behavior when raised by a Binary.View handler."
+syntax: "Binary.ViewError(errorRecord as record) as record"
+returnType: "record"
+returnDescription: "A modified error record that, when raised inside a Binary.View handler, prevents fallback to the default operation."
+parameters:
+  - name: "errorRecord"
+    type: "record"
+    required: true
+    description: "An error record (with Reason, Message, and optionally Detail fields) to wrap as a non-fallback error."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-view"
+  - "binary-viewfunction"
+  - "table-viewerror"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`Binary.ViewError` creates a modified error record from the given `errorRecord` that, when raised by a handler defined on a `Binary.View`, will not trigger a fallback to the default operation behavior. This is the binary-stream equivalent of `Table.ViewError`.
+
+By default, when a `Binary.View` handler raises an error, the engine falls back to applying the operation using the default behavior on the base binary. Wrapping the error with `Binary.ViewError` prevents this fallback, causing the error to be surfaced directly to the caller.
+
+This is useful in custom connectors when a handler detects a condition that should be reported as a hard failure rather than silently degrading to the default behavior.
+
+## Examples
+
+### Example 1: Raise a non-fallback error from a view handler
+
+Create a binary view where the GetLength handler raises an error that prevents fallback.
+
+```powerquery
+let
+    View = Binary.View(
+        Text.ToBinary("test data"),
+        [
+            GetLength = () =>
+                error Binary.ViewError(
+                    [Reason = "Expression.Error", Message = "Length not supported for this source"]
+                )
+        ]
+    )
+in
+    try Binary.Length(View)
+```
+
+<!--output
+[HasError = true, Error = [Reason = "Expression.Error", Message = "Length not supported for this source"]]
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "View",
+      "description": "Creates a binary view over \"test data\" with a GetLength handler that raises a Binary.ViewError. This error will not fall back to default behavior.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary View"}]}
+    },
+    {
+      "name": "Result",
+      "description": "Attempts to get the length of the view. Because the handler raises a Binary.ViewError, the engine does not fall back to counting bytes — instead it surfaces the error directly.",
+      "output": {"columns":[{"name":"Value","type":"record"}],"rows":[{"Value":"[HasError = true, Error = [Reason = \"Expression.Error\", Message = \"Length not supported for this source\"]]"}]}
+    }
+  ]
+}
+-->

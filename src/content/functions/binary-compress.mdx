@@ -1,0 +1,90 @@
+---
+title: "Binary.Compress"
+slug: "binary-compress"
+category: "Binary"
+description: "Compresses a binary value using the specified compression type (GZip or Deflate)."
+syntax: "Binary.Compress(binary as nullable binary, compressionType as number) as nullable binary"
+returnType: "binary"
+returnDescription: "A compressed copy of the input binary value."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to compress."
+  - name: "compressionType"
+    type: "number"
+    required: true
+    description: "The compression algorithm to use: Compression.GZip or Compression.Deflate."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-decompress"
+  - "binary-from"
+  - "binary-fromlist"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Compress` compresses a binary value using the specified compression algorithm. The result is a compressed copy of the input. Supported compression types are:
+
+- `Compression.GZip` — GZip compression (RFC 1952). Produces output with a GZip header/trailer; commonly used for HTTP content encoding.
+- `Compression.Deflate` — Deflate compression (RFC 1951). Produces raw compressed output without headers.
+
+Use `Binary.Decompress` with the same compression type to reverse the operation. This pair of functions is useful for reducing the size of binary data for storage or transmission.
+
+## Examples
+
+### Example 1: Compress a binary value using Deflate
+
+Compress a binary consisting of 1000 repeated bytes.
+
+```powerquery
+let
+    Source = Binary.FromList(List.Repeat({10}, 1000)),
+    Compressed = Binary.Compress(Source, Compression.Deflate),
+    OriginalSize = Binary.Length(Source),
+    CompressedSize = Binary.Length(Compressed)
+in
+    #table({"OriginalBytes", "CompressedBytes"}, {{OriginalSize, CompressedSize}})
+```
+
+<!--output
+{"columns":[{"name":"OriginalBytes","type":"number"},{"name":"CompressedBytes","type":"number"}],"rows":[{"OriginalBytes":"1000","CompressedBytes":"11"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a binary value from a list of 1000 bytes, all with value 10.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary (1000 bytes)"}]}
+    },
+    {
+      "name": "Compressed",
+      "description": "Compresses the binary value using the Deflate algorithm, producing a much smaller binary.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary (11 bytes)"}]}
+    },
+    {
+      "name": "OriginalSize",
+      "description": "Returns the length of the original uncompressed binary: 1000 bytes.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"1000"}]}
+    },
+    {
+      "name": "CompressedSize",
+      "description": "Returns the length of the compressed binary: 11 bytes.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"11"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table comparing the original and compressed sizes.",
+      "output": {"columns":[{"name":"OriginalBytes","type":"number"},{"name":"CompressedBytes","type":"number"}],"rows":[{"OriginalBytes":"1000","CompressedBytes":"11"}]}
+    }
+  ]
+}
+-->

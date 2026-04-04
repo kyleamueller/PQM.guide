@@ -1,0 +1,104 @@
+---
+title: "Binary.ToList"
+slug: "binary-tolist"
+category: "Binary"
+description: "Converts a binary value into a list of byte numbers (0-255)."
+syntax: "Binary.ToList(binary as binary) as list"
+returnType: "list"
+returnDescription: "A list of numbers (each 0 to 255) representing the individual bytes of the binary value."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to convert to a list of byte values."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-fromlist"
+  - "binary-from"
+  - "binary-totext"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.ToList` converts a binary value into a list of numbers, where each number represents a single byte (0 to 255). This is the inverse of `Binary.FromList`.
+
+This function is useful for inspecting binary data at the byte level, performing byte-level transformations, or debugging binary content.
+
+## Examples
+
+### Example 1: Convert a binary value to a list of bytes
+
+Convert a binary created from text into its constituent byte values.
+
+```powerquery
+let
+    Source = Binary.From("Hi"),
+    Bytes = Binary.ToList(Source)
+in
+    Bytes
+```
+
+<!--output
+{72, 105}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Converts the text \"Hi\" to its binary (UTF-8) representation.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Bytes",
+      "description": "Converts the binary value to a list of byte values: {72, 105}, corresponding to the ASCII codes for 'H' and 'i'.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{72, 105}"}]}
+    }
+  ]
+}
+-->
+
+### Example 2: Round-trip from list to binary and back
+
+Verify that Binary.FromList and Binary.ToList are inverses.
+
+```powerquery
+let
+    Original = {0, 127, 255},
+    AsBinary = Binary.FromList(Original),
+    BackToList = Binary.ToList(AsBinary)
+in
+    BackToList
+```
+
+<!--output
+{0, 127, 255}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Defines a list of three byte values: 0, 127, and 255 (the minimum, midpoint, and maximum byte values).",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{0, 127, 255}"}]}
+    },
+    {
+      "name": "AsBinary",
+      "description": "Converts the list of byte values into a binary value using Binary.FromList.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "BackToList",
+      "description": "Converts the binary back to a list of byte values, confirming the round-trip produces {0, 127, 255}.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{0, 127, 255}"}]}
+    }
+  ]
+}
+-->

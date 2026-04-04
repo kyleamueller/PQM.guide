@@ -1,0 +1,92 @@
+---
+title: "Binary.View"
+slug: "binary-view"
+category: "Binary"
+description: "Creates a custom view of a binary value with handler functions that override default operation behavior."
+syntax: "Binary.View(binary as nullable binary, handlers as record) as binary"
+returnType: "binary"
+returnDescription: "A binary view where specified handler functions override default operation behavior."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: false
+    description: "The base binary value to create a view of. If null, the GetStream handler is required."
+  - name: "handlers"
+    type: "record"
+    required: true
+    description: "A record of handler functions that replace the default behavior of operations applied to the view."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-viewerror"
+  - "binary-viewfunction"
+  - "table-view"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`Binary.View` creates a custom binary view where handler functions override the default behavior of operations applied to the binary. This is the binary-stream equivalent of `Table.View` and is primarily used in custom connector development to implement folding for binary data sources.
+
+When an operation is applied to the view:
+
+1. If a matching handler exists, it is called.
+2. If the handler raises an error, the engine falls back to applying the operation against the base `binary`. Use `Binary.ViewError` to raise errors that bypass this fallback.
+3. If no handler exists, the default behavior is applied to `binary`.
+
+If `binary` is `null`, the `GetStream` handler is required since there is no base binary to fall back to.
+
+Common handler functions include:
+
+- `GetStream` — returns the binary stream content. Called when the binary data is accessed.
+- `GetLength` — returns the length of the binary without reading the full stream.
+- `GetExpression` — returns the M expression representing the view.
+- `OnInvoke` — called when a view function (created via `Binary.ViewFunction`) is invoked on the view.
+
+Refer to the published Power Query custom connector documentation for a complete description of `Binary.View`.
+
+## Examples
+
+### Example 1: Create a basic view with a custom length handler
+
+Define a view that provides the length without reading the data.
+
+```powerquery
+let
+    View = Binary.View(
+        null,
+        [
+            GetLength = () => 12,
+            GetStream = () => Text.ToBinary("hello world!")
+        ]
+    ),
+    Len = Binary.Length(View)
+in
+    Len
+```
+
+<!--output
+12
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "View",
+      "description": "Creates a binary view with a GetLength handler that returns 12 and a GetStream handler that provides the actual binary content.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary View"}]}
+    },
+    {
+      "name": "Len",
+      "description": "Calls Binary.Length on the view, which invokes the GetLength handler and returns 12 without reading the stream.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"12"}]}
+    }
+  ]
+}
+-->
