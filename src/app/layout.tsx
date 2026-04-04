@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { ThemeProvider } from "next-themes";
 import AppShell from "@/components/layout/AppShell";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import CookieConsent from "@/components/ui/CookieConsent";
 import { buildSearchIndex, buildUnifiedSearchIndex } from "@/lib/mdx";
 import "./globals.css";
-
-const GA_MEASUREMENT_ID = "G-DQ1EF903SN";
 
 export const metadata: Metadata = {
   title: {
@@ -50,27 +49,31 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                analytics_storage: 'denied',
+                ad_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied',
+              });
+            `,
+          }}
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          `}
-        </Script>
       </head>
       <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+        <GoogleAnalytics />
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <AppShell functions={functions} searchItems={searchItems}>{children}</AppShell>
         </ThemeProvider>
+        <CookieConsent />
       </body>
     </html>
   );

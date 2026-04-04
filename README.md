@@ -83,10 +83,11 @@ These commands live in `.claude/commands/` and are loaded automatically when you
 git clone https://github.com/kyleamueller/PQM.guide.git
 cd PQM.guide
 npm install
+cp .env.example .env.local   # optional — enables Google Analytics locally
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to preview the site. `npm install` also sets up a pre-push hook that runs type checking and tests automatically.
+Open [http://localhost:3000](http://localhost:3000) to preview the site. `npm install` also sets up a pre-push hook that runs type checking and tests automatically. Google Analytics is optional — the site works fully without setting `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
 
 Other useful commands:
 

@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import SearchDialog from "@/components/search/SearchDialog";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { FunctionIndexEntry, SearchIndexEntry } from "@/lib/types";
+import { hasConsentBeenGiven } from "@/lib/consent";
 
 interface AppShellProps {
   functions: FunctionIndexEntry[];
@@ -15,6 +16,7 @@ interface AppShellProps {
 export default function AppShell({ functions, searchItems, children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [showCookieBtn, setShowCookieBtn] = useState(false);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -27,6 +29,10 @@ export default function AppShell({ functions, searchItems, children }: AppShellP
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
+
+  useEffect(() => {
+    setShowCookieBtn(hasConsentBeenGiven());
+  }, []);
 
   return (
     <>
@@ -56,6 +62,21 @@ export default function AppShell({ functions, searchItems, children }: AppShellP
         onClose={() => setSearchOpen(false)}
       />
       <div className="page-utility-bar">
+        {showCookieBtn && (
+          <button
+            className="utility-bar-link"
+            onClick={() => {
+              window.dispatchEvent(new Event("pqm:reset-consent"));
+              setShowCookieBtn(false);
+            }}
+            aria-label="Cookie settings"
+            title="Cookie settings"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 1a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9Zm0 16.5A7.5 7.5 0 1 1 17.5 10 7.508 7.508 0 0 1 10 17.5ZM8.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm2 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm4-1a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm-3 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+            </svg>
+          </button>
+        )}
         <ThemeToggle />
         <a
           href="https://github.com/kyleamueller/PQM.guide"
