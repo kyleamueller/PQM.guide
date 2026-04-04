@@ -1,16 +1,18 @@
 ---
-title: "BinaryFormat.Decimal"
-slug: "binaryformat-decimal"
-category: "Binary"
-description: "A binary format that reads a .NET 16-byte decimal value."
-syntax: "BinaryFormat.Decimal(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads a 16-byte .NET decimal value from binary data."
+title: BinaryFormat.Decimal
+slug: binaryformat-decimal
+category: Binary
+description: A binary format that reads a .NET 16-byte decimal value.
+syntax: BinaryFormat.Decimal(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads a 16-byte .NET decimal value from binary
+  data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 16-byte decimal value from."
+    description: The binary data to read the 16-byte decimal value from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,15 +21,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-double"
-  - "binaryformat-single"
-  - "binaryformat-byte"
-  - "binaryformat-signedinteger32"
-  - "binaryformat-record"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Decimal number representation"
-  - ".NET decimal format"
+  - binaryformat-double
+  - binaryformat-single
+  - binaryformat-byte
+  - binaryformat-signedinteger32
+  - binaryformat-record
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -59,6 +58,4 @@ in
     result
 ```
 
-<!--output
-1.0
--->
+

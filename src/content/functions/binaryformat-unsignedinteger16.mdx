@@ -1,16 +1,18 @@
 ---
-title: "BinaryFormat.UnsignedInteger16"
-slug: "binaryformat-unsignedinteger16"
-category: "Binary"
-description: "A binary format that reads a 16-bit unsigned integer."
-syntax: "BinaryFormat.UnsignedInteger16(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads a 2-byte unsigned integer from binary data."
+title: BinaryFormat.UnsignedInteger16
+slug: binaryformat-unsignedinteger16
+category: Binary
+description: A binary format that reads a 16-bit unsigned integer.
+syntax: BinaryFormat.UnsignedInteger16(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads a 2-byte unsigned integer from binary
+  data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 16-bit unsigned integer from."
+    description: The binary data to read the 16-bit unsigned integer from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,14 +21,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-unsignedinteger32"
-  - "binaryformat-unsignedinteger64"
-  - "binaryformat-signedinteger16"
-  - "binaryformat-byte"
-  - "binaryformat-byteorder"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Unsigned integers"
+  - binaryformat-unsignedinteger32
+  - binaryformat-unsignedinteger64
+  - binaryformat-signedinteger16
+  - binaryformat-byte
+  - binaryformat-byteorder
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -51,9 +51,7 @@ in
     result
 ```
 
-<!--output
-256
--->
+
 
 ### Example 2: Read two 16-bit unsigned integers in a record
 
@@ -70,6 +68,4 @@ in
     format(binaryData)
 ```
 
-<!--output
-[First = 1, Second = 255]
--->
+

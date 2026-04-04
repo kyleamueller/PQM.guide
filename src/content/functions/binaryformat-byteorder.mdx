@@ -1,20 +1,22 @@
 ---
-title: "BinaryFormat.ByteOrder"
-slug: "binaryformat-byteorder"
-category: "Binary"
-description: "Returns a binary format with the byte order specified by the given format."
-syntax: "BinaryFormat.ByteOrder(binaryFormat as function, byteOrder as number) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads data using the specified byte order."
+title: BinaryFormat.ByteOrder
+slug: binaryformat-byteorder
+category: Binary
+description: Returns a binary format with the byte order specified by the given format.
+syntax: >-
+  BinaryFormat.ByteOrder(binaryFormat as function, byteOrder as number) as
+  function
+returnType: function
+returnDescription: A binary format function that reads data using the specified byte order.
 parameters:
-  - name: "binaryFormat"
-    type: "function"
+  - name: binaryFormat
+    type: function
     required: true
-    description: "The binary format to apply the byte order to."
-  - name: "byteOrder"
-    type: "number"
+    description: The binary format to apply the byte order to.
+  - name: byteOrder
+    type: number
     required: true
-    description: "The byte order to use. Use ByteOrder.LittleEndian or ByteOrder.BigEndian."
+    description: The byte order to use. Use ByteOrder.LittleEndian or ByteOrder.BigEndian.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,17 +25,13 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-unsignedinteger16"
-  - "binaryformat-unsignedinteger32"
-  - "binaryformat-signedinteger16"
-  - "binaryformat-signedinteger32"
-  - "binaryformat-double"
-  - "binaryformat-single"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Byte order"
-  - "Endianness"
-  - "Big-endian vs little-endian"
+  - binaryformat-unsignedinteger16
+  - binaryformat-unsignedinteger32
+  - binaryformat-signedinteger16
+  - binaryformat-signedinteger32
+  - binaryformat-double
+  - binaryformat-single
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -63,9 +61,7 @@ in
     format(binaryData)
 ```
 
-<!--output
-1
--->
+
 
 ### Example 2: Read a big-endian record
 
@@ -88,6 +84,4 @@ in
     format(binaryData)
 ```
 
-<!--output
-[A = 1, B = 2]
--->
+

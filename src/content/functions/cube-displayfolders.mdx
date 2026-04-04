@@ -1,16 +1,20 @@
 ---
-title: "Cube.DisplayFolders"
-slug: "cube-displayfolders"
-category: "Table"
-description: "Returns a nested tree of tables representing the display folder hierarchy of objects available in the cube."
-syntax: "Cube.DisplayFolders(cube as table) as table"
-returnType: "table"
-returnDescription: "A nested tree of tables representing the display folder hierarchy of dimensions, measures, and other objects in the cube."
+title: Cube.DisplayFolders
+slug: cube-displayfolders
+category: Table
+description: >-
+  Returns a nested tree of tables representing the display folder hierarchy of
+  objects available in the cube.
+syntax: Cube.DisplayFolders(cube as table) as table
+returnType: table
+returnDescription: >-
+  A nested tree of tables representing the display folder hierarchy of
+  dimensions, measures, and other objects in the cube.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to retrieve display folders from."
+    description: The cube table to retrieve display folders from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,16 +23,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-dimensions"
-  - "cube-measures"
-  - "cube-properties"
-  - "cube-measureproperties"
-  - "analysisservices-database"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "Display folders"
-  - "Cube metadata"
-  - "OLAP navigation"
+  - cube-dimensions
+  - cube-measures
+  - cube-properties
+  - cube-measureproperties
+  - analysisservices-database
+relatedConcepts: []
 ---
 
 ## Remarks

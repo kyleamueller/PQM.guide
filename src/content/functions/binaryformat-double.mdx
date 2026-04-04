@@ -1,16 +1,22 @@
 ---
-title: "BinaryFormat.Double"
-slug: "binaryformat-double"
-category: "Binary"
-description: "A binary format that reads an 8-byte IEEE double-precision floating point value."
-syntax: "BinaryFormat.Double(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads an 8-byte IEEE 754 double-precision floating point value from binary data."
+title: BinaryFormat.Double
+slug: binaryformat-double
+category: Binary
+description: >-
+  A binary format that reads an 8-byte IEEE double-precision floating point
+  value.
+syntax: BinaryFormat.Double(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads an 8-byte IEEE 754 double-precision
+  floating point value from binary data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 8-byte double-precision floating point value from."
+    description: >-
+      The binary data to read the 8-byte double-precision floating point value
+      from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,15 +25,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-single"
-  - "binaryformat-decimal"
-  - "binaryformat-byte"
-  - "binaryformat-record"
-  - "binaryformat-list"
-relatedConcepts:
-  - "Binary data parsing"
-  - "IEEE 754 floating point"
-  - "Double-precision numbers"
+  - binaryformat-single
+  - binaryformat-decimal
+  - binaryformat-byte
+  - binaryformat-record
+  - binaryformat-list
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -56,6 +59,4 @@ in
     result
 ```
 
-<!--output
-1
--->
+

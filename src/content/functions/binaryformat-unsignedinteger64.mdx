@@ -1,16 +1,18 @@
 ---
-title: "BinaryFormat.UnsignedInteger64"
-slug: "binaryformat-unsignedinteger64"
-category: "Binary"
-description: "A binary format that reads a 64-bit unsigned integer."
-syntax: "BinaryFormat.UnsignedInteger64(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads an 8-byte unsigned integer from binary data."
+title: BinaryFormat.UnsignedInteger64
+slug: binaryformat-unsignedinteger64
+category: Binary
+description: A binary format that reads a 64-bit unsigned integer.
+syntax: BinaryFormat.UnsignedInteger64(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads an 8-byte unsigned integer from binary
+  data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 64-bit unsigned integer from."
+    description: The binary data to read the 64-bit unsigned integer from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,14 +21,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-unsignedinteger16"
-  - "binaryformat-unsignedinteger32"
-  - "binaryformat-signedinteger64"
-  - "binaryformat-byte"
-  - "binaryformat-byteorder"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Unsigned integers"
+  - binaryformat-unsignedinteger16
+  - binaryformat-unsignedinteger32
+  - binaryformat-signedinteger64
+  - binaryformat-byte
+  - binaryformat-byteorder
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -54,9 +54,7 @@ in
     result
 ```
 
-<!--output
-1
--->
+
 
 ### Example 2: Read a larger 64-bit unsigned integer
 
@@ -73,6 +71,4 @@ in
     result
 ```
 
-<!--output
-4294967296
--->
+

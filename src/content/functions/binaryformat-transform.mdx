@@ -1,20 +1,24 @@
 ---
-title: "BinaryFormat.Transform"
-slug: "binaryformat-transform"
-category: "Binary"
-description: "Returns a binary format that transforms values read by another binary format."
-syntax: "BinaryFormat.Transform(binaryFormat as function, function as function) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads a value and applies a transformation function to it."
+title: BinaryFormat.Transform
+slug: binaryformat-transform
+category: Binary
+description: Returns a binary format that transforms values read by another binary format.
+syntax: >-
+  BinaryFormat.Transform(binaryFormat as function, function as function) as
+  function
+returnType: function
+returnDescription: >-
+  A binary format function that reads a value and applies a transformation
+  function to it.
 parameters:
-  - name: "binaryFormat"
-    type: "function"
+  - name: binaryFormat
+    type: function
     required: true
-    description: "The binary format used to read the value."
-  - name: "function"
-    type: "function"
+    description: The binary format used to read the value.
+  - name: function
+    type: function
     required: true
-    description: "A function that receives the read value and returns the transformed value."
+    description: A function that receives the read value and returns the transformed value.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,15 +27,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-byte"
-  - "binaryformat-choice"
-  - "binaryformat-record"
-  - "binaryformat-list"
-  - "binaryformat-length"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Value transformation"
-  - "Post-processing binary reads"
+  - binaryformat-byte
+  - binaryformat-choice
+  - binaryformat-record
+  - binaryformat-list
+  - binaryformat-length
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -59,9 +60,7 @@ in
     transformFormat(binaryData)
 ```
 
-<!--output
-2
--->
+
 
 ### Example 2: Convert a byte to a boolean
 
@@ -78,6 +77,4 @@ in
     boolFormat(binaryData)
 ```
 
-<!--output
-true
--->
+

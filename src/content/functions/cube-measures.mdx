@@ -1,16 +1,18 @@
 ---
-title: "Cube.Measures"
-slug: "cube-measures"
-category: "Table"
-description: "Returns a table containing the set of available measures within a cube."
-syntax: "Cube.Measures(cube as any) as table"
-returnType: "table"
-returnDescription: "A table listing the available measures in the cube, where each measure is represented as a function."
+title: Cube.Measures
+slug: cube-measures
+category: Table
+description: Returns a table containing the set of available measures within a cube.
+syntax: Cube.Measures(cube as any) as table
+returnType: table
+returnDescription: >-
+  A table listing the available measures in the cube, where each measure is
+  represented as a function.
 parameters:
-  - name: "cube"
-    type: "any"
+  - name: cube
+    type: any
     required: true
-    description: "The cube to retrieve measures from."
+    description: The cube to retrieve measures from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,17 +21,13 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-addmeasurecolumn"
-  - "cube-measureproperty"
-  - "cube-measureproperties"
-  - "cube-dimensions"
-  - "cube-displayfolders"
-  - "analysisservices-database"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP measures"
-  - "Cube metadata"
-  - "Measure groups"
+  - cube-addmeasurecolumn
+  - cube-measureproperty
+  - cube-measureproperties
+  - cube-dimensions
+  - cube-displayfolders
+  - analysisservices-database
+relatedConcepts: []
 ---
 
 ## Remarks

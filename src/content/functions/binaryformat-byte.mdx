@@ -1,16 +1,18 @@
 ---
-title: "BinaryFormat.Byte"
-slug: "binaryformat-byte"
-category: "Binary"
-description: "A binary format that reads an 8-bit unsigned integer."
-syntax: "BinaryFormat.Byte(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads a single byte (8-bit unsigned integer) from binary data."
+title: BinaryFormat.Byte
+slug: binaryformat-byte
+category: Binary
+description: A binary format that reads an 8-bit unsigned integer.
+syntax: BinaryFormat.Byte(binary as binary) as any
+returnType: function
+returnDescription: >-
+  A binary format function that reads a single byte (8-bit unsigned integer)
+  from binary data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read a single byte from."
+    description: The binary data to read a single byte from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,14 +21,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-unsignedinteger16"
-  - "binaryformat-unsignedinteger32"
-  - "binaryformat-signedinteger16"
-  - "binaryformat-list"
-  - "binaryformat-record"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Unsigned integers"
+  - binaryformat-unsignedinteger16
+  - binaryformat-unsignedinteger32
+  - binaryformat-signedinteger16
+  - binaryformat-list
+  - binaryformat-record
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -49,9 +49,7 @@ in
     result
 ```
 
-<!--output
-42
--->
+
 
 ### Example 2: Read a list of bytes
 
@@ -65,6 +63,4 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{10, 20, 30}
--->
+

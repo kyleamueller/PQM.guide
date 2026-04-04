@@ -1,20 +1,27 @@
 ---
-title: "BinaryFormat.Text"
-slug: "binaryformat-text"
-category: "Binary"
-description: "Returns a binary format that reads a text value from binary data."
-syntax: "BinaryFormat.Text(length as any, optional encoding as nullable number) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads and decodes a text value from binary data."
+title: BinaryFormat.Text
+slug: binaryformat-text
+category: Binary
+description: Returns a binary format that reads a text value from binary data.
+syntax: >-
+  BinaryFormat.Text(length as any, optional encoding as nullable number) as
+  function
+returnType: function
+returnDescription: A binary format function that reads and decodes a text value from binary data.
 parameters:
-  - name: "length"
-    type: "any"
+  - name: length
+    type: any
     required: true
-    description: "The number of bytes to decode, or a binary format that reads the length preceding the text."
-  - name: "encoding"
-    type: "nullable number"
+    description: >-
+      The number of bytes to decode, or a binary format that reads the length
+      preceding the text.
+  - name: encoding
+    type: nullable number
     required: false
-    description: "The text encoding to use (e.g., TextEncoding.Ascii, TextEncoding.Utf8, TextEncoding.Utf16). If not specified, encoding is detected from Unicode byte order marks, defaulting to UTF-8."
+    description: >-
+      The text encoding to use (e.g., TextEncoding.Ascii, TextEncoding.Utf8,
+      TextEncoding.Utf16). If not specified, encoding is detected from Unicode
+      byte order marks, defaulting to UTF-8.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,15 +30,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-binary"
-  - "binaryformat-byte"
-  - "binaryformat-length"
-  - "binaryformat-list"
-  - "binary-totext"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Text encoding"
-  - "String parsing from binary"
+  - binaryformat-binary
+  - binaryformat-byte
+  - binaryformat-length
+  - binaryformat-list
+  - binary-totext
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -57,9 +61,7 @@ in
     textFormat(binaryData)
 ```
 
-<!--output
-"AB"
--->
+
 
 ### Example 2: Read length-prefixed text
 
@@ -76,6 +78,4 @@ in
     textFormat(binaryData)
 ```
 
-<!--output
-"AB"
--->
+

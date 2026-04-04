@@ -1,16 +1,18 @@
 ---
-title: "Cube.Dimensions"
-slug: "cube-dimensions"
-category: "Table"
-description: "Returns a table containing the set of available dimensions within a cube."
-syntax: "Cube.Dimensions(cube as table) as table"
-returnType: "table"
-returnDescription: "A table listing the available dimensions in the cube, where each dimension contains a set of dimension attributes."
+title: Cube.Dimensions
+slug: cube-dimensions
+category: Table
+description: Returns a table containing the set of available dimensions within a cube.
+syntax: Cube.Dimensions(cube as table) as table
+returnType: table
+returnDescription: >-
+  A table listing the available dimensions in the cube, where each dimension
+  contains a set of dimension attributes.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to retrieve dimensions from."
+    description: The cube table to retrieve dimensions from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,17 +21,13 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-addandexpanddimensioncolumn"
-  - "cube-measures"
-  - "cube-properties"
-  - "cube-displayfolders"
-  - "cube-replacedimensions"
-  - "analysisservices-database"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP dimensions"
-  - "Dimension hierarchies"
-  - "Cube metadata"
+  - cube-addandexpanddimensioncolumn
+  - cube-measures
+  - cube-properties
+  - cube-displayfolders
+  - cube-replacedimensions
+  - analysisservices-database
+relatedConcepts: []
 ---
 
 ## Remarks

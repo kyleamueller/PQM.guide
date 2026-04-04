@@ -1,24 +1,30 @@
 ---
-title: "Cube.AddMeasureColumn"
-slug: "cube-addmeasurecolumn"
-category: "Table"
-description: "Adds a column to the cube containing the results of a measure applied in each row's context."
-syntax: "Cube.AddMeasureColumn(cube as table, column as text, measureSelector as any) as table"
-returnType: "table"
-returnDescription: "The cube table with a new column containing measure values evaluated in the row context of each row."
+title: Cube.AddMeasureColumn
+slug: cube-addmeasurecolumn
+category: Table
+description: >-
+  Adds a column to the cube containing the results of a measure applied in each
+  row's context.
+syntax: >-
+  Cube.AddMeasureColumn(cube as table, column as text, measureSelector as any)
+  as table
+returnType: table
+returnDescription: >-
+  The cube table with a new column containing measure values evaluated in the
+  row context of each row.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to add the measure column to."
-  - name: "column"
-    type: "text"
+    description: The cube table to add the measure column to.
+  - name: column
+    type: text
     required: true
-    description: "The name of the new column to add."
-  - name: "measureSelector"
-    type: "any"
+    description: The name of the new column to add.
+  - name: measureSelector
+    type: any
     required: true
-    description: "The measure to apply. Typically a value from Cube.Measures."
+    description: The measure to apply. Typically a value from Cube.Measures.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -27,18 +33,14 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-measures"
-  - "cube-addandexpanddimensioncolumn"
-  - "cube-measureproperty"
-  - "cube-measureproperties"
-  - "cube-transform"
-  - "analysisservices-database"
-  - "table-addcolumn"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP measures"
-  - "Row context"
-  - "Measure aggregation"
+  - cube-measures
+  - cube-addandexpanddimensioncolumn
+  - cube-measureproperty
+  - cube-measureproperties
+  - cube-transform
+  - analysisservices-database
+  - table-addcolumn
+relatedConcepts: []
 ---
 
 ## Remarks

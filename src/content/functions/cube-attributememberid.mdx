@@ -1,16 +1,22 @@
 ---
-title: "Cube.AttributeMemberId"
-slug: "cube-attributememberid"
-category: "Table"
-description: "Returns the unique member identifier from a dimension attribute member property value."
-syntax: "Cube.AttributeMemberId(attribute as any) as any"
-returnType: "any"
-returnDescription: "The unique member identifier for the given attribute member property value, or null if the value is not a member property."
+title: Cube.AttributeMemberId
+slug: cube-attributememberid
+category: Table
+description: >-
+  Returns the unique member identifier from a dimension attribute member
+  property value.
+syntax: Cube.AttributeMemberId(attribute as any) as any
+returnType: any
+returnDescription: >-
+  The unique member identifier for the given attribute member property value, or
+  null if the value is not a member property.
 parameters:
-  - name: "attribute"
-    type: "any"
+  - name: attribute
+    type: any
     required: true
-    description: "A dimension attribute member property value from which to extract the unique member identifier."
+    description: >-
+      A dimension attribute member property value from which to extract the
+      unique member identifier.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,16 +25,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-attributememberproperty"
-  - "cube-dimensions"
-  - "cube-addandexpanddimensioncolumn"
-  - "cube-properties"
-  - "cube-propertykey"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP dimension members"
-  - "Member unique names"
-  - "Attribute hierarchies"
+  - cube-attributememberproperty
+  - cube-dimensions
+  - cube-addandexpanddimensioncolumn
+  - cube-properties
+  - cube-propertykey
+relatedConcepts: []
 ---
 
 ## Remarks

@@ -200,8 +200,33 @@ export default async function FunctionPage({ params }: PageProps) {
 
   const categorySlug = frontmatter.category.toLowerCase().replace(/\s+/g, "-");
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://pqm.guide" },
+          { "@type": "ListItem", position: 2, name: frontmatter.category, item: `https://pqm.guide/categories/${categorySlug}` },
+          { "@type": "ListItem", position: 3, name: frontmatter.title },
+        ],
+      },
+      {
+        "@type": "TechArticle",
+        headline: frontmatter.title,
+        description: frontmatter.description,
+        url: `https://pqm.guide/functions/${slug}`,
+        isPartOf: { "@type": "WebSite", url: "https://pqm.guide" },
+      },
+    ],
+  };
+
   return (
     <article>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <nav style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 20, display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
         <Link href="/categories" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Functions</Link>
         <span>›</span>

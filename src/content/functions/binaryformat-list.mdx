@@ -1,20 +1,27 @@
 ---
-title: "BinaryFormat.List"
-slug: "binaryformat-list"
-category: "Binary"
-description: "Returns a binary format that reads a sequence of items and returns a list."
-syntax: "BinaryFormat.List(binaryFormat as function, optional countOrCondition as any) as function"
-returnType: "function"
-returnDescription: "A binary format function that reads a sequence of items and returns them as a list."
+title: BinaryFormat.List
+slug: binaryformat-list
+category: Binary
+description: Returns a binary format that reads a sequence of items and returns a list.
+syntax: >-
+  BinaryFormat.List(binaryFormat as function, optional countOrCondition as any)
+  as function
+returnType: function
+returnDescription: >-
+  A binary format function that reads a sequence of items and returns them as a
+  list.
 parameters:
-  - name: "binaryFormat"
-    type: "function"
+  - name: binaryFormat
+    type: function
     required: true
-    description: "The binary format of each item in the list."
-  - name: "countOrCondition"
-    type: "any"
+    description: The binary format of each item in the list.
+  - name: countOrCondition
+    type: any
     required: false
-    description: "The number of items to read, a function that returns true to continue or false to stop, or a binary format that reads the count preceding the list. If omitted, reads until end of data."
+    description: >-
+      The number of items to read, a function that returns true to continue or
+      false to stop, or a binary format that reads the count preceding the list.
+      If omitted, reads until end of data.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -23,15 +30,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-byte"
-  - "binaryformat-record"
-  - "binaryformat-length"
-  - "binaryformat-choice"
-  - "binaryformat-binary"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Repeated binary structures"
-  - "List parsing"
+  - binaryformat-byte
+  - binaryformat-record
+  - binaryformat-length
+  - binaryformat-choice
+  - binaryformat-binary
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -61,9 +65,7 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{1, 2, 3}
--->
+
 
 ### Example 2: Read a fixed number of items
 
@@ -77,9 +79,7 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{1, 2}
--->
+
 
 ### Example 3: Read until a condition is met
 
@@ -93,6 +93,4 @@ in
     listFormat(binaryData)
 ```
 
-<!--output
-{1, 2}
--->
+

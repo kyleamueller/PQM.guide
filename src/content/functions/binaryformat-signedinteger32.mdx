@@ -1,16 +1,16 @@
 ---
-title: "BinaryFormat.SignedInteger32"
-slug: "binaryformat-signedinteger32"
-category: "Binary"
-description: "A binary format that reads a 32-bit signed integer."
-syntax: "BinaryFormat.SignedInteger32(binary as binary) as any"
-returnType: "function"
-returnDescription: "A binary format function that reads a 4-byte signed integer from binary data."
+title: BinaryFormat.SignedInteger32
+slug: binaryformat-signedinteger32
+category: Binary
+description: A binary format that reads a 32-bit signed integer.
+syntax: BinaryFormat.SignedInteger32(binary as binary) as any
+returnType: function
+returnDescription: A binary format function that reads a 4-byte signed integer from binary data.
 parameters:
-  - name: "binary"
-    type: "binary"
+  - name: binary
+    type: binary
     required: true
-    description: "The binary data to read the 32-bit signed integer from."
+    description: The binary data to read the 32-bit signed integer from.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -19,15 +19,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "binaryformat-signedinteger16"
-  - "binaryformat-signedinteger64"
-  - "binaryformat-unsignedinteger32"
-  - "binaryformat-byte"
-  - "binaryformat-byteorder"
-relatedConcepts:
-  - "Binary data parsing"
-  - "Signed integers"
-  - "Two's complement"
+  - binaryformat-signedinteger16
+  - binaryformat-signedinteger64
+  - binaryformat-unsignedinteger32
+  - binaryformat-byte
+  - binaryformat-byteorder
+relatedConcepts: []
 ---
 
 ## Remarks
@@ -52,9 +49,7 @@ in
     result
 ```
 
-<!--output
-1
--->
+
 
 ### Example 2: Read a negative 32-bit signed integer
 
@@ -69,6 +64,4 @@ in
     result
 ```
 
-<!--output
--100
--->
+

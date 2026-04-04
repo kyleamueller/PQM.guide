@@ -1,24 +1,26 @@
 ---
-title: "Cube.ApplyParameter"
-slug: "cube-applyparameter"
-category: "Table"
-description: "Returns a cube after applying a parameter with arguments to it."
-syntax: "Cube.ApplyParameter(cube as table, parameter as any, optional arguments as nullable list) as table"
-returnType: "table"
-returnDescription: "The cube table with the specified parameter and its arguments applied."
+title: Cube.ApplyParameter
+slug: cube-applyparameter
+category: Table
+description: Returns a cube after applying a parameter with arguments to it.
+syntax: >-
+  Cube.ApplyParameter(cube as table, parameter as any, optional arguments as
+  nullable list) as table
+returnType: table
+returnDescription: The cube table with the specified parameter and its arguments applied.
 parameters:
-  - name: "cube"
-    type: "table"
+  - name: cube
+    type: table
     required: true
-    description: "The cube table to apply the parameter to."
-  - name: "parameter"
-    type: "any"
+    description: The cube table to apply the parameter to.
+  - name: parameter
+    type: any
     required: true
-    description: "The parameter to apply. Typically a value from Cube.Parameters."
-  - name: "arguments"
-    type: "list"
+    description: The parameter to apply. Typically a value from Cube.Parameters.
+  - name: arguments
+    type: list
     required: false
-    description: "An optional list of arguments to pass with the parameter."
+    description: An optional list of arguments to pass with the parameter.
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -27,16 +29,12 @@ compatibility:
   dataflows: true
   fabricNotebooks: true
 relatedFunctions:
-  - "cube-parameters"
-  - "cube-dimensions"
-  - "cube-measures"
-  - "cube-transform"
-  - "analysisservices-database"
-relatedConcepts:
-  - "Analysis Services cubes"
-  - "OLAP parameters"
-  - "Cube parameterization"
-  - "MDX parameters"
+  - cube-parameters
+  - cube-dimensions
+  - cube-measures
+  - cube-transform
+  - analysisservices-database
+relatedConcepts: []
 ---
 
 ## Remarks
