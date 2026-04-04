@@ -1,0 +1,79 @@
+---
+title: "Function.ScalarVector"
+slug: "function-scalarvector"
+category: "Function"
+description: "Creates a scalar function that invokes a vector function behind the scenes, enabling batch processing when applied row-by-row across a table."
+syntax: "Function.ScalarVector(scalarFunctionType as type, vectorFunction as function) as function"
+returnType: "function"
+returnDescription: "A scalar function matching the specified type signature that delegates to the vector function for batch processing."
+parameters:
+  - name: "scalarFunctionType"
+    type: "type"
+    required: true
+    description: "The function type defining the parameter names, types, and return type for the scalar function."
+  - name: "vectorFunction"
+    type: "function"
+    required: true
+    description: "A function that receives a table of inputs (one row per call) and returns a list of results, one per input row."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "function-invoke"
+  - "function-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Function.ScalarVector` creates a scalar function (one that processes a single row) backed by a vector function (one that processes many rows at once). When the scalar function is applied row-by-row — for example, via `Table.AddColumn` — the engine automatically batches the calls and passes all inputs to the `vectorFunction` at once, rather than invoking the scalar function individually for each row.
+
+### How it works
+
+1. The returned function appears as a normal scalar function matching `scalarFunctionType`.
+2. When called individually, the `vectorFunction` receives a single-row table and should return a single-element list.
+3. When the scalar function is used in a row-by-row context like `Table.AddColumn`, the engine collects all input rows into a table and passes them to `vectorFunction` in one batch (or in chunks).
+
+### vectorFunction contract
+
+- **Input**: A table whose columns match the parameter names and positions of `scalarFunctionType`. Each row represents one call to the scalar function.
+- **Output**: A list with the same length as the input table. Each item is the result for the corresponding input row.
+- The input table is streamed, so `vectorFunction` should process data in chunks and must not enumerate the input table more than once.
+
+### Use cases
+
+- **API batching** — calling an external API with batched requests instead of one-by-one.
+- **Expensive computations** — processing multiple inputs together for efficiency.
+- **Custom connector optimization** — enabling bulk operations that are more efficient than individual calls.
+
+## Examples
+
+### Example 1: Batch-multiply two columns
+
+Create a scalar multiplication function backed by batch processing.
+
+```powerquery
+let
+    MultiplyScalar = (left, right) => left * right,
+    MultiplyVector = (input) =>
+        Table.TransformRows(input, each [left] * [right]),
+    Multiply = Function.ScalarVector(
+        type function (left as number, right as number) as number,
+        MultiplyVector
+    ),
+    Source = Table.FromRecords({
+        [a = 1, b = 2],
+        [a = 3, b = 4]
+    }),
+    Result = Table.AddColumn(Source, "Product", each Multiply([a], [b]))
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"a","type":"number"},{"name":"b","type":"number"},{"name":"Product","type":"number"}],"rows":[{"a":1,"b":2,"Product":2},{"a":3,"b":4,"Product":12}]}
+-->

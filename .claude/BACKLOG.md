@@ -21,6 +21,8 @@
 - [x] **GitHub contributor attribution** — Shows contributor avatars/usernames on each page based on git history, similar to MS Docs.
 - [ ] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
 - [ ] **Sample tables: surface the M code** — The M code on the sample tables page is too hidden; make it more discoverable/visible. *(Alex)*
+- [x] **Full relatedFunctions reference audit** — Tightened the content-integrity test to only allow references to documented slugs (removed spec slug fallback). Verified 0 broken references across all 661 functions.
+- [x] **Internal-only function tagging + concept page** — Added `internal: true` frontmatter to all 21 internal-only functions, "Internal" badge in the UI (FunctionHeader), and concept guide at `src/content/concepts/internal-functions.mdx`.
 
 ---
 

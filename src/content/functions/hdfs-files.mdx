@@ -1,0 +1,80 @@
+---
+title: "Hdfs.Files"
+slug: "hdfs-files"
+category: "Accessing Data"
+description: "Returns a table of all files found recursively at a folder URL and its subfolders from a Hadoop file system (HDFS)."
+syntax: "Hdfs.Files(url as text) as table"
+returnType: "table"
+returnDescription: "A table containing one row for each file found at the specified HDFS folder URL and all subfolders, with properties and a link to content."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the folder on the Hadoop Distributed File System (e.g., \"hdfs://namenode:8020/data/\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "hdfs-contents"
+  - "folder-contents"
+  - "azurestorage-blobs"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Hdfs.Files` connects to a Hadoop Distributed File System (HDFS) cluster and returns a table with one row per file found at the specified folder URL and all its subfolders recursively. Unlike `Hdfs.Contents`, this function only returns files (not folders) and automatically recurses into all subdirectories, similar to how `Folder.Files` works for local file systems.
+
+**Columns returned**: Each row in the result includes:
+- `Name` (text) -- the file name.
+- `Folder Path` (text) -- the full path of the containing folder.
+- `Date modified` (datetime) -- the last modification timestamp.
+- `Extension` (text) -- the file extension including the leading dot.
+- `Attributes` (record) -- file system metadata attributes.
+- `Content` (binary) -- the binary content of the file.
+
+**Authentication**: Supports Anonymous access and Basic authentication (username/password). Configure credentials in the Power Query data source settings dialog using the HDFS cluster URL as the credential scope. Kerberos authentication is not natively supported in the UI but may be configured through gateway settings.
+
+**URL format**: Provide the WebHDFS URL of the root folder to scan. Typically this follows the format `http://namenode:50070/webhdfs/v1/path/` or `hdfs://namenode:8020/path/`. The exact format depends on your Hadoop cluster configuration.
+
+**Query folding**: Not supported. Directory traversal and all filtering are performed in Power Query after the full recursive file listing is retrieved from HDFS.
+
+**Platform availability**: Available in **Power BI Desktop** only. Not supported in Power BI Service, Excel, Dataflows, or Fabric notebooks. For scheduled refresh in Power BI Service, an on-premises data gateway with network access to the HDFS cluster is required.
+
+**Content column**: The `Content` column is lazy-loaded. Files are not downloaded from HDFS until the `Content` binary is accessed. Apply `Table.SelectRows` on `Extension`, `Name`, or `Folder Path` before accessing `Content` to minimize data transfer.
+
+**Combining files pattern**: Use the standard combine-files pattern: list files, filter by extension, parse each file's `Content` with the appropriate function (`Csv.Document`, `Json.Document`, etc.), then combine with `Table.Combine`.
+
+## Examples
+
+### Example 1: List all files recursively from an HDFS path
+
+```powerquery
+Hdfs.Files("http://namenode:50070/webhdfs/v1/data/")
+```
+
+### Example 2: Filter to Parquet files across all subfolders
+
+```powerquery
+let
+    Source = Hdfs.Files("http://namenode:50070/webhdfs/v1/data/"),
+    ParquetFiles = Table.SelectRows(Source, each [Extension] = ".parquet")
+in
+    ParquetFiles
+```
+
+### Example 3: Combine all CSV files from HDFS into one table
+
+```powerquery
+let
+    Source = Hdfs.Files("http://namenode:50070/webhdfs/v1/data/exports/"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv"),
+    Parsed = Table.AddColumn(CsvFiles, "Data", each Csv.Document([Content], [Delimiter = ",", Encoding = 65001])),
+    Combined = Table.Combine(Parsed[Data])
+in
+    Combined
+```

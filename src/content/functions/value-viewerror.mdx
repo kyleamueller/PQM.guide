@@ -1,0 +1,61 @@
+---
+title: "Value.ViewError"
+slug: "value-viewerror"
+category: "Value"
+description: "Creates a modified error record suitable for use in a view handler. Intended for internal use only."
+syntax: "Value.ViewError(errorRecord as record) as record"
+returnType: "record"
+returnDescription: "A modified error record formatted for consumption by the view infrastructure."
+parameters:
+  - name: "errorRecord"
+    type: "record"
+    required: true
+    description: "An error record (with Reason, Message, and Detail fields) to transform for view handling."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-viewerror"
+  - "table-view"
+  - "table-viewfunction"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+This function is intended for **internal use only** and is not designed to be called directly in user-written M queries.
+
+`Value.ViewError` is part of the Power Query **view infrastructure** — the mechanism that allows connectors and the engine to provide custom handling for operations on tables and other values. It transforms a standard M error record (containing `Reason`, `Message`, and `Detail` fields) into a form that the view layer can consume and route appropriately.
+
+In practice, `Value.ViewError` works in conjunction with `Table.View` and `Table.ViewError`. When a custom connector implements `Table.View` to support query folding or custom operation handling, error conditions that arise during view operations are wrapped through `Value.ViewError` so the engine can:
+
+- Present the error to the user with the correct context.
+- Fall back to local evaluation if the view handler cannot process an operation.
+- Preserve structured error information across the view boundary.
+
+The related function `Table.ViewError` serves a similar purpose specifically for table views. `Value.ViewError` is the more general counterpart that operates on any value, not just tables.
+
+Calling `Value.ViewError` directly in a user query is not useful. The error record format and view-routing logic are engine internals.
+
+## Examples
+
+### Example 1: Passing an error record through Value.ViewError
+
+Demonstrates the function signature. In practice, this would only be called within a view handler.
+
+```powerquery
+let
+    ErrorRec = [Reason = "DataSource.Error", Message = "Could not connect", Detail = null],
+    ViewErr = Value.ViewError(ErrorRec)
+in
+    ViewErr[Reason]
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"DataSource.Error"}]}
+-->

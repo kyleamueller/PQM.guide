@@ -1,0 +1,58 @@
+---
+title: "Variable.ValueOrDefault"
+slug: "variable-valueordefault"
+category: "Value"
+description: "Returns the value of a variable identified by name, or an optional default value if the variable is not defined."
+syntax: "Variable.ValueOrDefault(identifier as text, optional defaultValue as any) as any"
+returnType: "any"
+returnDescription: "The value of the specified variable, or the default value if the variable is not defined."
+parameters:
+  - name: "identifier"
+    type: "text"
+    required: true
+    description: "The name of the variable to look up in the current evaluation environment."
+  - name: "defaultValue"
+    type: "any"
+    required: false
+    description: "The value to return if the variable identified by identifier is not defined."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+  - "value-expression"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Variable.ValueOrDefault` retrieves the value of a variable by its text name from the current evaluation environment. Unlike `Variable.Value`, which raises an error when the variable is not found, this function returns the optional `defaultValue` instead. If `defaultValue` is not provided and the variable is not defined, `null` is returned.
+
+This is an **internal engine function** used by the Power Query evaluation infrastructure to resolve variable references with fallback behavior. It supports scenarios where the engine needs to gracefully handle missing bindings during expression evaluation — for example, when evaluating expressions in environments where certain names may or may not be present.
+
+In normal user-written M queries, this function is not needed. Standard patterns such as `try ... otherwise ...` or null-coalescing with `??` provide equivalent fallback behavior for user code. If you need dynamic name resolution with defaults, consider using `Record.FieldOrDefault` on a record, or `Expression.Evaluate` with a controlled environment.
+
+## Examples
+
+### Example 1: Conceptual usage — resolve a variable with a fallback
+
+This illustrates the function's intended behavior. The evaluation environment is managed internally by the engine.
+
+```powerquery
+let
+    // Conceptually, if "x" is defined in the environment, return its value.
+    // If not defined, return the default value 0.
+    // Variable.ValueOrDefault("x", 0) would return 0 if x is not in scope.
+    Result = 0
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":0}]}
+-->

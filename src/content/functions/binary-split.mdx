@@ -1,0 +1,76 @@
+---
+title: "Binary.Split"
+slug: "binary-split"
+category: "Binary"
+description: "Splits a binary value into a list of binary chunks of a specified page size."
+syntax: "Binary.Split(binary as binary, pageSize as number) as list"
+returnType: "list"
+returnDescription: "A list of binary values, each containing up to pageSize bytes."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to split into chunks."
+  - name: "pageSize"
+    type: "number"
+    required: true
+    description: "The number of bytes per chunk. The last chunk may contain fewer bytes if the total is not evenly divisible."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-range"
+  - "binary-combine"
+  - "binary-length"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Split` divides a binary value into a list of binary chunks, where each chunk contains up to `pageSize` bytes. The first element contains the first `pageSize` bytes, the second element the next `pageSize` bytes, and so on. The final chunk may be smaller if the total byte count is not evenly divisible by `pageSize`.
+
+This function is useful for processing large binary streams in fixed-size pages, such as when uploading binary data in chunks or implementing paged binary protocols.
+
+## Examples
+
+### Example 1: Split a binary into chunks of 3 bytes
+
+Split a 10-byte binary into chunks of 3 bytes each.
+
+```powerquery
+let
+    Source = Binary.FromList({0..9}),
+    Chunks = Binary.Split(Source, 3),
+    ChunkSizes = List.Transform(Chunks, each Binary.Length(_))
+in
+    ChunkSizes
+```
+
+<!--output
+{3, 3, 3, 1}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a binary value from the byte list {0, 1, 2, ..., 9} — 10 bytes total.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary (10 bytes)"}]}
+    },
+    {
+      "name": "Chunks",
+      "description": "Splits the binary into chunks of 3 bytes each, producing a list of 4 binary values (the last chunk has only 1 byte).",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"List of 4 binary values"}]}
+    },
+    {
+      "name": "ChunkSizes",
+      "description": "Returns the byte lengths of each chunk: {3, 3, 3, 1}.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{3, 3, 3, 1}"}]}
+    }
+  ]
+}
+-->

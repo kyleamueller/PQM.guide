@@ -1,0 +1,53 @@
+---
+title: "Cdm.Contents"
+slug: "cdm-contents"
+category: "Accessing Data"
+description: "Returns a table representing the entities defined in a Common Data Model folder."
+syntax: "Cdm.Contents(table as table) as table"
+returnType: "table"
+returnDescription: "A navigation table of entities defined in the Common Data Model folder."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "A table representing a CDM folder structure, typically obtained from a Data Lake or storage connector that points to a model.json or manifest.cdm.json file."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "azurestorage-blobs"
+  - "json-document"
+---
+
+## Remarks
+
+`Cdm.Contents` reads a Common Data Model (CDM) folder and returns a navigation table of the entities defined within it. A CDM folder contains a metadata file (`model.json` or `manifest.cdm.json`) that describes the entity schemas and the underlying data files (typically CSV or Parquet) stored in Azure Data Lake Storage or a similar location.
+
+**Important**: The Microsoft documentation notes that this function may be "unavailable in the current context" in certain environments. Its availability depends on the connector and platform being used.
+
+**Authentication**: Authentication is handled by the underlying storage connector (e.g., Azure Data Lake Storage) that provides the CDM folder contents. Configure credentials for the storage account in the data source credentials dialog.
+
+**Query folding**: Not applicable. `Cdm.Contents` reads the CDM metadata and associated data files. Transformations are applied locally by the Power Query engine.
+
+**Platform availability**: Available in Power BI Desktop, Power BI Service, and Dataflows where CDM folder support is enabled. The Common Data Model connector is primarily designed for use with Dataflows and Azure Data Lake Storage Gen2. It is not available in Excel Desktop, Excel Online, or Fabric Notebooks in most scenarios.
+
+## Examples
+
+### Example 1: Read entities from a CDM folder (conceptual)
+
+```powerquery
+let
+    // Point to the Data Lake storage containing the CDM folder
+    Source = AzureStorage.DataLake("https://myaccount.dfs.core.windows.net/myfilesystem/cdmfolder"),
+    // Pass the folder listing to Cdm.Contents
+    Entities = Cdm.Contents(Source),
+    // Navigate to a specific entity
+    Customers = Entities{[Name = "Customers"]}[Data]
+in
+    Customers
+```
+Since `Cdm.Contents` depends on a properly structured CDM folder in cloud storage, this example is conceptual. The actual usage depends on the CDM metadata structure in your storage account.

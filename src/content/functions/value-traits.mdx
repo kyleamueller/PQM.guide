@@ -1,0 +1,76 @@
+---
+title: "Value.Traits"
+slug: "value-traits"
+category: "Value"
+description: "Returns a table describing the traits (capabilities and behaviors) of the given value. Intended for internal use only."
+syntax: "Value.Traits(value as any) as table"
+returnType: "table"
+returnDescription: "A table listing the traits associated with the value."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose traits to inspect."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+  - "value-expression"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+This function is intended for **internal use only** and is not designed to be called directly in user-written M queries.
+
+`Value.Traits` returns a table that describes the **traits** — capabilities and behavioral characteristics — of a given value. Traits are an engine-internal concept that allows the Power Query runtime to reason about what a value can do, beyond what its M type alone conveys.
+
+### What traits represent
+
+Traits can include information such as:
+
+- Whether a table supports query folding for specific operations (filtering, sorting, grouping).
+- Whether a value supports streaming or buffering.
+- What native query capabilities a data source exposes.
+- Whether a function supports specific calling conventions or optimizations.
+
+The engine and custom connectors use traits to make decisions about how to evaluate queries — for example, whether to fold a `Table.SelectRows` call into a SQL WHERE clause or to evaluate it locally.
+
+### Structure of the returned table
+
+The returned table's exact schema is not publicly documented and may vary across Power Query versions. It typically contains columns identifying the trait name (or kind) and associated metadata. Because the schema is engine-internal, code that depends on specific column names or trait identifiers may break across updates.
+
+For most users, the capabilities that traits describe are surfaced automatically by the engine (e.g., query folding happens transparently). `Value.Traits` is useful primarily in **custom connector development** and **engine diagnostics** where you need to programmatically inspect what capabilities a value advertises.
+
+## Examples
+
+### Example 1: Inspecting traits of a simple value
+
+Simple in-memory values typically have an empty or minimal traits table.
+
+```powerquery
+Value.Traits(42)
+```
+
+<!--output
+{"columns":[{"name":"Value","type":"any"}],"rows":[]}
+-->
+
+### Example 2: Traits return a table structure
+
+The result is always a table, even if no traits are present.
+
+```powerquery
+Value.Traits("hello") is table
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+-->

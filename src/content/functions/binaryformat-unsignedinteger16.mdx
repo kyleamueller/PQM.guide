@@ -1,0 +1,75 @@
+---
+title: "BinaryFormat.UnsignedInteger16"
+slug: "binaryformat-unsignedinteger16"
+category: "Binary"
+description: "A binary format that reads a 16-bit unsigned integer."
+syntax: "BinaryFormat.UnsignedInteger16(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 2-byte unsigned integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 16-bit unsigned integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-unsignedinteger32"
+  - "binaryformat-unsignedinteger64"
+  - "binaryformat-signedinteger16"
+  - "binaryformat-byte"
+  - "binaryformat-byteorder"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Unsigned integers"
+---
+
+## Remarks
+
+`BinaryFormat.UnsignedInteger16` is a binary format specifier that reads a 16-bit (2-byte) unsigned integer from binary data. The value range is 0 to 65,535 (UInt16 / ushort).
+
+The default byte order is little-endian (least significant byte first). Use `BinaryFormat.ByteOrder` to wrap this format if the source data uses big-endian byte ordering.
+
+This format is commonly used for reading port numbers, character codes, small counts, and other unsigned 16-bit values from binary file formats and network protocols.
+
+## Examples
+
+### Example 1: Read a 16-bit unsigned integer
+
+Read a 2-byte unsigned integer from binary data.
+
+```powerquery
+let
+    binaryData = #binary({0x00, 0x01}),
+    result = BinaryFormat.UnsignedInteger16(binaryData)
+in
+    result
+```
+
+<!--output
+256
+-->
+
+### Example 2: Read two 16-bit unsigned integers in a record
+
+Read a record with two 16-bit unsigned integer fields.
+
+```powerquery
+let
+    binaryData = #binary({0x01, 0x00, 0xFF, 0x00}),
+    format = BinaryFormat.Record([
+        First = BinaryFormat.UnsignedInteger16,
+        Second = BinaryFormat.UnsignedInteger16
+    ])
+in
+    format(binaryData)
+```
+
+<!--output
+[First = 1, Second = 255]
+-->

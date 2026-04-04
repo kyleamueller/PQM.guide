@@ -1,0 +1,52 @@
+---
+title: "Table.FilterWithDataTable"
+slug: "table-filterwithdatatable"
+category: "Table"
+description: "Filters a table using a data table identifier. Intended for internal use only."
+syntax: "Table.FilterWithDataTable(table as table, dataTableIdentifier as text) as any"
+returnType: "any"
+returnDescription: "The filtered table result."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table to filter."
+  - name: "dataTableIdentifier"
+    type: "text"
+    required: true
+    description: "An identifier for the data table used in filtering."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-selectrows"
+  - "table-view"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+This function is intended for internal use only. It is part of the Power Query engine's infrastructure for applying data table-based filters and is not designed for use in user-authored queries. Its behavior may change without notice between Power Query versions.
+
+For filtering tables in your own queries, use `Table.SelectRows` with a row filter condition instead.
+
+## Examples
+
+### Example 1: Recommended alternative — use Table.SelectRows
+
+Instead of this internal function, filter tables using `Table.SelectRows`:
+
+Input: `Sales`
+
+```powerquery
+Table.SelectRows(Sales, each [Category] = "Widgets")
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"Quantity","type":"number"},{"name":"UnitPrice","type":"number"},{"name":"CustomerID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":1,"Product":"Widget A","Category":"Widgets","Quantity":10,"UnitPrice":25.50,"CustomerID":1,"OrderDate":"2024-01-15"},{"OrderID":5,"Product":"Widget A","Category":"Widgets","Quantity":20,"UnitPrice":25.50,"CustomerID":1,"OrderDate":"2024-02-20"}]}
+-->

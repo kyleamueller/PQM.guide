@@ -1,0 +1,79 @@
+---
+title: "OleDb.Query"
+slug: "oledb-query"
+category: "Accessing Data"
+description: "Returns the result of running a SQL query against an OLE DB data source using the specified connection string."
+syntax: "OleDb.Query(connectionString as any, query as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table containing the result set of the SQL query executed against the OLE DB data source."
+parameters:
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "The OLE DB connection string. Can be text (e.g., \"Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=mydb;\") or a record of property value pairs. Property values can be text or number."
+  - name: "query"
+    type: "text"
+    required: true
+    description: "The SQL query to execute against the data source."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options such as ConnectionTimeout, CommandTimeout, and SqlCompatibleWindowsAuth."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "oledb-datasource"
+  - "odbc-query"
+  - "sql-database"
+---
+
+## Remarks
+
+`OleDb.Query` executes a SQL statement directly against an OLE DB data source and returns the result as a Power Query table. Unlike `OleDb.DataSource`, which provides a navigation table for interactive browsing and may support dynamic SQL folding, `OleDb.Query` sends the SQL you provide verbatim to the OLE DB provider. Use it when you need precise control over the SQL being executed -- for example, when using provider-specific syntax, calling stored procedures, or running queries that Power Query's automatic folding cannot express.
+
+**Connection string formats**: The `connectionString` parameter accepts two forms:
+- A text connection string: `"Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=mydb;Integrated Security=SSPI;"`.
+- A record of key-value pairs: `[Provider = "SQLOLEDB", #"Data Source" = "myserver", #"Initial Catalog" = "mydb"]`. Power Query assembles these into a connection string automatically. Property values can be text or number.
+
+**Options record fields**:
+- `ConnectionTimeout` (duration) -- Controls how long to wait before abandoning an attempt to make a connection to the server. The default value is driver-dependent.
+- `CommandTimeout` (duration) -- Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes.
+- `SqlCompatibleWindowsAuth` (logical) -- Determines whether to produce SQL Server-compatible connection string options for Windows authentication. The default value is true.
+
+**Query folding**: `OleDb.Query` results are not further foldable. The SQL is executed on the server exactly as written; any Power Query transformations applied after `OleDb.Query` are performed in-memory in the Power Query engine. If you need downstream folding, use `OleDb.DataSource` and navigate to the table instead.
+
+**Authentication**: Credentials are managed through the Power Query credentials dialog. For Windows authentication on SQL Server-compatible providers, the `SqlCompatibleWindowsAuth` option (defaulting to true) ensures the connection string includes the appropriate Windows auth tokens. Avoid embedding credentials directly in the connection string.
+
+**Platform availability**: Requires the OLE DB provider for the target data source to be installed on the machine running Power Query. Not available in Power BI Service without an on-premises data gateway. Not supported in Excel Online, dataflows, or Fabric Notebooks.
+
+## Examples
+
+### Example 1: Run a SELECT query against SQL Server via OLE DB
+```powerquery
+OleDb.Query(
+    "Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=Northwind;Integrated Security=SSPI;",
+    "SELECT CustomerID, CompanyName, Country FROM Customers WHERE Country = 'Germany'"
+)
+```
+
+### Example 2: Use a record-based connection string
+```powerquery
+OleDb.Query(
+    [Provider = "SQLOLEDB", #"Data Source" = "myserver", #"Initial Catalog" = "Northwind"],
+    "SELECT TOP 50 OrderID, OrderDate FROM Orders ORDER BY OrderDate DESC"
+)
+```
+
+### Example 3: Set a command timeout for a long-running query
+```powerquery
+OleDb.Query(
+    "Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=Sales;",
+    "SELECT ProductID, SUM(Quantity) AS TotalQty FROM OrderDetails GROUP BY ProductID",
+    [CommandTimeout = #duration(0, 0, 15, 0)]
+)
+```

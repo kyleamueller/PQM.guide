@@ -1,0 +1,72 @@
+---
+title: "BinaryFormat.UnsignedInteger32"
+slug: "binaryformat-unsignedinteger32"
+category: "Binary"
+description: "A binary format that reads a 32-bit unsigned integer."
+syntax: "BinaryFormat.UnsignedInteger32(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 4-byte unsigned integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 32-bit unsigned integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-unsignedinteger16"
+  - "binaryformat-unsignedinteger64"
+  - "binaryformat-signedinteger32"
+  - "binaryformat-byte"
+  - "binaryformat-byteorder"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Unsigned integers"
+---
+
+## Remarks
+
+`BinaryFormat.UnsignedInteger32` is a binary format specifier that reads a 32-bit (4-byte) unsigned integer from binary data. The value range is 0 to 4,294,967,295 (UInt32 / uint).
+
+The default byte order is little-endian (least significant byte first). Use `BinaryFormat.ByteOrder` to wrap this format if the source data uses big-endian byte ordering.
+
+This format is widely used in binary file formats for sizes, offsets, counts, magic numbers, and other 32-bit unsigned values. Many file format headers (e.g., PNG, ZIP) use unsigned 32-bit integers extensively.
+
+## Examples
+
+### Example 1: Read a 32-bit unsigned integer
+
+Read a 4-byte unsigned integer from binary data.
+
+```powerquery
+let
+    binaryData = #binary({0x01, 0x00, 0x00, 0x00}),
+    result = BinaryFormat.UnsignedInteger32(binaryData)
+in
+    result
+```
+
+<!--output
+1
+-->
+
+### Example 2: Read a larger 32-bit unsigned integer
+
+Read the value 65536 (0x00010000) stored in little-endian format.
+
+```powerquery
+let
+    binaryData = #binary({0x00, 0x00, 0x01, 0x00}),
+    result = BinaryFormat.UnsignedInteger32(binaryData)
+in
+    result
+```
+
+<!--output
+65536
+-->

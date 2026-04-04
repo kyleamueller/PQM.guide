@@ -1,0 +1,77 @@
+---
+title: "Cube.MeasureProperties"
+slug: "cube-measureproperties"
+category: "Table"
+description: "Returns a table containing the set of available properties for measures that are expanded in the cube."
+syntax: "Cube.MeasureProperties(cube as table) as table"
+returnType: "table"
+returnDescription: "A table listing the available properties for measures expanded in the cube."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to retrieve measure properties from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-measureproperty"
+  - "cube-measures"
+  - "cube-addmeasurecolumn"
+  - "cube-properties"
+  - "cube-displayfolders"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP measure properties"
+  - "Cube metadata"
+  - "Measure formatting"
+---
+
+## Remarks
+
+`Cube.MeasureProperties` returns a table containing the set of available properties for measures that are expanded in the cube. Measure properties are metadata attributes associated with measures in an Analysis Services model, such as format strings, display folders, measure group names, and aggregation functions.
+
+Common measure properties include:
+- `FORMAT_STRING` -- the format pattern used to display the measure value (e.g., `"$#,##0.00"` for currency).
+- `MEASURE_DISPLAY_FOLDER` -- the display folder path for the measure.
+- `MEASURE_AGGREGATOR` -- the aggregation function (Sum, Count, Min, Max, etc.).
+- `MEASURE_IS_VISIBLE` -- whether the measure is visible to end users.
+
+The returned table can be used with `Cube.MeasureProperty` to retrieve specific property values from individual measures.
+
+## Examples
+
+### Example 1: List measure properties available in a cube
+
+Get all available measure properties from an Analysis Services cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    MeasureProps = Cube.MeasureProperties(Cube)
+in
+    MeasureProps
+```
+
+### Example 2: Use measure properties with a measure column
+
+Retrieve measure properties after adding a measure column to explore available metadata.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithSales = Cube.AddMeasureColumn(
+        Cube,
+        "Sales",
+        {"[Measures].[Internet Sales Amount]"}
+    ),
+    Props = Cube.MeasureProperties(WithSales)
+in
+    Props
+```

@@ -1,0 +1,77 @@
+---
+title: "RData.FromBinary"
+slug: "rdata-frombinary"
+category: "Accessing Data"
+description: "Returns a record of data frames from an R Data (.rdata / .rda) binary file."
+syntax: "RData.FromBinary(stream as binary) as any"
+returnType: "any"
+returnDescription: "A record where each field corresponds to a named data frame from the RData file. Each data frame is represented as a table."
+parameters:
+  - name: "stream"
+    type: "binary"
+    required: true
+    description: "The binary content of an RData file (.rdata or .rda) containing serialized R data frames."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "file-contents"
+  - "csv-document"
+  - "json-document"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`RData.FromBinary` reads the binary content of an R Data file (`.rdata` or `.rda`) and returns a record containing the data frames stored within it. Each field in the returned record corresponds to a named R object, and data frames are converted to Power Query tables.
+
+**Supported R objects**: The function primarily supports R data frames, which are converted to tables. Other R object types (vectors, lists, matrices) may be included in the record but their conversion behavior varies. Complex R objects such as S4 classes or environments are not supported.
+
+**How to use**: Since `RData.FromBinary` expects a binary value, it is typically combined with `File.Contents` (for local files) or `Web.Contents` (for files hosted at a URL) to supply the binary stream.
+
+**Authentication**: This function does not perform any authentication itself. Authentication is handled by the function that supplies the binary content (e.g., `File.Contents` for local files, `Web.Contents` for web-hosted files).
+
+**Query folding**: Not supported. The entire RData file is read into memory and parsed. All subsequent Power Query transformations are applied in-memory.
+
+**Platform availability**: Available in Power BI Desktop and Excel Desktop. Supported in Power BI Service for scheduled refresh (when the file source is accessible). Available in Dataflows. Not available in Excel Online or Fabric Notebooks.
+
+**Limitations**:
+- Large RData files may consume significant memory during parsing.
+- R-specific data types (factors, ordered factors, POSIXct dates) are converted to their closest Power Query equivalents.
+- Only objects saved with `save()` in the standard RData format are supported. RDS files (single-object serialization via `saveRDS()`) are not supported by this function.
+
+## Examples
+
+### Example 1: Load data frames from a local RData file
+
+```powerquery
+let
+    Source = RData.FromBinary(File.Contents("C:\Data\analysis.rdata"))
+in
+    Source
+```
+
+### Example 2: Access a specific data frame by name
+
+```powerquery
+let
+    Source = RData.FromBinary(File.Contents("C:\Data\analysis.rdata")),
+    SalesData = Source[sales_df]
+in
+    SalesData
+```
+
+### Example 3: Load an RData file from a URL
+
+```powerquery
+let
+    Source = RData.FromBinary(
+        Web.Contents("https://example.com/data/dataset.rdata")
+    )
+in
+    Source
+```

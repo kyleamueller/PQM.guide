@@ -1,0 +1,78 @@
+---
+title: "Binary.Combine"
+slug: "binary-combine"
+category: "Binary"
+description: "Combines a list of binary values into a single binary value."
+syntax: "Binary.Combine(binaries as list) as binary"
+returnType: "binary"
+returnDescription: "A single binary value formed by concatenating all binaries in the list."
+parameters:
+  - name: "binaries"
+    type: "list"
+    required: true
+    description: "A list of binary values to concatenate."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-from"
+  - "binary-range"
+  - "binary-fromlist"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Combine` concatenates a list of binary values into a single binary value, appending each element in order. This is analogous to `Text.Combine` for text values.
+
+This function is useful when you need to assemble binary data from multiple parts, such as constructing a binary protocol message with a header and payload.
+
+## Examples
+
+### Example 1: Combine two binary values
+
+Concatenate two binary values and verify the result.
+
+```powerquery
+let
+    Part1 = Binary.FromList({72, 101, 108}),
+    Part2 = Binary.FromList({108, 111}),
+    Combined = Binary.Combine({Part1, Part2}),
+    AsText = Text.FromBinary(Combined)
+in
+    AsText
+```
+
+<!--output
+"Hello"
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Part1",
+      "description": "Creates a binary value from the byte list {72, 101, 108}, representing the UTF-8 bytes for \"Hel\".",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Part2",
+      "description": "Creates a binary value from the byte list {108, 111}, representing the UTF-8 bytes for \"lo\".",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Combined",
+      "description": "Combines Part1 and Part2 into a single binary value containing all five bytes.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsText",
+      "description": "Converts the combined binary to text, yielding \"Hello\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello"}]}
+    }
+  ]
+}
+-->

@@ -1,0 +1,93 @@
+---
+title: "Binary.ViewFunction"
+slug: "binary-viewfunction"
+category: "Binary"
+description: "Creates a view function that can be intercepted by the OnInvoke handler defined on a Binary.View."
+syntax: "Binary.ViewFunction(function as function) as function"
+returnType: "function"
+returnDescription: "A view-aware wrapper function that integrates with the Binary.View infrastructure."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "The function to wrap for view-aware execution within a Binary.View."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-view"
+  - "binary-viewerror"
+  - "table-viewfunction"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`Binary.ViewFunction` creates a view function based on the given `function` that can be handled within a view created by `Binary.View`. This is the binary-stream equivalent of `Table.ViewFunction`.
+
+The `OnInvoke` handler of `Binary.View` can be used to define custom handling for the view function. When the wrapped function is invoked on a binary view:
+
+1. If the view has an `OnInvoke` handler that handles the view function, it is called.
+2. If no `OnInvoke` handler is specified, or if it does not handle the view function, or if the handler raises an error, the original `function` is applied on top of the view using default behavior.
+
+This function is primarily used in custom connector development to expose source-specific binary operations that can be folded back to the data source.
+
+Refer to the published Power Query custom connector documentation for a more complete description of `Binary.View` and custom view functions.
+
+## Examples
+
+### Example 1: Create a view function for a binary view
+
+Wrap a function so it can be intercepted by a binary view's OnInvoke handler.
+
+```powerquery
+let
+    // Define a view function that reads a specific section
+    ReadSection = Binary.ViewFunction((binary, offset, size) =>
+        Binary.Range(binary, offset, size)
+    ),
+    // Create a view with an OnInvoke handler
+    View = Binary.View(
+        null,
+        [
+            GetStream = () => Binary.FromList({0..99}),
+            OnInvoke = (function, args) =>
+                if function = ReadSection then
+                    Binary.Range(Binary.FromList({0..99}), args{1}, args{2})
+                else
+                    ...
+        ]
+    )
+in
+    ReadSection
+```
+
+<!--output
+(function value)
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "ReadSection",
+      "description": "Creates a view function by wrapping a function that extracts a range from a binary. This allows Binary.View's OnInvoke handler to intercept calls to it.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"Function"}]}
+    },
+    {
+      "name": "View",
+      "description": "Creates a binary view with a GetStream handler and an OnInvoke handler that intercepts calls to the ReadSection view function.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary View"}]}
+    },
+    {
+      "name": "Result",
+      "description": "Returns the ReadSection view function, which can now be applied to the binary view and handled by OnInvoke.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"Function"}]}
+    }
+  ]
+}
+-->

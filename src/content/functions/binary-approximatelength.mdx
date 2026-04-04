@@ -1,0 +1,66 @@
+---
+title: "Binary.ApproximateLength"
+slug: "binary-approximatelength"
+category: "Binary"
+description: "Returns the approximate length of a binary value, or an error if the data source does not support approximate length."
+syntax: "Binary.ApproximateLength(binary as nullable binary) as nullable number"
+returnType: "number"
+returnDescription: "The approximate number of bytes in the binary value."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value whose approximate length to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-length"
+  - "binary-buffer"
+  - "binary-range"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.ApproximateLength` returns an estimate of the number of bytes in a binary value. Unlike `Binary.Length`, which may need to fully evaluate a stream to determine its exact size, this function can return a result without reading all bytes. Not all data sources support approximate lengths — if the source cannot provide one, an error is raised.
+
+This function is useful in scenarios where you need a quick size check without the cost of fully materializing a binary stream, such as when deciding whether to buffer content into memory.
+
+## Examples
+
+### Example 1: Get the approximate length of a binary value
+
+Return the approximate length of a binary created from a Base64-encoded string.
+
+```powerquery
+let
+    Source = Binary.FromText("i45WMlSKjQUA", BinaryEncoding.Base64),
+    ApproxLen = Binary.ApproximateLength(Source)
+in
+    ApproxLen
+```
+
+<!--output
+9
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Decodes the Base64 string \"i45WMlSKjQUA\" into a binary value.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "ApproxLen",
+      "description": "Returns the approximate length of the binary value, which is 9 bytes.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"9"}]}
+    }
+  ]
+}
+-->

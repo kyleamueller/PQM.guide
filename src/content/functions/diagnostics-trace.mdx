@@ -1,0 +1,102 @@
+---
+title: "Diagnostics.Trace"
+slug: "diagnostics-trace"
+category: "Expression"
+description: "Writes a trace message if tracing is enabled and returns the provided value."
+syntax: "Diagnostics.Trace(traceLevel as number, message as anynonnull, value as any, optional delayed as nullable logical) as any"
+returnType: "any"
+returnDescription: "The value passed as the third argument, returned unchanged after writing the trace message."
+parameters:
+  - name: "traceLevel"
+    type: "number"
+    required: true
+    description: "The severity level of the trace message. Use TraceLevel.Critical, TraceLevel.Error, TraceLevel.Warning, TraceLevel.Information, or TraceLevel.Verbose."
+  - name: "message"
+    type: "anynonnull"
+    required: true
+    description: "The trace message to write. Can be a text value or a zero-argument function that returns text when delayed is true."
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value to return. Can be the actual value or a zero-argument function when delayed is true."
+  - name: "delayed"
+    type: "logical"
+    required: false
+    description: "If true, the evaluation of both message and value is deferred until the trace message is actually consumed, improving performance when tracing is disabled."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "diagnostics-activityid"
+  - "diagnostics-correlationid"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Diagnostics.Trace` writes a trace message to the Power Query diagnostics log (if tracing is enabled) and returns `value` unchanged. This is the primary function for debugging and instrumenting M queries.
+
+The `traceLevel` parameter controls the severity of the message using the `TraceLevel` enumeration:
+
+- `TraceLevel.Critical` — critical failures
+- `TraceLevel.Error` — errors
+- `TraceLevel.Warning` — warnings
+- `TraceLevel.Information` — informational messages
+- `TraceLevel.Verbose` — detailed diagnostic output
+
+### Delayed evaluation
+
+When `delayed` is `true`, both `message` and `value` should be zero-argument functions (e.g., `() => "my message"` and `() => expensiveComputation()`). This ensures that the message text and value are only computed when the trace is actually being recorded, avoiding unnecessary overhead when tracing is disabled.
+
+### Viewing trace output
+
+To view trace output in Power BI Desktop, enable query diagnostics via **Tools > Diagnostics > Start Diagnostics**, then run your query and stop diagnostics. The trace messages appear in the diagnostics tables.
+
+## Examples
+
+### Example 1: Trace a message before a computation
+
+Write an informational trace and return the result, using delayed evaluation.
+
+```powerquery
+let
+    Result = Diagnostics.Trace(
+        TraceLevel.Information,
+        "Converting number to text",
+        () => Text.From(123),
+        true
+    )
+in
+    #table({"Result"}, {{Result}})
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"123"}]}
+-->
+
+### Example 2: Trace with a warning level
+
+Log a warning message when a fallback value is used.
+
+```powerquery
+let
+    RawValue = null,
+    Result = if RawValue = null then
+        Diagnostics.Trace(
+            TraceLevel.Warning,
+            "RawValue was null, using default",
+            0
+        )
+    else
+        RawValue
+in
+    #table({"RawValue", "Result"}, {{RawValue, Result}})
+```
+
+<!--output
+{"columns":[{"name":"RawValue","type":"any"},{"name":"Result","type":"number"}],"rows":[{"RawValue":null,"Result":0}]}
+-->

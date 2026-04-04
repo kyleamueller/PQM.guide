@@ -1,0 +1,88 @@
+---
+title: "SapHana.Database"
+slug: "saphana-database"
+category: "Accessing Data"
+description: "Returns a table of multidimensional packages from an SAP HANA database."
+syntax: "SapHana.Database(server as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of multidimensional packages (calculation views, analytic views, attribute views) from the specified SAP HANA database."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The SAP HANA server hostname or IP address, optionally including the instance number as a port suffix (e.g., \"hanaserver:30015\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control connection and query behavior. Supported fields: Query, Distribution, Implementation, EnableColumnBinding, ConnectionTimeout, CommandTimeout."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sapbusinesswarehouse-cubes"
+  - "odbc-datasource"
+  - "odbc-query"
+---
+
+## Remarks
+
+`SapHana.Database` connects to an SAP HANA database and returns a navigation table of multidimensional packages, including calculation views, analytic views, and attribute views. This is the primary connector for SAP HANA in Power Query.
+
+**Option record fields**:
+
+| Field | Type | Description |
+|---|---|---|
+| `Query` | text | A native SQL query used to retrieve data. If the query produces multiple result sets, only the first will be returned. |
+| `Distribution` | SapHanaDistribution.Type | Sets the value of the "Distribution" property in the connection string. Statement routing is the method of evaluating the correct server node of a distributed system before statement execution. The default value is `SapHanaDistribution.All`. |
+| `Implementation` | text | Specifies the implementation of the SAP HANA connector to use. |
+| `EnableColumnBinding` | logical | Binds variables to the columns of a SAP HANA result set when fetching data. May potentially improve performance at the cost of slightly higher memory utilization. The default value is `false`. |
+| `ConnectionTimeout` | duration | Controls how long to wait before abandoning an attempt to make a connection to the server. The default value is 15 seconds. |
+| `CommandTimeout` | duration | Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes. |
+
+**Authentication**: SAP HANA supports database username/password authentication and, in some configurations, Windows authentication (Kerberos) or SAML-based SSO via an on-premises data gateway. Configure credentials in the Power Query data source credentials dialog.
+
+**Driver requirements**: The SAP HANA ODBC driver must be installed on the machine running Power Query. For Power BI Desktop (64-bit), install the 64-bit HANA client. For 32-bit Excel, install the 32-bit version.
+
+**Query folding**: When browsing multidimensional views (not using the `Query` option), filters and projections applied in Power Query are pushed down to SAP HANA for server-side execution. When using the `Query` option with a native SQL statement, folding does not occur on top of the native query.
+
+**Distribution (statement routing)**: The `Distribution` option controls how queries are routed in a scale-out (distributed) SAP HANA system. The `SapHanaDistribution.All` default sends queries to all nodes; other values can restrict execution to specific nodes for performance tuning.
+
+**Power BI Service**: SAP HANA is not supported for direct cloud refresh. An on-premises data gateway with the SAP HANA ODBC driver installed is required for scheduled refresh.
+
+## Examples
+
+### Example 1: Connect to an SAP HANA server
+```powerquery
+SapHana.Database("hanaserver:30015")
+```
+
+### Example 2: Run a native SQL query against SAP HANA
+```powerquery
+SapHana.Database(
+    "hanaserver:30015",
+    [Query = "SELECT TOP 100 * FROM \"_SYS_BIC\".\"sales/CV_ORDERS\""]
+)
+```
+
+### Example 3: Connect with a custom command timeout
+```powerquery
+SapHana.Database(
+    "hanaserver:30015",
+    [
+        CommandTimeout = #duration(0, 0, 30, 0),
+        ConnectionTimeout = #duration(0, 0, 0, 30)
+    ]
+)
+```
+
+### Example 4: Enable column binding for improved performance
+```powerquery
+SapHana.Database(
+    "hanaserver:30015",
+    [EnableColumnBinding = true]
+)
+```

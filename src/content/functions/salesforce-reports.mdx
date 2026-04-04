@@ -1,0 +1,88 @@
+---
+title: "Salesforce.Reports"
+slug: "salesforce-reports"
+category: "Accessing Data"
+description: "Returns a navigation table of reports from a Salesforce account."
+syntax: "Salesforce.Reports(optional loginUrl as nullable text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of reports available in the authenticated Salesforce account."
+parameters:
+  - name: "loginUrl"
+    type: "text"
+    required: false
+    description: "The Salesforce environment login URL. If not provided, connects to production (https://login.salesforce.com). Use \"https://test.salesforce.com\" for sandbox environments, or a custom domain URL for My Domain configurations."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control the API version and request timeout."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "salesforce-data"
+---
+
+## Remarks
+
+`Salesforce.Reports` connects to a Salesforce account and returns a navigation table of all reports visible to the authenticated user. This allows you to import the results of existing Salesforce reports directly into Power Query without rewriting the report logic in M or SOQL.
+
+**Authentication**: Like `Salesforce.Data`, this function uses OAuth 2.0 authentication. Power Query prompts for browser-based sign-in on first connection. The authenticated user's permissions determine which reports are visible and accessible.
+
+**Login URL**: The `loginUrl` parameter controls which Salesforce environment to connect to:
+- Production: `"https://login.salesforce.com"` (default when omitted).
+- Sandbox: `"https://test.salesforce.com"`.
+- Custom domain: `"https://mycompany.my.salesforce.com"`.
+
+**Query folding**: Salesforce reports do not support query folding in the same way as `Salesforce.Data`. The report is executed on the Salesforce server as-is (with its built-in filters and groupings), and the full result set is returned to Power Query. Any additional Power Query transformations applied after the report data is retrieved are evaluated locally.
+
+**Key options**:
+- `ApiVersion` (number) — the Salesforce API version to use for this query. When not specified, API version 29.0 is used. Specify a higher version to access reports that use features from newer Salesforce releases.
+- `Timeout` (duration) — maximum time to wait before abandoning a request to the Salesforce server. The default value is source-specific.
+
+**Report limitations**: Salesforce report results returned through the API are subject to Salesforce's own limits (e.g., maximum 2,000 rows for detailed reports without the Analytics API). For large datasets, consider using `Salesforce.Data` with direct object queries instead of reports.
+
+**Power BI Service**: Salesforce Reports supports direct cloud refresh in the Power BI Service without requiring an on-premises data gateway.
+
+## Examples
+
+### Example 1: Connect to Salesforce reports in production
+```powerquery
+Salesforce.Reports()
+```
+
+### Example 2: Connect to reports in a Salesforce sandbox
+```powerquery
+Salesforce.Reports("https://test.salesforce.com")
+```
+
+### Example 3: Connect with a specific API version
+```powerquery
+Salesforce.Reports(
+    "https://login.salesforce.com",
+    [ApiVersion = 58.0]
+)
+```
+
+### Example 4: Navigate to a specific report by name
+```powerquery
+let
+    Source = Salesforce.Reports("https://login.salesforce.com", [ApiVersion = 58.0]),
+    MonthlySales = Source{[Name="Monthly Sales Summary"]}[Data]
+in
+    MonthlySales
+```
+
+### Example 5: Connect using a custom domain with a timeout
+```powerquery
+Salesforce.Reports(
+    "https://mycompany.my.salesforce.com",
+    [
+        ApiVersion = 58.0,
+        Timeout = #duration(0, 0, 3, 0)
+    ]
+)
+```

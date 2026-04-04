@@ -1,0 +1,59 @@
+---
+title: "Identity.IsMemberOf"
+slug: "identity-ismemberof"
+category: "Accessing Data"
+description: "Determines whether an identity is a member of an identity collection."
+syntax: "Identity.IsMemberOf(identity as record, collection as record) as logical"
+returnType: "logical"
+returnDescription: "True if the specified identity is a member of the given identity collection; otherwise, false."
+parameters:
+  - name: "identity"
+    type: "record"
+    required: true
+    description: "An identity record (as produced by Identity.From) representing the user or principal to check."
+  - name: "collection"
+    type: "record"
+    required: true
+    description: "An identity collection record representing a group, role, or set of identities to check membership against."
+compatibility:
+  pbiDesktop: false
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "web-contents"
+internal: true
+---
+
+## Remarks
+
+`Identity.IsMemberOf` is an **internal function** used by the Power Query infrastructure to evaluate group or role membership for identity-based data access scenarios such as row-level security (RLS) in Power BI and Microsoft Fabric.
+
+**Internal use only**: This function is not intended for direct use in user-authored queries. It is called internally by the Power Query host to determine whether the current user belongs to a specific security group or role. Calling it directly in a desktop or interactive environment will typically produce an error.
+
+**How it works**: The function takes an identity record (produced by `Identity.From`) and checks whether it belongs to a collection record representing a group or role. The identity provider resolves the membership check against its backing directory service (e.g., Azure Active Directory / Entra ID).
+
+**Authentication**: This function does not authenticate the user. It operates on identity records that have already been authenticated by the host environment.
+
+**Query folding**: Not applicable. Membership checks are evaluated in-memory by the identity provider.
+
+**Platform availability**: Used internally by Power BI Service and Microsoft Fabric for identity-based filtering. Not available for interactive use in Power BI Desktop, Excel, or other end-user authoring environments.
+
+**Recommended alternatives**: For role-based data filtering in Power BI, use the `USERPRINCIPALNAME()` DAX function or the `USERNAME()` DAX function within your RLS role definitions. For M-based identity checks, rely on the host-provided identity context rather than calling this function directly.
+
+## Examples
+
+### Example 1: Check group membership (conceptual)
+
+This example illustrates the function signature. In practice, this call is made internally by the Power Query host.
+
+```powerquery
+let
+    currentUser = Identity.From(IdentityProvider.Default(), "user@contoso.com"),
+    adminGroup = Identity.From(IdentityProvider.Default(), "AdminGroup"),
+    isMember = Identity.IsMemberOf(currentUser, adminGroup)
+in
+    isMember
+```

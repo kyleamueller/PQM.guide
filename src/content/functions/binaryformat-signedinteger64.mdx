@@ -1,0 +1,80 @@
+---
+title: "BinaryFormat.SignedInteger64"
+slug: "binaryformat-signedinteger64"
+category: "Binary"
+description: "A binary format that reads a 64-bit signed integer."
+syntax: "BinaryFormat.SignedInteger64(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads an 8-byte signed integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 64-bit signed integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-signedinteger16"
+  - "binaryformat-signedinteger32"
+  - "binaryformat-unsignedinteger64"
+  - "binaryformat-byte"
+  - "binaryformat-byteorder"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Signed integers"
+  - "Two's complement"
+---
+
+## Remarks
+
+`BinaryFormat.SignedInteger64` is a binary format specifier that reads a 64-bit (8-byte) signed integer from binary data. The value range is -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 (Int64 / long). The integer is stored in two's complement format.
+
+The default byte order is little-endian. Use `BinaryFormat.ByteOrder` to wrap this format if the source data uses big-endian byte ordering.
+
+This format is used for large integer values such as file sizes, timestamps, and counters that exceed the range of 32-bit integers.
+
+## Examples
+
+### Example 1: Read a 64-bit signed integer
+
+Read an 8-byte signed integer from binary data.
+
+```powerquery
+let
+    binaryData = #binary({
+        0x01, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    }),
+    result = BinaryFormat.SignedInteger64(binaryData)
+in
+    result
+```
+
+<!--output
+1
+-->
+
+### Example 2: Read a large 64-bit signed integer
+
+Read a larger value stored as a 64-bit signed integer.
+
+```powerquery
+let
+    // 1,000,000 in 64-bit little-endian
+    binaryData = #binary({
+        0x40, 0x42, 0x0F, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    }),
+    result = BinaryFormat.SignedInteger64(binaryData)
+in
+    result
+```
+
+<!--output
+1000000
+-->

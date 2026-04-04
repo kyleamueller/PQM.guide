@@ -1,0 +1,66 @@
+---
+title: "SqlExpression.ToExpression"
+slug: "sqlexpression-toexpression"
+category: "Expression"
+description: "Converts a SQL query to M code using the provided environment of available identifiers. Intended for internal use only."
+syntax: "SqlExpression.ToExpression(sql as text, environment as record) as text"
+returnType: "text"
+returnDescription: "A text string containing the M code equivalent of the provided SQL query."
+parameters:
+  - name: "sql"
+    type: "text"
+    required: true
+    description: "The SQL query text to convert to M code."
+  - name: "environment"
+    type: "record"
+    required: true
+    description: "A record of available identifiers that define the context for the conversion."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "sqlexpression-schemafrom"
+  - "table-view"
+  - "expression-evaluate"
+relatedConcepts:
+  - "query-folding"
+internal: true
+---
+
+## Remarks
+
+`SqlExpression.ToExpression` is an **internal-only function** as stated in the official Microsoft documentation. It converts a SQL query text into equivalent M code, using the `environment` record to resolve table and column identifiers.
+
+This function is part of the Power Query engine's query folding infrastructure. It is used internally by SQL-based connectors to translate SQL expressions back into M code, typically as part of the bidirectional translation needed for query folding optimization.
+
+### Context
+
+In the Power Query query folding pipeline:
+
+1. M expressions are analyzed and translated to SQL for efficient server-side execution.
+2. `SqlExpression.ToExpression` provides the reverse direction — converting SQL back to M when needed.
+
+For standard M query development, this function has no practical use. Custom connector developers should use `Table.View` handlers to implement query folding rather than calling this function directly.
+
+## Examples
+
+### Example 1: Conceptual usage
+
+This function is internal to the Power Query engine. Direct invocation in user queries is not supported.
+
+```powerquery
+let
+    // SqlExpression.ToExpression converts SQL to M code internally.
+    // For example, conceptually:
+    // SqlExpression.ToExpression("SELECT * FROM Customers WHERE City = 'Seattle'", env)
+    // would produce equivalent M filtering code.
+    //
+    // In practice, use Table.View handlers for query folding.
+    Result = "See Table.View for query folding patterns"
+in
+    Result
+```

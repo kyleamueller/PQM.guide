@@ -1,0 +1,56 @@
+---
+title: "Variable.Value"
+slug: "variable-value"
+category: "Value"
+description: "Returns the value of a variable identified by name from the current evaluation environment."
+syntax: "Variable.Value(identifier as text) as any"
+returnType: "any"
+returnDescription: "The value of the specified variable in the current evaluation environment."
+parameters:
+  - name: "identifier"
+    type: "text"
+    required: true
+    description: "The name of the variable to look up in the current evaluation environment."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+  - "value-expression"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Variable.Value` retrieves the value of a variable by its text name from the current evaluation environment. If the variable identified by `identifier` is not defined in the environment, an error is raised.
+
+This is an **internal engine function** used by the Power Query evaluation infrastructure to resolve variable references dynamically at runtime. It is part of the mechanism by which the M engine looks up names during expression evaluation.
+
+In normal user-written M queries, variable references are resolved directly by the language (e.g., writing `myVar` in a `let` expression). `Variable.Value` exists to support scenarios where variable resolution must happen programmatically — such as within the engine's own evaluation pipeline, custom connector internals, or advanced metaprogramming utilities that manipulate expressions as data.
+
+Calling `Variable.Value` directly in a standard query is not recommended. If you need dynamic name resolution, consider `Expression.Evaluate` with an explicit environment record or `Record.Field` to look up fields by name.
+
+## Examples
+
+### Example 1: Conceptual usage — resolve a variable by name
+
+This illustrates the function's intended behavior. In practice, the evaluation environment is managed by the engine.
+
+```powerquery
+let
+    x = 10,
+    // Conceptually equivalent to accessing x by name:
+    // Variable.Value("x") would return 10 within the engine
+    Result = x
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
+-->

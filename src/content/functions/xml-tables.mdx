@@ -1,0 +1,93 @@
+---
+title: "Xml.Tables"
+slug: "xml-tables"
+category: "Accessing Data"
+description: "Returns the contents of an XML document as a nested collection of flattened tables."
+syntax: "Xml.Tables(contents as any, optional options as nullable record, optional encoding as nullable number) as table"
+returnType: "table"
+returnDescription: "A table representing the flattened contents of the XML document, with nested child elements represented as embedded tables."
+parameters:
+  - name: "contents"
+    type: "any"
+    required: true
+    description: "The XML content to parse. Can be text (a string of XML) or binary (e.g., the result of File.Contents or Web.Contents)."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record of options to control parsing behavior."
+  - name: "encoding"
+    type: "number"
+    required: false
+    description: "The text encoding of the content (e.g., TextEncoding.Utf8, TextEncoding.Utf16). If omitted, the encoding is auto-detected from the XML declaration or BOM."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "xml-document"
+  - "csv-document"
+  - "json-document"
+  - "html-table"
+---
+
+## Remarks
+
+`Xml.Tables` parses XML content and returns its contents as a **nested collection of flattened tables**. Unlike `Xml.Document`, which preserves the full XML hierarchy as deeply nested name/value/attribute/children structures, `Xml.Tables` automatically flattens repeating elements into tabular form -- making it more suitable for consuming structured XML data (such as RSS feeds, data exports, or web service responses) without extensive manual expansion steps.
+
+Each repeating XML element at a given level becomes a table. Element attributes become columns, text content becomes a column, and child elements that repeat become nested tables within cells.
+
+**Comparison with Xml.Document**:
+
+| Feature | Xml.Tables | Xml.Document |
+|---|---|---|
+| Output structure | Flattened tables | Deeply nested hierarchy |
+| Ease of use for tabular data | Easier -- less expansion needed | Requires manual drilling |
+| Preserves full XML structure | Partial -- flattens repeating elements | Full fidelity |
+| Best for | Data-oriented XML (lists, records) | Document-oriented XML |
+
+**Encoding**: If the XML content is provided as binary (e.g., from `File.Contents`), the encoding is determined automatically from the XML declaration (`<?xml encoding="..."?>`) or byte-order mark (BOM). You can override this by specifying the `encoding` parameter explicitly using constants like `TextEncoding.Utf8` (65001), `TextEncoding.Utf16` (1200), or `TextEncoding.Ascii` (20127).
+
+**Query folding**: Not applicable. `Xml.Tables` operates on in-memory XML content and does not connect to an external query-foldable data source.
+
+**Platform availability**: `Xml.Tables` is available across all Power Query environments including Power BI Desktop, Power BI Service, Excel (desktop and online), Dataflows, and Fabric Notebooks.
+
+## Examples
+
+### Example 1: Parse a local XML file
+```powerquery
+Xml.Tables(File.Contents("C:\invoices.xml"))
+```
+
+### Example 2: Parse XML from a web source
+```powerquery
+Xml.Tables(Web.Contents("https://example.com/data/products.xml"))
+```
+
+### Example 3: Parse inline XML text
+```powerquery
+Xml.Tables(
+    "<catalog><book><title>M Fundamentals</title><price>29.99</price></book><book><title>DAX Patterns</title><price>39.99</price></book></catalog>"
+)
+```
+
+### Example 4: Navigate into a specific nested table
+```powerquery
+let
+    Source = Xml.Tables(File.Contents("C:\orders.xml")),
+    Orders = Source{0}[orders],
+    OrderItems = Orders{0}[items]
+in
+    OrderItems
+```
+
+### Example 5: Parse XML with explicit UTF-8 encoding
+```powerquery
+Xml.Tables(
+    File.Contents("C:\data\international.xml"),
+    null,
+    TextEncoding.Utf8
+)
+```

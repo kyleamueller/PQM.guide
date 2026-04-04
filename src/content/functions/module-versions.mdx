@@ -1,0 +1,51 @@
+---
+title: "Module.Versions"
+slug: "module-versions"
+category: "Value"
+description: "Returns a record of module versions for the current module and its dependencies."
+syntax: "Module.Versions() as record"
+returnType: "record"
+returnDescription: "A record containing version information for the current module and its dependencies."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Module.Versions` returns a record containing **version information** for the current module and its dependencies. It takes no parameters and returns a record whose fields represent module names and whose values represent version identifiers.
+
+This function is part of the Power Query engine's **module system** — an internal infrastructure that organizes M standard library functions and connector code into versioned modules. The module system allows the engine to manage compatibility, track which versions of library code are in use, and support scenarios where different connectors may depend on different versions of shared modules.
+
+The returned record typically contains entries like the M standard library version, the engine version, and any connector-specific module versions that are loaded in the current evaluation context. The exact structure and field names depend on the host environment (Power BI Desktop, Excel, Dataflows, etc.) and the connectors in use.
+
+For standard M query development, this function provides informational value only. It can be useful for **diagnostic and debugging purposes** — for example, to verify which engine version is running or to log module versions for troubleshooting connector compatibility issues.
+
+## Examples
+
+### Example 1: Retrieve module version information
+
+Calling `Module.Versions()` returns a record of module names and their versions. The exact output depends on the host environment.
+
+```powerquery
+let
+    Versions = Module.Versions(),
+    // The result is a record like:
+    // [StandardLibrary = "...", Engine = "...", ...]
+    FieldCount = Record.FieldCount(Versions)
+in
+    FieldCount
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->

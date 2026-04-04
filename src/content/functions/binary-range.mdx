@@ -1,0 +1,118 @@
+---
+title: "Binary.Range"
+slug: "binary-range"
+category: "Binary"
+description: "Returns a subset of a binary value beginning at a given offset."
+syntax: "Binary.Range(binary as binary, offset as number, optional count as nullable number) as binary"
+returnType: "binary"
+returnDescription: "A binary value containing the specified subset of bytes."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value to extract a subset from."
+  - name: "offset"
+    type: "number"
+    required: true
+    description: "The zero-based byte position at which to begin the subset."
+  - name: "count"
+    type: "number"
+    required: false
+    description: "The maximum number of bytes to include. If omitted, all bytes from the offset to the end are returned."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-length"
+  - "binary-split"
+  - "binary-combine"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Range` returns a subset of a binary value starting at the specified zero-based `offset`. An optional `count` parameter limits the number of bytes returned. If `count` is omitted, all bytes from the offset to the end of the binary are included.
+
+This function is useful for extracting specific portions of binary data, such as reading a fixed-size header from a binary stream.
+
+## Examples
+
+### Example 1: Extract bytes from a specific offset
+
+Return all bytes from offset 6 to the end.
+
+```powerquery
+let
+    Source = Binary.FromList({0..10}),
+    Subset = Binary.Range(Source, 6),
+    AsList = Binary.ToList(Subset)
+in
+    AsList
+```
+
+<!--output
+{6, 7, 8, 9, 10}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a binary value from the byte list {0, 1, 2, ..., 10}.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Subset",
+      "description": "Extracts all bytes starting at offset 6, returning bytes {6, 7, 8, 9, 10}.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsList",
+      "description": "Converts the subset binary to a list for inspection.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{6, 7, 8, 9, 10}"}]}
+    }
+  ]
+}
+-->
+
+### Example 2: Extract a specific number of bytes
+
+Return 2 bytes starting at offset 6.
+
+```powerquery
+let
+    Source = Binary.FromList({0..10}),
+    Subset = Binary.Range(Source, 6, 2),
+    AsList = Binary.ToList(Subset)
+in
+    AsList
+```
+
+<!--output
+{6, 7}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a binary value from the byte list {0, 1, 2, ..., 10}.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Subset",
+      "description": "Extracts 2 bytes starting at offset 6, returning bytes {6, 7}.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsList",
+      "description": "Converts the subset binary to a list, confirming {6, 7}.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{6, 7}"}]}
+    }
+  ]
+}
+-->

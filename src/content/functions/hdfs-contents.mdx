@@ -1,0 +1,78 @@
+---
+title: "Hdfs.Contents"
+slug: "hdfs-contents"
+category: "Accessing Data"
+description: "Returns a table of folders and files found at a folder URL from a Hadoop file system (HDFS)."
+syntax: "Hdfs.Contents(url as text) as table"
+returnType: "table"
+returnDescription: "A table containing one row for each folder and file at the specified HDFS folder URL, with properties and a link to content."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the folder on the Hadoop Distributed File System (e.g., \"hdfs://namenode:8020/data/\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "hdfs-files"
+  - "folder-contents"
+  - "azurestorage-blobs"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Hdfs.Contents` connects to a Hadoop Distributed File System (HDFS) cluster and returns a table with one row per folder and file found at the specified folder URL. Unlike `Hdfs.Files`, this function returns both files and folders at the immediate level (similar to `Folder.Contents` for local file systems) rather than recursively listing all files.
+
+**Columns returned**: Each row in the result includes:
+- `Name` (text) -- the file or folder name.
+- `Folder Path` (text) -- the path of the containing folder.
+- `Date modified` (datetime) -- the last modification timestamp.
+- `Extension` (text) -- the file extension including the leading dot. Empty for folders.
+- `Attributes` (record) -- file system metadata attributes.
+- `Content` (binary) -- the binary content of the file. `null` for folders.
+
+**Authentication**: Supports Anonymous access and Basic authentication (username/password). Configure credentials in the Power Query data source settings dialog using the HDFS cluster URL as the credential scope. Kerberos authentication is not natively supported in the UI but may be configured through gateway settings.
+
+**URL format**: Provide the WebHDFS URL of the folder to browse. Typically this follows the format `http://namenode:50070/webhdfs/v1/path/` or `hdfs://namenode:8020/path/`. The exact format depends on your Hadoop cluster configuration and whether WebHDFS or HttpFS is enabled.
+
+**Query folding**: Not supported. Directory listing and all filtering are performed in Power Query after the folder contents are retrieved from HDFS.
+
+**Platform availability**: Available in **Power BI Desktop** only. Not supported in Power BI Service, Excel, Dataflows, or Fabric notebooks. For scheduled refresh in Power BI Service, an on-premises data gateway with network access to the HDFS cluster is required.
+
+**Content column**: The `Content` column is lazy-loaded. Files are not downloaded from HDFS until the `Content` binary is accessed. Filter to the specific files you need before expanding content to minimize data transfer.
+
+## Examples
+
+### Example 1: List files and folders at an HDFS path
+
+```powerquery
+Hdfs.Contents("http://namenode:50070/webhdfs/v1/data/")
+```
+
+### Example 2: Navigate to a subfolder and filter to CSV files
+
+```powerquery
+let
+    Source = Hdfs.Contents("http://namenode:50070/webhdfs/v1/data/"),
+    CsvFiles = Table.SelectRows(Source, each [Extension] = ".csv")
+in
+    CsvFiles
+```
+
+### Example 3: Read a specific CSV file from HDFS
+
+```powerquery
+let
+    Source = Hdfs.Contents("http://namenode:50070/webhdfs/v1/data/reports/"),
+    File = Source{[Name = "sales.csv"]}[Content],
+    Parsed = Csv.Document(File, [Delimiter = ",", Encoding = TextEncoding.Utf8]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```

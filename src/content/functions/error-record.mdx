@@ -1,0 +1,110 @@
+---
+title: "Error.Record"
+slug: "error-record"
+category: "Expression"
+description: "Creates an error record from the provided reason, message, detail, parameters, and error code values."
+syntax: "Error.Record(reason as text, optional message as nullable text, optional detail as any, optional parameters as nullable list, optional errorCode as nullable text) as record"
+returnType: "record"
+returnDescription: "An error record with Reason, Message, Detail, Message.Parameters, and ErrorCode fields."
+parameters:
+  - name: "reason"
+    type: "text"
+    required: true
+    description: "The high-level cause of the error (e.g., \"DataFormat.Error\", \"Expression.Error\")."
+  - name: "message"
+    type: "text"
+    required: false
+    description: "A human-readable description of the error."
+  - name: "detail"
+    type: "any"
+    required: false
+    description: "Additional detailed information about the error."
+  - name: "parameters"
+    type: "list"
+    required: false
+    description: "A list of values that provide additional context for the error, typically used for diagnostics or programmatic handling."
+  - name: "errorCode"
+    type: "text"
+    required: false
+    description: "An identifier for the error."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "expression-evaluate"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Error.Record` creates a structured error record that can be used with the `error` keyword to raise custom errors in M. The resulting record contains the fields `Reason`, `Message`, `Detail`, `Message.Format`, `Message.Parameters`, and `ErrorCode`.
+
+This is the recommended way to construct error values for use with `error` expressions and `try ... catch` patterns:
+
+```powerquery
+error Error.Record("MyCustomError", "Something went wrong", [Step = "Validation"])
+```
+
+### Error record fields
+
+The returned record contains these fields:
+
+- **Reason** — the high-level error category (from the `reason` parameter).
+- **Message** — the human-readable error description (from the `message` parameter).
+- **Detail** — additional structured detail (from the `detail` parameter).
+- **Message.Format** — the original message format string.
+- **Message.Parameters** — the parameters list for message formatting.
+- **ErrorCode** — the error code identifier.
+
+While you can also raise errors with a plain text string (`error "something"`), `Error.Record` gives you full control over all fields of the error record, making it easier to catch and handle errors programmatically.
+
+## Examples
+
+### Example 1: Raise and catch a custom error
+
+Create an error record and catch it with `try`.
+
+```powerquery
+let
+    Result = try error Error.Record(
+        "DivideByZero",
+        "You attempted to divide by zero."
+    )
+in
+    #table(
+        {"HasError", "Reason", "Message"},
+        {{Result[HasError], Result[Error][Reason], Result[Error][Message]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"HasError","type":"logical"},{"name":"Reason","type":"text"},{"name":"Message","type":"text"}],"rows":[{"HasError":true,"Reason":"DivideByZero","Message":"You attempted to divide by zero."}]}
+-->
+
+### Example 2: Error record with all fields
+
+Create an error record with reason, message, detail, parameters, and error code.
+
+```powerquery
+let
+    Result = try error Error.Record(
+        "CustomerNotFound",
+        "Customer ID 12345 was not found.",
+        "Customer does not exist.",
+        {"Invalid ID = 12345", "Valid IDs: https://api.contoso.com/customers"},
+        "ERR404"
+    )
+in
+    #table(
+        {"Reason", "Message", "ErrorCode"},
+        {{Result[Error][Reason], Result[Error][Message], Result[Error][ErrorCode]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Reason","type":"text"},{"name":"Message","type":"text"},{"name":"ErrorCode","type":"text"}],"rows":[{"Reason":"CustomerNotFound","Message":"Customer ID 12345 was not found.","ErrorCode":"ERR404"}]}
+-->

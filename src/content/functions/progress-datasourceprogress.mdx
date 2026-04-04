@@ -1,0 +1,55 @@
+---
+title: "Progress.DataSourceProgress"
+slug: "progress-datasourceprogress"
+category: "Value"
+description: "Reports data source loading progress to the evaluation environment. Intended for internal use only."
+syntax: "Progress.DataSourceProgress() as any"
+returnType: "any"
+returnDescription: "A value representing the current data source loading progress state."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-type"
+  - "value-metadata"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+`Progress.DataSourceProgress` is an **internal-only function** as stated in the official Microsoft documentation. It is part of the Power Query engine's **progress reporting infrastructure**, used to communicate data source loading progress back to the host environment (such as the Power BI Desktop progress bar or the Excel status bar).
+
+When the Power Query engine evaluates a query that involves loading data from external sources, it uses progress reporting functions to update the user interface with status information — for example, "Loading rows from SQL Server..." or showing a percentage-complete indicator. `Progress.DataSourceProgress` provides the mechanism for connectors and the engine to report this progress.
+
+This function takes no parameters and returns a value representing the current progress state. The exact nature of the returned value is determined by the engine's internal progress tracking protocol and is not meaningful outside the engine's evaluation pipeline.
+
+For standard M query development, this function has no practical use. Progress reporting is handled automatically by the engine and connectors. Custom connector authors who need to report progress should refer to the Power Query SDK documentation for the supported progress reporting APIs.
+
+## Examples
+
+### Example 1: Conceptual usage — progress reporting in the engine
+
+This function is internal-only and cannot be meaningfully called in user M code. The concept is illustrated below.
+
+```powerquery
+let
+    // Conceptually, the engine uses Progress.DataSourceProgress internally:
+    // 1. Connector begins loading data
+    // 2. Engine calls Progress.DataSourceProgress() to get/report progress
+    // 3. Host UI updates the progress indicator
+    //
+    // In user code, there is no equivalent — progress is automatic.
+    Result = "Progress reporting is handled automatically by the engine"
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Progress reporting is handled automatically by the engine"}]}
+-->

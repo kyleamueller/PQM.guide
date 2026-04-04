@@ -1,0 +1,123 @@
+---
+title: "Binary.Decompress"
+slug: "binary-decompress"
+category: "Binary"
+description: "Decompresses a binary value using the specified compression type (GZip or Deflate)."
+syntax: "Binary.Decompress(binary as nullable binary, compressionType as number) as nullable binary"
+returnType: "binary"
+returnDescription: "A decompressed copy of the input binary value."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The compressed binary value to decompress."
+  - name: "compressionType"
+    type: "number"
+    required: true
+    description: "The compression algorithm that was used: Compression.GZip or Compression.Deflate."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-compress"
+  - "binary-from"
+  - "binary-fromlist"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Decompress` decompresses a binary value using the specified compression algorithm. The result is a decompressed copy of the input. Supported compression types are:
+
+- `Compression.GZip` — GZip decompression (RFC 1952). Use this when the input was compressed with GZip.
+- `Compression.Deflate` — Deflate decompression (RFC 1951). Use this when the input was compressed with raw Deflate.
+
+The `compressionType` must match the algorithm originally used to compress the data. Use `Binary.Compress` with the same type to perform the reverse operation.
+
+## Examples
+
+### Example 1: Decompress a Deflate-compressed binary
+
+Decompress a previously compressed binary and convert to text.
+
+```powerquery
+let
+    Compressed = #binary({115, 103, 200, 7, 194, 20, 134, 36, 134, 74, 134, 84, 6, 0}),
+    Decompressed = Binary.Decompress(Compressed, Compression.Deflate),
+    AsList = Binary.ToList(Decompressed)
+in
+    AsList
+```
+
+<!--output
+{71, 0, 111, 0, 111, 0, 100, 0, 98, 0, 121, 0, 101, 0}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Compressed",
+      "description": "Defines a binary literal containing Deflate-compressed data.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Decompressed",
+      "description": "Decompresses the binary using the Deflate algorithm, restoring the original data.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsList",
+      "description": "Converts the decompressed binary to a list of byte values for inspection. The bytes represent the UTF-16 LE encoding of \"Goodbye\".",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{71, 0, 111, 0, 111, 0, 100, 0, 98, 0, 121, 0, 101, 0}"}]}
+    }
+  ]
+}
+-->
+
+### Example 2: Round-trip compress and decompress
+
+Compress a binary value and then decompress it to verify the original data is recovered.
+
+```powerquery
+let
+    Original = Binary.FromList({1, 2, 3, 4, 5}),
+    Compressed = Binary.Compress(Original, Compression.GZip),
+    Decompressed = Binary.Decompress(Compressed, Compression.GZip),
+    AsList = Binary.ToList(Decompressed)
+in
+    AsList
+```
+
+<!--output
+{1, 2, 3, 4, 5}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Creates a binary value from the byte list {1, 2, 3, 4, 5}.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Compressed",
+      "description": "Compresses the binary value using the GZip algorithm.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Decompressed",
+      "description": "Decompresses the GZip-compressed binary, restoring the original bytes.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsList",
+      "description": "Converts the decompressed binary back to a list, confirming the round-trip produced {1, 2, 3, 4, 5}.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{1, 2, 3, 4, 5}"}]}
+    }
+  ]
+}
+-->

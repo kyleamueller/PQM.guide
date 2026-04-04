@@ -1,0 +1,109 @@
+---
+title: "Binary.Length"
+slug: "binary-length"
+category: "Binary"
+description: "Returns the number of bytes in a binary value."
+syntax: "Binary.Length(binary as nullable binary) as nullable number"
+returnType: "number"
+returnDescription: "The number of bytes in the binary value."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary value whose length (in bytes) to return."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-approximatelength"
+  - "binary-range"
+  - "binary-buffer"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.Length` returns the exact number of bytes in a binary value. Unlike `Binary.ApproximateLength`, this function fully evaluates the binary stream to determine its precise size.
+
+For streaming binary values where you only need a rough size estimate, consider using `Binary.ApproximateLength` instead to avoid materializing the entire stream.
+
+## Examples
+
+### Example 1: Get the length of a binary value
+
+Determine the byte count of a binary created from text.
+
+```powerquery
+let
+    Source = Binary.FromList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}),
+    Len = Binary.Length(Source)
+in
+    Len
+```
+
+<!--output
+11
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Creates a binary value from a list of 11 bytes (0 through 10).",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "Len",
+      "description": "Returns the length of the binary value, which is 11 bytes.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"11"}]}
+    }
+  ]
+}
+-->
+
+### Example 2: Get the length of text converted to binary
+
+Show how text length differs from binary length due to UTF-8 encoding.
+
+```powerquery
+let
+    TextVal = "Hello",
+    AsBinary = Binary.From(TextVal),
+    ByteLength = Binary.Length(AsBinary)
+in
+    #table({"Text", "ByteLength"}, {{TextVal, ByteLength}})
+```
+
+<!--output
+{"columns":[{"name":"Text","type":"text"},{"name":"ByteLength","type":"number"}],"rows":[{"Text":"Hello","ByteLength":"5"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TextVal",
+      "description": "Defines the text string \"Hello\" as the input.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello"}]}
+    },
+    {
+      "name": "AsBinary",
+      "description": "Converts the text to its binary (UTF-8) representation.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "ByteLength",
+      "description": "Returns the number of bytes in the binary value: 5 bytes for the five ASCII characters.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":"5"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table showing the text and its byte length.",
+      "output": {"columns":[{"name":"Text","type":"text"},{"name":"ByteLength","type":"number"}],"rows":[{"Text":"Hello","ByteLength":"5"}]}
+    }
+  ]
+}
+-->

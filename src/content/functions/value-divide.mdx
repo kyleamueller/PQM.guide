@@ -1,0 +1,90 @@
+---
+title: "Value.Divide"
+slug: "value-divide"
+category: "Value"
+description: "Returns the result of dividing one value by another, with support for numbers and durations."
+syntax: "Value.Divide(value1 as any, value2 as any, optional precision as nullable number) as any"
+returnType: "any"
+returnDescription: "The result of dividing value1 by value2."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The dividend (number, duration, etc.)."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The divisor."
+  - name: "precision"
+    type: "number"
+    required: false
+    description: "Controls floating-point precision. Defaults to Precision.Double."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-multiply"
+  - "value-add"
+  - "value-subtract"
+  - "value-equals"
+  - "number-from"
+---
+
+## Remarks
+
+`Value.Divide` returns the result of dividing `value1` by `value2`. It is the **functional equivalent of the `/` operator** in M — `Value.Divide(a, b)` produces the same result as `a / b`.
+
+This function supports **type coercion** across compatible types:
+
+- **number / number** — standard numeric division, returning a number.
+- **duration / number** — divides a duration by a scalar, returning a shorter duration.
+- **duration / duration** — divides two durations, returning a number (the ratio).
+
+The optional `precision` parameter controls floating-point precision for numeric operations. By default, `Precision.Double` is used. You can specify `Precision.Decimal` for higher-precision decimal arithmetic.
+
+Division by zero raises an error. If the two values are of incompatible types, an error is raised.
+
+## Examples
+
+### Example 1: Calculate unit price from total and quantity
+
+Divide each order's total by its quantity to verify the unit price.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "Product", "UnitPrice", "Quantity"}),
+    "Computed", each Value.Divide([UnitPrice] * [Quantity], [Quantity]), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Computed","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","UnitPrice":25,"Quantity":4,"Computed":25},{"OrderID":2,"Product":"Gadget B","UnitPrice":50,"Quantity":2,"Computed":50},{"OrderID":3,"Product":"Widget C","UnitPrice":15,"Quantity":10,"Computed":15},{"OrderID":4,"Product":"Gadget D","UnitPrice":75,"Quantity":1,"Computed":75},{"OrderID":5,"Product":"Widget A","UnitPrice":25,"Quantity":2,"Computed":25}]}
+-->
+
+### Example 2: Divide a duration by a number
+
+Split a 10-day duration into 4 equal parts.
+
+```powerquery
+Value.Divide(#duration(10, 0, 0, 0), 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"2.12:00:00"}]}
+-->
+
+### Example 3: Simple division of two numbers
+
+```powerquery
+Value.Divide(100, 4)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":25}]}
+-->

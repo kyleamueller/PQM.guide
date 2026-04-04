@@ -1,0 +1,90 @@
+---
+title: "Value.Multiply"
+slug: "value-multiply"
+category: "Value"
+description: "Returns the product of multiplying two values, with support for numbers and durations."
+syntax: "Value.Multiply(value1 as any, value2 as any, optional precision as nullable number) as any"
+returnType: "any"
+returnDescription: "The product of value1 and value2."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The first value (number, duration, etc.)."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The second value to multiply by."
+  - name: "precision"
+    type: "number"
+    required: false
+    description: "Controls floating-point precision. Defaults to Precision.Double."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-divide"
+  - "value-add"
+  - "value-subtract"
+  - "value-equals"
+  - "number-from"
+---
+
+## Remarks
+
+`Value.Multiply` returns the product of `value1` and `value2`. It is the **functional equivalent of the `*` operator** in M — `Value.Multiply(a, b)` produces the same result as `a * b`.
+
+This function supports **type coercion** across compatible types:
+
+- **number * number** — standard numeric multiplication, returning a number.
+- **duration * number** — scales a duration by a numeric factor, returning a duration.
+- **number * duration** — equivalent to duration * number.
+
+The optional `precision` parameter controls floating-point precision for numeric operations. By default, `Precision.Double` is used. You can specify `Precision.Decimal` for higher-precision decimal arithmetic.
+
+If the two values are of incompatible types (e.g., text * number), an error is raised.
+
+## Examples
+
+### Example 1: Calculate line totals from unit price and quantity
+
+Multiply each order's unit price by its quantity to compute the line total.
+
+Input: `Sales`
+
+```powerquery
+Table.AddColumn(
+    Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "Product", "UnitPrice", "Quantity"}),
+    "LineTotal", each Value.Multiply([UnitPrice], [Quantity]), type number
+)
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"LineTotal","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","UnitPrice":25,"Quantity":4,"LineTotal":100},{"OrderID":2,"Product":"Gadget B","UnitPrice":50,"Quantity":2,"LineTotal":100},{"OrderID":3,"Product":"Widget C","UnitPrice":15,"Quantity":10,"LineTotal":150},{"OrderID":4,"Product":"Gadget D","UnitPrice":75,"Quantity":1,"LineTotal":75},{"OrderID":5,"Product":"Widget A","UnitPrice":25,"Quantity":2,"LineTotal":50}]}
+-->
+
+### Example 2: Scale a duration by a factor
+
+Triple a 2-hour duration.
+
+```powerquery
+Value.Multiply(#duration(0, 2, 0, 0), 3)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"0.06:00:00"}]}
+-->
+
+### Example 3: Simple multiplication of two numbers
+
+```powerquery
+Value.Multiply(7, 8)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":56}]}
+-->

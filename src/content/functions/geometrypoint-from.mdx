@@ -1,0 +1,96 @@
+---
+title: "GeometryPoint.From"
+slug: "geometrypoint-from"
+category: "Value"
+description: "Creates a record representing a geometric point from its constituent parts such as X coordinate, Y coordinate, and optional Z coordinate."
+syntax: "GeometryPoint.From(x as number, y as number, optional z as nullable number, optional m as nullable number, optional srid as nullable number) as record"
+returnType: "record"
+returnDescription: "A structured record representing a geometric point with the specified coordinates."
+parameters:
+  - name: "x"
+    type: "number"
+    required: true
+    description: "The X coordinate of the geometric point."
+  - name: "y"
+    type: "number"
+    required: true
+    description: "The Y coordinate of the geometric point."
+  - name: "z"
+    type: "number"
+    required: false
+    description: "The Z coordinate (elevation or depth) of the geometric point. Omit if not applicable."
+  - name: "m"
+    type: "number"
+    required: false
+    description: "The measure (M value) associated with the geometric point. Omit if not applicable."
+  - name: "srid"
+    type: "number"
+    required: false
+    description: "The Spatial Reference Identifier (SRID) for the point. Defaults to 0 if not specified."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "geometry-fromwellknowntext"
+  - "geometry-towellknowntext"
+  - "geographypoint-from"
+  - "geography-fromwellknowntext"
+  - "geography-towellknowntext"
+relatedConcepts: []
+---
+
+## Remarks
+
+`GeometryPoint.From` creates a structured record representing a geometric point from individual coordinate values. This provides a convenient way to construct geometric point values without needing to write WKT strings.
+
+The function uses a flat Cartesian (planar) coordinate system. The `x` and `y` parameters specify the point's position on the plane. Unlike geographic points which use longitude/latitude on a round-earth model, geometric points operate in a flat coordinate space suitable for floor plans, engineering drawings, or projected map coordinates.
+
+The optional `z` parameter represents a third dimension (often elevation or depth), and the optional `m` parameter represents an arbitrary measure value (often used for linear referencing). The optional `srid` parameter specifies the Spatial Reference Identifier; if omitted, it defaults to 0.
+
+The resulting record can be serialized to WKT format using `Geometry.ToWellKnownText`, making it easy to round-trip geometric data between structured records and text representations.
+
+For round-earth geographic points using longitude and latitude, use `GeographyPoint.From` instead.
+
+## Examples
+
+### Example 1: Create a geometric point
+
+Create a geometric point record from X and Y coordinates.
+
+```powerquery
+let
+    Point = GeometryPoint.From(10, 20)
+in
+    Record.ToTable(Point)
+```
+
+### Example 2: Create geometric points with a Z coordinate
+
+Build a table of geometric points that include elevation data.
+
+```powerquery
+let
+    Points = #table({"Label", "X", "Y", "Z"}, {
+        {"Sensor A", 100, 200, 5.5},
+        {"Sensor B", 150, 250, 3.2}
+    }),
+    WithGeo = Table.AddColumn(Points, "GeoPoint", each GeometryPoint.From([X], [Y], [Z]))
+in
+    WithGeo
+```
+
+### Example 3: Create a point and convert to WKT
+
+Round-trip a geometric point through record creation and WKT serialization.
+
+```powerquery
+let
+    Point = GeometryPoint.From(50, 75),
+    WKT = Geometry.ToWellKnownText(Point, true)
+in
+    #table({"Label", "WKT"}, {{"Center", WKT}})
+```

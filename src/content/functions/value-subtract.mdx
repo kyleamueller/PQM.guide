@@ -1,0 +1,98 @@
+---
+title: "Value.Subtract"
+slug: "value-subtract"
+category: "Value"
+description: "Returns the difference of two values, with support for numbers, durations, and date/time types."
+syntax: "Value.Subtract(value1 as any, value2 as any, optional precision as nullable number) as any"
+returnType: "any"
+returnDescription: "The difference of value1 and value2."
+parameters:
+  - name: "value1"
+    type: "any"
+    required: true
+    description: "The value to subtract from (number, duration, datetime, etc.)."
+  - name: "value2"
+    type: "any"
+    required: true
+    description: "The value to subtract."
+  - name: "precision"
+    type: "number"
+    required: false
+    description: "Controls floating-point precision. Defaults to Precision.Double."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-add"
+  - "value-multiply"
+  - "value-divide"
+  - "value-equals"
+  - "number-from"
+---
+
+## Remarks
+
+`Value.Subtract` returns the difference of `value1` and `value2`. It is the **functional equivalent of the `-` operator** in M — `Value.Subtract(a, b)` produces the same result as `a - b`.
+
+This function supports **type coercion** across compatible types:
+
+- **number - number** — standard numeric subtraction, returning a number.
+- **duration - duration** — subtracts one duration from another, returning a duration.
+- **datetime - duration** — shifts a datetime backward by the given duration, returning a datetime.
+- **datetime - datetime** — computes the elapsed time between two datetimes, returning a duration.
+- **date - duration** — shifts a date backward by the given duration, returning a date.
+- **date - date** — computes the elapsed time between two dates, returning a duration.
+- **time - duration** — shifts a time backward by the given duration, returning a time.
+- **time - time** — computes the difference between two times, returning a duration.
+- **datetimezone - duration** — shifts a datetimezone backward, returning a datetimezone.
+- **datetimezone - datetimezone** — computes the elapsed time, returning a duration.
+
+The optional `precision` parameter controls floating-point precision for numeric operations. By default, `Precision.Double` is used. You can specify `Precision.Decimal` for higher-precision decimal arithmetic.
+
+If the two values are of incompatible types, an error is raised.
+
+## Examples
+
+### Example 1: Calculate days since order
+
+Subtract each order date from a reference date to find the age of each order.
+
+Input: `Sales`
+
+```powerquery
+let
+    RefDate = #date(2024, 3, 1)
+in
+    Table.AddColumn(
+        Table.SelectColumns(Table.FirstN(Sales, 5), {"OrderID", "Product", "OrderDate"}),
+        "DaysAgo", each Duration.Days(Value.Subtract(RefDate, [OrderDate])), type number
+    )
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"OrderDate","type":"date"},{"name":"DaysAgo","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","OrderDate":"2024-01-15","DaysAgo":46},{"OrderID":2,"Product":"Gadget B","OrderDate":"2024-01-20","DaysAgo":41},{"OrderID":3,"Product":"Widget C","OrderDate":"2024-02-01","DaysAgo":29},{"OrderID":4,"Product":"Gadget D","OrderDate":"2024-02-15","DaysAgo":15},{"OrderID":5,"Product":"Widget A","OrderDate":"2024-03-01","DaysAgo":0}]}
+-->
+
+### Example 2: Subtract two durations
+
+```powerquery
+Value.Subtract(#duration(10, 0, 0, 0), #duration(3, 12, 0, 0))
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"duration"}],"rows":[{"Result":"6.12:00:00"}]}
+-->
+
+### Example 3: Simple subtraction of two numbers
+
+```powerquery
+Value.Subtract(100, 37)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":63}]}
+-->

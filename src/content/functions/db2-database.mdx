@@ -1,0 +1,104 @@
+---
+title: "DB2.Database"
+slug: "db2-database"
+category: "Accessing Data"
+description: "Returns a navigation table of SQL tables and views from an IBM Db2 database."
+syntax: "DB2.Database(server as text, database as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of SQL tables and views available in the specified Db2 database instance."
+parameters:
+  - name: "server"
+    type: "text"
+    required: true
+    description: "The Db2 server hostname or IP address. The port may optionally be specified by appending a colon and port number (e.g., \"myserver:50000\")."
+  - name: "database"
+    type: "text"
+    required: true
+    description: "The name of the database instance to connect to on the Db2 server."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control connection behavior, native queries, navigation properties, timeouts, implementation provider, and binary encoding options."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "sql-database"
+  - "odbc-datasource"
+  - "oracle-database"
+---
+
+## Remarks
+
+`DB2.Database` connects to an IBM Db2 database server and returns a navigation table of the SQL tables and views available in the specified database instance. The navigation table lets you browse and select objects to load into Power Query.
+
+**Server string format**: The `server` parameter accepts a hostname or IP address. To specify a non-default port, append a colon and the port number: `"myserver:50000"`. If no port is specified, the driver's default port is used.
+
+**Authentication**: Db2 uses database authentication (username and password). Configure credentials in the Power Query data source credentials dialog — do not embed credentials in the M query.
+
+**Query folding**: Db2 supports query folding. Standard Power Query transformations such as filtering, column selection, sorting, grouping, and joins are translated into SQL and executed on the Db2 server, returning only the result set to Power Query.
+
+**Implementation providers**: The `Implementation` option selects which internal database provider is used. Valid values are:
+- `"IBM"` — uses the IBM Data Server Driver for ODBC.
+- `"Microsoft"` — uses the Microsoft OLE DB Provider for DB2 (included with some Power Query hosts). Several additional options apply only when using the Microsoft implementation: `BinaryCodePage`, `PackageCollection`, and `UseDb2ConnectGateway`.
+
+**Key options**:
+- `CreateNavigationProperties` (logical) — generate navigation properties on the returned values based on foreign key relationships. Default is `true`.
+- `NavigationPropertyNameGenerator` (function) — a custom function used to create names for navigation properties.
+- `Query` (text) — a native SQL query used to retrieve data. If the query produces multiple result sets, only the first is returned.
+- `CommandTimeout` (duration) — maximum time to wait for a server-side query to complete before canceling. Default is ten minutes.
+- `ConnectionTimeout` (duration) — maximum time to wait when establishing a connection to the server. Default is driver-dependent.
+- `HierarchicalNavigation` (logical) — group the navigation table by schema name. Default is `false`.
+- `Implementation` (text) — selects the internal database provider. Valid values are `"IBM"` and `"Microsoft"`.
+- `BinaryCodePage` (number) — the CCSID (Coded Character Set Identifier) used to decode Db2 FOR BIT binary data into character strings. Applies only when `Implementation = "Microsoft"`. Set `0` to disable conversion (default). Set `1` to convert based on database encoding. Set any other CCSID number to convert to application encoding.
+- `PackageCollection` (text) — a string value for the package collection to enable use of shared packages required to process SQL statements. Default is `"NULLID"`. Applies only when `Implementation = "Microsoft"`.
+- `UseDb2ConnectGateway` (logical) — specifies whether the connection is being made through a Db2 Connect gateway. Applies only when `Implementation = "Microsoft"`.
+
+**Power BI Service**: On-premises Db2 servers require an on-premises data gateway with the appropriate Db2 driver installed for scheduled refresh.
+
+## Examples
+
+### Example 1: Connect to a Db2 database with default settings
+```powerquery
+DB2.Database("myserver", "SALESDB")
+```
+
+### Example 2: Connect specifying a non-default port
+```powerquery
+DB2.Database("myserver:50000", "SALESDB")
+```
+
+### Example 3: Navigate to a specific table
+```powerquery
+let
+    Source = DB2.Database("myserver", "SALESDB"),
+    Orders = Source{[Schema="DB2ADMIN", Item="ORDERS"]}[Data]
+in
+    Orders
+```
+
+### Example 4: Run a native SQL query
+```powerquery
+DB2.Database(
+    "myserver",
+    "SALESDB",
+    [Query = "SELECT ORDER_ID, CUSTOMER_ID, ORDER_DATE FROM DB2ADMIN.ORDERS FETCH FIRST 1000 ROWS ONLY"]
+)
+```
+
+### Example 5: Use the Microsoft implementation with custom timeout and hierarchical navigation
+```powerquery
+DB2.Database(
+    "myserver:50000",
+    "SALESDB",
+    [
+        Implementation = "Microsoft",
+        HierarchicalNavigation = true,
+        CommandTimeout = #duration(0, 0, 5, 0)
+    ]
+)
+```

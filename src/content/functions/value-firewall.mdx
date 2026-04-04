@@ -1,0 +1,57 @@
+---
+title: "Value.Firewall"
+slug: "value-firewall"
+category: "Value"
+description: "Returns a firewall-partitioned value for the given key. Intended for internal use only."
+syntax: "Value.Firewall(key as text) as any"
+returnType: "any"
+returnDescription: "The value associated with the specified firewall partition key."
+parameters:
+  - name: "key"
+    type: "text"
+    required: true
+    description: "The firewall partition key identifying the data source or partition to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-metadata"
+  - "value-type"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+This function is intended for **internal use only** and is not designed to be called directly in user-written M queries.
+
+`Value.Firewall` is part of the Power Query **data privacy firewall** infrastructure. The firewall engine partitions data by source and enforces rules that prevent unauthorized data flow between sources with different privacy levels (e.g., Public, Organizational, Private). `Value.Firewall` retrieves a value from a specific firewall partition identified by the `key` parameter.
+
+When Power Query evaluates a query that combines data from multiple sources, the engine internally inserts `Value.Firewall` calls to isolate data from each source into its own partition. This ensures that data from a Private source cannot leak into a query sent to a Public source, and vice versa.
+
+### How the firewall works at a high level
+
+- Each data source accessed in a query is assigned a **privacy level** (Public, Organizational, or Private).
+- The engine creates **partitions** — one per data source — and wraps each partition's data behind `Value.Firewall`.
+- Before combining data across partitions, the engine checks whether the combination is allowed by the configured privacy levels.
+- If the combination violates the privacy rules, the query raises a `Formula.Firewall` error rather than silently leaking data.
+
+You will typically encounter `Value.Firewall` only in diagnostic or trace output from the Power Query engine. Calling it directly will not produce useful results and may raise errors, since the `key` values are engine-internal identifiers.
+
+## Examples
+
+### Example 1: Understanding the firewall concept
+
+The firewall is transparent to users. This example shows what happens when you try to call `Value.Firewall` directly with an arbitrary key — it raises an error because the key is not a valid engine-internal partition identifier.
+
+```powerquery
+try Value.Firewall("invalid-key") otherwise "Error: key not recognized by the firewall engine"
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Error: key not recognized by the firewall engine"}]}
+-->

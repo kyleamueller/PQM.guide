@@ -1,0 +1,60 @@
+---
+title: "Expression.Identifier"
+slug: "expression-identifier"
+category: "Expression"
+description: "Returns the M source code representation of an identifier name."
+syntax: "Expression.Identifier(name as text) as text"
+returnType: "text"
+returnDescription: "A text string containing the properly escaped M source code representation of the identifier."
+parameters:
+  - name: "name"
+    type: "text"
+    required: true
+    description: "The identifier name to convert to its M source code representation."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "expression-evaluate"
+  - "expression-constant"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Expression.Identifier` returns the M source code representation of an identifier (variable or step name). If the identifier name is a simple name that does not require escaping (no spaces or special characters), it is returned as-is. If the name contains spaces or other characters that require quoting, the function wraps it in the `#"..."` escaped identifier syntax used by M.
+
+This is useful for dynamically building M expressions as text strings. When you need to reference a column or step name that might contain spaces, `Expression.Identifier` ensures the name is properly escaped for use in code generated for `Expression.Evaluate`.
+
+### Escaping rules
+
+- Simple identifiers (e.g., `MyIdentifier`) are returned unchanged.
+- Identifiers with spaces or special characters (e.g., `My Identifier`) are returned as `#"My Identifier"`.
+
+## Examples
+
+### Example 1: Serialize simple and complex identifiers
+
+Compare identifiers that do and do not require escaping.
+
+```powerquery
+let
+    Simple = Expression.Identifier("MyIdentifier"),
+    WithSpace = Expression.Identifier("My Identifier")
+in
+    #table(
+        {"Input", "M Representation"},
+        {
+            {"MyIdentifier", Simple},
+            {"My Identifier", WithSpace}
+        }
+    )
+```
+
+<!--output
+{"columns":[{"name":"Input","type":"text"},{"name":"M Representation","type":"text"}],"rows":[{"Input":"MyIdentifier","M Representation":"MyIdentifier"},{"Input":"My Identifier","M Representation":"#\"My Identifier\""}]}
+-->

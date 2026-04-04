@@ -1,0 +1,71 @@
+---
+title: "GoogleAnalytics.Accounts"
+slug: "googleanalytics-accounts"
+category: "Accessing Data"
+description: "Returns a table of Google Analytics accounts accessible from the current credential."
+syntax: "GoogleAnalytics.Accounts(optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table listing the Google Analytics accounts, properties, and views accessible with the current credential."
+parameters:
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to specify additional connection options."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "odata-feed"
+  - "web-contents"
+relatedConcepts: []
+---
+
+## Remarks
+
+`GoogleAnalytics.Accounts` connects to Google Analytics and returns a navigation table of all accounts accessible with the authenticated Google credential. The navigation table provides a hierarchical structure: accounts contain properties, and properties contain views (profiles), allowing you to drill into the specific data source you need.
+
+**Authentication**: Requires Google account (OAuth 2.0) credentials. When first connecting, Power Query opens a browser-based consent flow to authorize access to Google Analytics data. The credential is stored in the Power Query data source settings and can be refreshed or revoked there. Ensure the Google account has at least Read & Analyze permissions on the target Analytics account.
+
+**Google Analytics versions**: This connector supports Google Analytics Universal Analytics (UA) properties. Google transitioned to Google Analytics 4 (GA4) in July 2023, and Universal Analytics properties stopped processing data. For GA4 properties, consider using the Google Analytics Data API via `Web.Contents` or a dedicated GA4 connector if available.
+
+**Navigation table structure**: The returned table is hierarchical. Each row at the top level represents a Google Analytics account. Drilling into an account's `Data` column reveals its properties (web properties), and drilling further reveals views (profiles) with their associated report data.
+
+**Query folding**: Limited. Some dimension and metric selections may fold to the Google Analytics Reporting API, but most filtering and transformations are performed in Power Query after data retrieval.
+
+**Platform availability**: Available in **Power BI Desktop** and **Power BI Service** (with cloud refresh). Also supported in **Dataflows**. Not available in Excel Desktop, Excel Online, or Fabric notebooks. In Power BI Service, the OAuth credential must be configured in the dataset's data source settings.
+
+**Rate limits**: Google Analytics API enforces quota limits. Large queries or frequent refreshes may encounter rate limiting. Use date range filters and limit the number of dimensions and metrics to reduce API usage.
+
+## Examples
+
+### Example 1: List all accessible Google Analytics accounts
+
+```powerquery
+GoogleAnalytics.Accounts()
+```
+
+### Example 2: Navigate to a specific account and list its properties
+
+```powerquery
+let
+    Accounts = GoogleAnalytics.Accounts(),
+    MyAccount = Accounts{[Name = "My Website Analytics"]}[Data]
+in
+    MyAccount
+```
+
+### Example 3: Drill into a specific property and view
+
+```powerquery
+let
+    Accounts = GoogleAnalytics.Accounts(),
+    Account = Accounts{[Name = "My Website Analytics"]}[Data],
+    Property = Account{[Name = "www.contoso.com"]}[Data],
+    View = Property{[Name = "All Web Site Data"]}[Data]
+in
+    View
+```

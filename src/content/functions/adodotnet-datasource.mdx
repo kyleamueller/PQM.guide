@@ -1,0 +1,79 @@
+---
+title: "AdoDotNet.DataSource"
+slug: "adodotnet-datasource"
+category: "Accessing Data"
+description: "Returns the schema collection for an ADO.NET data source with the specified provider name and connection string."
+syntax: "AdoDotNet.DataSource(providerName as text, connectionString as any, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table representing the schema collection for the ADO.NET data source, listing the available tables, views, and other database objects."
+parameters:
+  - name: "providerName"
+    type: "text"
+    required: true
+    description: "The invariant name of the ADO.NET managed data provider (e.g., \"System.Data.SqlClient\", \"System.Data.OracleClient\", \"Npgsql\")."
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "The connection string for the data source. Can be text (e.g., \"Server=myserver;Database=mydb;\") or a record of property value pairs. Property values can be text or number."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to specify additional properties including CommandTimeout, SqlCompatibleWindowsAuth, and TypeMap."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "adodotnet-query"
+  - "oledb-datasource"
+  - "sql-database"
+---
+
+## Remarks
+
+`AdoDotNet.DataSource` returns the schema collection for an ADO.NET data source. It uses the .NET managed data provider identified by `providerName` to connect via `connectionString` and enumerate the available database objects (tables, views, etc.). This is a low-level connector that works with any ADO.NET-compatible provider and is typically used when no higher-level Power Query connector exists for the target database.
+
+**Connection string formats**: The `connectionString` parameter accepts two forms:
+- A text connection string: `"Server=myserver;Database=mydb;Integrated Security=true;"`.
+- A record of key-value pairs: `[Server = "myserver", Database = "mydb"]`. Power Query assembles these into a connection string automatically. Property values can be text or number.
+
+**Options record fields**:
+- `CommandTimeout` (duration) -- Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes.
+- `SqlCompatibleWindowsAuth` (logical) -- Determines whether to produce SQL Server-compatible connection string options for Windows authentication. The default value is true.
+- `TypeMap` -- A value that controls how ADO.NET data types are mapped to Power Query types.
+
+**Authentication**: Credentials are managed through the Power Query credentials dialog. For Windows authentication on SQL Server-compatible providers, the `SqlCompatibleWindowsAuth` option (defaulting to true) ensures the connection string includes the appropriate Windows auth tokens. Avoid embedding credentials directly in the connection string.
+
+**Query folding**: Folding behavior depends on the underlying ADO.NET provider. `AdoDotNet.DataSource` exposes a navigation table; downstream Power Query transformations may fold into SQL if the provider supports it.
+
+**Platform availability**: Requires the target ADO.NET provider to be installed on the machine running Power Query. Not available in Power BI Service without an on-premises data gateway. Not supported in Excel Online, dataflows, or Fabric Notebooks.
+
+## Examples
+
+### Example 1: Connect to a SQL Server using the SqlClient provider
+```powerquery
+AdoDotNet.DataSource(
+    "System.Data.SqlClient",
+    "Server=myserver;Database=Northwind;Integrated Security=true;"
+)
+```
+
+### Example 2: Connect using a record-based connection string
+```powerquery
+AdoDotNet.DataSource(
+    "System.Data.SqlClient",
+    [Server = "myserver", Database = "Northwind"]
+)
+```
+
+### Example 3: Set a custom command timeout
+```powerquery
+AdoDotNet.DataSource(
+    "System.Data.SqlClient",
+    "Server=myserver;Database=Northwind;",
+    [CommandTimeout = #duration(0, 0, 30, 0)]
+)
+```

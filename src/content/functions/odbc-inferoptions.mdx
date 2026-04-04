@@ -1,0 +1,62 @@
+---
+title: "Odbc.InferOptions"
+slug: "odbc-inferoptions"
+category: "Accessing Data"
+description: "Returns the result of trying to infer SQL capabilities for an ODBC data source using the given connection string."
+syntax: "Odbc.InferOptions(connectionString as any) as record"
+returnType: "record"
+returnDescription: "A record containing the inferred SQL capabilities and driver options for the ODBC data source."
+parameters:
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "An ODBC connection string as text (e.g., \"DSN=MyDSN;\" or \"Driver={SQL Server};Server=myserver;Database=mydb;\") or a record of connection string key-value pairs. Property values can be text or number."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "odbc-datasource"
+  - "odbc-query"
+---
+
+## Remarks
+
+`Odbc.InferOptions` connects to an ODBC data source and interrogates the driver to determine its SQL capabilities, returning the results as a record. This is primarily a diagnostic and development tool -- useful when building custom ODBC-based connectors or troubleshooting query folding behavior. The returned record describes what SQL grammar, functions, and features the ODBC driver reports it supports.
+
+**Connection string formats**: The `connectionString` parameter accepts two forms:
+- A text DSN or driver string: `"DSN=MyDSN;"` to use a pre-configured System DSN, or `"Driver={DriverName};Server=host;Database=db;"` for a driver-based connection.
+- A record of key-value pairs: `[Driver = "SQL Server", Server = "myserver", Database = "mydb"]`. Power Query assembles these into a connection string automatically.
+
+**Returned record**: The record returned by `Odbc.InferOptions` contains fields that describe the driver's reported SQL capabilities. These inferred options correspond to the options that `Odbc.DataSource` would use internally to determine how to fold Power Query transformations into SQL. The fields may include information about supported SQL conformance levels, aggregate functions, string functions, numeric functions, date/time functions, SQL-92 predicates, join capabilities, subquery support, GROUP BY behavior, and other driver-specific capabilities.
+
+**Use in custom connector development**: When developing an ODBC-based custom connector using the Power Query SDK, `Odbc.InferOptions` helps you understand what the driver reports so you can override specific capability flags in your connector's `Odbc.DataSource` options if the driver misreports or under-reports its capabilities.
+
+**Query folding**: This function does not execute queries or return data -- it only inspects driver capabilities. The inferred options directly relate to how well query folding will work when using `Odbc.DataSource` with the same driver.
+
+**Platform availability**: Requires the ODBC driver to be installed on the machine running Power Query. Not available in Power BI Service without an on-premises data gateway. Not supported in Excel Online, dataflows, or Fabric Notebooks.
+
+## Examples
+
+### Example 1: Infer SQL capabilities for a DSN
+```powerquery
+Odbc.InferOptions("DSN=your_dsn")
+```
+Result: A record describing the SQL capabilities reported by the ODBC driver configured for `your_dsn`.
+
+### Example 2: Infer capabilities using a driver connection string
+```powerquery
+Odbc.InferOptions("Driver={PostgreSQL Unicode};Server=myserver;Port=5432;Database=analytics;")
+```
+
+### Example 3: Infer capabilities using a record-based connection string
+```powerquery
+Odbc.InferOptions([
+    Driver = "SQL Server",
+    Server = "myserver",
+    Database = "Northwind"
+])
+```

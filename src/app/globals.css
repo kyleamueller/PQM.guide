@@ -397,6 +397,17 @@ code {
   white-space: nowrap;
 }
 
+.internal-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #f59e0b20;
+  color: #d97706;
+  white-space: nowrap;
+  border: 1px solid #f59e0b40;
+}
+
 .function-description {
   font-size: 16px;
   color: var(--text-secondary);

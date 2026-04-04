@@ -1,0 +1,67 @@
+---
+title: "RowExpression.From"
+slug: "rowexpression-from"
+category: "Expression"
+description: "Returns the abstract syntax tree (AST) for the body of a function, normalized into a row expression."
+syntax: "RowExpression.From(function as function) as record"
+returnType: "record"
+returnDescription: "A record representing the abstract syntax tree (AST) of the function body as a row expression."
+parameters:
+  - name: "function"
+    type: "function"
+    required: true
+    description: "A single-argument lambda function whose body will be converted to an AST."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "rowexpression-column"
+  - "itemexpression-from"
+  - "table-view"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`RowExpression.From` returns the abstract syntax tree (AST) for the body of `function`, normalized into a *row expression*. This is an **advanced/internal function** used by the Power Query engine and custom connector infrastructure for query folding.
+
+### Requirements
+
+- The function must be a single-argument lambda (e.g., an `each` expression).
+- All references to the function parameter are replaced with `RowExpression.Row`.
+- All references to columns are replaced with `RowExpression.Column(columnName)`.
+- The AST is simplified to contain only these node kinds: `Constant`, `Invocation`, `Unary`, `Binary`, `If`, and `FieldAccess`.
+
+An error is raised if the function body cannot be represented as a valid row expression AST.
+
+This function is identical to `ItemExpression.From`. The difference is semantic: `RowExpression.From` is used in table contexts (where the parameter represents a row record), while `ItemExpression.From` is used in list contexts.
+
+### Use cases
+
+- Custom connectors implementing `Table.View` handlers that need to inspect filter predicates, sort expressions, or computed column definitions.
+- Translating M row expressions into SQL WHERE clauses, OData filters, or other native query syntax.
+
+## Examples
+
+### Example 1: Get the AST for a row filter
+
+Extract the AST for `each [CustomerName] = "ALFKI"`.
+
+```powerquery
+let
+    AST = RowExpression.From(each [CustomerName] = "ALFKI")
+in
+    #table(
+        {"Kind", "Operator"},
+        {{AST[Kind], AST[Operator]}}
+    )
+```
+
+<!--output
+{"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"}],"rows":[{"Kind":"Binary","Operator":"Equals"}]}
+-->

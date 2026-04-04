@@ -1,0 +1,54 @@
+---
+title: "Table.ReplaceRelationshipIdentity"
+slug: "table-replacerelationshipidentity"
+category: "Table"
+description: "Replaces the relationship identity on a value. Intended for internal use only."
+syntax: "Table.ReplaceRelationshipIdentity(value as any, identity as text) as any"
+returnType: "any"
+returnDescription: "The value with the relationship identity replaced."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose relationship identity to replace."
+  - name: "identity"
+    type: "text"
+    required: true
+    description: "The new relationship identity text to assign."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "tables-getrelationships"
+  - "table-replacekeys"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+This function is intended for internal use only. It is part of the Power Query engine's infrastructure for managing relationship metadata between tables — for example, the foreign key relationships used in Power BI data models. Its behavior may change without notice between Power Query versions.
+
+For working with table relationships in user-authored queries, use `Tables.GetRelationships` to discover relationships and `Table.NestedJoin` or `Table.Join` to combine related tables.
+
+## Examples
+
+### Example 1: Recommended alternative — use Table.NestedJoin
+
+Instead of this internal function, join related tables using `Table.NestedJoin`:
+
+```powerquery
+let
+    Joined = Table.NestedJoin(
+        Sales, {"CustomerID"},
+        Customers, {"CustomerID"},
+        "CustomerDetails",
+        JoinKind.LeftOuter
+    )
+in
+    Joined
+```

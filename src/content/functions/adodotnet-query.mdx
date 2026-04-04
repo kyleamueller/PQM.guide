@@ -1,0 +1,85 @@
+---
+title: "AdoDotNet.Query"
+slug: "adodotnet-query"
+category: "Accessing Data"
+description: "Returns the result of running a SQL query against an ADO.NET data source with the specified provider name and connection string."
+syntax: "AdoDotNet.Query(providerName as text, connectionString as any, query as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table containing the result set of the SQL query executed against the ADO.NET data source."
+parameters:
+  - name: "providerName"
+    type: "text"
+    required: true
+    description: "The invariant name of the ADO.NET managed data provider (e.g., \"System.Data.SqlClient\", \"System.Data.OracleClient\", \"Npgsql\")."
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "The connection string for the data source. Can be text (e.g., \"Server=myserver;Database=mydb;\") or a record of property value pairs. Property values can be text or number."
+  - name: "query"
+    type: "text"
+    required: true
+    description: "The SQL query to execute against the data source."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to specify additional properties including CommandTimeout and SqlCompatibleWindowsAuth."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "adodotnet-datasource"
+  - "oledb-query"
+  - "sql-database"
+---
+
+## Remarks
+
+`AdoDotNet.Query` executes a SQL statement against an ADO.NET data source using the managed data provider specified by `providerName` and returns the result set as a Power Query table. Unlike `AdoDotNet.DataSource`, which returns a schema collection for interactive navigation, `AdoDotNet.Query` sends the SQL you provide verbatim to the data source. Use it when you need precise control over the SQL being executed.
+
+**Connection string formats**: The `connectionString` parameter accepts two forms:
+- A text connection string: `"Server=myserver;Database=mydb;Integrated Security=true;"`.
+- A record of key-value pairs: `[Server = "myserver", Database = "mydb"]`. Power Query assembles these into a connection string automatically. Property values can be text or number.
+
+**Options record fields**:
+- `CommandTimeout` (duration) -- Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes.
+- `SqlCompatibleWindowsAuth` (logical) -- Determines whether to produce SQL Server-compatible connection string options for Windows authentication. The default value is true.
+
+**Query folding**: `AdoDotNet.Query` results are not further foldable. The SQL is executed on the server exactly as written; any Power Query transformations applied after `AdoDotNet.Query` are performed in-memory in the Power Query engine. If you need downstream folding, use `AdoDotNet.DataSource` and navigate to the table instead.
+
+**Authentication**: Credentials are managed through the Power Query credentials dialog. For Windows authentication on SQL Server-compatible providers, the `SqlCompatibleWindowsAuth` option (defaulting to true) ensures the connection string includes the appropriate Windows auth tokens. Avoid embedding credentials directly in the connection string.
+
+**Platform availability**: Requires the target ADO.NET provider to be installed on the machine running Power Query. Not available in Power BI Service without an on-premises data gateway. Not supported in Excel Online, dataflows, or Fabric Notebooks.
+
+## Examples
+
+### Example 1: Run a SELECT query against SQL Server
+```powerquery
+AdoDotNet.Query(
+    "System.Data.SqlClient",
+    "Server=myserver;Database=Northwind;Integrated Security=true;",
+    "SELECT CustomerID, CompanyName, Country FROM Customers WHERE Country = 'Germany'"
+)
+```
+
+### Example 2: Use a record-based connection string with a timeout
+```powerquery
+AdoDotNet.Query(
+    "System.Data.SqlClient",
+    [Server = "myserver", Database = "Northwind"],
+    "SELECT TOP 100 OrderID, OrderDate, ShipCountry FROM Orders ORDER BY OrderDate DESC",
+    [CommandTimeout = #duration(0, 0, 5, 0)]
+)
+```
+
+### Example 3: Query an Oracle database using the Oracle provider
+```powerquery
+AdoDotNet.Query(
+    "System.Data.OracleClient",
+    "Data Source=ORCL;",
+    "SELECT employee_id, first_name, last_name FROM employees WHERE department_id = 10"
+)
+```

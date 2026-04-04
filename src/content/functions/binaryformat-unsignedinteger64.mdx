@@ -1,0 +1,78 @@
+---
+title: "BinaryFormat.UnsignedInteger64"
+slug: "binaryformat-unsignedinteger64"
+category: "Binary"
+description: "A binary format that reads a 64-bit unsigned integer."
+syntax: "BinaryFormat.UnsignedInteger64(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads an 8-byte unsigned integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 64-bit unsigned integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-unsignedinteger16"
+  - "binaryformat-unsignedinteger32"
+  - "binaryformat-signedinteger64"
+  - "binaryformat-byte"
+  - "binaryformat-byteorder"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Unsigned integers"
+---
+
+## Remarks
+
+`BinaryFormat.UnsignedInteger64` is a binary format specifier that reads a 64-bit (8-byte) unsigned integer from binary data. The value range is 0 to 18,446,744,073,709,551,615 (UInt64 / ulong).
+
+The default byte order is little-endian (least significant byte first). Use `BinaryFormat.ByteOrder` to wrap this format if the source data uses big-endian byte ordering.
+
+This format is used for very large unsigned values such as file sizes, large counters, unique identifiers, and addresses in binary protocols and file formats.
+
+## Examples
+
+### Example 1: Read a 64-bit unsigned integer
+
+Read an 8-byte unsigned integer from binary data.
+
+```powerquery
+let
+    binaryData = #binary({
+        0x01, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    }),
+    result = BinaryFormat.UnsignedInteger64(binaryData)
+in
+    result
+```
+
+<!--output
+1
+-->
+
+### Example 2: Read a larger 64-bit unsigned integer
+
+Read the value 4,294,967,296 (one more than the 32-bit unsigned max).
+
+```powerquery
+let
+    binaryData = #binary({
+        0x00, 0x00, 0x00, 0x00,
+        0x01, 0x00, 0x00, 0x00
+    }),
+    result = BinaryFormat.UnsignedInteger64(binaryData)
+in
+    result
+```
+
+<!--output
+4294967296
+-->

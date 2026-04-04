@@ -1,0 +1,75 @@
+---
+title: "HdInsight.Contents"
+slug: "hdinsight-contents"
+category: "Accessing Data"
+description: "Returns a navigation table of containers from an Azure HDInsight storage vault."
+syntax: "HdInsight.Contents(account as text) as table"
+returnType: "table"
+returnDescription: "A navigation table containing one row for each container found at the Azure storage account URL, with a link to the container's blobs."
+parameters:
+  - name: "account"
+    type: "text"
+    required: true
+    description: "The Azure storage account URL associated with the HDInsight cluster (e.g., \"https://mystorageaccount.blob.core.windows.net\")."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "hdinsight-containers"
+  - "hdinsight-files"
+  - "azurestorage-blobs"
+  - "azurestorage-tables"
+relatedConcepts: []
+---
+
+## Remarks
+
+`HdInsight.Contents` connects to the Azure storage account associated with an Azure HDInsight cluster and returns a navigation table listing all blob containers. Each row represents a container with a link to browse its blobs. This function is functionally equivalent to `HdInsight.Containers` and provides the same navigation table structure for accessing HDInsight-associated Azure Blob Storage.
+
+**Navigation table structure**: The result is a navigation table where each row contains:
+- `Name` (text) -- the container name.
+- `Data` (table) -- a nested table of blobs within the container, accessible by drilling into this column.
+
+**Authentication**: Requires the Azure storage account key for the storage account backing the HDInsight cluster. Configure the account key credential in the Power Query data source settings dialog using the storage account URL as the credential scope. Shared Access Signature (SAS) tokens may also be supported.
+
+**Account parameter**: Pass the full Azure Blob Storage service endpoint URL (e.g., `"https://mystorageaccount.blob.core.windows.net"`) or the storage account name alone. Power Query resolves the account name to the standard blob endpoint.
+
+**Comparison with HdInsight.Containers**: `HdInsight.Contents` and `HdInsight.Containers` are equivalent -- both return a navigation table of containers from the same Azure storage account. They exist as aliases for compatibility. Use either function interchangeably.
+
+**Relationship to HDInsight**: Azure HDInsight clusters use Azure Blob Storage (or Azure Data Lake Storage) as their default file system. This function provides access to the underlying storage containers where HDInsight stores input data, output results, and cluster logs.
+
+**Query folding**: Not supported. Container enumeration and all filtering are performed in Power Query after the container list is retrieved from Azure Storage.
+
+**Platform availability**: Available in **Power BI Desktop**, **Power BI Service**, **Excel Desktop**, and **Dataflows**. Not available in Excel Online or Fabric notebooks. In Power BI Service, the storage account key credential must be configured in the dataset's data source settings for scheduled refresh.
+
+## Examples
+
+### Example 1: List all containers in an HDInsight storage account
+
+```powerquery
+HdInsight.Contents("https://mystorageaccount.blob.core.windows.net")
+```
+
+### Example 2: Navigate to a specific container and browse its blobs
+
+```powerquery
+let
+    Containers = HdInsight.Contents("https://mystorageaccount.blob.core.windows.net"),
+    DataContainer = Containers{[Name = "hdinsight-data"]}[Data]
+in
+    DataContainer
+```
+
+### Example 3: List all containers and their names
+
+```powerquery
+let
+    Source = HdInsight.Contents("mystorageaccount"),
+    ContainerNames = Source[Name]
+in
+    ContainerNames
+```

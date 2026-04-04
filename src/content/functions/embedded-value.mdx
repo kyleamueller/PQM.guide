@@ -1,0 +1,63 @@
+---
+title: "Embedded.Value"
+slug: "embedded-value"
+category: "Value"
+description: "Accesses a value within an embedded resource by path. Intended for internal use only."
+syntax: "Embedded.Value(value as any, path as text) as any"
+returnType: "any"
+returnDescription: "The value located at the specified path within the embedded resource."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The embedded resource or container value to access."
+  - name: "path"
+    type: "text"
+    required: true
+    description: "The path identifying the specific value to extract from the embedded resource."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-metadata"
+  - "value-type"
+  - "value-expression"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+`Embedded.Value` is an **internal-only function** as stated in the official Microsoft documentation. It accesses a value within an embedded resource by navigating to it using a text `path`.
+
+Embedded resources in the Power Query context refer to data or code artifacts that are bundled within a connector, mashup package, or Power BI file. For example, a custom connector (.mez file) may embed static data, configuration records, or helper functions that need to be accessed by the connector's M code at runtime.
+
+`Embedded.Value` provides the mechanism for the engine and connectors to navigate into these embedded containers and extract specific values by path — similar to how `Record.Field` accesses a field by name, but operating on the engine's internal embedded resource structure.
+
+For standard M query development, this function has no practical use. Embedded resources are managed by the connector packaging infrastructure and the Power BI file format. If you need to access nested values in user code, use `Record.Field`, list indexing, or navigation expressions.
+
+## Examples
+
+### Example 1: Conceptual usage — accessing an embedded resource
+
+This function is internal-only. The concept is analogous to navigating a nested record by path.
+
+```powerquery
+let
+    // Conceptually, Embedded.Value operates like navigating a nested structure:
+    // Embedded.Value(someResource, "config/timeout") returns the timeout setting
+    //
+    // The user-code equivalent of path-based access:
+    Resource = [config = [timeout = 30, retries = 3]],
+    Result = Resource[config][timeout]
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+-->

@@ -1,0 +1,85 @@
+---
+title: "Cube.ReplaceDimensions"
+slug: "cube-replacedimensions"
+category: "Table"
+description: "Replaces the set of dimensions returned by Cube.Dimensions for a cube."
+syntax: "Cube.ReplaceDimensions(cube as table, dimensions as any) as table"
+returnType: "table"
+returnDescription: "The cube table with the modified set of dimensions."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table whose dimensions are to be replaced."
+  - name: "dimensions"
+    type: "any"
+    required: true
+    description: "The replacement dimensions to use. Typically a modified version of the table returned by Cube.Dimensions."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-dimensions"
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-collapseandremovecolumns"
+  - "cube-transform"
+  - "analysisservices-database"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP dimensions"
+  - "Dimension customization"
+  - "Cube metadata"
+---
+
+## Remarks
+
+`Cube.ReplaceDimensions` replaces the set of dimensions returned by `Cube.Dimensions` for the given cube. This allows you to customize or augment the dimension definitions before expanding them. For example, you can add an ID column to a dimension attribute so that the data source groups on the internal ID rather than the displayed value.
+
+This function is an advanced operation that modifies the cube's metadata layer. The `dimensions` parameter is typically a modified version of the table originally returned by `Cube.Dimensions`. After replacement, subsequent calls to `Cube.Dimensions` on the resulting cube will return the new dimensions.
+
+Common use cases include:
+- Adding key columns to dimensions for more efficient grouping.
+- Filtering or reordering the set of available dimensions.
+- Augmenting dimension attribute definitions with additional hierarchies or properties.
+
+## Examples
+
+### Example 1: Replace dimensions with a modified set
+
+Modify the dimensions table to add an ID column for a dimension attribute.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Dims = Cube.Dimensions(Cube),
+    // Modify the dimensions table as needed
+    ModifiedDims = Table.SelectRows(Dims, each [Name] <> "Internal"),
+    NewCube = Cube.ReplaceDimensions(Cube, ModifiedDims)
+in
+    NewCube
+```
+
+### Example 2: Replace dimensions to customize grouping behavior
+
+Replace dimensions so that subsequent expansions use the ID rather than the display value for grouping.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    OriginalDims = Cube.Dimensions(Cube),
+    CustomDims = OriginalDims,
+    CubeWithCustomDims = Cube.ReplaceDimensions(Cube, CustomDims),
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        CubeWithCustomDims,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    )
+in
+    WithProduct
+```

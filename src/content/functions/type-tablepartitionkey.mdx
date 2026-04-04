@@ -1,0 +1,58 @@
+---
+title: "Type.TablePartitionKey"
+slug: "type-tablepartitionkey"
+category: "Type"
+description: "Returns the partition key for the given table type, if one is defined."
+syntax: "Type.TablePartitionKey(tableType as type) as nullable list"
+returnType: "list"
+returnDescription: "A list of column names that form the partition key of the table type, or null if no partition key is defined."
+parameters:
+  - name: "tableType"
+    type: "type"
+    required: true
+    description: "The table type whose partition key to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "type-replacetablepartitionkey"
+  - "table-partitionkey"
+  - "table-replacepartitionkey"
+  - "type-tablerow"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Type.TablePartitionKey` returns the partition key metadata attached to a table type as a list of column names, or `null` if no partition key has been defined on the type.
+
+This is the type-system counterpart to `Table.PartitionKey`. While `Table.PartitionKey` retrieves partition key metadata from a table value, `Type.TablePartitionKey` retrieves it from a table type definition.
+
+### Use cases
+
+- Inspecting table type metadata in custom connector development.
+- Verifying that a table type has the expected partition key before using it.
+- Working with the Power Query SDK to read partitioned data source type definitions.
+
+Partition keys indicate how a table's data is logically segmented. They are primarily relevant when working with partitioned data sources or building custom connectors that expose partitioned data to the Power Query engine for parallel evaluation.
+
+## Examples
+
+### Example 1: Check the partition key of a table type
+
+Retrieve the partition key from a table type that has one defined.
+
+```powerquery
+let
+    MyType = Type.ReplaceTablePartitionKey(
+        type table [Region = text, Sales = number],
+        {"Region"}
+    ),
+    Key = Type.TablePartitionKey(MyType)
+in
+    if Key = null then "No partition key" else Text.Combine(Key, ", ")
+```

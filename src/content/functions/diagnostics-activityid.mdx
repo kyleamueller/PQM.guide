@@ -1,0 +1,48 @@
+---
+title: "Diagnostics.ActivityId"
+slug: "diagnostics-activityid"
+category: "Expression"
+description: "Returns an opaque identifier for the currently-running evaluation."
+syntax: "Diagnostics.ActivityId() as nullable text"
+returnType: "text"
+returnDescription: "A text identifier for the current evaluation activity, or null if unavailable."
+parameters: []
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "diagnostics-correlationid"
+  - "diagnostics-trace"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Diagnostics.ActivityId` returns an opaque text identifier for the currently-running evaluation. This identifier is generated internally by the Power Query engine and uniquely identifies a single evaluation session.
+
+This is an **internal/advanced function** primarily useful for:
+
+- Correlating log entries across diagnostic traces within a single query evaluation.
+- Custom connector development where activity tracking is needed.
+- Debugging complex evaluation scenarios by tagging trace output with the activity ID.
+
+The function takes no parameters. It returns `null` if no activity ID is available in the current context.
+
+Because this is an engine-level diagnostic identifier, its format is not guaranteed and should be treated as opaque — do not parse or rely on its structure.
+
+## Examples
+
+### Example 1: Retrieve the current activity ID
+
+Capture the activity identifier for the running evaluation.
+
+```powerquery
+let
+    ActivityId = Diagnostics.ActivityId()
+in
+    #table({"ActivityId"}, {{ActivityId}})
+```

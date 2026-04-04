@@ -1,0 +1,70 @@
+---
+title: "Access.Database"
+slug: "access-database"
+category: "Accessing Data"
+description: "Returns a structural representation of a Microsoft Access database."
+syntax: "Access.Database(database as binary, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table listing the tables, queries, and other objects in the Access database."
+parameters:
+  - name: "database"
+    type: "binary"
+    required: true
+    description: "The binary content of a Microsoft Access database file (.accdb or .mdb), typically obtained via File.Contents."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control behavior. Supported fields include CreateNavigationProperties and NavigationPropertyNameGenerator."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "file-contents"
+  - "sql-database"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`Access.Database` reads the binary content of a Microsoft Access database file (.accdb or .mdb) and returns a **navigation table** of the tables, queries, and other objects contained within it. Because it requires a binary input, it is almost always paired with `File.Contents` to read the file from disk.
+
+**Key options** (passed in the `options` record):
+- `CreateNavigationProperties` (logical) -- when `true`, navigation properties are generated on the returned values based on relationships in the database. Defaults to `false`.
+- `NavigationPropertyNameGenerator` (function) -- a custom function used to create names for navigation properties.
+
+**Authentication**: Access databases do not use connector-level authentication. The file must be accessible on disk or via a network share. If the .accdb file is password-protected, the credentials dialog in Power BI Desktop or Excel will prompt for the database password.
+
+**Query folding**: Limited. Access.Database does not support query folding to the same extent as SQL Server. Filter and column selection operations are generally evaluated locally by the Power Query engine after loading the data.
+
+**Platform availability**: This function is available only in **Power BI Desktop** and **Excel Desktop**. It is not supported in Power BI Service (cloud refresh), Excel Online, Dataflows, or Fabric Notebooks because it relies on the Microsoft Access Database Engine (ACE provider), which is a local desktop component. In Power BI Service, an on-premises data gateway with the ACE driver installed is required.
+
+## Examples
+
+### Example 1: Open an Access database from a local file
+
+```powerquery
+Access.Database(File.Contents("C:\Data\Northwind.accdb"))
+```
+
+### Example 2: Open an Access database with navigation properties enabled
+
+```powerquery
+Access.Database(
+    File.Contents("C:\Data\Northwind.accdb"),
+    [CreateNavigationProperties = true]
+)
+```
+
+### Example 3: Navigate to a specific table in the Access database
+
+```powerquery
+let
+    Source = Access.Database(File.Contents("C:\Data\Sales.accdb")),
+    Orders = Source{[Name = "Orders"]}[Data]
+in
+    Orders
+```

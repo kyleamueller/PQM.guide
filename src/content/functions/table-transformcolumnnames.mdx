@@ -1,0 +1,89 @@
+---
+title: "Table.TransformColumnNames"
+slug: "table-transformcolumnnames"
+category: "Table"
+description: "Transforms column names in a table using the specified function."
+syntax: "Table.TransformColumnNames(table as table, nameGenerator as function, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A table with column names transformed by the nameGenerator function."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The input table whose column names will be transformed."
+  - name: "nameGenerator"
+    type: "function"
+    required: true
+    description: "A function applied to each column name to produce the new name."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "A record with optional fields MaxLength (number) and Comparer (comparer function)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-renamecolumns"
+  - "table-columnnames"
+  - "table-prefixcolumns"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Table.TransformColumnNames` applies a function to every column name in a table and returns a table with the transformed names. This is useful for bulk cleanup — trimming whitespace, removing special characters, standardizing casing, or adding prefixes.
+
+The optional `options` record supports two fields:
+
+- **MaxLength** — limits the length of generated names. If the transformed name exceeds this limit, it is truncated and a numeric suffix is appended to disambiguate duplicates.
+- **Comparer** — controls how duplicate detection works during renaming. Use `Comparer.OrdinalIgnoreCase` to treat `"Column"` and `"COLUMN"` as duplicates.
+
+Unlike `Table.RenameColumns`, which maps specific old names to new names, this function applies a single transformation rule to all columns at once. Use `Table.RenameColumns` when you need to rename specific columns individually; use `Table.TransformColumnNames` when you need to apply a uniform rule across all columns.
+
+## Examples
+
+### Example 1: Clean column names by removing non-printable characters
+
+Remove tab characters and other control characters from column names imported from an external source.
+
+```powerquery
+let
+    Source = Table.FromRecords({[#"Col#(tab)A" = 1, #"Col#(tab)B" = 2]}),
+    Cleaned = Table.TransformColumnNames(Source, Text.Clean)
+in
+    Cleaned
+```
+
+### Example 2: Trim and uppercase all column names
+
+Standardize column names from a messy source to uppercase with no leading/trailing spaces.
+
+```powerquery
+let
+    Trimmed = Table.TransformColumnNames(
+        Sales,
+        each Text.Upper(Text.Trim(_))
+    )
+in
+    Trimmed
+```
+
+### Example 3: Handle duplicate names with MaxLength
+
+When truncation causes duplicate names, a numeric suffix is appended automatically.
+
+```powerquery
+let
+    Source = Table.FromRecords({[ColumnNum = 1, cOlumnnum = 2, coLumnNUM = 3]}),
+    Shortened = Table.TransformColumnNames(
+        Source,
+        Text.Clean,
+        [MaxLength = 6, Comparer = Comparer.OrdinalIgnoreCase]
+    )
+in
+    Shortened
+```

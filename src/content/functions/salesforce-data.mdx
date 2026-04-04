@@ -1,0 +1,93 @@
+---
+title: "Salesforce.Data"
+slug: "salesforce-data"
+category: "Accessing Data"
+description: "Returns a navigation table of objects from a Salesforce account."
+syntax: "Salesforce.Data(optional loginUrl as any, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of Salesforce objects (tables) available in the authenticated Salesforce account."
+parameters:
+  - name: "loginUrl"
+    type: "any"
+    required: false
+    description: "The Salesforce environment login URL. If not provided, connects to production (https://login.salesforce.com). Use \"https://test.salesforce.com\" for sandbox environments, or a custom domain URL for My Domain configurations."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control navigation properties, API version, and request timeout."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: false
+relatedFunctions:
+  - "salesforce-reports"
+---
+
+## Remarks
+
+`Salesforce.Data` connects to a Salesforce account and returns a navigation table of all Salesforce objects (such as Account, Contact, Opportunity, and custom objects) visible to the authenticated user. The function uses the Salesforce REST API to retrieve metadata and data.
+
+**Authentication**: Salesforce uses OAuth 2.0 authentication. When you first connect, Power Query prompts you to sign in to Salesforce through a browser-based OAuth flow. Credentials are managed by Power Query's credential store — do not embed credentials in the M query. The authenticated user's permissions and field-level security in Salesforce determine which objects and fields are accessible.
+
+**Login URL**: The `loginUrl` parameter controls which Salesforce environment to connect to:
+- Production: `"https://login.salesforce.com"` (default when omitted).
+- Sandbox: `"https://test.salesforce.com"`.
+- Custom domain: `"https://mycompany.my.salesforce.com"`.
+
+**Query folding**: Salesforce supports query folding. Power Query translates filters (`Table.SelectRows`), column selection (`Table.SelectColumns`), and row limits into SOQL queries executed on the Salesforce server, reducing the data transferred.
+
+**Key options**:
+- `CreateNavigationProperties` (logical) — generate navigation properties on the returned values based on Salesforce object relationships. Default is `false`.
+- `ApiVersion` (number) — the Salesforce API version to use for this query. When not specified, API version 29.0 is used. Specify a higher version to access newer Salesforce features and fields.
+- `Timeout` (duration) — maximum time to wait before abandoning a request to the Salesforce server. The default value is source-specific.
+
+**API version considerations**: The default API version 29.0 is quite old. Many newer Salesforce features, custom objects, and fields may require a more recent API version (e.g., 58.0 or higher). Specify the `ApiVersion` option to match your Salesforce org's capabilities.
+
+**Power BI Service**: Salesforce supports direct cloud refresh in the Power BI Service without requiring an on-premises data gateway, since Salesforce is a cloud service accessed via public APIs.
+
+## Examples
+
+### Example 1: Connect to Salesforce production with defaults
+```powerquery
+Salesforce.Data()
+```
+
+### Example 2: Connect to a Salesforce sandbox
+```powerquery
+Salesforce.Data("https://test.salesforce.com")
+```
+
+### Example 3: Connect with a specific API version and navigation properties
+```powerquery
+Salesforce.Data(
+    "https://login.salesforce.com",
+    [
+        ApiVersion = 58.0,
+        CreateNavigationProperties = true
+    ]
+)
+```
+
+### Example 4: Navigate to the Account object and filter rows
+```powerquery
+let
+    Source = Salesforce.Data("https://login.salesforce.com", [ApiVersion = 58.0]),
+    Accounts = Source{[Name="Account"]}[Data],
+    ActiveAccounts = Table.SelectRows(Accounts, each [IsDeleted] = false)
+in
+    ActiveAccounts
+```
+
+### Example 5: Connect using a custom My Domain URL with a timeout
+```powerquery
+Salesforce.Data(
+    "https://mycompany.my.salesforce.com",
+    [
+        ApiVersion = 58.0,
+        Timeout = #duration(0, 0, 2, 0)
+    ]
+)
+```

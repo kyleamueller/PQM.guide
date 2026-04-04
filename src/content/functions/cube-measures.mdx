@@ -1,0 +1,71 @@
+---
+title: "Cube.Measures"
+slug: "cube-measures"
+category: "Table"
+description: "Returns a table containing the set of available measures within a cube."
+syntax: "Cube.Measures(cube as any) as table"
+returnType: "table"
+returnDescription: "A table listing the available measures in the cube, where each measure is represented as a function."
+parameters:
+  - name: "cube"
+    type: "any"
+    required: true
+    description: "The cube to retrieve measures from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-addmeasurecolumn"
+  - "cube-measureproperty"
+  - "cube-measureproperties"
+  - "cube-dimensions"
+  - "cube-displayfolders"
+  - "analysisservices-database"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP measures"
+  - "Cube metadata"
+  - "Measure groups"
+---
+
+## Remarks
+
+`Cube.Measures` returns a table containing the set of available measures within the specified cube. Each measure is represented as a function that can be evaluated in a specific dimensional context. Measures are the quantitative values in an OLAP cube -- they represent the data that is aggregated and analyzed (e.g., Sales Amount, Order Count, Profit Margin).
+
+Measures from this table can be applied to the cube using `Cube.AddMeasureColumn`. The measure selector values from this table are passed as the `measureSelector` argument. Individual measure properties (such as format string or aggregation type) can be retrieved using `Cube.MeasureProperty`.
+
+In Analysis Services multidimensional models, measures are organized into measure groups. In tabular models, measures are defined within tables using DAX expressions.
+
+## Examples
+
+### Example 1: List all measures in a cube
+
+Retrieve the list of measures available in the Adventure Works cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Measures = Cube.Measures(Cube)
+in
+    Measures
+```
+
+### Example 2: Select a measure and add it to the cube
+
+Retrieve a measure from the measures table and use it as a column in the cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Measures = Cube.Measures(Cube),
+    SalesMeasure = Measures{[Name = "Internet Sales Amount"]}[Value],
+    WithSales = Cube.AddMeasureColumn(Cube, "Sales", SalesMeasure)
+in
+    WithSales
+```

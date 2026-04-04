@@ -1,0 +1,57 @@
+---
+title: "BinaryFormat.7BitEncodedUnsignedInteger"
+slug: "binaryformat-7bitencodedunsignedinteger"
+category: "Binary"
+description: "A binary format that reads a 64-bit unsigned integer encoded using a 7-bit variable-length encoding."
+syntax: "BinaryFormat.7BitEncodedUnsignedInteger(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 7-bit variable-length encoded unsigned integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 7-bit encoded unsigned integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-7bitencodedsignedinteger"
+  - "binaryformat-byte"
+  - "binaryformat-unsignedinteger16"
+  - "binaryformat-unsignedinteger32"
+  - "binaryformat-unsignedinteger64"
+relatedConcepts:
+  - "Variable-length encoding"
+  - "Binary data parsing"
+---
+
+## Remarks
+
+`BinaryFormat.7BitEncodedUnsignedInteger` is a binary format specifier that reads a 64-bit unsigned integer that was encoded using a 7-bit variable-length encoding. In this encoding, small values use fewer bytes than larger values. Each byte uses 7 bits for data and 1 bit (the high bit) to indicate whether more bytes follow.
+
+This format is commonly found in .NET binary serialization (e.g., `BinaryWriter.Write7BitEncodedInt`) and is often used to prefix strings or lists with their length in a compact form. Values 0-127 use a single byte, values 128-16383 use two bytes, and so on.
+
+This is a format value (a function), not a function you call directly on data. Use it as a format specifier with other `BinaryFormat` functions or apply it directly to binary data.
+
+## Examples
+
+### Example 1: Read a 7-bit encoded unsigned integer
+
+Read a small unsigned integer encoded in a single byte.
+
+```powerquery
+let
+    // The value 10 encoded as a single byte (values < 128 fit in one byte)
+    binaryData = #binary({0x0A}),
+    result = BinaryFormat.7BitEncodedUnsignedInteger(binaryData)
+in
+    result
+```
+
+<!--output
+10
+-->

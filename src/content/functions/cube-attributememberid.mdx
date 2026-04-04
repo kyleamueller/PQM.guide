@@ -1,0 +1,84 @@
+---
+title: "Cube.AttributeMemberId"
+slug: "cube-attributememberid"
+category: "Table"
+description: "Returns the unique member identifier from a dimension attribute member property value."
+syntax: "Cube.AttributeMemberId(attribute as any) as any"
+returnType: "any"
+returnDescription: "The unique member identifier for the given attribute member property value, or null if the value is not a member property."
+parameters:
+  - name: "attribute"
+    type: "any"
+    required: true
+    description: "A dimension attribute member property value from which to extract the unique member identifier."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-attributememberproperty"
+  - "cube-dimensions"
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-properties"
+  - "cube-propertykey"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP dimension members"
+  - "Member unique names"
+  - "Attribute hierarchies"
+---
+
+## Remarks
+
+`Cube.AttributeMemberId` extracts the unique member identifier from a member property value returned by a dimension attribute column. In Analysis Services, each member in a dimension hierarchy has a unique identifier (often in the format `[Dimension].[Hierarchy].&[Key]`). This function retrieves that identifier from attribute values in the cube's tabular view.
+
+The function returns `null` for values that are not member property values (i.e., values that did not originate from a cube dimension attribute).
+
+This is useful when you need to reference a specific member programmatically -- for example, to build MDX expressions or to match members across different dimensions or hierarchies.
+
+## Examples
+
+### Example 1: Get the member ID from a product attribute
+
+Extract the unique member identifier from a Product Name attribute value.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    FirstRow = Table.First(WithProduct),
+    MemberId = Cube.AttributeMemberId(FirstRow[Product Name])
+in
+    MemberId
+```
+
+### Example 2: Compare member IDs
+
+Use `Cube.AttributeMemberId` to check whether two attribute values refer to the same member.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    AddMemberId = Table.AddColumn(
+        WithProduct,
+        "MemberId",
+        each Cube.AttributeMemberId([Product Name]),
+        type text
+    )
+in
+    AddMemberId
+```

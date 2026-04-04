@@ -1,0 +1,53 @@
+---
+title: "SqlExpression.SchemaFrom"
+slug: "sqlexpression-schemafrom"
+category: "Expression"
+description: "Returns schema information from a SQL-related expression. Intended for internal use only."
+syntax: "SqlExpression.SchemaFrom(schema as any) as any"
+returnType: "any"
+returnDescription: "Schema information derived from the provided input."
+parameters:
+  - name: "schema"
+    type: "any"
+    required: true
+    description: "The schema value to process."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "sqlexpression-toexpression"
+  - "table-view"
+relatedConcepts:
+  - "query-folding"
+internal: true
+---
+
+## Remarks
+
+`SqlExpression.SchemaFrom` is an **internal-only function** as stated in the official Microsoft documentation. It is part of the `SqlExpression` family of functions that support query folding infrastructure within the Power Query engine.
+
+This function is used internally by the engine and custom SQL-based connectors to extract or process schema information from SQL-related expressions. The schema information is typically used during query folding to map M table types to SQL table schemas.
+
+For standard M query development, this function has no practical use. Custom connector developers working with SQL-based data sources should refer to the Power Query SDK documentation for guidance on implementing query folding using `Table.View` handlers.
+
+## Examples
+
+### Example 1: Conceptual usage
+
+This function is internal to the Power Query engine. Direct invocation in user queries is not supported.
+
+```powerquery
+let
+    // SqlExpression.SchemaFrom is used internally by the Power Query engine
+    // for SQL query folding. It is not intended for direct use in M queries.
+    //
+    // Custom connector developers implement query folding via Table.View handlers,
+    // which may use SqlExpression functions behind the scenes.
+    Result = "See Table.View for query folding patterns"
+in
+    Result
+```

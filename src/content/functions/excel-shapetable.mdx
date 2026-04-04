@@ -1,0 +1,59 @@
+---
+title: "Excel.ShapeTable"
+slug: "excel-shapetable"
+category: "Accessing Data"
+description: "Retrieves shape data from an Excel workbook as a table. This function is intended for internal use only."
+syntax: "Excel.ShapeTable(table as table, optional options as nullable record) as any"
+returnType: "any"
+returnDescription: "The shape data extracted from the Excel workbook, returned in a format determined by the internal implementation."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "A table representing the Excel workbook content, typically derived from the internal workbook parsing pipeline."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record for specifying additional processing options."
+compatibility:
+  pbiDesktop: false
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "excel-workbook"
+  - "file-contents"
+internal: true
+---
+
+## Remarks
+
+`Excel.ShapeTable` is an **internal function** that is not intended for use in user-authored queries. According to the official Microsoft documentation, "this function is intended for internal use only."
+
+**Purpose**: This function is part of the internal Excel workbook parsing pipeline in Power Query. It is used behind the scenes to extract and process shape objects (such as charts, images, SmartArt, and other non-tabular elements) embedded in Excel workbooks.
+
+**Not for end-user use**: This function is not exposed in the Power Query UI and is not documented with detailed parameters or examples by Microsoft. Attempting to call it directly may produce unexpected results or errors.
+
+**Authentication**: Not applicable. This function operates on in-memory table data that has already been loaded from an Excel file.
+
+**Query folding**: Not applicable. This is an in-memory processing function.
+
+**Platform availability**: This function exists in the Power Query runtime but is not available for direct use in any end-user environment (Power BI Desktop, Power BI Service, Excel, Dataflows, or Fabric Notebooks).
+
+**Recommended alternatives**: To work with Excel workbook data, use `Excel.Workbook` which returns a navigation table of sheets, named tables, and named ranges. Shape data (charts, images) within Excel files is not directly accessible through Power Query's public API.
+
+## Examples
+
+### Example 1: Use Excel.Workbook instead (recommended)
+
+Since `Excel.ShapeTable` is internal-only, use `Excel.Workbook` to access Excel file contents:
+
+```powerquery
+let
+    Source = Excel.Workbook(File.Contents("C:\Data\report.xlsx"), true),
+    Sheet1 = Source{[Item = "Sheet", Name = "Sheet1"]}[Data]
+in
+    Sheet1
+```

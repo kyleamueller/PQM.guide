@@ -1,0 +1,74 @@
+---
+title: "BinaryFormat.SignedInteger16"
+slug: "binaryformat-signedinteger16"
+category: "Binary"
+description: "A binary format that reads a 16-bit signed integer."
+syntax: "BinaryFormat.SignedInteger16(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 2-byte signed integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 16-bit signed integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-signedinteger32"
+  - "binaryformat-signedinteger64"
+  - "binaryformat-unsignedinteger16"
+  - "binaryformat-byte"
+  - "binaryformat-byteorder"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Signed integers"
+  - "Two's complement"
+---
+
+## Remarks
+
+`BinaryFormat.SignedInteger16` is a binary format specifier that reads a 16-bit (2-byte) signed integer from binary data. The value range is -32768 to 32767 (Int16 / short). The integer is stored in two's complement format.
+
+The default byte order is little-endian. Use `BinaryFormat.ByteOrder` to wrap this format if the source data uses big-endian byte ordering.
+
+This format is commonly used in audio file headers (e.g., WAV files), image metadata, and network protocols that use 16-bit signed values.
+
+## Examples
+
+### Example 1: Read a 16-bit signed integer
+
+Read a 2-byte signed integer from binary data.
+
+```powerquery
+let
+    binaryData = #binary({0x01, 0x00}),
+    result = BinaryFormat.SignedInteger16(binaryData)
+in
+    result
+```
+
+<!--output
+1
+-->
+
+### Example 2: Read a negative 16-bit signed integer
+
+Read a negative value stored as a 16-bit signed integer in two's complement.
+
+```powerquery
+let
+    // -1 in 16-bit two's complement little-endian = 0xFF, 0xFF
+    binaryData = #binary({0xFF, 0xFF}),
+    result = BinaryFormat.SignedInteger16(binaryData)
+in
+    result
+```
+
+<!--output
+-1
+-->

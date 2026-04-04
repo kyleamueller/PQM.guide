@@ -1,0 +1,69 @@
+---
+title: "Table.View"
+slug: "table-view"
+category: "Table"
+description: "Creates a custom view of a table with handler functions that override default operation behavior."
+syntax: "Table.View(table as nullable table, handlers as record) as table"
+returnType: "table"
+returnDescription: "A table view where specified handler functions override default operation behavior."
+parameters:
+  - name: "table"
+    type: "table"
+    required: false
+    description: "The base table to create a view of. If null, the GetType and GetRows handlers are required."
+  - name: "handlers"
+    type: "record"
+    required: true
+    description: "A record of handler functions that replace the default behavior of operations applied to the view."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-viewerror"
+  - "table-viewfunction"
+relatedConcepts:
+  - "query-folding"
+---
+
+## Remarks
+
+`Table.View` is the primary mechanism for implementing query folding in custom Power Query connectors. It creates a table "view" where you provide handler functions that intercept standard M operations (filtering, sorting, column selection, etc.) and translate them into source-native queries instead of processing data in memory.
+
+When an operation is applied to a view:
+
+1. If a matching handler exists, it is called.
+2. If the handler raises an error, the engine falls back to applying the operation against the base `table` using default behavior. Use `Table.ViewError` to raise errors that bypass this fallback.
+3. If no handler exists, the default behavior is applied to `table`.
+
+If `table` is `null`, the `GetType` and `GetRows` handlers are required — there is no base table to fall back to.
+
+Common handler functions include `GetType`, `GetRows`, `GetRowCount`, `OnSelectColumns`, `OnSelectRows`, `OnSort`, `OnTake`, `OnSkip`, `OnGroup`, and `OnInvoke`. See the [Power Query SDK TripPin tutorial](https://learn.microsoft.com/en-us/power-query/samples/trippin/10-tableview1/readme) for a complete walkthrough.
+
+This function is primarily used by connector developers rather than end users writing ad-hoc queries.
+
+## Examples
+
+### Example 1: Create a basic view with explicit type and row count
+
+Define a view that provides type information and row count without requiring the engine to scan all rows.
+
+```powerquery
+let
+    View = Table.View(
+        null,
+        [
+            GetType = () => type table [CustomerID = number, Name = text, Phone = nullable text],
+            GetRows = () => Table.FromRecords({
+                [CustomerID = 1, Name = "Bob", Phone = "123-4567"],
+                [CustomerID = 2, Name = "Jim", Phone = "987-6543"]
+            }),
+            GetRowCount = () => 2
+        ]
+    )
+in
+    View
+```

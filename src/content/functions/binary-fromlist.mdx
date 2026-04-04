@@ -1,0 +1,72 @@
+---
+title: "Binary.FromList"
+slug: "binary-fromlist"
+category: "Binary"
+description: "Converts a list of byte numbers (0-255) into a binary value."
+syntax: "Binary.FromList(list as list) as binary"
+returnType: "binary"
+returnDescription: "A binary value created from the list of byte values."
+parameters:
+  - name: "list"
+    type: "list"
+    required: true
+    description: "A list of numbers (each 0 to 255) representing individual bytes."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binary-tolist"
+  - "binary-from"
+  - "binary-fromtext"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Binary.FromList` converts a list of numbers into a binary value. Each number in the list represents a single byte and must be in the range 0 to 255. This is the inverse of `Binary.ToList`.
+
+This function is useful for constructing binary data byte-by-byte, such as building custom binary headers or protocol messages.
+
+## Examples
+
+### Example 1: Create a binary from a list of bytes
+
+Build a binary value from individual byte values and convert to text.
+
+```powerquery
+let
+    Bytes = {72, 101, 108, 108, 111},
+    AsBinary = Binary.FromList(Bytes),
+    AsText = Text.FromBinary(AsBinary)
+in
+    AsText
+```
+
+<!--output
+"Hello"
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Bytes",
+      "description": "Defines a list of five byte values representing the UTF-8 encoding of \"Hello\".",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{72, 101, 108, 108, 111}"}]}
+    },
+    {
+      "name": "AsBinary",
+      "description": "Converts the list of byte values into a binary value using Binary.FromList.",
+      "output": {"columns":[{"name":"Value","type":"binary"}],"rows":[{"Value":"Binary"}]}
+    },
+    {
+      "name": "AsText",
+      "description": "Converts the binary value back to text, yielding \"Hello\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Hello"}]}
+    }
+  ]
+}
+-->

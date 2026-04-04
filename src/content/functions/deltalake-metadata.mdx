@@ -1,0 +1,42 @@
+---
+title: "DeltaLake.Metadata"
+slug: "deltalake-metadata"
+category: "Accessing Data"
+description: "Returns the transaction log entries for a Delta Lake table."
+syntax: "DeltaLake.Metadata(table as table) as table"
+returnType: "table"
+returnDescription: "A table containing the transaction log entries for the specified Delta Lake table."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "A Delta Lake table (as returned by DeltaLake.Table) whose transaction log entries you want to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: false
+  excelOnline: false
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "deltalake-table"
+---
+
+## Remarks
+
+`DeltaLake.Metadata` accepts a Delta Lake table and returns its transaction log entries. The Delta Lake transaction log (also known as the Delta log) records every change made to the table — including commits, schema changes, partition modifications, and file-level additions and removals. This function is useful for auditing, lineage tracking, and understanding the history of a Delta Lake table.
+
+The `table` parameter should be a value previously returned by `DeltaLake.Table`. Passing a non-Delta table will result in an error.
+
+**Platform availability**: This function is available in environments that support the Delta Lake connector, including Power BI Desktop, Power BI Service (via supported lakehouse/storage connections), Dataflows, and Fabric Notebooks. It is not available in Excel.
+
+## Examples
+
+### Example 1: Retrieve the transaction log for a Delta Lake table
+```powerquery
+let
+    DeltaTable = DeltaLake.Table("https://myaccount.dfs.core.windows.net/mycontainer/delta-table"),
+    Metadata = DeltaLake.Metadata(DeltaTable)
+in
+    Metadata
+```

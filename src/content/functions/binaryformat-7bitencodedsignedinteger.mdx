@@ -1,0 +1,57 @@
+---
+title: "BinaryFormat.7BitEncodedSignedInteger"
+slug: "binaryformat-7bitencodedsignedinteger"
+category: "Binary"
+description: "A binary format that reads a 64-bit signed integer encoded using a 7-bit variable-length encoding."
+syntax: "BinaryFormat.7BitEncodedSignedInteger(binary as binary) as any"
+returnType: "function"
+returnDescription: "A binary format function that reads a 7-bit variable-length encoded signed integer from binary data."
+parameters:
+  - name: "binary"
+    type: "binary"
+    required: true
+    description: "The binary data to read the 7-bit encoded signed integer from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-7bitencodedunsignedinteger"
+  - "binaryformat-byte"
+  - "binaryformat-signedinteger16"
+  - "binaryformat-signedinteger32"
+  - "binaryformat-signedinteger64"
+relatedConcepts:
+  - "Variable-length encoding"
+  - "Binary data parsing"
+---
+
+## Remarks
+
+`BinaryFormat.7BitEncodedSignedInteger` is a binary format specifier that reads a 64-bit signed integer that was encoded using a 7-bit variable-length encoding. In this encoding, small values use fewer bytes than larger values, making it an efficient way to store integers that are often small. Each byte uses 7 bits for data and 1 bit to indicate whether more bytes follow.
+
+This format is commonly used in .NET binary serialization and various compact binary protocols where signed integers need to be stored efficiently. The result is a signed 64-bit integer value.
+
+This is a format value (a function), not a function you call directly on data. Use it as a format specifier with other `BinaryFormat` functions or apply it directly to binary data.
+
+## Examples
+
+### Example 1: Read a 7-bit encoded signed integer
+
+Read a small signed integer that is encoded in a single byte using 7-bit variable-length encoding.
+
+```powerquery
+let
+    // The value 5 encoded as a 7-bit variable-length signed integer
+    binaryData = #binary({0x0A}),
+    result = BinaryFormat.7BitEncodedSignedInteger(binaryData)
+in
+    result
+```
+
+<!--output
+5
+-->

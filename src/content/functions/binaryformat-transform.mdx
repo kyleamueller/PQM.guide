@@ -1,0 +1,83 @@
+---
+title: "BinaryFormat.Transform"
+slug: "binaryformat-transform"
+category: "Binary"
+description: "Returns a binary format that transforms values read by another binary format."
+syntax: "BinaryFormat.Transform(binaryFormat as function, function as function) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads a value and applies a transformation function to it."
+parameters:
+  - name: "binaryFormat"
+    type: "function"
+    required: true
+    description: "The binary format used to read the value."
+  - name: "function"
+    type: "function"
+    required: true
+    description: "A function that receives the read value and returns the transformed value."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-byte"
+  - "binaryformat-choice"
+  - "binaryformat-record"
+  - "binaryformat-list"
+  - "binaryformat-length"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Value transformation"
+  - "Post-processing binary reads"
+---
+
+## Remarks
+
+`BinaryFormat.Transform` returns a binary format that reads a value using the specified `binaryFormat` and then applies a transformation `function` to the result. This enables post-processing of binary data inline within a format definition.
+
+The transformation function receives the raw value produced by `binaryFormat` and can return any type. This is useful for converting raw byte values into meaningful domain values, scaling numbers, mapping enumeration codes to text, or any other post-read processing.
+
+This pattern keeps the parsing and transformation logic together within the format definition rather than requiring a separate processing step after reading.
+
+## Examples
+
+### Example 1: Read a byte and add one to it
+
+Read a single byte and transform it by adding 1.
+
+```powerquery
+let
+    binaryData = #binary({1}),
+    transformFormat = BinaryFormat.Transform(
+        BinaryFormat.Byte,
+        (x) => x + 1
+    )
+in
+    transformFormat(binaryData)
+```
+
+<!--output
+2
+-->
+
+### Example 2: Convert a byte to a boolean
+
+Read a byte and transform it to a boolean value (0 = false, non-zero = true).
+
+```powerquery
+let
+    binaryData = #binary({1}),
+    boolFormat = BinaryFormat.Transform(
+        BinaryFormat.Byte,
+        (x) => x <> 0
+    )
+in
+    boolFormat(binaryData)
+```
+
+<!--output
+true
+-->

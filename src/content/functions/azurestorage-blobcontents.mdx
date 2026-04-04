@@ -1,0 +1,82 @@
+---
+title: "AzureStorage.BlobContents"
+slug: "azurestorage-blobcontents"
+category: "Accessing Data"
+description: "Returns the content of a blob from Azure Blob Storage as binary."
+syntax: "AzureStorage.BlobContents(url as text, optional options as nullable record) as binary"
+returnType: "binary"
+returnDescription: "The binary content of the specified blob from an Azure storage vault."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The full URL of the blob in Azure Blob Storage (e.g., \"https://myaccount.blob.core.windows.net/mycontainer/myfile.csv\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control download behavior. Supported fields include BlockSize, RequestSize, and ConcurrentRequests."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "azurestorage-blobs"
+  - "csv-document"
+  - "json-document"
+  - "excel-workbook"
+---
+
+## Remarks
+
+`AzureStorage.BlobContents` downloads a single blob from Azure Blob Storage and returns its content as a `binary` value. The binary result is typically passed to a parser function such as `Csv.Document`, `Json.Document`, or `Excel.Workbook` to interpret the data.
+
+**Key options** (passed in the `options` record):
+- `BlockSize` (number) -- the number of bytes to read before waiting on the data consumer. Defaults to 4 MB.
+- `RequestSize` (number) -- the number of bytes to try to read in a single HTTP request to the server. Defaults to 4 MB.
+- `ConcurrentRequests` (number) -- the number of requests to make in parallel for faster downloads. Higher values increase memory usage. Memory required is approximately ConcurrentRequests multiplied by RequestSize. Defaults to `16`.
+
+**Authentication**: Supports Account Key, Shared Access Signature (SAS), Microsoft Account (Azure AD / Entra ID), and Anonymous access. Configure the appropriate credential type in the data source credentials dialog. Do not embed account keys or SAS tokens in the M query.
+
+**Query folding**: Not applicable. This function downloads the entire blob as a single binary stream. Any filtering or transformation is performed locally after the data is downloaded and parsed.
+
+**Platform availability**: Available across all Power Query environments including Power BI Desktop, Power BI Service, Excel Desktop, Excel Online, Dataflows, and Fabric Notebooks. No gateway is required for cloud-to-cloud access.
+
+## Examples
+
+### Example 1: Download a CSV file from Azure Blob Storage
+
+```powerquery
+let
+    Source = AzureStorage.BlobContents("https://myaccount.blob.core.windows.net/data/sales.csv"),
+    Parsed = Csv.Document(Source, [Delimiter = ",", Encoding = TextEncoding.Utf8]),
+    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true])
+in
+    Promoted
+```
+
+### Example 2: Download a JSON file with increased concurrency
+
+```powerquery
+let
+    Source = AzureStorage.BlobContents(
+        "https://myaccount.blob.core.windows.net/data/records.json",
+        [ConcurrentRequests = 32, RequestSize = 8388608]
+    ),
+    Parsed = Json.Document(Source)
+in
+    Parsed
+```
+
+### Example 3: Download an Excel workbook from Azure Blob Storage
+
+```powerquery
+let
+    Source = AzureStorage.BlobContents("https://myaccount.blob.core.windows.net/reports/quarterly.xlsx"),
+    Workbook = Excel.Workbook(Source, true),
+    Sheet1 = Workbook{[Item = "Sheet", Name = "Sheet1"]}[Data]
+in
+    Sheet1
+```

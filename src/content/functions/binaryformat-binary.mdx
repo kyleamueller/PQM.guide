@@ -1,0 +1,74 @@
+---
+title: "BinaryFormat.Binary"
+slug: "binaryformat-binary"
+category: "Binary"
+description: "Returns a binary format that reads a binary value."
+syntax: "BinaryFormat.Binary(optional length as any) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads a binary value of the specified length."
+parameters:
+  - name: "length"
+    type: "any"
+    required: false
+    description: "The number of bytes to read, or a binary format that reads the length preceding the binary data. If not specified, reads the remaining bytes."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-text"
+  - "binaryformat-list"
+  - "binaryformat-length"
+  - "binaryformat-byte"
+  - "binary-from"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Raw byte extraction"
+---
+
+## Remarks
+
+`BinaryFormat.Binary` returns a binary format that reads a binary value from the input. The `length` parameter controls how many bytes are read:
+
+- If `length` is not specified, all remaining bytes in the binary stream are read.
+- If `length` is a number, that exact number of bytes is read.
+- If `length` is a binary format (such as `BinaryFormat.Byte` or `BinaryFormat.UnsignedInteger32`), the length value is read first from the stream using that format, and then that many bytes of binary data are read.
+
+This is useful when extracting raw binary chunks from a larger binary stream, such as reading embedded images or binary blobs from a structured file format.
+
+## Examples
+
+### Example 1: Read a fixed number of binary bytes
+
+Read the first 2 bytes from a binary value.
+
+```powerquery
+let
+    binaryData = #binary({0x48, 0x65, 0x6C, 0x6C, 0x6F}),
+    format = BinaryFormat.Binary(2)
+in
+    format(binaryData)
+```
+
+<!--output
+#binary({0x48, 0x65})
+-->
+
+### Example 2: Read binary data with a length prefix
+
+Read binary data where the first byte indicates how many bytes follow.
+
+```powerquery
+let
+    binaryData = #binary({3, 0x41, 0x42, 0x43, 0xFF}),
+    format = BinaryFormat.Binary(BinaryFormat.Byte)
+in
+    format(binaryData)
+```
+
+<!--output
+#binary({0x41, 0x42, 0x43})
+-->

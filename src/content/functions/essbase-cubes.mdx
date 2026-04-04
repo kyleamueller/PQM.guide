@@ -1,0 +1,69 @@
+---
+title: "Essbase.Cubes"
+slug: "essbase-cubes"
+category: "Accessing Data"
+description: "Returns a table of cubes grouped by Essbase server from an Oracle Essbase instance."
+syntax: "Essbase.Cubes(url as text, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of cubes grouped by server from the specified Essbase instance."
+parameters:
+  - name: "url"
+    type: "text"
+    required: true
+    description: "The URL of the Essbase APS (Analytic Provider Services) server (e.g., \"https://essbase-server:9001/aps/XMLA\")."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record to control behavior. Supported fields include CommandTimeout."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: false
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "analysisservices-database"
+---
+
+## Remarks
+
+`Essbase.Cubes` connects to an Oracle Essbase instance via its Analytic Provider Services (APS) server and returns a navigation table of cubes grouped by Essbase server. Essbase is an OLAP (Online Analytical Processing) database from Oracle commonly used for financial planning and analysis.
+
+**Key options** (passed in the `options` record):
+- `CommandTimeout` (duration) -- maximum time the server-side query is allowed to run before cancellation. Defaults to ten minutes.
+
+**Authentication**: Essbase uses Basic (username/password) authentication. When connecting for the first time, Power BI Desktop will prompt for Essbase server credentials. Configure the credentials in the data source credentials dialog. Do not embed credentials in the M query.
+
+**Query folding**: The Essbase connector communicates with the server via XMLA (XML for Analysis). Dimension and measure selections are sent to the Essbase server, and some filter operations can be pushed to the server. However, complex Power Query transformations are typically applied locally.
+
+**Platform availability**: This connector is available only in **Power BI Desktop**. It is not supported in Power BI Service (cloud refresh), Excel, Excel Online, Dataflows, or Fabric Notebooks. The connector requires the Oracle Essbase APS middleware to be accessible from the machine running Power BI Desktop.
+
+## Examples
+
+### Example 1: Connect to an Essbase APS server
+
+```powerquery
+Essbase.Cubes("https://essbase-server:9001/aps/XMLA")
+```
+
+### Example 2: Connect with a custom command timeout
+
+```powerquery
+Essbase.Cubes(
+    "https://essbase-server:9001/aps/XMLA",
+    [CommandTimeout = #duration(0, 0, 30, 0)]
+)
+```
+
+### Example 3: Navigate to a specific cube
+
+```powerquery
+let
+    Source = Essbase.Cubes("https://essbase-server:9001/aps/XMLA"),
+    Server = Source{[Name = "EssbaseServer1"]}[Data],
+    App = Server{[Name = "Sample"]}[Data],
+    Cube = App{[Name = "Basic"]}[Data]
+in
+    Cube
+```

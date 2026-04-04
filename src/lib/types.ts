@@ -60,6 +60,7 @@ export interface FunctionFrontmatter {
   compatibility: Compatibility;
   relatedFunctions: string[];
   relatedConcepts?: string[];
+  internal?: boolean;
 }
 
 export interface FunctionIndexEntry {

@@ -1,0 +1,89 @@
+---
+title: "OleDb.DataSource"
+slug: "oledb-datasource"
+category: "Accessing Data"
+description: "Returns a table of SQL tables and views from the OLE DB data source specified by the connection string."
+syntax: "OleDb.DataSource(connectionString as any, optional options as nullable record) as table"
+returnType: "table"
+returnDescription: "A navigation table of SQL tables and views available through the OLE DB data source."
+parameters:
+  - name: "connectionString"
+    type: "any"
+    required: true
+    description: "The OLE DB connection string. Can be text (e.g., \"Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=mydb;\") or a record of property value pairs. Property values can be text or number."
+  - name: "options"
+    type: "record"
+    required: false
+    description: "An optional record with options such as CreateNavigationProperties, NavigationPropertyNameGenerator, Query, HierarchicalNavigation, ConnectionTimeout, CommandTimeout, and SqlCompatibleWindowsAuth."
+compatibility:
+  pbiDesktop: true
+  pbiService: false
+  excelDesktop: true
+  excelOnline: false
+  dataflows: false
+  fabricNotebooks: false
+relatedFunctions:
+  - "oledb-query"
+  - "odbc-datasource"
+  - "sql-database"
+---
+
+## Remarks
+
+`OleDb.DataSource` connects to an OLE DB data source specified by the connection string and returns a navigation table of the available SQL tables and views. It is a generic connector useful for databases and data sources that expose an OLE DB provider but do not have a dedicated Power Query connector.
+
+**Connection string formats**: The `connectionString` parameter accepts two forms:
+- A text connection string: `"Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=mydb;Integrated Security=SSPI;"`.
+- A record of key-value pairs: `[Provider = "SQLOLEDB", #"Data Source" = "myserver", #"Initial Catalog" = "mydb"]`. Power Query assembles these into a connection string automatically. Property values can be text or number.
+
+**Options record fields**:
+- `CreateNavigationProperties` (logical) -- Sets whether to generate navigation properties on the returned values. Default is true.
+- `NavigationPropertyNameGenerator` (function) -- A function used for the creation of names for navigation properties.
+- `Query` (text) -- A native SQL query used to retrieve data. If the query produces multiple result sets, only the first will be returned.
+- `HierarchicalNavigation` (logical) -- Sets whether to view the tables grouped by their schema names. Default is true.
+- `ConnectionTimeout` (duration) -- Controls how long to wait before abandoning an attempt to make a connection to the server. The default value is driver-dependent.
+- `CommandTimeout` (duration) -- Controls how long the server-side query is allowed to run before it is canceled. The default value is ten minutes.
+- `SqlCompatibleWindowsAuth` (logical) -- Determines whether to produce SQL Server-compatible connection string options for Windows authentication. The default value is true.
+
+The record parameter is specified as `[option1 = value1, option2 = value2...]` or `[Query = "select ..."]` for example.
+
+**Authentication**: Credentials are managed through the Power Query credentials dialog. For Windows authentication on SQL Server-compatible providers, the `SqlCompatibleWindowsAuth` option (defaulting to true) ensures the connection string includes the appropriate Windows auth tokens. Avoid embedding credentials directly in the connection string.
+
+**Query folding**: When using the navigation table (without the `Query` option), downstream Power Query transformations may fold into SQL depending on the OLE DB provider's capabilities. When the `Query` option is used to supply a native SQL query, folding behavior on top of that query result may be limited.
+
+**Platform availability**: Requires the OLE DB provider for the target data source to be installed on the machine running Power Query. Not available in Power BI Service without an on-premises data gateway. Not supported in Excel Online, dataflows, or Fabric Notebooks.
+
+## Examples
+
+### Example 1: Connect to a SQL Server using an OLE DB provider
+```powerquery
+OleDb.DataSource("Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=Northwind;Integrated Security=SSPI;")
+```
+
+### Example 2: Connect using a record-based connection string
+```powerquery
+OleDb.DataSource([
+    Provider = "SQLOLEDB",
+    #"Data Source" = "myserver",
+    #"Initial Catalog" = "Northwind"
+])
+```
+
+### Example 3: Use the Query option to run a native SQL query
+```powerquery
+OleDb.DataSource(
+    "Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=Northwind;",
+    [Query = "SELECT CustomerID, CompanyName FROM Customers WHERE Country = 'USA'"]
+)
+```
+
+### Example 4: Set a custom command timeout and disable hierarchical navigation
+```powerquery
+OleDb.DataSource(
+    "Provider=SQLOLEDB;Data Source=myserver;Initial Catalog=Northwind;",
+    [
+        HierarchicalNavigation = false,
+        CommandTimeout = #duration(0, 0, 5, 0)
+    ]
+)
+```

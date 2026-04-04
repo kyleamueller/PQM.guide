@@ -1,0 +1,70 @@
+---
+title: "Cube.Parameters"
+slug: "cube-parameters"
+category: "Table"
+description: "Returns a table containing the set of parameters that can be applied to a cube."
+syntax: "Cube.Parameters(cube as table) as table"
+returnType: "table"
+returnDescription: "A table listing the available parameters for the cube, where each parameter is a function that can be invoked."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to retrieve parameters from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-applyparameter"
+  - "cube-dimensions"
+  - "cube-measures"
+  - "cube-transform"
+  - "analysisservices-database"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP parameters"
+  - "Cube parameterization"
+  - "Dynamic filtering"
+---
+
+## Remarks
+
+`Cube.Parameters` returns a table containing the set of parameters that can be applied to the specified cube. Each parameter is represented as a function that can be invoked to produce a new cube with the parameter and its arguments applied.
+
+Parameters in Analysis Services models allow dynamic configuration of cube queries. They are defined on the server side and may control aspects like default member selections, calculated member behavior, or scoped assignments. Parameters can be applied to the cube using `Cube.ApplyParameter` or by invoking the parameter function directly.
+
+This function is useful for discovering what parameterization options are available in a cube before building dynamic queries.
+
+## Examples
+
+### Example 1: List all parameters in a cube
+
+Retrieve the list of parameters available in the Adventure Works cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Params = Cube.Parameters(Cube)
+in
+    Params
+```
+
+### Example 2: Discover and apply a parameter
+
+List the parameters, select one, and apply it to the cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Params = Cube.Parameters(Cube),
+    FirstParam = Params{0}[Value],
+    Applied = Cube.ApplyParameter(Cube, FirstParam, {"2024"})
+in
+    Applied
+```

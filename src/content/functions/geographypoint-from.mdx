@@ -1,0 +1,94 @@
+---
+title: "GeographyPoint.From"
+slug: "geographypoint-from"
+category: "Value"
+description: "Creates a record representing a geographic point from its constituent parts such as longitude, latitude, and optional elevation."
+syntax: "GeographyPoint.From(longitude as number, latitude as number, optional z as nullable number, optional m as nullable number, optional srid as nullable number) as record"
+returnType: "record"
+returnDescription: "A structured record representing a geographic point with the specified coordinates."
+parameters:
+  - name: "longitude"
+    type: "number"
+    required: true
+    description: "The longitude of the geographic point, in degrees."
+  - name: "latitude"
+    type: "number"
+    required: true
+    description: "The latitude of the geographic point, in degrees."
+  - name: "z"
+    type: "number"
+    required: false
+    description: "The elevation (Z coordinate) of the geographic point. Omit if not applicable."
+  - name: "m"
+    type: "number"
+    required: false
+    description: "The measure (M value) associated with the geographic point. Omit if not applicable."
+  - name: "srid"
+    type: "number"
+    required: false
+    description: "The Spatial Reference Identifier (SRID) for the point. Defaults to 4326 (WGS 84) if not specified."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "geography-fromwellknowntext"
+  - "geography-towellknowntext"
+  - "geometrypoint-from"
+  - "geometry-fromwellknowntext"
+  - "geometry-towellknowntext"
+relatedConcepts: []
+---
+
+## Remarks
+
+`GeographyPoint.From` creates a structured record representing a geographic point from individual coordinate values. This provides a convenient way to construct geographic point values without needing to write WKT strings.
+
+The function uses a round-earth (ellipsoidal) coordinate system. The `longitude` and `latitude` parameters specify the point's position on the globe in degrees. Longitude values typically range from -180 to 180, and latitude values from -90 to 90.
+
+The optional `z` parameter represents elevation, and the optional `m` parameter represents an arbitrary measure value (often used for linear referencing). The optional `srid` parameter specifies the Spatial Reference Identifier; if omitted, it defaults to 4326 (WGS 84), which is the standard GPS coordinate system.
+
+The resulting record can be serialized to WKT format using `Geography.ToWellKnownText`, making it easy to round-trip geographic data between structured records and text representations.
+
+## Examples
+
+### Example 1: Create a geographic point for Seattle
+
+Create a geographic point record from longitude and latitude coordinates.
+
+```powerquery
+let
+    SeattlePoint = GeographyPoint.From(-122.3321, 47.6062)
+in
+    Record.ToTable(SeattlePoint)
+```
+
+### Example 2: Create geographic points with elevation
+
+Build a table of geographic points with elevation data.
+
+```powerquery
+let
+    Points = #table({"City", "Longitude", "Latitude", "Elevation"}, {
+        {"Denver", -104.9903, 39.7392, 1609},
+        {"Seattle", -122.3321, 47.6062, 56}
+    }),
+    WithGeo = Table.AddColumn(Points, "GeoPoint", each GeographyPoint.From([Longitude], [Latitude], [Elevation]))
+in
+    WithGeo
+```
+
+### Example 3: Create a point and convert to WKT
+
+Round-trip a geographic point through record creation and WKT serialization.
+
+```powerquery
+let
+    Point = GeographyPoint.From(-74.006, 40.7128),
+    WKT = Geography.ToWellKnownText(Point, true)
+in
+    #table({"City", "WKT"}, {{"New York", WKT}})
+```

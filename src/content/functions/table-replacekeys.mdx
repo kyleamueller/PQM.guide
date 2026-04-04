@@ -1,0 +1,72 @@
+---
+title: "Table.ReplaceKeys"
+slug: "table-replacekeys"
+category: "Table"
+description: "Replaces all keys on a table with a new set of key definitions."
+syntax: "Table.ReplaceKeys(table as table, keys as list) as table"
+returnType: "table"
+returnDescription: "A table with its keys replaced by the specified key definitions."
+parameters:
+  - name: "table"
+    type: "table"
+    required: true
+    description: "The table whose keys will be replaced."
+  - name: "keys"
+    type: "list"
+    required: true
+    description: "A list of key records, each with Columns (list of column names) and Primary (boolean)."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "table-addkey"
+  - "table-keys"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Table.ReplaceKeys` replaces all existing keys on a table with a new set of key definitions. Unlike `Table.AddKey`, which appends a single key, this function replaces the entire key set at once.
+
+Each key in the `keys` list is a record with two fields:
+
+- **Columns** — a list of column names that make up the key (e.g., `{"OrderID"}` or `{"CustomerID", "ProductID"}` for a composite key).
+- **Primary** — a boolean indicating whether the key is a primary key (`true`) or a non-primary/alternate key (`false`).
+
+Keys are metadata attached to the table value. They inform the Power Query engine about uniqueness constraints, which can improve join performance and enable certain optimizations. Use `Table.Keys` to inspect the keys currently defined on a table.
+
+## Examples
+
+### Example 1: Replace a primary key with a non-primary key
+
+Demote an existing primary key to a non-primary key.
+
+```powerquery
+let
+    Source = Table.FromRecords({
+        [Id = 1, Name = "Hello There"],
+        [Id = 2, Name = "Good Bye"]
+    }),
+    WithPrimary = Table.AddKey(Source, {"Id"}, true),
+    Demoted = Table.ReplaceKeys(WithPrimary, {[Columns = {"Id"}, Primary = false]})
+in
+    Table.Keys(Demoted)
+```
+
+### Example 2: Define a composite key
+
+Set a composite primary key spanning multiple columns.
+
+```powerquery
+let
+    Keyed = Table.ReplaceKeys(
+        Sales,
+        {[Columns = {"OrderID", "Product"}, Primary = true]}
+    )
+in
+    Table.Keys(Keyed)
+```

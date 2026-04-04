@@ -1,0 +1,71 @@
+---
+title: "Value.Lineage"
+slug: "value-lineage"
+category: "Value"
+description: "Returns the lineage information associated with a value, tracking its data source origins. Intended for internal use only."
+syntax: "Value.Lineage(value as any) as any"
+returnType: "any"
+returnDescription: "The lineage information associated with the value, or the value itself with lineage annotations."
+parameters:
+  - name: "value"
+    type: "any"
+    required: true
+    description: "The value whose lineage information to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "value-metadata"
+  - "value-type"
+  - "value-removemetadata"
+relatedConcepts: []
+internal: true
+---
+
+## Remarks
+
+This function is intended for **internal use only** and is not designed to be called directly in user-written M queries.
+
+`Value.Lineage` retrieves or annotates **lineage information** on a value — metadata that tracks which data source(s) a value originated from and how it flowed through a query. Lineage tracking is a core part of how the Power Query engine enforces the **data privacy firewall** and manages **data source dependency analysis**.
+
+### How lineage works at a high level
+
+- When data is loaded from a data source (e.g., a SQL Server table, an Excel file, a web API), the engine tags the resulting value with lineage metadata identifying its origin.
+- As the value flows through transformations (filtering, joining, adding columns), the lineage propagates so the engine always knows which sources contributed to a given intermediate or final result.
+- The firewall engine uses lineage to determine whether two values that are being combined originate from sources with compatible privacy levels.
+
+`Value.Lineage` makes this lineage information accessible programmatically. In engine-internal and custom connector scenarios, it can be used to:
+
+- Inspect which data sources contributed to a value.
+- Annotate a value with specific lineage tags to control firewall partitioning behavior.
+- Debug data privacy firewall errors by examining where the engine believes data originated.
+
+For user-written queries, lineage tracking is fully automatic and transparent. Calling `Value.Lineage` on a plain in-memory value (like a number or text string) will typically return the value unchanged, since in-memory literals do not carry data-source lineage.
+
+## Examples
+
+### Example 1: Lineage of an in-memory value
+
+Simple values created in a query do not carry lineage information, so `Value.Lineage` returns the value as-is.
+
+```powerquery
+Value.Lineage(42)
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+-->
+
+### Example 2: Checking lineage on a text value
+
+```powerquery
+Value.Lineage("hello")
+```
+
+<!--output
+{"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"hello"}]}
+-->

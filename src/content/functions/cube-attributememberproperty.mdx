@@ -1,0 +1,91 @@
+---
+title: "Cube.AttributeMemberProperty"
+slug: "cube-attributememberproperty"
+category: "Table"
+description: "Returns the value of a named property from a dimension attribute member."
+syntax: "Cube.AttributeMemberProperty(attribute as any, propertyName as text) as any"
+returnType: "any"
+returnDescription: "The value of the specified property for the given dimension attribute member."
+parameters:
+  - name: "attribute"
+    type: "any"
+    required: true
+    description: "A dimension attribute member value from which to retrieve the property."
+  - name: "propertyName"
+    type: "text"
+    required: true
+    description: "The name of the member property to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-attributememberid"
+  - "cube-properties"
+  - "cube-propertykey"
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-dimensions"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP member properties"
+  - "Dimension attribute properties"
+  - "Intrinsic member properties"
+---
+
+## Remarks
+
+`Cube.AttributeMemberProperty` retrieves a named property from a dimension attribute member. In Analysis Services, dimension members can have additional properties beyond their name and key -- for example, a Customer member might have properties like `Phone`, `Email`, or `Address`.
+
+Member properties can be either intrinsic (built-in properties like `MEMBER_CAPTION`, `MEMBER_UNIQUE_NAME`, `LEVEL_NUMBER`) or custom properties defined in the cube's dimension design.
+
+This function is useful for accessing metadata or supplementary attributes of dimension members without needing to expand additional dimension attributes.
+
+## Examples
+
+### Example 1: Get a member property from a dimension attribute
+
+Retrieve the caption property of a Product attribute member.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    FirstRow = Table.First(WithProduct),
+    Caption = Cube.AttributeMemberProperty(
+        FirstRow[Product Name],
+        "MEMBER_CAPTION"
+    )
+in
+    Caption
+```
+
+### Example 2: Add a member property as a column
+
+Add the Color property of each product member as a new column.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    AddColor = Table.AddColumn(
+        WithProduct,
+        "Color",
+        each Cube.AttributeMemberProperty([Product Name], "Color"),
+        type text
+    )
+in
+    AddColor
+```

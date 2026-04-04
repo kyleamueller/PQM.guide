@@ -1,0 +1,81 @@
+---
+title: "BinaryFormat.Text"
+slug: "binaryformat-text"
+category: "Binary"
+description: "Returns a binary format that reads a text value from binary data."
+syntax: "BinaryFormat.Text(length as any, optional encoding as nullable number) as function"
+returnType: "function"
+returnDescription: "A binary format function that reads and decodes a text value from binary data."
+parameters:
+  - name: "length"
+    type: "any"
+    required: true
+    description: "The number of bytes to decode, or a binary format that reads the length preceding the text."
+  - name: "encoding"
+    type: "nullable number"
+    required: false
+    description: "The text encoding to use (e.g., TextEncoding.Ascii, TextEncoding.Utf8, TextEncoding.Utf16). If not specified, encoding is detected from Unicode byte order marks, defaulting to UTF-8."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "binaryformat-binary"
+  - "binaryformat-byte"
+  - "binaryformat-length"
+  - "binaryformat-list"
+  - "binary-totext"
+relatedConcepts:
+  - "Binary data parsing"
+  - "Text encoding"
+  - "String parsing from binary"
+---
+
+## Remarks
+
+`BinaryFormat.Text` returns a binary format that reads a text value by decoding a specified number of bytes from binary data. The `length` parameter can be:
+
+- A **number** -- Reads exactly that many bytes and decodes them as text.
+- A **binary format** -- Reads the length from the stream using that format first, then reads and decodes that many bytes of text.
+
+The optional `encoding` parameter specifies the text encoding. Supported values include `TextEncoding.Ascii`, `TextEncoding.Utf8`, `TextEncoding.Utf16`, `TextEncoding.Unicode`, and `TextEncoding.Windows`. If omitted, the encoding is determined from Unicode byte order marks (BOM). If no BOM is present, `TextEncoding.Utf8` is used.
+
+## Examples
+
+### Example 1: Decode a fixed number of bytes as ASCII text
+
+Read and decode 2 bytes as ASCII text.
+
+```powerquery
+let
+    binaryData = #binary({65, 66, 67}),
+    textFormat = BinaryFormat.Text(2, TextEncoding.Ascii)
+in
+    textFormat(binaryData)
+```
+
+<!--output
+"AB"
+-->
+
+### Example 2: Read length-prefixed text
+
+Read text where a leading byte specifies the length in bytes.
+
+```powerquery
+let
+    binaryData = #binary({2, 65, 66}),
+    textFormat = BinaryFormat.Text(
+        BinaryFormat.Byte,
+        TextEncoding.Ascii
+    )
+in
+    textFormat(binaryData)
+```
+
+<!--output
+"AB"
+-->

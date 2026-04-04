@@ -1,0 +1,81 @@
+---
+title: "Geometry.FromWellKnownText"
+slug: "geometry-fromwellknowntext"
+category: "Value"
+description: "Translates text representing a geometric value in Well-Known Text (WKT) format into a structured record."
+syntax: "Geometry.FromWellKnownText(input as nullable text) as nullable record"
+returnType: "record"
+returnDescription: "A structured record representing the geometric value parsed from the WKT string, or null if the input is null."
+parameters:
+  - name: "input"
+    type: "text"
+    required: true
+    description: "A text value containing a geometric value in Well-Known Text (WKT) format."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "geometry-towellknowntext"
+  - "geometrypoint-from"
+  - "geography-fromwellknowntext"
+  - "geography-towellknowntext"
+  - "geographypoint-from"
+relatedConcepts: []
+---
+
+## Remarks
+
+`Geometry.FromWellKnownText` parses a Well-Known Text (WKT) string and returns a structured record representing a geometric value. WKT is a standard text format defined by the Open Geospatial Consortium (OGC) for representing spatial reference system objects. It is the typical serialization format used by databases including SQL Server.
+
+Geometric values use a flat Cartesian (planar) coordinate system, as opposed to geographic values which use a round-earth model based on latitude and longitude. The default spatial reference identifier (SRID) for geometry types is 0.
+
+Common WKT geometry types include `POINT`, `LINESTRING`, `POLYGON`, `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`, and `GEOMETRYCOLLECTION`. For example, a point at coordinates (10, 20) would be represented as `"POINT(10 20)"`.
+
+Use `Geometry.FromWellKnownText` when working with planar coordinate data such as floor plans, engineering drawings, or projected map coordinates. For GPS-style latitude/longitude data, use `Geography.FromWellKnownText` instead.
+
+If the input is null, the function returns null.
+
+## Examples
+
+### Example 1: Parse a WKT point into a record
+
+Convert a Well-Known Text point into a structured geometry record.
+
+```powerquery
+let
+    WKT = "POINT(10 20)",
+    Result = Geometry.FromWellKnownText(WKT)
+in
+    Record.ToTable(Result)
+```
+
+### Example 2: Parse a WKT polygon
+
+Parse a polygon WKT string into a structured record.
+
+```powerquery
+let
+    WKT = "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))",
+    Result = Geometry.FromWellKnownText(WKT)
+in
+    Record.ToTable(Result)
+```
+
+### Example 3: Parse WKT geometry values from a table column
+
+Parse a column of WKT strings into structured geometry records.
+
+```powerquery
+let
+    Source = #table({"Shape", "WKT"}, {
+        {"Origin", "POINT(0 0)"},
+        {"Square", "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"}
+    }),
+    Parsed = Table.AddColumn(Source, "Geometry", each Geometry.FromWellKnownText([WKT]))
+in
+    Parsed
+```
