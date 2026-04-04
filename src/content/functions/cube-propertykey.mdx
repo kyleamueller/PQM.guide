@@ -1,0 +1,83 @@
+---
+title: "Cube.PropertyKey"
+slug: "cube-propertykey"
+category: "Table"
+description: "Returns the key of a property."
+syntax: "Cube.PropertyKey(property as any) as any"
+returnType: "any"
+returnDescription: "The key identifier of the specified property."
+parameters:
+  - name: "property"
+    type: "any"
+    required: true
+    description: "A property value from which to extract the key."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-properties"
+  - "cube-measureproperties"
+  - "cube-attributememberproperty"
+  - "cube-attributememberid"
+  - "cube-dimensions"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP properties"
+  - "Property keys"
+  - "Cube metadata"
+---
+
+## Remarks
+
+`Cube.PropertyKey` returns the key of the specified property. Properties in an Analysis Services cube have both a display name and an internal key identifier. The key is used to uniquely identify a property, especially in cases where multiple properties might share similar display names across different dimensions or hierarchies.
+
+This function is typically used with property values obtained from `Cube.Properties` or `Cube.MeasureProperties`. The returned key can be used to programmatically reference properties in further cube operations.
+
+## Examples
+
+### Example 1: Get the key of a dimension property
+
+Retrieve the key identifier for a property from the properties table.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    Props = Cube.Properties(WithProduct),
+    FirstProp = Props{0}[Value],
+    Key = Cube.PropertyKey(FirstProp)
+in
+    Key
+```
+
+### Example 2: List property names with their keys
+
+Create a table of property names and their corresponding keys.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    Props = Cube.Properties(WithProduct),
+    WithKeys = Table.AddColumn(
+        Props,
+        "Key",
+        each Cube.PropertyKey([Value])
+    )
+in
+    WithKeys
+```

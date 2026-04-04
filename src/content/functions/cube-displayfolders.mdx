@@ -1,0 +1,69 @@
+---
+title: "Cube.DisplayFolders"
+slug: "cube-displayfolders"
+category: "Table"
+description: "Returns a nested tree of tables representing the display folder hierarchy of objects available in the cube."
+syntax: "Cube.DisplayFolders(cube as table) as table"
+returnType: "table"
+returnDescription: "A nested tree of tables representing the display folder hierarchy of dimensions, measures, and other objects in the cube."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to retrieve display folders from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-dimensions"
+  - "cube-measures"
+  - "cube-properties"
+  - "cube-measureproperties"
+  - "analysisservices-database"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "Display folders"
+  - "Cube metadata"
+  - "OLAP navigation"
+---
+
+## Remarks
+
+`Cube.DisplayFolders` returns a nested tree of tables representing the display folder hierarchy of the objects (such as dimensions and measures) available for use in the cube. Display folders are an organizational feature in Analysis Services models that group related measures, dimensions, or KPIs into a logical folder structure for easier navigation.
+
+The returned structure mirrors the folder hierarchy defined in the cube's metadata. Each folder is represented as a nested table, and the leaf nodes are the actual dimension attributes or measures. This function is useful for building navigation interfaces or for discovering how the model author organized the cube's objects.
+
+Display folders are commonly used in large models with many measures or dimensions to improve discoverability. If no display folders are defined, all objects appear at the root level.
+
+## Examples
+
+### Example 1: Retrieve the display folder tree
+
+Get the display folder hierarchy from an Analysis Services cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Folders = Cube.DisplayFolders(Cube)
+in
+    Folders
+```
+
+### Example 2: Navigate into a specific display folder
+
+Drill into the display folders to find measures organized under a specific folder.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Folders = Cube.DisplayFolders(Cube),
+    SalesFolder = Folders{[Name = "Internet Sales"]}[Data]
+in
+    SalesFolder
+```

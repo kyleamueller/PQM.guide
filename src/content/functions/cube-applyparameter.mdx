@@ -1,0 +1,85 @@
+---
+title: "Cube.ApplyParameter"
+slug: "cube-applyparameter"
+category: "Table"
+description: "Returns a cube after applying a parameter with arguments to it."
+syntax: "Cube.ApplyParameter(cube as table, parameter as any, optional arguments as nullable list) as table"
+returnType: "table"
+returnDescription: "The cube table with the specified parameter and its arguments applied."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to apply the parameter to."
+  - name: "parameter"
+    type: "any"
+    required: true
+    description: "The parameter to apply. Typically a value from Cube.Parameters."
+  - name: "arguments"
+    type: "list"
+    required: false
+    description: "An optional list of arguments to pass with the parameter."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-parameters"
+  - "cube-dimensions"
+  - "cube-measures"
+  - "cube-transform"
+  - "analysisservices-database"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP parameters"
+  - "Cube parameterization"
+  - "MDX parameters"
+---
+
+## Remarks
+
+`Cube.ApplyParameter` applies a parameter with optional arguments to a cube, returning the modified cube. Parameters are server-side objects defined within an Analysis Services model that allow dynamic filtering or configuration of cube behavior. They are similar to stored procedure parameters in relational databases.
+
+The parameter is typically obtained from the table returned by `Cube.Parameters`. Each parameter in that table is represented as a function, and `Cube.ApplyParameter` provides an alternative way to invoke it with explicit arguments.
+
+This function is useful when you need to programmatically apply parameters based on user input or dynamic conditions rather than hard-coding parameter values.
+
+## Examples
+
+### Example 1: Apply a parameter to a cube
+
+Apply a currency parameter to filter the cube to USD values.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Params = Cube.Parameters(Cube),
+    CurrencyParam = Params{[Name = "Currency"]}[Value],
+    Filtered = Cube.ApplyParameter(Cube, CurrencyParam, {"USD"})
+in
+    Filtered
+```
+
+### Example 2: Chain parameter application with dimension expansion
+
+Apply a parameter and then expand dimensions on the resulting cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Params = Cube.Parameters(Cube),
+    YearParam = Params{[Name = "Year"]}[Value],
+    FilteredCube = Cube.ApplyParameter(Cube, YearParam, {"2024"}),
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        FilteredCube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    )
+in
+    WithProduct
+```

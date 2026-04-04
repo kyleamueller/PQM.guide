@@ -1,0 +1,95 @@
+---
+title: "Cube.CollapseAndRemoveColumns"
+slug: "cube-collapseandremovecolumns"
+category: "Table"
+description: "Collapses dimension attributes mapped to specified columns, removing them from the cube's tabular view and changing its granularity."
+syntax: "Cube.CollapseAndRemoveColumns(cube as table, columnNames as list) as table"
+returnType: "table"
+returnDescription: "The cube table with the specified columns removed and the dimensional granularity collapsed accordingly."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to collapse columns from."
+  - name: "columnNames"
+    type: "list"
+    required: true
+    description: "A list of column names to collapse and remove from the tabular view."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-dimensions"
+  - "cube-transform"
+  - "cube-replacedimensions"
+  - "analysisservices-database"
+  - "table-removecolumns"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP dimensions"
+  - "Dimensional granularity"
+  - "Filter context"
+---
+
+## Remarks
+
+`Cube.CollapseAndRemoveColumns` changes the dimensional granularity of a cube's filter context by collapsing the attributes mapped to the specified columns. The columns are also removed from the tabular view. This effectively reverses an earlier `Cube.AddAndExpandDimensionColumn` operation for the specified attributes.
+
+When attributes are collapsed, any measure columns in the cube are automatically re-aggregated to the new (coarser) granularity. For example, if you expanded both Product Category and Product Name, then collapsed Product Name, measure values would be aggregated up to the Product Category level.
+
+This function operates on the cube's filter context and is not the same as `Table.RemoveColumns`, which only removes columns from a regular table without affecting OLAP semantics.
+
+## Examples
+
+### Example 1: Collapse a dimension column
+
+Remove the Product Name column from a cube, aggregating measures back to the parent level.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Category]", "[Product].[Product Name]"}
+    ),
+    WithSales = Cube.AddMeasureColumn(
+        WithProduct,
+        "Sales",
+        {"[Measures].[Internet Sales Amount]"}
+    ),
+    CollapsedProduct = Cube.CollapseAndRemoveColumns(
+        WithSales,
+        {"Product Name"}
+    )
+in
+    CollapsedProduct
+```
+
+### Example 2: Collapse multiple columns at once
+
+Remove both Year and Month columns, collapsing the date granularity entirely.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithDate = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Date]"},
+        {"[Date].[Calendar Year]", "[Date].[Month]"},
+        {"Year", "Month"}
+    ),
+    Collapsed = Cube.CollapseAndRemoveColumns(
+        WithDate,
+        {"Year", "Month"}
+    )
+in
+    Collapsed
+```

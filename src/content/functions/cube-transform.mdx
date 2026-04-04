@@ -1,0 +1,109 @@
+---
+title: "Cube.Transform"
+slug: "cube-transform"
+category: "Table"
+description: "Applies a list of cube functions as transforms to a cube."
+syntax: "Cube.Transform(cube as table, transforms as list) as table"
+returnType: "table"
+returnDescription: "The cube table with all specified transforms applied in sequence."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to apply transforms to."
+  - name: "transforms"
+    type: "list"
+    required: true
+    description: "A list of cube functions to apply to the cube in sequence."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-addmeasurecolumn"
+  - "cube-collapseandremovecolumns"
+  - "cube-applyparameter"
+  - "cube-replacedimensions"
+  - "analysisservices-database"
+  - "table-transformcolumns"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "Cube operations"
+  - "Transform pipeline"
+  - "Functional composition"
+---
+
+## Remarks
+
+`Cube.Transform` applies a list of cube functions (transforms) to the specified cube in sequence. Each transform in the list is a function that takes a cube and returns a modified cube. This provides a compact way to compose multiple cube operations into a single step rather than chaining them individually.
+
+The `transforms` list typically contains partially applied Cube functions such as `Cube.AddAndExpandDimensionColumn`, `Cube.AddMeasureColumn`, `Cube.CollapseAndRemoveColumns`, or `Cube.ApplyParameter`. Each function in the list receives the result of the previous transform.
+
+This function is useful for building reusable cube transformation pipelines or for programmatically constructing a series of cube operations.
+
+## Examples
+
+### Example 1: Apply multiple transforms to a cube
+
+Use `Cube.Transform` to expand a dimension and add a measure in a single step.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Transformed = Cube.Transform(Cube, {
+        each Cube.AddAndExpandDimensionColumn(
+            _,
+            {"[Product]"},
+            {"[Product].[Product Name]"}
+        ),
+        each Cube.AddMeasureColumn(
+            _,
+            "Sales",
+            {"[Measures].[Internet Sales Amount]"}
+        )
+    })
+in
+    Transformed
+```
+
+### Example 2: Build a dynamic transform pipeline
+
+Create a list of transforms and apply them all at once.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Transforms = {
+        each Cube.AddAndExpandDimensionColumn(
+            _,
+            {"[Date]"},
+            {"[Date].[Calendar Year]"},
+            {"Year"}
+        ),
+        each Cube.AddAndExpandDimensionColumn(
+            _,
+            {"[Product]"},
+            {"[Product].[Category]"},
+            {"Category"}
+        ),
+        each Cube.AddMeasureColumn(
+            _,
+            "Total Sales",
+            {"[Measures].[Internet Sales Amount]"}
+        ),
+        each Cube.AddMeasureColumn(
+            _,
+            "Order Count",
+            {"[Measures].[Internet Order Count]"}
+        )
+    },
+    Result = Cube.Transform(Cube, Transforms)
+in
+    Result
+```

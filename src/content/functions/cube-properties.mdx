@@ -1,0 +1,79 @@
+---
+title: "Cube.Properties"
+slug: "cube-properties"
+category: "Table"
+description: "Returns a table containing the set of available properties for dimensions that are expanded in the cube."
+syntax: "Cube.Properties(cube as table) as table"
+returnType: "table"
+returnDescription: "A table listing the available dimension properties for dimensions expanded in the cube."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to retrieve dimension properties from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-propertykey"
+  - "cube-dimensions"
+  - "cube-attributememberproperty"
+  - "cube-attributememberid"
+  - "cube-measureproperties"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP dimension properties"
+  - "Member properties"
+  - "Cube metadata"
+---
+
+## Remarks
+
+`Cube.Properties` returns a table containing the set of available properties for dimensions that are expanded in the cube. These are the dimension member properties that can be accessed via `Cube.AttributeMemberProperty`.
+
+Dimension properties provide supplementary information about dimension members. For example, a Geography dimension might expose properties like `Latitude`, `Longitude`, or `Population` for its members. A Product dimension might expose `Color`, `Weight`, or `List Price`.
+
+The properties returned depend on which dimensions have been expanded in the cube using `Cube.AddAndExpandDimensionColumn`. Only properties for currently expanded dimensions are listed. Use `Cube.PropertyKey` to get the key identifier for a specific property.
+
+## Examples
+
+### Example 1: List available dimension properties
+
+Get all dimension properties available for the currently expanded dimensions.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    Props = Cube.Properties(WithProduct)
+in
+    Props
+```
+
+### Example 2: Use properties to access member metadata
+
+Discover dimension properties and use them with `Cube.AttributeMemberProperty`.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithGeo = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Geography]"},
+        {"[Geography].[City]"}
+    ),
+    Props = Cube.Properties(WithGeo),
+    PropertyNames = Table.SelectColumns(Props, {"Name"})
+in
+    PropertyNames
+```

@@ -1,0 +1,91 @@
+---
+title: "Cube.AddAndExpandDimensionColumn"
+slug: "cube-addandexpanddimensioncolumn"
+category: "Table"
+description: "Merges a dimension into the cube's filter context and expands specified dimension attributes as new columns."
+syntax: "Cube.AddAndExpandDimensionColumn(cube as table, dimensionSelector as any, attributeNames as list, optional newColumnNames as any) as table"
+returnType: "table"
+returnDescription: "The cube table with the specified dimension attributes added as new columns and the filter context updated to the expanded granularity."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to add the dimension column to."
+  - name: "dimensionSelector"
+    type: "any"
+    required: true
+    description: "The dimension to merge into the cube's filter context. Typically a value from Cube.Dimensions."
+  - name: "attributeNames"
+    type: "list"
+    required: true
+    description: "A list of dimension attribute names to expand as columns in the tabular view."
+  - name: "newColumnNames"
+    type: "any"
+    required: false
+    description: "Optional list of new column names to use instead of the attribute names."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-collapseandremovecolumns"
+  - "cube-dimensions"
+  - "cube-addmeasurecolumn"
+  - "cube-transform"
+  - "cube-replacedimensions"
+  - "analysisservices-database"
+  - "table-expandtablecolumn"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP dimensions"
+  - "Dimension attributes"
+  - "Filter context"
+---
+
+## Remarks
+
+`Cube.AddAndExpandDimensionColumn` merges a specified dimension table into the filter context of a cube and changes the dimensional granularity by expanding the specified set of dimension attributes. The dimension attributes are added to the tabular view as new columns. If `newColumnNames` is provided, those names are used for the new columns; otherwise the attribute names from `attributeNames` are used.
+
+This function is the primary way to add dimension columns to a cube table returned by `AnalysisServices.Database`. Each call increases the granularity of the cube results by adding a new level of detail. The dimension selector is typically obtained from the table returned by `Cube.Dimensions`.
+
+This is the dimensional counterpart of `Cube.CollapseAndRemoveColumns` -- one expands dimensions and the other collapses them. Together they control which dimension attributes appear in the flattened tabular view of the cube.
+
+## Examples
+
+### Example 1: Expand a Product dimension into a cube
+
+Add the Product Name attribute from the Product dimension to a cube connected to an Analysis Services database.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    )
+in
+    WithProduct
+```
+
+### Example 2: Expand with custom column names
+
+Expand the Date dimension's Calendar Year and Month attributes using custom column names.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithDate = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Date]"},
+        {"[Date].[Calendar Year]", "[Date].[Month]"},
+        {"Year", "Month"}
+    )
+in
+    WithDate
+```

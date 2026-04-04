@@ -1,0 +1,80 @@
+---
+title: "Cube.MeasureProperty"
+slug: "cube-measureproperty"
+category: "Table"
+description: "Returns the value of a named property from a measure."
+syntax: "Cube.MeasureProperty(measure as any, propertyName as text) as any"
+returnType: "any"
+returnDescription: "The value of the specified property for the given measure."
+parameters:
+  - name: "measure"
+    type: "any"
+    required: true
+    description: "A measure value from which to retrieve the property."
+  - name: "propertyName"
+    type: "text"
+    required: true
+    description: "The name of the measure property to retrieve."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-measureproperties"
+  - "cube-measures"
+  - "cube-addmeasurecolumn"
+  - "cube-attributememberproperty"
+  - "cube-propertykey"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP measure properties"
+  - "Measure metadata"
+  - "Format strings"
+---
+
+## Remarks
+
+`Cube.MeasureProperty` returns the value of the property `propertyName` from the specified measure. This function is the measure counterpart of `Cube.AttributeMemberProperty`, which retrieves properties from dimension attribute members.
+
+Common measure properties you can retrieve include:
+- `FORMAT_STRING` -- the format pattern for displaying measure values.
+- `MEASURE_AGGREGATOR` -- the aggregation type (e.g., Sum, Count, Distinct Count).
+- `MEASURE_DISPLAY_FOLDER` -- the display folder where the measure is organized.
+- `DESCRIPTION` -- the description text defined for the measure.
+
+The list of available property names can be discovered using `Cube.MeasureProperties`.
+
+## Examples
+
+### Example 1: Get the format string of a measure
+
+Retrieve the format string property from a measure to understand its display format.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Measures = Cube.Measures(Cube),
+    SalesMeasure = Measures{[Name = "Internet Sales Amount"]}[Value],
+    FormatString = Cube.MeasureProperty(SalesMeasure, "FORMAT_STRING")
+in
+    FormatString
+```
+
+### Example 2: Get the aggregation type of a measure
+
+Retrieve the aggregation function used by a specific measure.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Measures = Cube.Measures(Cube),
+    CountMeasure = Measures{[Name = "Internet Order Count"]}[Value],
+    Aggregator = Cube.MeasureProperty(CountMeasure, "MEASURE_AGGREGATOR")
+in
+    Aggregator
+```

@@ -1,0 +1,96 @@
+---
+title: "Cube.AddMeasureColumn"
+slug: "cube-addmeasurecolumn"
+category: "Table"
+description: "Adds a column to the cube containing the results of a measure applied in each row's context."
+syntax: "Cube.AddMeasureColumn(cube as table, column as text, measureSelector as any) as table"
+returnType: "table"
+returnDescription: "The cube table with a new column containing measure values evaluated in the row context of each row."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to add the measure column to."
+  - name: "column"
+    type: "text"
+    required: true
+    description: "The name of the new column to add."
+  - name: "measureSelector"
+    type: "any"
+    required: true
+    description: "The measure to apply. Typically a value from Cube.Measures."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-measures"
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-measureproperty"
+  - "cube-measureproperties"
+  - "cube-transform"
+  - "analysisservices-database"
+  - "table-addcolumn"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP measures"
+  - "Row context"
+  - "Measure aggregation"
+---
+
+## Remarks
+
+`Cube.AddMeasureColumn` adds a column with the specified name to a cube table. The column contains the results of the measure applied in the row context of each row. Measure application is affected by changes to dimensional granularity and slicing -- measure values are automatically adjusted after cube operations such as expanding or collapsing dimensions.
+
+The measure selector is typically obtained from the table returned by `Cube.Measures`. Each measure is represented as a function that evaluates based on the current dimensional context of the row.
+
+This function is the measure counterpart of `Cube.AddAndExpandDimensionColumn`. While the dimension function adds attribute columns that define the granularity, `Cube.AddMeasureColumn` adds the numeric (or other typed) values that are aggregated at that granularity.
+
+## Examples
+
+### Example 1: Add an Internet Sales Amount measure
+
+Add the Internet Sales Amount measure as a column to the cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithMeasure = Cube.AddMeasureColumn(
+        Cube,
+        "Internet Sales",
+        {"[Measures].[Internet Sales Amount]"}
+    )
+in
+    WithMeasure
+```
+
+### Example 2: Add multiple measures to a cube
+
+Add both sales amount and order count measures to a cube that already has dimensions expanded.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        {"[Product]"},
+        {"[Product].[Product Name]"}
+    ),
+    WithSales = Cube.AddMeasureColumn(
+        WithProduct,
+        "Sales Amount",
+        {"[Measures].[Internet Sales Amount]"}
+    ),
+    WithCount = Cube.AddMeasureColumn(
+        WithSales,
+        "Order Count",
+        {"[Measures].[Internet Order Count]"}
+    )
+in
+    WithCount
+```

@@ -1,0 +1,75 @@
+---
+title: "Cube.Dimensions"
+slug: "cube-dimensions"
+category: "Table"
+description: "Returns a table containing the set of available dimensions within a cube."
+syntax: "Cube.Dimensions(cube as table) as table"
+returnType: "table"
+returnDescription: "A table listing the available dimensions in the cube, where each dimension contains a set of dimension attributes."
+parameters:
+  - name: "cube"
+    type: "table"
+    required: true
+    description: "The cube table to retrieve dimensions from."
+compatibility:
+  pbiDesktop: true
+  pbiService: true
+  excelDesktop: true
+  excelOnline: true
+  dataflows: true
+  fabricNotebooks: true
+relatedFunctions:
+  - "cube-addandexpanddimensioncolumn"
+  - "cube-measures"
+  - "cube-properties"
+  - "cube-displayfolders"
+  - "cube-replacedimensions"
+  - "analysisservices-database"
+relatedConcepts:
+  - "Analysis Services cubes"
+  - "OLAP dimensions"
+  - "Dimension hierarchies"
+  - "Cube metadata"
+---
+
+## Remarks
+
+`Cube.Dimensions` returns a table containing the set of available dimensions within the specified cube. Each dimension is itself a table containing a set of dimension attributes, and each dimension attribute is represented as a column in the dimension table.
+
+Dimensions are the primary organizational structures in an OLAP cube. They represent the axes along which data can be analyzed -- for example, Time, Product, Geography, or Customer. Each dimension contains one or more hierarchies and attributes that define how data can be sliced and aggregated.
+
+Dimensions from this table can be expanded into the cube using `Cube.AddAndExpandDimensionColumn`. The dimension selector values from this table are passed as the `dimensionSelector` argument.
+
+## Examples
+
+### Example 1: List all dimensions in a cube
+
+Retrieve the list of dimensions available in the Adventure Works cube.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Dims = Cube.Dimensions(Cube)
+in
+    Dims
+```
+
+### Example 2: Navigate dimensions to expand attributes
+
+Get the dimensions table and use it to expand the Product dimension.
+
+```powerquery
+let
+    Source = AnalysisServices.Database("localhost", "AdventureWorks"),
+    Cube = Source{[Name = "Adventure Works"]}[Data],
+    Dims = Cube.Dimensions(Cube),
+    ProductDim = Dims{[Name = "Product"]}[Value],
+    WithProduct = Cube.AddAndExpandDimensionColumn(
+        Cube,
+        ProductDim,
+        {"[Product].[Product Name]"}
+    )
+in
+    WithProduct
+```
