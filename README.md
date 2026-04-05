@@ -2,14 +2,14 @@
 
 A community-driven Power Query M language reference, hosted at [pqm.guide](https://pqm.guide).
 
-PQM.guide documents 512 Power Query M functions across 24 categories with clear syntax references, visual output examples, and practical best practices. It also includes concept guides, practical patterns, and an MCP server so AI assistants can query M documentation directly. Think of it as [DAX.guide](https://dax.guide) for the M language.
+PQM.guide documents 661 Power Query M functions across 26 categories with clear syntax references, visual output examples, and practical best practices. It also includes concept guides, practical patterns, and an MCP server so AI assistants can query M documentation directly. Think of it as [DAX.guide](https://dax.guide) for the M language.
 
 ## What's on the Site
 
 | Section | URL | Description |
 |---|---|---|
-| Functions | `/functions/[slug]` | 512 functions across 24 categories with syntax, parameters, examples, and best practices |
-| Concepts | `/concepts/[slug]` | 21 concept guides covering M fundamentals (lazy evaluation, query folding, type system, etc.) |
+| Functions | `/functions/[slug]` | 661 functions across 26 categories with syntax, parameters, examples, and best practices |
+| Concepts | `/concepts/[slug]` | 22 concept guides covering M fundamentals (lazy evaluation, query folding, type system, etc.) |
 | Patterns | `/patterns/[slug]` | 18 practical M recipes grouped by difficulty (beginner → advanced) |
 | Start Here | `/learn` | A curated 8-step learning path for developers new to M |
 | Sample Tables | `/sample-tables` | Reference data used in function examples (Sales, Customers, Products, Employees, OrderLog) |
@@ -22,7 +22,7 @@ PQM.guide exposes several machine-readable endpoints:
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/functions` | All 512 functions (metadata) |
+| `GET /api/functions` | All 661 functions (metadata) |
 | `GET /api/functions/[slug]` | Single function with full content, remarks, and parsed examples |
 | `GET /api/concepts` | All concept guides |
 | `GET /api/concepts/[slug]` | Single concept with full content |
@@ -59,7 +59,7 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for full details: frontmatter schemas
 **Quick ways to help:**
 
 - Fix a typo or improve a function's remarks
-- Add a missing function (149 of the official spec are still undocumented)
+- Improve a function's remarks or examples
 - Write a new concept guide or pattern recipe
 - [Open an issue](https://github.com/kyleamueller/PQM.guide/issues) or [start a discussion](https://github.com/kyleamueller/PQM.guide/discussions) if you'd rather suggest changes without code
 
@@ -94,7 +94,7 @@ Other useful commands:
 ```bash
 npm run typecheck   # TypeScript type check
 npm run test        # Vitest test suite (45 tests)
-npm run build       # Full production build (593 pages)
+npm run build       # Full production build (1,447 pages)
 ```
 
 ## License
