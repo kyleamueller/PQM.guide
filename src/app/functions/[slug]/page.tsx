@@ -118,6 +118,29 @@ function renderRemarks(remarks: string) {
   while (i < lines.length) {
     const line = lines[i];
 
+    if (line.startsWith("### ")) {
+      elements.push(<h3 key={key++} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(line.slice(4)) }} />);
+      i++;
+      continue;
+    }
+
+    if (line.startsWith("```")) {
+      const lang = line.slice(3).trim();
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip closing ```
+      elements.push(
+        <pre key={key++} className={lang ? `language-${lang}` : undefined}>
+          <code>{codeLines.join("\n")}</code>
+        </pre>
+      );
+      continue;
+    }
+
     if (line.startsWith("|")) {
       const tableLines: string[] = [];
       while (i < lines.length && lines[i].startsWith("|")) {
@@ -169,7 +192,9 @@ function renderRemarks(remarks: string) {
       i < lines.length &&
       lines[i].trim() !== "" &&
       !lines[i].startsWith("|") &&
-      !lines[i].startsWith("- ")
+      !lines[i].startsWith("- ") &&
+      !lines[i].startsWith("### ") &&
+      !lines[i].startsWith("```")
     ) {
       paraLines.push(lines[i]);
       i++;

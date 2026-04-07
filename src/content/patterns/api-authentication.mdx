@@ -19,7 +19,13 @@ All authentication in `Web.Contents` flows through its second argument — an op
 | `Headers` | record | HTTP request headers (API keys, Bearer tokens, Content-Type) |
 | `Query` | record | Query string parameters (appended to the URL) |
 | `Content` | binary | POST body |
+| `RelativePath` | text | Path appended to the base URL — required for dynamic endpoints that refresh in the Power BI Service |
+| `ManualStatusHandling` | list | HTTP status codes Power Query should return instead of raising an error |
 | `ManualCredentials` | logical | Set `true` to bypass Power Query's credential prompt |
+| `Timeout` | duration | Maximum time to wait for a response (e.g. `#duration(0, 0, 30, 0)` for 30 seconds) |
+| `IsRetry` | logical | Set `true` to ignore any cached response and re-fetch from the server |
+| `ExcludedFromCacheKey` | list | Header names that should not be included in the cache key (useful for volatile auth headers) |
+| `ApiKeyName` | text | Name of the API key parameter when using the Web API credential type |
 
 ### API Key in a Header
 
@@ -52,12 +58,15 @@ APIs using OAuth return a short-lived access token you include as a Bearer heade
 let
     // Step 1: Request a token
     TokenResponse = Json.Document(
-        Web.Contents("https://auth.example.com/oauth/token", [
+        Web.Contents("https://auth.example.com", [
+            RelativePath = "oauth/token",
             Headers = [#"Content-Type" = "application/x-www-form-urlencoded"],
             Content = Text.ToBinary(
-                "grant_type=client_credentials"
-                & "&client_id=YOUR_CLIENT_ID"
-                & "&client_secret=YOUR_CLIENT_SECRET"
+                Uri.BuildQueryString([
+                    grant_type    = "client_credentials",
+                    client_id     = "YOUR_CLIENT_ID",
+                    client_secret = "YOUR_CLIENT_SECRET"
+                ])
             ),
             ManualCredentials = true
         ])
@@ -66,7 +75,8 @@ let
 
     // Step 2: Use the token in the data request
     Data = Json.Document(
-        Web.Contents("https://api.example.com/v1/records", [
+        Web.Contents("https://api.example.com", [
+            RelativePath = "v1/records",
             Headers = [
                 Authorization = "Bearer " & AccessToken,
                 #"Content-Type" = "application/json"
@@ -77,6 +87,8 @@ let
 in
     Data
 ```
+
+Note: adding any `Content` field — even an empty binary — converts the request from GET to POST. Use `Uri.BuildQueryString` to build form-encoded POST bodies from a record instead of manually concatenating `&`-separated strings.
 
 ### Query String Parameters
 
@@ -99,6 +111,62 @@ Web.Contents("https://api.example.com/search?q=power+query&limit=50")
 ```
 
 The `Query` record values must be text — convert numbers with `Text.From(...)`.
+
+### RelativePath — Dynamic Endpoints That Refresh
+
+When a query refreshes in the Power BI Service, the engine evaluates the base URL at design time to determine which data-source credentials to apply. If you build the full URL dynamically (e.g. by concatenating a page number or resource ID), the service can't match it to a known data source and the refresh fails.
+
+`RelativePath` solves this — the base URL stays static, and the dynamic portion goes into `RelativePath`:
+
+```powerquery
+// Good — base URL is static, dynamic path handled by RelativePath
+Web.Contents("https://api.example.com", [
+    RelativePath = "v2/orders/" & Text.From(orderId),
+    Headers = [#"X-API-Key" = ApiKey],
+    ManualCredentials = true
+])
+
+// Avoid — dynamic URL breaks scheduled refresh in the Power BI Service
+Web.Contents("https://api.example.com/v2/orders/" & Text.From(orderId), [
+    Headers = [#"X-API-Key" = ApiKey],
+    ManualCredentials = true
+])
+```
+
+Power Query automatically inserts a `/` between the base URL and `RelativePath` — don't include a leading slash yourself, or you'll end up with a double `//` in the URL.
+
+`RelativePath` is especially important in pagination loops where the path changes on every iteration.
+
+### ManualStatusHandling — Graceful Error Responses
+
+By default, Power Query raises an error for any non-2xx HTTP response. `ManualStatusHandling` accepts a list of status codes that should be returned as normal responses instead:
+
+```powerquery
+let
+    Response = Web.Contents("https://api.example.com/users/42", [
+        Headers = [#"X-API-Key" = ApiKey],
+        ManualStatusHandling = {400, 404, 429, 500},
+        ManualCredentials = true
+    ]),
+
+    Status = Value.Metadata(Response)[Response.Status],
+
+    Result =
+        if Status = 200 then Json.Document(Response)
+        else if Status = 429 then error "Rate limited — retry later"
+        else if Status = 404 then null
+        else error "API returned HTTP " & Text.From(Status)
+in
+    Result
+```
+
+Common use cases:
+
+- **404** — return `null` instead of failing when a record doesn't exist
+- **429** — detect rate limiting and surface a clear error message
+- **500** — log the failure and continue processing other rows instead of aborting the entire query
+
+Without `ManualStatusHandling`, any of these status codes would immediately halt the query with a generic `DataSource.Error`.
 
 ### Paginating Through Results
 
@@ -162,3 +230,8 @@ in
 - `ManualCredentials = true` bypasses the credential store, so the key must be embedded or read from a parameter/config query that is itself accessible during refresh.
 - OAuth tokens are often short-lived. If the token expires between the token request and the data request (rare for scheduled refresh, possible for very large pulls), structure the query so the token fetch and data fetch happen in the same M evaluation.
 - Power BI Service enforces privacy level rules — if your API and your config query have different privacy levels, M may refuse to combine them. Set both to the same privacy level, or set the dataset to `Ignore Privacy Levels` (only for trusted, internal data).
+- Queries that combine a POST request (e.g. fetching an OAuth token) and a GET request (fetching data with that token) in the same query may fail to refresh in the Power BI Service because the engine detects a dynamic data source. Workarounds include using Dataflows, a Data Gateway with a custom connector, or splitting the token fetch into a separate query.
+
+### Further Reading
+
+- [APIs as Power BI Datasources](https://datameerkat.com/apis-as-power-bi-datasources) — Štěpán Rešl's walkthrough of connecting REST APIs to Power BI using `Web.Contents`, covering URL construction, authentication flows, and refresh limitations.

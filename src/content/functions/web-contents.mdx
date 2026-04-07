@@ -45,11 +45,16 @@ The optional `options` record supports the following fields:
 | `Timeout` | duration | Override the default request timeout. e.g., `#duration(0, 0, 30, 0)` for 30 seconds. |
 | `ManualStatusHandling` | list | A list of HTTP status codes (e.g., `{404, 500}`) that should not raise an error, allowing you to handle them in M code. |
 | `IsRetry` | logical | Set to `true` to ignore any cached response and re-fetch from the server. |
+| `ExcludedFromCacheKey` | list | Header names that should not be included in the cache key (useful for volatile auth headers). |
+| `ManualCredentials` | logical | Set to `true` to bypass Power Query's credential prompt when you handle authentication yourself via `Headers`. |
+| `ApiKeyName` | text | Name of the API key parameter when using the Web API credential type. |
 
 ### Important notes
 
 - `Web.Contents` **breaks query folding** — any transformations applied after it run entirely in the M engine.
-- In the Power BI Service, the base URL must be a **static string literal** for data source credentials to bind correctly. Use `RelativePath` and `Query` for dynamic parts.
+- In the Power BI Service, the base URL must be a **static string literal** for data source credentials to bind correctly. Use `RelativePath` and `Query` for dynamic parts. Power Query automatically inserts a `/` between the base URL and `RelativePath` — don't include a leading slash yourself.
+- Adding any `Content` field — even an empty binary — converts the request from GET to POST. Use `Uri.BuildQueryString` to build form-encoded POST bodies from a record instead of manually concatenating strings.
+- Queries that combine a POST request (e.g. fetching an OAuth token) and a GET request in the same query may fail to refresh in the Power BI Service due to dynamic data source detection. Consider using Dataflows, a Data Gateway with a custom connector, or splitting the token fetch into a separate query.
 - For paginated APIs, combine `Web.Contents` with `List.Generate` or a recursive function to fetch multiple pages.
 
 ### Typical usage patterns
