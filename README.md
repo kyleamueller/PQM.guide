@@ -72,6 +72,7 @@ If you use [Claude Code](https://claude.com/claude-code), the repo includes slas
 | `/add-function` | Scaffold a new function page — prompts for the function name, researches the official spec, generates the MDX file with correct frontmatter, and runs tests |
 | `/add-concept` | Scaffold a new concept guide |
 | `/add-pattern` | Scaffold a new pattern recipe |
+| `/edit-page` | Edit an existing page — accepts a URL, slug, or M function name (e.g. `Table.AddColumn`), reads the current content, and walks you through the change |
 | `/publish` | Package uncommitted changes into a pull request |
 | `/refresh-site` | Full content freshness review — scans Microsoft blogs, checks for new M functions, verifies compatibility flags, and updates stale content |
 
