@@ -45,11 +45,16 @@ The optional `options` record supports the following fields:
 | `Timeout` | duration | Override the default request timeout. e.g., `#duration(0, 0, 30, 0)` for 30 seconds. |
 | `ManualStatusHandling` | list | A list of HTTP status codes (e.g., `{404, 500}`) that should not raise an error, allowing you to handle them in M code. |
 | `IsRetry` | logical | Set to `true` to ignore any cached response and re-fetch from the server. |
+| `ExcludedFromCacheKey` | list | Header names that should not be included in the cache key (useful for volatile auth headers). |
+| `ManualCredentials` | logical | Set to `true` to bypass Power Query's credential prompt when you handle authentication yourself via `Headers`. |
+| `ApiKeyName` | text | Name of the API key parameter when using the Web API credential type. |
 
 ### Important notes
 
 - `Web.Contents` **breaks query folding** — any transformations applied after it run entirely in the M engine.
-- In the Power BI Service, the base URL must be a **static string literal** for data source credentials to bind correctly. Use `RelativePath` and `Query` for dynamic parts.
+- In the Power BI Service, the base URL must be a **static string literal** for data source credentials to bind correctly. Use `RelativePath` and `Query` for dynamic parts. Power Query automatically inserts a `/` between the base URL and `RelativePath` — don't include a leading slash yourself.
+- Adding any `Content` field — even an empty binary — converts the request from GET to POST. Use `Uri.BuildQueryString` to build form-encoded POST bodies from a record instead of manually concatenating strings.
+- Queries that combine a POST request (e.g. fetching an OAuth token) and a GET request in the same query may fail to refresh in the Power BI Service due to dynamic data source detection. Consider using Dataflows, a Data Gateway with a custom connector, or splitting the token fetch into a separate query.
 - For paginated APIs, combine `Web.Contents` with `List.Generate` or a recursive function to fetch multiple pages.
 
 ### Typical usage patterns
@@ -96,4 +101,104 @@ in
 
 ## Examples
 
-Since `Web.Contents` requires network access, live output examples are not shown. See the Remarks section above for typical usage patterns.
+### Example 1: Fetch JSON from a REST API
+
+Download the Products sample table from the pqm.guide API and parse it into a table.
+
+```powerquery
+let
+    Response = Web.Contents("https://pqm.guide/api/tables/Products"),
+    Parsed   = Json.Document(Response),
+    AsTable  = Table.FromRecords(Parsed[rows])
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Category":"Widgets","Price":25.00,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Category":"Gadgets","Price":50.00,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Category":"Widgets","Price":15.00,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Category":"Gadgets","Price":75.00,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Category":"Misc","Price":120.00,"InStock":false}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Response",
+      "description": "Calls the pqm.guide REST API and returns the raw HTTP response as a binary value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Binary.FromText(...)"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Parses the binary response as JSON, producing an M record with columns and rows fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"columns","Value":"[List]"},{"Field":"rows","Value":"[List]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a five-row table built from the rows field of the parsed JSON using Table.FromRecords.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Category":"Widgets","Price":25.00,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Category":"Gadgets","Price":50.00,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Category":"Widgets","Price":15.00,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Category":"Gadgets","Price":75.00,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Category":"Misc","Price":120.00,"InStock":false}]}
+    }
+  ]
+}
+-->
+
+### Example 2: Use RelativePath for Power BI Service compatibility
+
+Split the URL into a static base and a dynamic RelativePath so the query can refresh in the Power BI Service.
+
+```powerquery
+let
+    TableName = "Sales",
+    Response  = Web.Contents("https://pqm.guide", [
+        RelativePath = "api/tables/" & TableName
+    ]),
+    Parsed  = Json.Document(Response),
+    AsTable = Table.FromRecords(Parsed[rows])
+in
+    AsTable
+```
+
+<!--output
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.00,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
+-->
+
+### Example 3: Handle a 404 with ManualStatusHandling
+
+Attempt to fetch a table that doesn't exist and handle the 404 gracefully instead of raising an error.
+
+```powerquery
+let
+    Response = Web.Contents("https://pqm.guide/api/tables/NonExistent", [
+        ManualStatusHandling = {404}
+    ]),
+    Status = Value.Metadata(Response)[Response.Status],
+    Result =
+        if Status = 404 then #table({"Status", "Message"}, {{404, "Table not found"}})
+        else Table.FromRecords(Json.Document(Response)[rows])
+in
+    Result
+```
+
+<!--output
+{"columns":[{"name":"Status","type":"number"},{"name":"Message","type":"text"}],"rows":[{"Status":404,"Message":"Table not found"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Response",
+      "description": "Calls the API for a non-existent table. Because 404 is listed in ManualStatusHandling, Power Query returns the response instead of raising an error.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Binary.FromText(...)"}]}
+    },
+    {
+      "name": "Status",
+      "description": "Reads the HTTP status code from the response metadata. Returns 404 because the table does not exist.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":404}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — since the status is 404, returns a one-row table with the status code and a user-friendly message instead of failing.",
+      "output": {"columns":[{"name":"Status","type":"number"},{"name":"Message","type":"text"}],"rows":[{"Status":404,"Message":"Table not found"}]}
+    }
+  ]
+}
+-->
