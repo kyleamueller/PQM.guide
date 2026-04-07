@@ -83,6 +83,24 @@ export default function ResourcesPage() {
         <div className="resource-card">
           <h3>
             <a
+              href="https://mgame.datameerkat.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              MQuery Game — Štěpán Rešl
+            </a>
+          </h3>
+          <p>
+            An interactive browser-based game for learning the M language.
+            Practice writing Power Query expressions through hands-on challenges
+            that progressively build your skills — a fun alternative to reading
+            documentation.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
               href="https://learn.microsoft.com/en-us/powerquery-m/"
               target="_blank"
               rel="noopener noreferrer"
