@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import { parseInlineMarkdown } from "@/lib/markdown";
 import {
   getConceptBySlug,
   getAllConceptSlugs,
@@ -39,12 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-function parseInlineMarkdown(text: string): string {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/`([^`]+)`/g, "<code>$1</code>");
-}
+// parseInlineMarkdown imported from @/lib/markdown
 
 function renderConceptBody(content: string) {
   const elements: { type: "p" | "h3" | "code" | "ul" | "table"; content: string }[] = [];
