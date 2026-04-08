@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { getFunctionBySlug, getAllFunctionSlugs, buildSearchIndex } from "@/lib/mdx";
 import { PQTableData, ExampleStep } from "@/lib/types";
+import { parseInlineMarkdown } from "@/lib/markdown";
 import FunctionHeader from "@/components/function-page/FunctionHeader";
 import SyntaxBlock from "@/components/function-page/SyntaxBlock";
 import ParametersTable from "@/components/function-page/ParametersTable";
@@ -102,12 +103,7 @@ function parseRemarks(content: string): string | null {
   return remarksMatch ? remarksMatch[1].trim() : null;
 }
 
-function parseInlineMarkdown(text: string): string {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/`([^`]+)`/g, "<code>$1</code>");
-}
+// parseInlineMarkdown imported from @/lib/markdown
 
 function renderRemarks(remarks: string) {
   const elements: React.ReactElement[] = [];
@@ -247,7 +243,7 @@ export default async function FunctionPage({ params }: PageProps) {
   };
 
   return (
-    <article>
+    <article key={slug}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

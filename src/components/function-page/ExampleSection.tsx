@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PQTableData, ExampleStep } from "@/lib/types";
 import { sampleTables } from "@/data/sample-tables";
+import { parseInlineMarkdown } from "@/lib/markdown";
 import PQTable from "@/components/pq-table/PQTable";
 import SyntaxBlock from "./SyntaxBlock";
 
@@ -42,7 +43,7 @@ export default function ExampleSection({
       <h3>
         Example {index + 1}: {title}
       </h3>
-      {description && <p className="example-description">{description}</p>}
+      {description && <p className="example-description" dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(description) }} />}
 
       <div className="example-code">
         <SyntaxBlock code={code} />
@@ -96,7 +97,7 @@ export default function ExampleSection({
           {currentStep && (
             <div className="step-output">
               {currentStep.description && (
-                <p className="step-description">{currentStep.description}</p>
+                <p className="step-description" dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(currentStep.description) }} />
               )}
               <div className="example-table">
                 <PQTable data={currentStep.output} />
