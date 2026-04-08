@@ -9,12 +9,13 @@
 
 - [ ] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
 - [ ] **Sample tables: surface the M code** — The M code on the sample tables page is too hidden; make it more discoverable/visible. *(Alex)*
+- [ ] **Add M formatting to the MCP Server** — Enhance the MCP server to enable it to automatically format M code *(Bernat)*
 
 ---
 
 ## P3 — Valuable features, more design work
 
-- [ ] **Resources: add Dom's book + Alex Powers articles** — Add Dom Petri's Power Query book and Alex Powers' query folding articles to the Resources page. Find other high-quality additions too. *(Kerski)*
+- [ ] **Resources: add Dom's book + Alex Powers articles** — Add Dom's Power Query book and Alex Powers' query folding articles to the Resources page. Find other high-quality additions too. *(Kerski)*
 - [ ] **Schema/data view toggle** — Inspired by the Power BI Dataflows UI: add a toggle on sample tables (and/or function pages) to switch between a data view and a schema view (column names, types, icons). Makes the site feel more like it's teaching Power Query end-to-end. *(Alex)*
 
 ---
