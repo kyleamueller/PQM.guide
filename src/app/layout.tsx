@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/next";
 import AppShell from "@/components/layout/AppShell";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import CookieConsent from "@/components/ui/CookieConsent";
@@ -74,6 +75,7 @@ export default function RootLayout({
           <AppShell functions={functions} searchItems={searchItems}>{children}</AppShell>
         </ThemeProvider>
         <CookieConsent />
+        <Analytics />
       </body>
     </html>
   );
