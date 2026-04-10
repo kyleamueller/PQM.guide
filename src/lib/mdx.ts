@@ -7,14 +7,17 @@ import { functionSynonyms } from "@/data/search-synonyms";
 const CONTENT_DIR = path.join(process.cwd(), "src/content/functions");
 const CONCEPTS_DIR = path.join(process.cwd(), "src/content/concepts");
 
+const functionCache = new Map<string, { frontmatter: FunctionFrontmatter; content: string }>();
+
 export function getFunctionBySlug(slug: string) {
+  const cached = functionCache.get(slug);
+  if (cached) return cached;
   const filePath = path.join(CONTENT_DIR, `${slug}.mdx`);
   const raw = fs.readFileSync(filePath, "utf-8").replace(/\r\n/g, "\n");
   const { data, content } = matter(raw);
-  return {
-    frontmatter: data as FunctionFrontmatter,
-    content,
-  };
+  const result = { frontmatter: data as FunctionFrontmatter, content };
+  functionCache.set(slug, result);
+  return result;
 }
 
 export function getAllFunctionSlugs(): string[] {
@@ -57,14 +60,17 @@ export function buildSearchIndex(): FunctionIndexEntry[] {
 
 // Concept utilities
 
+const conceptCache = new Map<string, { frontmatter: ConceptFrontmatter; content: string }>();
+
 export function getConceptBySlug(slug: string) {
+  const cached = conceptCache.get(slug);
+  if (cached) return cached;
   const filePath = path.join(CONCEPTS_DIR, `${slug}.mdx`);
   const raw = fs.readFileSync(filePath, "utf-8").replace(/\r\n/g, "\n");
   const { data, content } = matter(raw);
-  return {
-    frontmatter: data as ConceptFrontmatter,
-    content,
-  };
+  const result = { frontmatter: data as ConceptFrontmatter, content };
+  conceptCache.set(slug, result);
+  return result;
 }
 
 export function getAllConceptSlugs(): string[] {
@@ -87,14 +93,17 @@ export function getAllConcepts(): (ConceptFrontmatter & { slug: string })[] {
 
 const PATTERNS_DIR = path.join(process.cwd(), "src/content/patterns");
 
+const patternCache = new Map<string, { frontmatter: PatternFrontmatter; content: string }>();
+
 export function getPatternBySlug(slug: string) {
+  const cached = patternCache.get(slug);
+  if (cached) return cached;
   const filePath = path.join(PATTERNS_DIR, `${slug}.mdx`);
   const raw = fs.readFileSync(filePath, "utf-8").replace(/\r\n/g, "\n");
   const { data, content } = matter(raw);
-  return {
-    frontmatter: data as PatternFrontmatter,
-    content,
-  };
+  const result = { frontmatter: data as PatternFrontmatter, content };
+  patternCache.set(slug, result);
+  return result;
 }
 
 export function getAllPatternSlugs(): string[] {
