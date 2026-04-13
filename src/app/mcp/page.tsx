@@ -69,6 +69,16 @@ const TOOLS = [
     args: `{ "category": "list" }`,
     description: "All functions in a given category. Use list_categories first to get valid category slugs.",
   },
+  {
+    name: "format_m_code",
+    args: `{ "code": "let x=1 in x" }`,
+    description: "Format M code canonically using Microsoft's official Power Query formatter. Accepts documents or bare expressions.",
+  },
+  {
+    name: "validate_m_code",
+    args: `{ "code": "let x = in" }`,
+    description: "Parse-check M code. Returns valid/invalid plus line and column of the first syntax error.",
+  },
 ];
 
 export default function McpPage() {

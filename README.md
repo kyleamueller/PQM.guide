@@ -15,6 +15,7 @@ PQM.guide documents 661 Power Query M functions across 26 categories with clear 
 | Sample Tables | `/sample-tables` | Reference data used in function examples (Sales, Customers, Products, Employees, OrderLog) |
 | Resources | `/resources` | Curated tools, books, YouTube channels, blogs, and community links |
 | MCP Server | `/mcp` | Connect AI assistants like Claude and Cursor to PQM.guide via the Model Context Protocol |
+| Format M | `/format-m` | Interactive formatter and validator for Power Query M snippets |
 
 ## API & LLM Access
 
@@ -32,6 +33,7 @@ PQM.guide exposes several machine-readable endpoints:
 | `GET /api/tables/[id]` | Sample table data as JSON (Sales, Customers, Products, Employees, OrderLog) |
 | `GET /llms.txt` | Plain-text index (llmstxt.org format) for LLM crawlers |
 | `POST /api/mcp` | MCP JSON-RPC 2.0 endpoint (Streamable HTTP transport) |
+| `POST /api/format-m` | Format or validate M code — body `{ code, action: "format" \| "validate" }` |
 
 ### MCP Server
 
@@ -112,5 +114,6 @@ If you republish or build on the documentation content, attribution to [pqm.guid
 - [Tailwind CSS 4](https://tailwindcss.com)
 - TypeScript, MDX, gray-matter, PrismJS, Fuse.js, next-themes
 - [@fluentui/react-icons](https://github.com/microsoft/fluentui-system-icons) for sidebar category icons
+- [@microsoft/powerquery-formatter](https://github.com/microsoft/powerquery-formatter) and [@microsoft/powerquery-parser](https://github.com/microsoft/powerquery-parser) (MIT) power the `/format-m` page and the `format_m_code` / `validate_m_code` MCP tools — the same engines behind VS Code's Power Query extension
 - MCP: JSON-RPC 2.0 over Streamable HTTP (no external SDK)
 - Deployed on [Vercel](https://vercel.com)
