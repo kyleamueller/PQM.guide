@@ -71,8 +71,8 @@ const TOOLS = [
   },
   {
     name: "format_m_code",
-    args: `{ "code": "let x=1 in x" }`,
-    description: "Format M code canonically using Microsoft's official Power Query formatter. Accepts documents or bare expressions.",
+    args: `{ "code": "let x=1 in x", "style": "long" }`,
+    description: "Format M code canonically using Microsoft's official Power Query formatter. Accepts documents or bare expressions. Optional `style`: 'long' (default, editor-style) or 'short' (spreads complex function args onto their own lines).",
   },
   {
     name: "validate_m_code",

@@ -18,8 +18,11 @@ const EXAMPLE = `let
   Filtered = Table.SelectRows(Typed, each [Amount]>100)
 in Filtered`;
 
+type FormatStyle = "long" | "short";
+
 export default function FormatClient() {
   const [input, setInput] = useState(EXAMPLE);
+  const [style, setStyle] = useState<FormatStyle>("long");
   const [output, setOutput] = useState<string | null>(null);
   const [errorInfo, setErrorInfo] = useState<{ message: string; line?: number; column?: number } | null>(null);
   const [validation, setValidation] = useState<ValidateResponse | null>(null);
@@ -34,7 +37,7 @@ export default function FormatClient() {
       const res = await fetch("/api/format-m", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: input, action }),
+        body: JSON.stringify({ code: input, action, style }),
       });
       const data = await res.json();
       if (action === "format") {
@@ -82,7 +85,41 @@ export default function FormatClient() {
         />
       </div>
 
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div
+          role="radiogroup"
+          aria-label="Formatting style"
+          style={{ display: "inline-flex", border: "1px solid var(--border-color)", borderRadius: 6, overflow: "hidden" }}
+        >
+          {(["long", "short"] as const).map((option) => {
+            const active = style === option;
+            return (
+              <button
+                key={option}
+                role="radio"
+                aria-checked={active}
+                onClick={() => setStyle(option)}
+                title={
+                  option === "long"
+                    ? "Long lines: Power Query editor style — each step on one line up to ~120 chars."
+                    : "Short lines: spreads parameters of complex function calls onto their own lines."
+                }
+                style={{
+                  padding: "6px 14px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  background: active ? "var(--accent)" : "var(--bg-secondary)",
+                  color: active ? "#fff" : "var(--text-primary)",
+                  border: "none",
+                  cursor: "pointer",
+                  textTransform: "capitalize",
+                }}
+              >
+                {option} lines
+              </button>
+            );
+          })}
+        </div>
         <button
           onClick={() => runAction("format")}
           disabled={loading || input.trim().length === 0}

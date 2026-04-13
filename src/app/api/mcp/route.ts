@@ -152,13 +152,19 @@ const TOOLS = [
   {
     name: "format_m_code",
     description:
-      "Format Power Query M code using Microsoft's official formatter. Accepts a full `let … in …` document or a bare expression and returns canonical, consistently-indented M. Useful for cleaning up pasted code or normalizing AI-generated M before using it.",
+      "Format Power Query M code using Microsoft's official formatter. Accepts a full `let … in …` document or a bare expression and returns canonical, consistently-indented M. Supports two layout styles: 'long' (default, Power Query editor style — each step on a single line up to ~120 chars) and 'short' (readability style — wider function calls break each parameter onto its own line).",
     inputSchema: {
       type: "object",
       properties: {
         code: {
           type: "string",
           description: "Power Query M source to format.",
+        },
+        style: {
+          type: "string",
+          enum: ["long", "short"],
+          description:
+            "Layout style. 'long' (default) keeps each step on one line until ~120 chars; 'short' spreads parameters of complex function calls onto their own lines for readability.",
         },
       },
       required: ["code"],
@@ -425,7 +431,8 @@ async function callTool(
 
       case "format_m_code": {
         const code = String(args.code ?? "");
-        const result = await formatMCode(code);
+        const style = args.style === "short" ? "short" : "long";
+        const result = await formatMCode(code, style);
         if (result.ok) {
           return `\`\`\`powerquery\n${result.formatted}\n\`\`\``;
         }

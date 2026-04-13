@@ -53,6 +53,30 @@ describe("formatMCode", () => {
       }
     }
   });
+
+  it("short style produces more lines than long style for complex calls", async () => {
+    const code = `let Source = Table.FromRecords({[a=1,b=2,c=3],[a=4,b=5,c=6],[a=7,b=8,c=9]}), Filtered = Table.SelectRows(Source, each [a] > 2 and [b] < 9) in Filtered`;
+    const long = await formatMCode(code, "long");
+    const short = await formatMCode(code, "short");
+    expect(long.ok).toBe(true);
+    expect(short.ok).toBe(true);
+    if (long.ok && short.ok) {
+      const longLines = long.formatted.split("\n").length;
+      const shortLines = short.formatted.split("\n").length;
+      expect(shortLines).toBeGreaterThan(longLines);
+    }
+  });
+
+  it("style defaults to long when omitted", async () => {
+    const code = "let x=1,y=2 in x+y";
+    const explicit = await formatMCode(code, "long");
+    const implicit = await formatMCode(code);
+    expect(explicit.ok).toBe(true);
+    expect(implicit.ok).toBe(true);
+    if (explicit.ok && implicit.ok) {
+      expect(implicit.formatted).toBe(explicit.formatted);
+    }
+  });
 });
 
 describe("validateMCode", () => {

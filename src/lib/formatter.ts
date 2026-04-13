@@ -20,10 +20,24 @@ import {
 // The formatter accepts both full `let … in …` documents and bare expressions
 // natively, so no pre-parsing or cascading fallback is needed for v1.
 // See backlog (P3) for the follow-up to revisit input handling.
-const SETTINGS: FormatSettings = {
-  ...DefaultSettings,
-  newlineLiteral: NewlineLiteral.Unix,
-};
+
+export type FormatStyle = "long" | "short";
+
+// "long" is the Power Query editor default — keeps each step on a single
+// long line until it exceeds ~120 chars. "short" lowers the wrap budget so
+// function calls with several arguments break each parameter onto its own
+// line (similar to what you'd write by hand for readability), without going
+// so far as to break apart simple expressions like `each [x] > 1`.
+const MAX_WIDTH_LONG = 120;
+const MAX_WIDTH_SHORT = 60;
+
+function settingsFor(style: FormatStyle): FormatSettings {
+  return {
+    ...DefaultSettings,
+    newlineLiteral: NewlineLiteral.Unix,
+    maxWidth: style === "short" ? MAX_WIDTH_SHORT : MAX_WIDTH_LONG,
+  };
+}
 
 export interface FormatErrorInfo {
   message: string;
@@ -93,13 +107,16 @@ function extractPosition(err: TFormatError): { line?: number; column?: number } 
  * newline). On failure returns a structured error with line/column when
  * available.
  */
-export async function formatMCode(code: string): Promise<FormatResult> {
+export async function formatMCode(
+  code: string,
+  style: FormatStyle = "long"
+): Promise<FormatResult> {
   if (typeof code !== "string" || code.trim().length === 0) {
     return { ok: false, error: { message: "No M code provided." } };
   }
 
   try {
-    const result = await tryFormat(SETTINGS, code);
+    const result = await tryFormat(settingsFor(style), code);
     if (result.kind === "Ok") {
       return { ok: true, formatted: result.value.replace(/\r\n/g, "\n").replace(/\s+$/, "") };
     }
@@ -132,7 +149,8 @@ export async function validateMCode(code: string): Promise<ValidateResult> {
   }
 
   try {
-    const result = await tryFormat(SETTINGS, code);
+    // Style doesn't affect parse-check success/failure — use "long" defaults.
+    const result = await tryFormat(settingsFor("long"), code);
     if (result.kind === "Ok") {
       return { valid: true, errors: [] };
     }

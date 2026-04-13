@@ -21,8 +21,10 @@ export default function FormatMPage() {
         <h1 style={{ fontSize: 32, marginBottom: 8 }}>Format M Code</h1>
         <p style={{ color: "var(--text-secondary)", lineHeight: 1.6, fontSize: 16 }}>
           Paste a Power Query M snippet — a full <code>let … in …</code> query or a bare
-          expression — and get canonical formatting back. Use <strong>Validate</strong> to
-          parse-check without reformatting.
+          expression — and get canonical formatting back. Choose{" "}
+          <strong>long lines</strong> (Power Query editor style) or{" "}
+          <strong>short lines</strong> (spreads complex function calls across lines for
+          readability). Use <strong>Validate</strong> to parse-check without reformatting.
         </p>
       </div>
 

@@ -11,7 +11,7 @@ export function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  let body: { code?: unknown; action?: unknown };
+  let body: { code?: unknown; action?: unknown; style?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -23,12 +23,13 @@ export async function POST(req: Request) {
 
   const code = typeof body.code === "string" ? body.code : "";
   const action = body.action === "validate" ? "validate" : "format";
+  const style = body.style === "short" ? "short" : "long";
 
   if (action === "validate") {
     const result = await validateMCode(code);
     return Response.json(result, { headers: CORS_HEADERS });
   }
 
-  const result = await formatMCode(code);
+  const result = await formatMCode(code, style);
   return Response.json(result, { headers: CORS_HEADERS });
 }
