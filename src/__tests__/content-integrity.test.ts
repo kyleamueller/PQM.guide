@@ -8,6 +8,8 @@ import {
   getPatternBySlug,
 } from "@/lib/mdx";
 import officialSpecSlugs from "./fixtures/official-spec-slugs.json";
+import recentlyEditedData from "@/data/recently-edited.json";
+import type { RecentlyEditedEntry } from "@/lib/types";
 
 // All 661 official spec slugs are now documented — relatedFunctions must
 // reference existing documented slugs only (no forward-reference fallback).
@@ -160,5 +162,81 @@ describe("Pattern MDX integrity", () => {
       expect(frontmatter.title, `${slug}: title`).toBeTruthy();
       expect(frontmatter.description, `${slug}: description`).toBeTruthy();
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Recently Edited
+// ---------------------------------------------------------------------------
+
+describe("Recently Edited data integrity", () => {
+  const entries = recentlyEditedData as RecentlyEditedEntry[];
+
+  it("has between 1 and 6 entries", () => {
+    expect(entries.length).toBeGreaterThanOrEqual(1);
+    expect(entries.length).toBeLessThanOrEqual(6);
+  });
+
+  it("every entry has valid schema fields", () => {
+    const validTypes = ["function", "concept", "pattern"];
+    for (const entry of entries) {
+      expect(typeof entry.slug, `slug type for ${entry.slug}`).toBe("string");
+      expect(entry.slug.length, `slug empty`).toBeGreaterThan(0);
+      expect(validTypes, `invalid type "${entry.type}"`).toContain(entry.type);
+      expect(typeof entry.date, `date type for ${entry.slug}`).toBe("string");
+      expect(
+        /^\d{4}-\d{2}-\d{2}$/.test(entry.date),
+        `invalid date format "${entry.date}" for ${entry.slug}`
+      ).toBe(true);
+      expect(
+        isNaN(Date.parse(entry.date)),
+        `unparseable date "${entry.date}" for ${entry.slug}`
+      ).toBe(false);
+      expect(typeof entry.description, `description type for ${entry.slug}`).toBe("string");
+      expect(entry.description.length, `empty description for ${entry.slug}`).toBeGreaterThan(0);
+    }
+  });
+
+  it("every entry slug references an existing content file", () => {
+    const functionSlugs = new Set(getAllFunctionSlugs());
+    const conceptSlugs = new Set(getAllConceptSlugs());
+    const patternSlugs = new Set(getAllPatternSlugs());
+    for (const entry of entries) {
+      switch (entry.type) {
+        case "function":
+          expect(functionSlugs.has(entry.slug), `function slug "${entry.slug}" does not exist`).toBe(true);
+          break;
+        case "concept":
+          expect(conceptSlugs.has(entry.slug), `concept slug "${entry.slug}" does not exist`).toBe(true);
+          break;
+        case "pattern":
+          expect(patternSlugs.has(entry.slug), `pattern slug "${entry.slug}" does not exist`).toBe(true);
+          break;
+      }
+    }
+  });
+
+  it("has no duplicate slug+type combinations", () => {
+    const keys = entries.map((e) => `${e.type}/${e.slug}`);
+    expect(new Set(keys).size, "duplicate entries found").toBe(keys.length);
+  });
+
+  it("entries are sorted newest-first", () => {
+    for (let i = 1; i < entries.length; i++) {
+      expect(
+        entries[i - 1].date >= entries[i].date,
+        `entries[${i - 1}] (${entries[i - 1].date}) should be >= entries[${i}] (${entries[i].date})`
+      ).toBe(true);
+    }
+  });
+
+  it("most recent entry is within the last 45 days", () => {
+    const now = new Date();
+    const newest = new Date(entries[0].date);
+    const diffDays = (now.getTime() - newest.getTime()) / (1000 * 60 * 60 * 24);
+    expect(
+      diffDays,
+      `most recent entry is ${Math.round(diffDays)} days old — update recently-edited.json`
+    ).toBeLessThanOrEqual(45);
   });
 });

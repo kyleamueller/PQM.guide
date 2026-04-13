@@ -120,3 +120,10 @@ export interface PatternIndexEntry {
   description: string;
   difficulty: PatternDifficulty;
 }
+
+export interface RecentlyEditedEntry {
+  slug: string;
+  type: SearchResultType;
+  date: string;
+  description: string;
+}

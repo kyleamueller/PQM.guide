@@ -24,3 +24,11 @@
 ## Windows gotcha
 
 MDX files on Windows have CRLF line endings. All file readers in `src/lib/mdx.ts` normalize with `.replace(/\r\n/g, "\n")` — do not remove this.
+
+## Recently Edited section
+
+The home page "Recently Edited" section is driven by `src/data/recently-edited.json`.
+When editing content files, update this JSON:
+1. Add a new entry at the top with the slug, type, today's date, and a short change description.
+2. Keep the array at 6 entries max — remove the oldest if needed.
+3. A content-integrity test enforces that the most recent entry is within the last 45 days.
