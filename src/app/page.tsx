@@ -1,9 +1,9 @@
 import Link from "next/link";
-import path from "path";
-import { execSync } from "child_process";
 import { categories } from "@/data/categories";
-import { getAllFunctions, getFunctionBySlug, getAllPatterns } from "@/lib/mdx";
+import recentlyEditedData from "@/data/recently-edited.json";
+import { getAllFunctions, getFunctionBySlug, getConceptBySlug, getPatternBySlug, getAllPatterns } from "@/lib/mdx";
 import { PatternDifficulty } from "@/lib/types";
+import type { RecentlyEditedEntry } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,30 +19,35 @@ export const metadata: Metadata = {
   },
 };
 
-function getRecentlyAdded(limit = 6) {
-  try {
-    const output = execSync(
-      "git log --format=\"\" --diff-filter=A --name-only -- src/content/functions/",
-      { cwd: process.cwd() }
-    ).toString().trim();
-
-    const slugs = output
-      .split("\n")
-      .filter((f) => f.endsWith(".mdx"))
-      .slice(0, limit)
-      .map((f) => path.basename(f, ".mdx"));
-
-    return slugs.flatMap((slug) => {
-      try {
-        const { frontmatter } = getFunctionBySlug(slug);
-        return [{ slug, title: frontmatter.title, category: frontmatter.category, description: frontmatter.description }];
-      } catch {
-        return [];
+function getRecentlyEdited() {
+  return (recentlyEditedData as RecentlyEditedEntry[]).flatMap((entry) => {
+    try {
+      let title: string, contentDesc: string;
+      switch (entry.type) {
+        case "function": {
+          const { frontmatter } = getFunctionBySlug(entry.slug);
+          title = frontmatter.title;
+          contentDesc = frontmatter.description;
+          break;
+        }
+        case "concept": {
+          const { frontmatter } = getConceptBySlug(entry.slug);
+          title = frontmatter.title;
+          contentDesc = frontmatter.description;
+          break;
+        }
+        case "pattern": {
+          const { frontmatter } = getPatternBySlug(entry.slug);
+          title = frontmatter.title;
+          contentDesc = frontmatter.description;
+          break;
+        }
       }
-    });
-  } catch {
-    return [];
-  }
+      return [{ ...entry, title, contentDescription: contentDesc }];
+    } catch {
+      return [];
+    }
+  });
 }
 
 const DIFFICULTY_COLOR: Record<PatternDifficulty, string> = {
@@ -59,7 +64,7 @@ const DIFFICULTY_LABEL: Record<PatternDifficulty, string> = {
 
 export default function Home() {
   const allFunctions = getAllFunctions();
-  const recentlyAdded = getRecentlyAdded();
+  const recentlyEdited = getRecentlyEdited();
   const allPatterns = getAllPatterns();
   // Show beginner patterns first, then fill with intermediate up to 4 total
   const featuredPatterns = [
@@ -137,16 +142,16 @@ export default function Home() {
         </div>
       </div>
 
-      {recentlyAdded.length > 0 && (
+      {recentlyEdited.length > 0 && (
         <div style={{ marginBottom: 40 }}>
           <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Recently Added
+            Recently Edited
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
-            {recentlyAdded.map((fn) => (
+            {recentlyEdited.map((item) => (
               <Link
-                key={fn.slug}
-                href={`/functions/${fn.slug}`}
+                key={`${item.type}-${item.slug}`}
+                href={`/${item.type}s/${item.slug}`}
                 style={{
                   display: "block",
                   background: "var(--bg-secondary)",
@@ -156,11 +161,24 @@ export default function Home() {
                   textDecoration: "none",
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginBottom: 2, fontFamily: "var(--font-mono)" }}>
-                  {fn.title}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
+                  <span style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--accent)",
+                    fontFamily: item.type === "function" ? "var(--font-mono)" : undefined,
+                  }}>
+                    {item.title}
+                  </span>
+                  <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", color: "var(--text-muted)", flexShrink: 0, marginLeft: 8 }}>
+                    {item.type}
+                  </span>
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {fn.description}
+                  {item.contentDescription}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4, opacity: 0.7 }}>
+                  {item.date}
                 </div>
               </Link>
             ))}

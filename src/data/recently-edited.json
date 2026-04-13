@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "web-contents",
+    "type": "function",
+    "date": "2026-04-07",
+    "description": "Added RelativePath, ManualStatusHandling options and 3 real examples"
+  },
+  {
+    "slug": "api-authentication",
+    "type": "pattern",
+    "date": "2026-04-07",
+    "description": "Added 6 new Web.Contents options, RelativePath/ManualStatusHandling sections"
+  },
+  {
+    "slug": "power-query-environments",
+    "type": "concept",
+    "date": "2026-04-03",
+    "description": "April 2026 freshness review updates"
+  },
+  {
+    "slug": "m-paradigm",
+    "type": "concept",
+    "date": "2026-03-11",
+    "description": "Overhauled for UI-to-M beginner learning path"
+  },
+  {
+    "slug": "table-join",
+    "type": "function",
+    "date": "2026-03-08",
+    "description": "Corrected examples and added output comments"
+  }
+]
