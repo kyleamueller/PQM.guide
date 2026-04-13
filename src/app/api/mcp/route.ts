@@ -13,6 +13,7 @@ import { sampleTables } from "@/data/sample-tables";
 import Fuse from "fuse.js";
 import { createSearchIndex } from "@/lib/search";
 import { PQTableData } from "@/lib/types";
+import { formatMCode, validateMCode } from "@/lib/formatter";
 
 // ---------------------------------------------------------------------------
 // MCP Tool definitions
@@ -146,6 +147,42 @@ const TOOLS = [
         },
       },
       required: ["name"],
+    },
+  },
+  {
+    name: "format_m_code",
+    description:
+      "Format Power Query M code using Microsoft's official formatter. Accepts a full `let … in …` document or a bare expression and returns canonical, consistently-indented M. Supports two layout styles: 'long' (default, Power Query editor style — each step on a single line up to ~120 chars) and 'short' (readability style — wider function calls break each parameter onto its own line).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: {
+          type: "string",
+          description: "Power Query M source to format.",
+        },
+        style: {
+          type: "string",
+          enum: ["long", "short"],
+          description:
+            "Layout style. 'long' (default) keeps each step on one line until ~120 chars; 'short' spreads parameters of complex function calls onto their own lines for readability.",
+        },
+      },
+      required: ["code"],
+    },
+  },
+  {
+    name: "validate_m_code",
+    description:
+      "Validate Power Query M code by parsing it. Returns `Valid M code.` on success, or a human-readable summary of the first syntax error (with line and column) on failure. Pair with format_m_code when you need both formatted output and explicit pass/fail status.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: {
+          type: "string",
+          description: "Power Query M source to validate.",
+        },
+      },
+      required: ["code"],
     },
   },
   {
@@ -389,6 +426,32 @@ async function callTool(
           table.description,
           "",
           formatTableData(table.data),
+        ].join("\n");
+      }
+
+      case "format_m_code": {
+        const code = String(args.code ?? "");
+        const style = args.style === "short" ? "short" : "long";
+        const result = await formatMCode(code, style);
+        if (result.ok) {
+          return `\`\`\`powerquery\n${result.formatted}\n\`\`\``;
+        }
+        const loc =
+          result.error.line !== undefined && result.error.column !== undefined
+            ? ` (line ${result.error.line}, col ${result.error.column})`
+            : "";
+        return `Could not format M code${loc}: ${result.error.message}`;
+      }
+
+      case "validate_m_code": {
+        const code = String(args.code ?? "");
+        const result = await validateMCode(code);
+        if (result.valid) return "Valid M code.";
+        return [
+          `Invalid M code — ${result.errors.length} error${result.errors.length === 1 ? "" : "s"}:`,
+          ...result.errors.map(
+            (e) => `  - Line ${e.line}, col ${e.column}: ${e.message}`
+          ),
         ].join("\n");
       }
 
