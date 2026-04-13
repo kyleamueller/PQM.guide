@@ -121,7 +121,7 @@ function renderRemarks(remarks: string) {
     }
 
     if (line.startsWith("```")) {
-      const lang = line.slice(3).trim();
+      const lang = line.slice(3).trim() || "powerquery";
       const codeLines: string[] = [];
       i++;
       while (i < lines.length && !lines[i].startsWith("```")) {
@@ -130,9 +130,7 @@ function renderRemarks(remarks: string) {
       }
       i++; // skip closing ```
       elements.push(
-        <pre key={key++} className={lang ? `language-${lang}` : undefined}>
-          <code>{codeLines.join("\n")}</code>
-        </pre>
+        <SyntaxBlock key={key++} code={codeLines.join("\n")} language={lang} />
       );
       continue;
     }
