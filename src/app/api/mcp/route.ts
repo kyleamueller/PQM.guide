@@ -15,7 +15,7 @@ import { createSearchIndex } from "@/lib/search";
 import { PQTableData } from "@/lib/types";
 import { formatMCode, validateMCode } from "@/lib/formatter";
 import { parseLet, renameSteps } from "@/lib/m-parser";
-import { stepNames, assignDescriptiveNames } from "@/data/step-names";
+import { resolveStepName, assignDescriptiveNames } from "@/data/step-names";
 
 // ---------------------------------------------------------------------------
 // MCP Tool definitions
@@ -522,8 +522,10 @@ async function callTool(
         }
 
         const summaryParts = parsed.steps.map((s) => {
+          const resolved = resolveStepName(s.callFunction, s.callArgs);
+          if (resolved) return resolved;
           if (!s.callFunction) return s.identifier;
-          return stepNames[s.callFunction] ?? s.callFunction.split(".").pop() ?? s.callFunction;
+          return s.callFunction.split(".").pop() ?? s.callFunction;
         });
         const summaryLine = `// Query summary: ${summaryParts.join(" → ")}`;
 

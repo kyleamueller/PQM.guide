@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseLet, renameSteps } from "@/lib/m-parser";
-import { assignDescriptiveNames } from "@/data/step-names";
+import { assignDescriptiveNames, resolveStepName } from "@/data/step-names";
 import { POST } from "@/app/api/mcp/route";
 
 // ---------------------------------------------------------------------------
@@ -149,6 +149,225 @@ describe("assignDescriptiveNames", () => {
 });
 
 // ---------------------------------------------------------------------------
+// resolveStepName — argument-aware descriptive naming
+// ---------------------------------------------------------------------------
+
+describe("resolveStepName", () => {
+  it("Table.AddColumn surfaces the new column name", () => {
+    expect(
+      resolveStepName("Table.AddColumn", [
+        { kind: "other" },
+        { kind: "string", value: "TotalPrice" },
+        { kind: "other" },
+      ])
+    ).toBe("Added TotalPrice");
+  });
+
+  it("Table.AddColumn falls back to 'Added Custom' when the name is non-literal", () => {
+    expect(
+      resolveStepName("Table.AddColumn", [
+        { kind: "other" },
+        { kind: "other" },
+        { kind: "other" },
+      ])
+    ).toBe("Added Custom");
+  });
+
+  it("Table.RemoveColumns surfaces a single removed column", () => {
+    expect(
+      resolveStepName("Table.RemoveColumns", [
+        { kind: "other" },
+        { kind: "stringList", values: ["GUID"] },
+      ])
+    ).toBe("Removed GUID");
+  });
+
+  it("Table.RemoveColumns joins up to 3 column names", () => {
+    expect(
+      resolveStepName("Table.RemoveColumns", [
+        { kind: "other" },
+        { kind: "stringList", values: ["A", "B", "C"] },
+      ])
+    ).toBe("Removed A, B, C");
+  });
+
+  it("Table.RemoveColumns compacts a long list with a `+ N more` suffix", () => {
+    expect(
+      resolveStepName("Table.RemoveColumns", [
+        { kind: "other" },
+        { kind: "stringList", values: ["A", "B", "C", "D", "E"] },
+      ])
+    ).toBe("Removed A + 4 more");
+  });
+
+  it("Table.RenameColumns spells out a single rename", () => {
+    expect(
+      resolveStepName("Table.RenameColumns", [
+        { kind: "other" },
+        { kind: "stringPairList", pairs: [["OldName", "NewName"]] },
+      ])
+    ).toBe("Renamed OldName to NewName");
+  });
+
+  it("Table.RenameColumns joins multiple renamed columns by source name", () => {
+    expect(
+      resolveStepName("Table.RenameColumns", [
+        { kind: "other" },
+        { kind: "stringPairList", pairs: [["A", "X"], ["B", "Y"]] },
+      ])
+    ).toBe("Renamed A, B");
+  });
+
+  it("Table.Sort surfaces the sort key from a pair list", () => {
+    expect(
+      resolveStepName("Table.Sort", [
+        { kind: "other" },
+        { kind: "stringFirstPairList", firsts: ["OrderDate"] },
+      ])
+    ).toBe("Sorted by OrderDate");
+  });
+
+  it("Table.TransformColumnTypes surfaces the type-changed columns", () => {
+    expect(
+      resolveStepName("Table.TransformColumnTypes", [
+        { kind: "other" },
+        { kind: "stringFirstPairList", firsts: ["Amount", "OrderDate"] },
+      ])
+    ).toBe("Changed Type of Amount, OrderDate");
+  });
+
+  it("Table.Group surfaces the grouping key", () => {
+    expect(
+      resolveStepName("Table.Group", [
+        { kind: "other" },
+        { kind: "stringList", values: ["Region"] },
+        { kind: "other" },
+      ])
+    ).toBe("Grouped by Region");
+  });
+
+  it("Table.ExpandTableColumn surfaces the expanded column name", () => {
+    expect(
+      resolveStepName("Table.ExpandTableColumn", [
+        { kind: "other" },
+        { kind: "string", value: "Orders" },
+        { kind: "other" },
+        { kind: "other" },
+      ])
+    ).toBe("Expanded Orders");
+  });
+
+  it("Table.SelectColumns surfaces the kept columns", () => {
+    expect(
+      resolveStepName("Table.SelectColumns", [
+        { kind: "other" },
+        { kind: "stringList", values: ["Date", "Product", "Units"] },
+      ])
+    ).toBe("Kept Date, Product, Units");
+  });
+
+  it("Table.SelectColumns falls back to 'Removed Other Columns' with non-literal cols", () => {
+    expect(
+      resolveStepName("Table.SelectColumns", [
+        { kind: "other" },
+        { kind: "other" },
+      ])
+    ).toBe("Removed Other Columns");
+  });
+
+  it("returns null for functions not in the map", () => {
+    expect(resolveStepName("MyCustom.Function", [])).toBeNull();
+    expect(resolveStepName(undefined, undefined)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseLet — argument extraction from the outermost call
+// ---------------------------------------------------------------------------
+
+describe("parseLet argument extraction", () => {
+  it("extracts a string literal from Table.AddColumn's column-name arg", async () => {
+    const code = `let
+    Source = Sales,
+    Added = Table.AddColumn(Source, "TotalPrice", each [Quantity] * [UnitPrice])
+in
+    Added`;
+    const result = await parseLet(code);
+    expect(result).not.toBeNull();
+    const step = result!.steps[1];
+    expect(step.callFunction).toBe("Table.AddColumn");
+    expect(step.callArgs?.[1]).toEqual({ kind: "string", value: "TotalPrice" });
+    // First arg is a step reference — not a literal
+    expect(step.callArgs?.[0]).toEqual({ kind: "other" });
+    // Third arg is a lambda — not a literal
+    expect(step.callArgs?.[2]).toEqual({ kind: "other" });
+  });
+
+  it("extracts a stringList from Table.RemoveColumns", async () => {
+    const code = `let
+    Source = Sales,
+    Removed = Table.RemoveColumns(Source, {"A", "B", "C"})
+in
+    Removed`;
+    const result = await parseLet(code);
+    expect(result!.steps[1].callArgs?.[1]).toEqual({
+      kind: "stringList",
+      values: ["A", "B", "C"],
+    });
+  });
+
+  it("extracts a stringPairList from Table.RenameColumns", async () => {
+    const code = `let
+    Source = Sales,
+    Renamed = Table.RenameColumns(Source, {{"Old", "New"}, {"Foo", "Bar"}})
+in
+    Renamed`;
+    const result = await parseLet(code);
+    expect(result!.steps[1].callArgs?.[1]).toEqual({
+      kind: "stringPairList",
+      pairs: [
+        ["Old", "New"],
+        ["Foo", "Bar"],
+      ],
+    });
+  });
+
+  it("extracts a stringFirstPairList from Table.Sort with sort orders", async () => {
+    const code = `let
+    Source = Sales,
+    Sorted = Table.Sort(Source, {{"OrderDate", Order.Descending}, {"Amount", Order.Ascending}})
+in
+    Sorted`;
+    const result = await parseLet(code);
+    expect(result!.steps[1].callArgs?.[1]).toEqual({
+      kind: "stringFirstPairList",
+      firsts: ["OrderDate", "Amount"],
+    });
+  });
+
+  it("marks a step as compound when its outer call has a nested invocation", async () => {
+    const code = `let
+    Source = Sales,
+    Both = Table.SelectRows(Table.AddColumn(Source, "X", each [Amount]), each [X] > 0)
+in
+    Both`;
+    const result = await parseLet(code);
+    expect(result!.steps[1].callFunction).toBe("Table.SelectRows");
+    expect(result!.steps[1].compound).toBe(true);
+  });
+
+  it("does not mark a plain single-op step as compound", async () => {
+    const code = `let
+    Source = Sales,
+    Added = Table.AddColumn(Source, "X", each [Amount])
+in
+    Added`;
+    const result = await parseLet(code);
+    expect(result!.steps[1].compound).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // End-to-end MCP tool tests — call the JSON-RPC POST handler directly
 // ---------------------------------------------------------------------------
 
@@ -225,11 +444,13 @@ describe("MCP: rename_applied_steps", () => {
 in
     Step3`;
 
-  it("applies canonical descriptive names under style: descriptive", async () => {
+  it("applies argument-aware descriptive names under style: descriptive", async () => {
     const out = await callMcpTool("rename_applied_steps", { code: query, style: "descriptive" });
+    // Table.SelectRows has no arg-extractable label — falls back to "Filtered Rows"
     expect(out).toContain('#"Filtered Rows" = Table.SelectRows');
-    expect(out).toContain('#"Sorted Rows" = Table.Sort');
-    expect(out.trimEnd()).toMatch(/#"Sorted Rows"\n```/);
+    // Table.Sort surfaces the sort key from its arg
+    expect(out).toContain('#"Sorted by OrderDate" = Table.Sort');
+    expect(out.trimEnd()).toMatch(/#"Sorted by OrderDate"\n```/);
   });
 
   it("keeps steps whose function isn't in the map (Step1)", async () => {
