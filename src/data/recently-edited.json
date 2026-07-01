@@ -1,5 +1,11 @@
 [
   {
+    "slug": "power-query-environments",
+    "type": "concept",
+    "date": "2026-07-01",
+    "description": "July 2026 freshness pass: Excel Online full editor GA (Jan 2026); Dataflow Gen2 Variable Library GA and ADF Mapping Data Flow integration"
+  },
+  {
     "slug": "web-contents",
     "type": "function",
     "date": "2026-04-07",
@@ -10,12 +16,6 @@
     "type": "pattern",
     "date": "2026-04-07",
     "description": "Added 6 new Web.Contents options, RelativePath/ManualStatusHandling sections"
-  },
-  {
-    "slug": "power-query-environments",
-    "type": "concept",
-    "date": "2026-04-03",
-    "description": "April 2026 freshness review updates"
   },
   {
     "slug": "m-paradigm",

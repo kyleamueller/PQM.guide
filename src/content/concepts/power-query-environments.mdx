@@ -16,6 +16,8 @@ Dataflows Gen2 is the most capable Power Query environment as of 2026. It runs i
 
 Requires a Fabric capacity (not just Power BI Pro). Supports on-premises sources via gateway.
 
+At FabCon Atlanta 2026, Microsoft announced that **Variable Library integration is now generally available** in Dataflow Gen2, enabling enterprise-grade CI/CD and ALM patterns through centrally managed configuration. Additional improvements include enhanced SharePoint destination selection and Recent Tables in Modern Get Data for faster re-connection to previously used sources. Separately, at Build 2026 Microsoft announced that Azure Data Factory's **Mapping Data Flow transformations are now available inside Dataflow Gen2**, bringing low-code Spark-scale data engineering into the modern Fabric authoring experience.
+
 ### The Fabric Execute Query REST API (Preview, February 2026)
 
 Microsoft announced in February 2026 that Power Query M can now be executed programmatically through a public REST API:
@@ -57,11 +59,11 @@ The same Power Query engine as Power BI Desktop — both use the Mashup Engine u
 
 Mac users face the same limitations as Power BI Desktop on Mac: fewer connectors, some functions unavailable.
 
-### Excel Online (Rolling Out)
+### Excel Online
 
-Power Query is rolling out to Excel for the web as of 2024–2025. Viewing and refreshing existing queries is available to all Microsoft 365 subscribers. **Creating and editing queries requires a Microsoft 365 Business or Enterprise plan** — Personal and Family plans do not have the editor.
+**As of January 2026, the full Power Query experience — including the import wizard and Power Query Editor — is generally available in Excel for the web** for Microsoft 365 Business and Enterprise subscribers. Viewing and refreshing existing queries remains available to all Microsoft 365 subscribers (including Personal and Family plans); authoring and editing require Business or Enterprise.
 
-Local file sources are not yet available in the web version. The feature is still rolling out and is not at full parity with Excel Desktop.
+Supported sources at GA include Excel Workbook, Text/CSV, XML, JSON, SQL Server Database, SharePoint Online List, OData, Blank Table, and Blank Query. Local file sources (from the user's desktop) remain unavailable in the web editor, which connects only to cloud and network sources. For very large datasets or complex multi-step pipelines, the desktop editor remains a better fit for performance reasons.
 
 ### Power Automate and Power Apps Dataflows
 
