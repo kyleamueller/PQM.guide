@@ -14,6 +14,8 @@ import Fuse from "fuse.js";
 import { createSearchIndex } from "@/lib/search";
 import { PQTableData } from "@/lib/types";
 import { formatMCode, validateMCode } from "@/lib/formatter";
+import { parseLet, renameSteps } from "@/lib/m-parser";
+import { stepNames, assignDescriptiveNames } from "@/data/step-names";
 
 // ---------------------------------------------------------------------------
 // MCP Tool definitions
@@ -180,6 +182,47 @@ const TOOLS = [
         code: {
           type: "string",
           description: "Power Query M source to validate.",
+        },
+      },
+      required: ["code"],
+    },
+  },
+  {
+    name: "comment_m_code",
+    description:
+      "Annotate a Power Query M `let … in …` query with a whole-query summary comment above the block and a per-step `//` comment describing the M function each step calls (sourced from pqm.guide). Idempotent — reruns replace the summary in place and skip steps that already have a comment on the line above.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Power Query M source (`let … in …`)." },
+        style: {
+          type: "string",
+          enum: ["brief", "detailed"],
+          description:
+            "'brief' (default) uses just the function's description; 'detailed' also adds a line with the syntax.",
+        },
+      },
+      required: ["code"],
+    },
+  },
+  {
+    name: "rename_applied_steps",
+    description:
+      "Rename applied steps in a Power Query M `let … in …` query — updates the declaration LHS, every RHS reference, and the `in` target. Two input modes: `mapping` for an explicit `{ oldName: newName }` map (names accepted either bare or in `#\"…\"` form), or `style: \"descriptive\"` to assign the canonical Power Query UI step name based on the function each step calls (e.g. Table.SelectRows → 'Filtered Rows'). Descriptive mode uses PQ-style numeric suffixes for collisions.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Power Query M source (`let … in …`)." },
+        mapping: {
+          type: "object",
+          description: "Map from existing step name to new step name. Names can be given bare (`Filtered Rows`) or wrapped (`#\"Filtered Rows\"`).",
+          additionalProperties: { type: "string" },
+        },
+        style: {
+          type: "string",
+          enum: ["descriptive"],
+          description:
+            "'descriptive' assigns each step the canonical Power Query UI step name based on the function it calls. Steps whose function isn't in the map keep their existing name.",
         },
       },
       required: ["code"],
@@ -453,6 +496,146 @@ async function callTool(
             (e) => `  - Line ${e.line}, col ${e.column}: ${e.message}`
           ),
         ].join("\n");
+      }
+
+      case "comment_m_code": {
+        const code = String(args.code ?? "");
+        const style = args.style === "detailed" ? "detailed" : "brief";
+
+        const formatted = await formatMCode(code, "long");
+        if (!formatted.ok) {
+          const loc =
+            formatted.error.line !== undefined && formatted.error.column !== undefined
+              ? ` (line ${formatted.error.line}, col ${formatted.error.column})`
+              : "";
+          return `Could not format M code${loc}: ${formatted.error.message}`;
+        }
+
+        let parsed;
+        try {
+          parsed = await parseLet(formatted.formatted);
+        } catch (err) {
+          return `Could not parse M code: ${(err as Error).message}`;
+        }
+        if (parsed === null) {
+          return "Only 'let … in …' queries can be commented.";
+        }
+
+        const summaryParts = parsed.steps.map((s) => {
+          if (!s.callFunction) return s.identifier;
+          return stepNames[s.callFunction] ?? s.callFunction.split(".").pop() ?? s.callFunction;
+        });
+        const summaryLine = `// Query summary: ${summaryParts.join(" → ")}`;
+
+        const stepComments = new Map<number, string>();
+        for (const step of parsed.steps) {
+          if (!step.callFunction) continue;
+          const slug = nameToSlug(step.callFunction);
+          let frontmatter: { description?: string; syntax?: string } | undefined;
+          try {
+            frontmatter = getFunctionBySlug(slug).frontmatter;
+          } catch {
+            continue;
+          }
+          const description = frontmatter?.description;
+          if (!description) continue;
+          const line =
+            style === "detailed" && frontmatter?.syntax
+              ? `${step.indent}// ${description}\n${step.indent}// Syntax: ${frontmatter.syntax}`
+              : `${step.indent}// ${description}`;
+          stepComments.set(step.lineIndex, line);
+        }
+
+        const lines = formatted.formatted.split("\n");
+        const output: string[] = [];
+        let summaryInserted = false;
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          // Insert or replace the whole-query summary immediately before `let`.
+          if (!summaryInserted && /^\s*let\s*$/.test(line)) {
+            const prev = output[output.length - 1];
+            if (prev && /^\s*\/\/\s*Query summary:/.test(prev)) {
+              output[output.length - 1] = summaryLine;
+            } else {
+              output.push(summaryLine);
+            }
+            summaryInserted = true;
+            output.push(line);
+            continue;
+          }
+          // Insert per-step comment when we reach a step's declaration line.
+          const comment = stepComments.get(i);
+          if (comment) {
+            const prev = output[output.length - 1];
+            if (!prev || !/^\s*\/\//.test(prev)) {
+              output.push(comment);
+            }
+          }
+          output.push(line);
+        }
+
+        return `\`\`\`powerquery\n${output.join("\n")}\n\`\`\``;
+      }
+
+      case "rename_applied_steps": {
+        const code = String(args.code ?? "");
+        const rawMapping = args.mapping as Record<string, string> | undefined;
+        const style = args.style as string | undefined;
+
+        const hasMapping = Boolean(
+          rawMapping && typeof rawMapping === "object" && Object.keys(rawMapping).length > 0
+        );
+        const hasStyle = typeof style === "string" && style.length > 0;
+
+        if (hasMapping === hasStyle) {
+          return "Provide exactly one of `mapping` or `style`.";
+        }
+        if (hasStyle && style !== "descriptive") {
+          return `Unknown style "${style}". Supported: descriptive.`;
+        }
+
+        const formatted = await formatMCode(code, "long");
+        if (!formatted.ok) {
+          const loc =
+            formatted.error.line !== undefined && formatted.error.column !== undefined
+              ? ` (line ${formatted.error.line}, col ${formatted.error.column})`
+              : "";
+          return `Could not format M code${loc}: ${formatted.error.message}`;
+        }
+
+        let parsed;
+        try {
+          parsed = await parseLet(formatted.formatted);
+        } catch (err) {
+          return `Could not parse M code: ${(err as Error).message}`;
+        }
+        if (parsed === null) {
+          return "Only 'let … in …' queries support rename.";
+        }
+
+        let mapping: Map<string, string>;
+        if (hasMapping) {
+          mapping = new Map();
+          const identifiers = new Set(parsed.steps.map((s) => s.identifier));
+          for (const [rawKey, rawValue] of Object.entries(rawMapping!)) {
+            const key = rawKey.match(/^#"(.*)"$/)?.[1] ?? rawKey;
+            const value = rawValue.match(/^#"(.*)"$/)?.[1] ?? rawValue;
+            if (!identifiers.has(key)) {
+              return `Mapping key "${rawKey}" does not match any step in the query. Steps: ${parsed.steps.map((s) => s.identifier).join(", ")}.`;
+            }
+            mapping.set(key, value);
+          }
+        } else {
+          mapping = assignDescriptiveNames(parsed.steps);
+        }
+
+        let renamed: string;
+        try {
+          renamed = await renameSteps(formatted.formatted, mapping);
+        } catch (err) {
+          return `Rename failed: ${(err as Error).message}`;
+        }
+        return `\`\`\`powerquery\n${renamed}\n\`\`\``;
       }
 
       case "list_functions_by_category": {

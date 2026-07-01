@@ -70,6 +70,16 @@ const TOOLS = [
     description: "All functions in a given category. Use list_categories first to get valid category slugs.",
   },
   {
+    name: "comment_m_code",
+    args: `{ "code": "let ... in ...", "style": "brief" }`,
+    description: "Annotate a `let … in …` query with a whole-query summary comment above the block plus a per-step comment describing what each M function does — sourced from pqm.guide function descriptions. Idempotent.",
+  },
+  {
+    name: "rename_applied_steps",
+    args: `{ "code": "let ... in ...", "style": "descriptive" }`,
+    description: "Rename applied steps in bulk — either from an explicit `mapping` or by assigning descriptive Power Query UI-style names based on the function each step calls (e.g. Table.SelectRows → 'Filtered Rows'). Updates every reference and the `in` target.",
+  },
+  {
     name: "format_m_code",
     args: `{ "code": "let x=1 in x", "style": "long" }`,
     description: "Format M code canonically using Microsoft's official Power Query formatter. Accepts documents or bare expressions. Optional `style`: 'long' (default, editor-style) or 'short' (spreads complex function args onto their own lines).",
