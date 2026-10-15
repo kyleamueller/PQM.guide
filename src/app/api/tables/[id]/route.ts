@@ -16,7 +16,9 @@ export function OPTIONS() {
 
 export async function GET(_req: Request, { params }: RouteParams) {
   const { id } = await params;
-  const table = sampleTables[id];
+  // Accept any casing and an optional .json suffix (e.g. /api/tables/sales.json)
+  const wanted = id.replace(/\.json$/i, "").toLowerCase();
+  const table = Object.values(sampleTables).find((t) => t.id.toLowerCase() === wanted);
 
   if (!table) {
     return Response.json(

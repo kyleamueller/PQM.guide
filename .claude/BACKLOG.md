@@ -25,7 +25,7 @@
 
 ## P4 — Strategic / needs a decision first
 
-- [ ] **TMDL script for sample tables** — In addition to the M/Power Query code, provide a TMDL script so users can load sample tables directly via that path. *(Kerski)*
+- [x] **TMDL script for sample tables** — In addition to the M/Power Query code, provide a TMDL script so users can load sample tables directly via that path. *(Kerski)*
 - [ ] **Autonomous monthly content review** — Replace the current "create a reminder issue" workflow with a Claude Code headless run that automatically researches Microsoft blogs/docs, updates stale content, and opens a PR. The original plan (`.claude/plans/autonomous-content-review.md`) was never committed; recover it from a local checkout or re-plan. Requires adding `ANTHROPIC_API_KEY` to GitHub Actions secrets.
 - [ ] **Build our own M formatter** — Replace `@microsoft/powerquery-formatter` with a house formatter for full style control (indent size, line-wrap rules, trailing commas, etc.). The current dependency gets us live fast; a custom formatter would let us match site conventions exactly and enable lint-level rules.
 - [ ] **Explore additional MCP tools leveraging site context (e.g. M Best Practices Analyzer)** — With the parser now wired up, we have an AST we can walk. Candidate: a BPA-style `analyze_m_code` tool that flags anti-patterns (missing type annotations, non-folding steps, hardcoded file paths, `Table.Buffer` misuse, etc.) and returns rule explanations sourced from pqm.guide concepts/patterns. Tabular Editor's BPA rule-authoring model is a useful reference.
