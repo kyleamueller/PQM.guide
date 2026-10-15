@@ -43,7 +43,7 @@ relatedFunctions:
 - `Content-Length` — the size of the body in bytes, as a text value. Estimate download size before calling `Web.Contents`.
 - `Content-Disposition` — may include the suggested file name for a download.
 
-**Accessing headers**: Record field names include hyphens (e.g., `Content-Type`, `Last-Modified`). Access them using the standard record field syntax: `Headers[Content-Type]`. If a header name conflicts with an M keyword or contains special characters, use `Record.Field(Headers, "Header-Name")`.
+**Accessing headers**: Record field names include hyphens (e.g., `Content-Type`, `Last-Modified`). Because of the hyphen, wrap the name in a quoted identifier: `Headers[#"Content-Type"]`. `Headers[Content-Type]` without the quotes is a syntax error. You can also use `Record.Field(Headers, "Content-Type")`.
 
 **Query folding**: Not supported.
 
@@ -58,7 +58,7 @@ Web.Headers("https://example.com/data.csv")
 ```powerquery
 let
     Headers = Web.Headers("https://example.com/report"),
-    ContentType = Headers[Content-Type]
+    ContentType = Headers[#"Content-Type"]
 in
     ContentType
 ```
@@ -67,7 +67,7 @@ in
 ```powerquery
 let
     Headers = Web.Headers("https://example.com/report.xlsx"),
-    LastModified = Headers[Last-Modified]
+    LastModified = Headers[#"Last-Modified"]
 in
     LastModified
 ```

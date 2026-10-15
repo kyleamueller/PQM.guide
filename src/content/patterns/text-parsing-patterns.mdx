@@ -148,7 +148,7 @@ let
     Source = Orders,  // Each row has [OrderID] and [Tags] = "red\nurgent\nexport"
 
     Expanded = Table.TransformColumns(Source, {
-        {"Tags", each Text.Split(_, "#(lf)"), type {type text}}
+        {"Tags", each Text.Split(_, "#(lf)"), type {text}}
     }),
     Result = Table.ExpandListColumn(Expanded, "Tags")
 in
