@@ -10,8 +10,7 @@ To apply updates automatically, run `/refresh-site` in Claude Code from the PQM.
 
 Scan official blogs and release notes for anything Power Query-related. Most PQ changes are buried inside monthly "Feature Summary" posts — check the latest 2–3, not just the blog index.
 
-- [ ] [Power BI blog](https://powerbi.microsoft.com/en-us/blog/) — look for the latest monthly feature summary post
-- [ ] [Fabric blog](https://blog.fabric.microsoft.com/en-us/blog/)
+- [ ] [Fabric & Power BI updates blog](https://community.fabric.microsoft.com/category/fabricupdatesblogs) — look for the latest Power BI and Fabric monthly feature summary posts
 - [ ] [Power BI monthly release notes](https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-latest-update)
 - [ ] [Fabric Data Factory what's new](https://learn.microsoft.com/en-us/fabric/data-factory/whats-new)
 - [ ] [Power Query connector release notes](https://learn.microsoft.com/en-us/power-query/connectors/)

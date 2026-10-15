@@ -14,7 +14,6 @@
 ---
 
 - [ ] **Re-check Dataflow Gen2 output destinations** — Oct 2026 freshness pass couldn't load the destinations doc; the Sept 2026 Fabric summary mentions "New data destinations (GA)". Verify the list in `power-query-environments.mdx`.
-- [ ] **Update refresh-site blog URLs** — the Power BI blog moved to `community.fabric.microsoft.com`; the `powerbi.microsoft.com/.../feature-summary` URL pattern in `.claude/commands/refresh-site.md` and the review template now fails.
 
 ## P3 — Valuable features, more design work
 
@@ -27,6 +26,6 @@
 ## P4 — Strategic / needs a decision first
 
 - [ ] **TMDL script for sample tables** — In addition to the M/Power Query code, provide a TMDL script so users can load sample tables directly via that path. *(Kerski)*
-- [ ] **Autonomous monthly content review** — Replace the current "create a reminder issue" workflow with a Claude Code headless run that automatically researches Microsoft blogs/docs, updates stale content, and opens a PR. Plan saved at `.claude/plans/autonomous-content-review.md`. Requires adding `ANTHROPIC_API_KEY` to GitHub Actions secrets.
+- [ ] **Autonomous monthly content review** — Replace the current "create a reminder issue" workflow with a Claude Code headless run that automatically researches Microsoft blogs/docs, updates stale content, and opens a PR. The original plan (`.claude/plans/autonomous-content-review.md`) was never committed; recover it from a local checkout or re-plan. Requires adding `ANTHROPIC_API_KEY` to GitHub Actions secrets.
 - [ ] **Build our own M formatter** — Replace `@microsoft/powerquery-formatter` with a house formatter for full style control (indent size, line-wrap rules, trailing commas, etc.). The current dependency gets us live fast; a custom formatter would let us match site conventions exactly and enable lint-level rules.
 - [ ] **Explore additional MCP tools leveraging site context (e.g. M Best Practices Analyzer)** — With the parser now wired up, we have an AST we can walk. Candidate: a BPA-style `analyze_m_code` tool that flags anti-patterns (missing type annotations, non-folding steps, hardcoded file paths, `Table.Buffer` misuse, etc.) and returns rule explanations sourced from pqm.guide concepts/patterns. Tabular Editor's BPA rule-authoring model is a useful reference.

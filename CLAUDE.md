@@ -16,7 +16,7 @@
 
 - **Stack**: Next.js 16 App Router, React 19, TypeScript, MDX content, Fuse.js search
 - **Content**: MDX files in `src/content/` (functions, concepts, patterns)
-- **Tests**: Vitest, 42 tests across 4 files (`npm test`)
+- **Tests**: Vitest, test files in `src/__tests__/` (`npm test`)
 - **Typecheck**: `npm run typecheck`
 - Pre-push hook runs both — fix failures before pushing
 - **Licensing**: MIT for code (`LICENSE`), CC BY 4.0 for content (`LICENSE-CONTENT`)
