@@ -21,6 +21,8 @@ Without query folding, Power Query downloads the entire dataset into memory and 
 
 In the Power Query Editor, right-click any step in the Applied Steps pane. If you see **"View Native Query"** and it is not grayed out, that step (and all steps above it) have been folded into a single native query. If the option is grayed out, folding has been broken at or before that step.
 
+Power Query Online (Dataflows Gen2, Excel for the web) shows **step folding indicators** next to each applied step, plus a **query plan** view that shows which parts of the query run at the source. As of September 2026, the new Power Query editor preview in Power BI Desktop brings both of these to Desktop too.
+
 ### What Breaks Query Folding
 
 Not all M functions can be translated into native queries. Common folding-breakers include:

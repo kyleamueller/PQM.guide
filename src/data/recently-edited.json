@@ -2,8 +2,20 @@
   {
     "slug": "power-query-environments",
     "type": "concept",
-    "date": "2026-07-01",
-    "description": "July 2026 freshness pass: Excel Online full editor GA (Jan 2026); Dataflow Gen2 Variable Library GA and ADF Mapping Data Flow integration"
+    "date": "2026-10-15",
+    "description": "October 2026 freshness pass: Gen1 Upgrade Wizard, 100+ Gen2 connectors, CI/CD by default, new Desktop editor preview, Execute Query API auth details"
+  },
+  {
+    "slug": "common-errors",
+    "type": "concept",
+    "date": "2026-10-15",
+    "description": "Added the 'references other queries or steps' Formula.Firewall error and the July 2026 Desktop change"
+  },
+  {
+    "slug": "exchange-contents",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Noted the new Microsoft Outlook Mail connector (Preview) as the modern alternative"
   },
   {
     "slug": "web-contents",
@@ -22,11 +34,5 @@
     "type": "concept",
     "date": "2026-03-11",
     "description": "Overhauled for UI-to-M beginner learning path"
-  },
-  {
-    "slug": "table-join",
-    "type": "function",
-    "date": "2026-03-08",
-    "description": "Corrected examples and added output comments"
   }
 ]
