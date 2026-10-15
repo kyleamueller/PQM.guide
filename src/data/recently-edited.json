@@ -1,5 +1,11 @@
 [
   {
+    "slug": "table-filldown",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Rewrote the example so the output actually shows null Region values filled down (including North)"
+  },
+  {
     "slug": "value-subtract",
     "type": "function",
     "date": "2026-10-15",
@@ -28,11 +34,5 @@
     "type": "function",
     "date": "2026-10-15",
     "description": "Noted the new Microsoft Outlook Mail connector (Preview) as the modern alternative"
-  },
-  {
-    "slug": "web-contents",
-    "type": "function",
-    "date": "2026-04-07",
-    "description": "Added RelativePath, ManualStatusHandling options and 3 real examples"
   }
 ]
