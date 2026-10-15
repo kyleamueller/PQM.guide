@@ -60,6 +60,23 @@ in
 {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"3","ProductName":"Widget C","Category":"Widgets","Price":"15","InStock":"false"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25","InStock":"true"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50","InStock":"true"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a typed five-row Products table with ProductID, ProductName, Category, Price, and InStock columns, priced from 15 to 120.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25","InStock":"true"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50","InStock":"true"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets","Price":"15","InStock":"false"},{"ProductID":"4","ProductName":"Gadget D","Category":"Gadgets","Price":"75","InStock":"true"},{"ProductID":"5","ProductName":"Thingamajig E","Category":"Misc","Price":"120","InStock":"false"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.MinN returns the 3 rows with the lowest Price in ascending order: Widget C (15), Widget A (25), and Gadget B (50).",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"3","ProductName":"Widget C","Category":"Widgets","Price":"15","InStock":"false"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets","Price":"25","InStock":"true"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets","Price":"50","InStock":"true"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: All orders with unit price below 30 (using a condition)
 
 ```powerquery
@@ -77,6 +94,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15"},{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline four-row Sales table with OrderID, CustomerName, Product, and UnitPrice columns, in unsorted price order (25, 15, 50, 75).",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.MinN sorts by UnitPrice ascending and keeps rows while UnitPrice < 30, returning Widget C (15) and Widget A (25) and stopping at Gadget B (50).",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15"},{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Identify the 2 lowest-paid employees
 
 ```powerquery
@@ -92,4 +126,21 @@ in
 
 <!--output
 {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E006","FullName":"frank lee","Department":"Marketing","Salary":"52000"},{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Defines a typed four-row Employees table with EmployeeID, FullName, Department, and Salary columns.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E006","FullName":"frank lee","Department":"Marketing","Salary":"52000"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing","Salary":"72000"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.MinN returns the 2 rows with the lowest Salary in ascending order: frank lee (52000) and alice smith (55000).",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E006","FullName":"frank lee","Department":"Marketing","Salary":"52000"},{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"}]}
+    }
+  ]
+}
 -->

@@ -49,6 +49,23 @@ in
 {"columns":[{"name":"RowCount","type":"number"}],"rows":[{"RowCount":8}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Count",
+      "description": "Table.RowCount returns 8, the number of rows in the Sales table.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":8}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps Count in a one-row table with a RowCount column.",
+      "output": {"columns":[{"name":"RowCount","type":"number"}],"rows":[{"RowCount":8}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Count rows per group
 
 Count orders by region using Table.RowCount inside a group.

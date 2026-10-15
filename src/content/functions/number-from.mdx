@@ -66,3 +66,20 @@ in
 <!--output
 {"columns":[{"name":"ParsedValue","type":"number"}],"rows":[{"ParsedValue":95000}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Result",
+      "description": "Number.From parses the text \"95000\" into the number 95000.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":95000}]}
+    },
+    {
+      "name": "Output",
+      "description": "The final output — wraps the parsed number in a one-row table with a ParsedValue column.",
+      "output": {"columns":[{"name":"ParsedValue","type":"number"}],"rows":[{"ParsedValue":95000}]}
+    }
+  ]
+}
+-->

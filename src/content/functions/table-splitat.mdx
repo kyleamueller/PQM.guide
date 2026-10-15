@@ -59,6 +59,23 @@ in
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[First = [Table], Remaining = [Table]]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a 5-row Sales table with orders 1 through 5.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","OrderDate":"2024-01-15"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","OrderDate":"2024-01-18"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","OrderDate":"2024-02-01"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","OrderDate":"2024-02-10"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","OrderDate":"2024-03-05"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.SplitAt returns a record whose First field holds orders 1-3 and whose Remaining field holds orders 4-5.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[First = [Table], Remaining = [Table]]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Access and count rows in both parts
 
 ```powerquery

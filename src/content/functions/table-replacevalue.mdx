@@ -87,3 +87,20 @@ in
 <!--output
 {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"East"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"East"},{"CustomerName":"Alice","Region":"Unknown"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "WithNull",
+      "description": "Takes the first 4 Sales rows, keeps CustomerName and Region, then replaces \"North\" with null in Region to simulate missing data (Alice's Gadget D order).",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"East"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"East"},{"CustomerName":"Alice","Region":null}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.ReplaceValue replaces the null Region value with \"Unknown\", leaving the other three rows unchanged.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Region","type":"text"}],"rows":[{"CustomerName":"Alice","Region":"East"},{"CustomerName":"Bob","Region":"West"},{"CustomerName":"Charlie","Region":"East"},{"CustomerName":"Alice","Region":"Unknown"}]}
+    }
+  ]
+}
+-->

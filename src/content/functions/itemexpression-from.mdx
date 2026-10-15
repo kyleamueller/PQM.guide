@@ -62,3 +62,20 @@ in
 <!--output
 {"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"}],"rows":[{"Kind":"Binary","Operator":"NotEquals"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AST",
+      "description": "Converts the function each _ <> null into an expression AST record: a Binary node with Operator \"NotEquals\", the item as Left, and a null Constant as Right.",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"},{"name":"Left","type":"record"},{"name":"Right","type":"record"}],"rows":[{"Kind":"Binary","Operator":"NotEquals","Left":"[Record]","Right":"[Record]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the AST root's Kind (\"Binary\") and Operator (\"NotEquals\").",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"}],"rows":[{"Kind":"Binary","Operator":"NotEquals"}]}
+    }
+  ]
+}
+-->

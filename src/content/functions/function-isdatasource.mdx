@@ -65,3 +65,25 @@ in
 <!--output
 {"columns":[{"name":"Function","type":"text"},{"name":"IsDataSource","type":"logical"}],"rows":[{"Function":"Sql.Database","IsDataSource":true},{"Function":"Text.Upper","IsDataSource":false}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "IsDS_SqlDb",
+      "description": "Function.IsDataSource(Sql.Database) returns true because Sql.Database connects to an external source.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "IsDS_TextUpper",
+      "description": "Function.IsDataSource(Text.Upper) returns false because Text.Upper is a pure text function.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-row table pairing each function name with its IsDataSource result.",
+      "output": {"columns":[{"name":"Function","type":"text"},{"name":"IsDataSource","type":"logical"}],"rows":[{"Function":"Sql.Database","IsDataSource":true},{"Function":"Text.Upper","IsDataSource":false}]}
+    }
+  ]
+}
+-->

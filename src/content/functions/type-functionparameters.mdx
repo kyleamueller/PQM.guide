@@ -49,6 +49,23 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"x","Value":"type number"},{"Name":"y","Value":"type text"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Defines a function type that takes x as number and y as text and returns logical.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (x as number, y as text) as logical"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.FunctionParameters returns a record [x = type number, y = type text], which Record.ToTable turns into a two-row Name/Value table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"x","Value":"type number"},{"Name":"y","Value":"type text"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Inspect parameter types of a built-in function
 
 ```powerquery
@@ -62,6 +79,23 @@ in
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"number","Value":"type nullable number"},{"Name":"digits","Value":"type nullable number"},{"Name":"roundingMode","Value":"type nullable number"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Uses Value.Type to get the function type of the built-in Number.Round, which has one required and two optional nullable number parameters.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (number as nullable number, optional digits as nullable number, optional roundingMode as nullable number) as nullable number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.FunctionParameters returns a record of the three parameter types (number, digits, roundingMode), which Record.ToTable turns into a three-row Name/Value table.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"number","Value":"type nullable number"},{"Name":"digits","Value":"type nullable number"},{"Name":"roundingMode","Value":"type nullable number"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Count the total parameters of a function
 
 ```powerquery
@@ -73,4 +107,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Uses Value.Type to get the function type of Text.BetweenDelimiters, which declares text, startDelimiter, endDelimiter, and the optional startIndex and endIndex parameters.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (text as nullable text, startDelimiter as text, endDelimiter as text, optional startIndex as any, optional endIndex as any) as any"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Record.FieldCount counts the fields of the parameter record from Type.FunctionParameters, returning 5 (required and optional parameters both count).",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":5}]}
+    }
+  ]
+}
 -->

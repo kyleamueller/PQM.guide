@@ -66,6 +66,23 @@ in
 {"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAt","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":2,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":3,"RefreshedAt":"2026-03-08T10:00:00-06:00"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RefreshTime",
+      "description": "Captures the local date, time, and offset once with DateTimeZone.FixedLocalNow (shown here as the illustrative 2026-03-08T10:00:00-06:00).",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2026-03-08T10:00:00-06:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — keeps OrderID from the first three Sales rows and adds a RefreshedAt column holding the same RefreshTime value on every row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"RefreshedAt","type":"datetimezone"}],"rows":[{"OrderID":1,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":2,"RefreshedAt":"2026-03-08T10:00:00-06:00"},{"OrderID":3,"RefreshedAt":"2026-03-08T10:00:00-06:00"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Filter orders from the current calendar day using local time
 
 Use DateTimeZone.LocalNow to define today in the local timezone and filter accordingly.
@@ -81,4 +98,21 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Today",
+      "description": "Converts the current local datetimezone to a date with Date.From (2026-03-08 at the illustrative time used on this page).",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2026-03-08"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.SelectRows keeps only Sales rows whose OrderDate equals Today; none of the 2024 orders match, so the table is empty.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
+    }
+  ]
+}
 -->

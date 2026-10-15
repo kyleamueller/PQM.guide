@@ -74,7 +74,23 @@ in
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"OrderDate","type":"date"},{"name":"DaysAgo","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","OrderDate":"2024-01-15","DaysAgo":46},{"OrderID":2,"Product":"Gadget B","OrderDate":"2024-01-20","DaysAgo":41},{"OrderID":3,"Product":"Widget C","OrderDate":"2024-02-01","DaysAgo":29},{"OrderID":4,"Product":"Gadget D","OrderDate":"2024-02-15","DaysAgo":15},{"OrderID":5,"Product":"Widget A","OrderDate":"2024-03-01","DaysAgo":0}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"OrderDate","type":"date"},{"name":"DaysAgo","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","OrderDate":"2024-01-15","DaysAgo":46},{"OrderID":2,"Product":"Gadget B","OrderDate":"2024-01-18","DaysAgo":43},{"OrderID":3,"Product":"Widget C","OrderDate":"2024-02-01","DaysAgo":29},{"OrderID":4,"Product":"Gadget D","OrderDate":"2024-02-10","DaysAgo":20},{"OrderID":5,"Product":"Widget A","OrderDate":"2024-03-05","DaysAgo":-4}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RefDate",
+      "description": "The reference date: March 1, 2024.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2024-03-01"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 the first 5 Sales orders with a DaysAgo column computed as RefDate minus OrderDate in days. Order 5 is dated after RefDate, so its value is negative (-4).",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"OrderDate","type":"date"},{"name":"DaysAgo","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","OrderDate":"2024-01-15","DaysAgo":46},{"OrderID":2,"Product":"Gadget B","OrderDate":"2024-01-18","DaysAgo":43},{"OrderID":3,"Product":"Widget C","OrderDate":"2024-02-01","DaysAgo":29},{"OrderID":4,"Product":"Gadget D","OrderDate":"2024-02-10","DaysAgo":20},{"OrderID":5,"Product":"Widget A","OrderDate":"2024-03-05","DaysAgo":-4}]}
+    }
+  ]
+}
 -->
 
 ### Example 2: Subtract two durations

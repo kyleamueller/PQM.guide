@@ -66,6 +66,23 @@ in
 {"columns":[{"name":"Price","type":"any"}],"rows":[{"Price":"25"},{"Price":"50"},{"Price":"15"},{"Price":"75"},{"Price":"120"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Defines a list of five product prices: 25, 50, 15, 75 and 120.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":25},{"Value":50},{"Value":15},{"Value":75},{"Value":120}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-column table with one row per price, using \"Price\" as the column name instead of the default \"Value\".",
+      "output": {"columns":[{"name":"Price","type":"any"}],"rows":[{"Price":"25"},{"Price":"50"},{"Price":"15"},{"Price":"75"},{"Price":"120"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Convert a record into a key-value table
 
 ```powerquery
@@ -77,4 +94,21 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Name":"StartDate","Value":"2024-01-01"},{"Name":"EndDate","Value":"2024-12-31"},{"Name":"MaxRows","Value":"1000"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Config",
+      "description": "Defines a configuration record with StartDate \"2024-01-01\", EndDate \"2024-12-31\" and MaxRows 1000.",
+      "output": {"columns":[{"name":"StartDate","type":"text"},{"name":"EndDate","type":"text"},{"name":"MaxRows","type":"number"}],"rows":[{"StartDate":"2024-01-01","EndDate":"2024-12-31","MaxRows":1000}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FromValue turns the record into a Name/Value table with one row per field.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"Value","type":"any"}],"rows":[{"Name":"StartDate","Value":"2024-01-01"},{"Name":"EndDate","Value":"2024-12-31"},{"Name":"MaxRows","Value":"1000"}]}
+    }
+  ]
+}
 -->

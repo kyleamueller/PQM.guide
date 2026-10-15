@@ -83,3 +83,19 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
 -->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Today",
+      "description": "Today's date from the system clock. This illustration assumes today is March 8, 2026.",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2026-03-08"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 Sales orders dated in the current month (March 2026) on or before Today.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+    }
+  ]
+}
+-->

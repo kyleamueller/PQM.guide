@@ -56,3 +56,20 @@ in
 <!--output
 {"columns":[{"name":"Check","type":"text"},{"name":"Result","type":"logical"}],"rows":[{"Check":"number vs number","Result":true},{"Check":"text vs any","Result":true},{"Check":"text vs number","Result":false},{"Check":"record vs any","Result":true}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Checks",
+      "description": "Builds a list of 4 two-item lists, each pairing a label with the logical result of a Type.Is comparison.",
+      "output": {"columns":[{"name":"Value","type":"list"}],"rows":[{"Value":"{\"number vs number\", true}"},{"Value":"{\"text vs any\", true}"},{"Value":"{\"text vs number\", false}"},{"Value":"{\"record vs any\", true}"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — #table turns the 4 pairs into rows with Check and Result columns; only text vs number is false.",
+      "output": {"columns":[{"name":"Check","type":"text"},{"name":"Result","type":"logical"}],"rows":[{"Check":"number vs number","Result":true},{"Check":"text vs any","Result":true},{"Check":"text vs number","Result":false},{"Check":"record vs any","Result":true}]}
+    }
+  ]
+}
+-->

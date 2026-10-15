@@ -73,6 +73,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"7","CustomerName":"Charlie","Product":"Gadget B"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines an inline eight-row table with OrderID, CustomerName, and Product columns for orders 1 through 8.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E"},{"OrderID":"7","CustomerName":"Charlie","Product":"Gadget B"},{"OrderID":"8","CustomerName":"Diana","Product":"Widget C"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.AlternateRows starts at offset 0, skips 1 row, then keeps 1 row, repeating, so orders 1, 3, 5, and 7 remain.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A"},{"OrderID":"7","CustomerName":"Charlie","Product":"Gadget B"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Keep first 2 rows, drop 1, then repeat
 
 Useful for structured exports where one out of every three rows is a divider.

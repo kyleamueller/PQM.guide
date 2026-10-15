@@ -54,3 +54,20 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"UnitPrice","Value":25}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Selected",
+      "description": "Takes the first Sales row (Sales{0}) and keeps only the OrderID, Product, and UnitPrice fields with Record.SelectFields.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"}],"rows":[{"OrderID":1,"Product":"Widget A","UnitPrice":25}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Record.ToTable converts the three-field record into a Name/Value table with one row per field.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"Product","Value":"Widget A"},{"Name":"UnitPrice","Value":25}]}
+    }
+  ]
+}
+-->

@@ -55,6 +55,23 @@ in
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"EmployeeID\", \"FullName\", \"Department\", \"Title\"}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Defines a typed one-row Employees table with four text columns, one date column (HireDate), and one number column (Salary).",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Title","type":"text"},{"name":"HireDate","type":"date"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Title":"Sales Rep","HireDate":"2021-03-15","Salary":"55000"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.ColumnsOfType returns the names of the four text-typed columns.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"EmployeeID\", \"FullName\", \"Department\", \"Title\"}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Trim whitespace from all text columns dynamically
 
 Get the list of text columns and pass it to `Table.TransformColumns` to trim each one.
@@ -110,4 +127,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"ProductID\", \"Price\", \"InStock\"}"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a typed 2-row Products table with number columns ProductID and Price, a text ProductName, and a logical InStock.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25","InStock":"true"},{"ProductID":"2","ProductName":"Gadget B","Price":"50","InStock":"true"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.ColumnsOfType returns the three columns typed as number or logical: ProductID, Price, and InStock.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"ProductID\", \"Price\", \"InStock\"}"}]}
+    }
+  ]
+}
 -->

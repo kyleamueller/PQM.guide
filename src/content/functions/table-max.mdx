@@ -60,6 +60,23 @@ in
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 6, CustomerName = \"Bob\", Product = \"Thingamajig E\", UnitPrice = 120, Quantity = 1]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a 4-row Sales table with OrderID, CustomerName, Product, UnitPrice, and Quantity; unit prices are 25, 50, 120, and 75.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75","Quantity":"1"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Max returns the whole row with the largest UnitPrice (120): order 6, Thingamajig E.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[OrderID = 6, CustomerName = \"Bob\", Product = \"Thingamajig E\", UnitPrice = 120, Quantity = 1]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Extract just the product name with the highest unit price
 
 ```powerquery
@@ -75,6 +92,23 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Thingamajig E"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a 4-row Sales table with OrderID, CustomerName, Product, and UnitPrice; the highest unit price is 120 for Thingamajig E.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Max finds the row with UnitPrice 120 and the [Product] field access returns just its product name.",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"Thingamajig E"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Return a safe default when no East-region orders exist

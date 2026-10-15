@@ -67,3 +67,20 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Constrained",
+      "description": "Applies Precision = 10 and Scale = 2 facets to type number with Type.ReplaceFacets; the base type is still number.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.Facets returns the facets now attached to the type: Precision 10 and Scale 2.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+    }
+  ]
+}
+-->

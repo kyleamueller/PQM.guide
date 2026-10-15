@@ -139,3 +139,20 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Today",
+      "description": "Calls DateTime.FixedLocalNow() once and converts it to a date with Date.From, giving today's date (shown here as 2026-03-08, the reference time used on this page).",
+      "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2026-03-08"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.SelectRows keeps Sales rows whose OrderDate equals Today; every sample order is from 2024, so the result is an empty table with the Sales columns.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[]}
+    }
+  ]
+}
+-->

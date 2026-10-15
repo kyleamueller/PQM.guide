@@ -62,6 +62,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Amount":"175"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a 3-row Sales table that is missing order 2 between orders 1 and 3.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Amount":"175"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — inserts Bob's order 2 at offset 1, between Alice's order 1 and Charlie's order 3.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Amount":"175"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Append a row at the end using RowCount as offset
 
 ```powerquery
@@ -119,4 +136,21 @@ in
 
 <!--output
 {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"},{"ProductID":"5","ProductName":"Thingamajig E","Price":"120"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a 3-row Products table containing products 3, 4, and 5.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"},{"ProductID":"5","ProductName":"Thingamajig E","Price":"120"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — inserts products 1 and 2 at offset 0, so the table starts with Widget A and Gadget B.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"50"},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"4","ProductName":"Gadget D","Price":"75"},{"ProductID":"5","ProductName":"Thingamajig E","Price":"120"}]}
+    }
+  ]
+}
 -->

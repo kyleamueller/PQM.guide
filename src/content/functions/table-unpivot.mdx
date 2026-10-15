@@ -64,3 +64,20 @@ in
 <!--output
 {"columns":[{"name":"Product","type":"text"},{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Product":"Widget A","Measure":"UnitPrice","Value":25},{"Product":"Widget A","Measure":"Quantity","Value":4},{"Product":"Gadget B","Measure":"UnitPrice","Value":50},{"Product":"Gadget B","Measure":"Quantity","Value":2},{"Product":"Widget C","Measure":"UnitPrice","Value":15},{"Product":"Widget C","Measure":"Quantity","Value":10}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Takes the first 3 Sales rows and keeps only the Product, UnitPrice, and Quantity columns.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":25,"Quantity":4},{"Product":"Gadget B","UnitPrice":50,"Quantity":2},{"Product":"Widget C","UnitPrice":15,"Quantity":10}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — each product row becomes 2 rows, one for UnitPrice and one for Quantity, with the column name in Measure and the amount in Value.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Product":"Widget A","Measure":"UnitPrice","Value":25},{"Product":"Widget A","Measure":"Quantity","Value":4},{"Product":"Gadget B","Measure":"UnitPrice","Value":50},{"Product":"Gadget B","Measure":"Quantity","Value":2},{"Product":"Widget C","Measure":"UnitPrice","Value":15},{"Product":"Widget C","Measure":"Quantity","Value":10}]}
+    }
+  ]
+}
+-->

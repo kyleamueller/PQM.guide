@@ -84,3 +84,20 @@ in
 <!--output
 {"columns":[{"name":"IsEmpty","type":"logical"}],"rows":[{"IsEmpty":false}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "IsEmpty",
+      "description": "Calls Table.IsEmpty on the full Sales table, returning false because it has 8 rows.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the IsEmpty logical value in a single-row table for display, showing false.",
+      "output": {"columns":[{"name":"IsEmpty","type":"logical"}],"rows":[{"IsEmpty":false}]}
+    }
+  ]
+}
+-->

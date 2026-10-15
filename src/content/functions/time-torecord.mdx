@@ -97,3 +97,20 @@ in
 <!--output
 {"columns":[{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Hour":14,"Minute":30,"Second":45}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Rec",
+      "description": "Converts #time(14, 30, 45) into a record with Hour, Minute, and Second fields using Time.ToRecord.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Field":"Hour","Value":14},{"Field":"Minute","Value":30},{"Field":"Second","Value":45}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — presents the time components as a single-row table with Hour, Minute, and Second columns.",
+      "output": {"columns":[{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Hour":14,"Minute":30,"Second":45}]}
+    }
+  ]
+}
+-->

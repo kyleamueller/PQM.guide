@@ -61,5 +61,21 @@ in
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"RefreshUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"CustomerName":"John Smith","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":2,"CustomerName":"Sara Johnson","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":3,"CustomerName":"Mike Davis","RefreshUTC":"2024-07-15T15:30:00+00:00"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"RefreshUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"CustomerName":"Alice","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":2,"CustomerName":"Bob","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":3,"CustomerName":"Charlie","RefreshUTC":"2024-07-15T15:30:00+00:00"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "UtcNow",
+      "description": "A fixed UTC timestamp (July 15, 2024 15:30 UTC) standing in for DateTimeZone.UtcNow().",
+      "output": {"columns":[{"name":"Value","type":"datetimezone"}],"rows":[{"Value":"2024-07-15T15:30:00+00:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 the first 3 Sales orders (OrderID and CustomerName) with a RefreshUTC column holding the same timestamp on every row.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"RefreshUTC","type":"datetimezone"}],"rows":[{"OrderID":1,"CustomerName":"Alice","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":2,"CustomerName":"Bob","RefreshUTC":"2024-07-15T15:30:00+00:00"},{"OrderID":3,"CustomerName":"Charlie","RefreshUTC":"2024-07-15T15:30:00+00:00"}]}
+    }
+  ]
+}
 -->

@@ -50,6 +50,23 @@ in
 {"columns":[{"name":"HasRegion","type":"logical"}],"rows":[{"HasRegion":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "HasRegion",
+      "description": "Table.HasColumns checks the Sales table for a Region column and returns true.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":true}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the HasRegion value in a one-row, one-column table.",
+      "output": {"columns":[{"name":"HasRegion","type":"logical"}],"rows":[{"HasRegion":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Check for a missing column
 
 Check whether the Sales table has a Discount column.
@@ -65,4 +82,21 @@ in
 
 <!--output
 {"columns":[{"name":"HasDiscount","type":"logical"}],"rows":[{"HasDiscount":false}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "HasDiscount",
+      "description": "Table.HasColumns checks the Sales table for a Discount column and returns false because Sales has no such column.",
+      "output": {"columns":[{"name":"Value","type":"logical"}],"rows":[{"Value":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps the HasDiscount value in a one-row, one-column table.",
+      "output": {"columns":[{"name":"HasDiscount","type":"logical"}],"rows":[{"HasDiscount":false}]}
+    }
+  ]
+}
 -->

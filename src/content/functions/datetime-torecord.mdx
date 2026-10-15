@@ -90,3 +90,20 @@ in
 <!--output
 {"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Year":2024,"Month":6,"Day":15,"Hour":14,"Minute":30,"Second":45}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Rec",
+      "description": "Calls DateTime.ToRecord on #datetime(2024, 6, 15, 14, 30, 45) to decompose it into a record with Year, Month, Day, Hour, Minute, and Second fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Field":"Year","Value":2024},{"Field":"Month","Value":6},{"Field":"Day","Value":15},{"Field":"Hour","Value":14},{"Field":"Minute","Value":30},{"Field":"Second","Value":45}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a single-row table displaying each datetime component read from Rec.",
+      "output": {"columns":[{"name":"Year","type":"number"},{"name":"Month","type":"number"},{"name":"Day","type":"number"},{"name":"Hour","type":"number"},{"name":"Minute","type":"number"},{"name":"Second","type":"number"}],"rows":[{"Year":2024,"Month":6,"Day":15,"Hour":14,"Minute":30,"Second":45}]}
+    }
+  ]
+}
+-->

@@ -67,6 +67,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","Quantity":"10"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a 3-row Sales table where order 2 has a typo in the Product column (\"Gadgt B\").",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadgt B","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","Quantity":"10"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.ReplaceRows swaps 1 row at offset 1 for the corrected record, so order 2 now reads \"Gadget B\".",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","Quantity":"10"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Replace two rows with a single consolidated row
 
 ```powerquery
@@ -81,6 +98,23 @@ in
 
 <!--output
 {"columns":[{"name":"Region","type":"any"},{"name":"Total","type":"any"}],"rows":[{"Region":"East","Total":"100"},{"Region":"North+West","Total":"350"},{"Region":"South","Total":"50"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Summary",
+      "description": "Creates a 4-row Summary table of regional totals: East 100, North 150, West 200, South 50.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Total","type":"any"}],"rows":[{"Region":"East","Total":"100"},{"Region":"North","Total":"150"},{"Region":"West","Total":"200"},{"Region":"South","Total":"50"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the 2 rows starting at offset 1 (North and West) are replaced by one \"North+West\" row with Total 350, leaving 3 rows.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Total","type":"any"}],"rows":[{"Region":"East","Total":"100"},{"Region":"North+West","Total":"350"},{"Region":"South","Total":"50"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Dynamically locate a row, then replace it

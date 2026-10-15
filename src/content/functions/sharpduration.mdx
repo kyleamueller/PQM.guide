@@ -81,3 +81,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "d",
+      "description": "Creates a duration of 1 day and 6 hours.",
+      "output": {"columns":[{"name":"Value","type":"duration"}],"rows":[{"Value":"1.06:00:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Duration.TotalHours converts 1 day 6 hours into 30 hours.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+    }
+  ]
+}
+-->

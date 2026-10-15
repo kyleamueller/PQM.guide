@@ -56,3 +56,20 @@ in
 <!--output
 {"columns":[{"name":"Alice","type":"any"},{"name":"Widget A","type":"any"},{"name":"East","type":"any"}],"rows":[{"Alice":"Bob","Widget A":"Gadget B","East":"West"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Demoted",
+      "description": "Keeps CustomerName, Product, and Region from the first 2 Sales rows, then Table.DemoteHeaders moves the header names into row 1 and renames the columns Column1 to Column3.",
+      "output": {"columns":[{"name":"Column1","type":"any"},{"name":"Column2","type":"any"},{"name":"Column3","type":"any"}],"rows":[{"Column1":"CustomerName","Column2":"Product","Column3":"Region"},{"Column1":"Alice","Column2":"Widget A","Column3":"East"},{"Column1":"Bob","Column2":"Gadget B","Column3":"West"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.PromoteHeaders makes the first row (CustomerName, Product, Region) the headers again, so the demo round-trips back to 2 rows.",
+      "output": {"columns":[{"name":"Alice","type":"any"},{"name":"Widget A","type":"any"},{"name":"East","type":"any"}],"rows":[{"Alice":"Bob","Widget A":"Gadget B","East":"West"}]}
+    }
+  ]
+}
+-->

@@ -63,3 +63,20 @@ in
 <!--output
 {"columns":[{"name":"Region","type":"text"},{"name":"Widgets","type":"number"},{"name":"Gadgets","type":"number"},{"name":"Misc","type":"number"}],"rows":[{"Region":"East","Widgets":14,"Gadgets":null,"Misc":1},{"Region":"West","Widgets":6,"Gadgets":5,"Misc":null},{"Region":"North","Widgets":8,"Gadgets":1,"Misc":null}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Keeps only the Region, Category, and Quantity columns from the 8-row Sales table.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Category","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Category":"Widgets","Quantity":4},{"Region":"West","Category":"Gadgets","Quantity":2},{"Region":"East","Category":"Widgets","Quantity":10},{"Region":"North","Category":"Gadgets","Quantity":1},{"Region":"West","Category":"Widgets","Quantity":6},{"Region":"East","Category":"Misc","Quantity":1},{"Region":"West","Category":"Gadgets","Quantity":3},{"Region":"North","Category":"Widgets","Quantity":8}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — pivots Category into Widgets, Gadgets, and Misc columns, summing Quantity per Region (e.g. East Widgets = 4 + 10 = 14); combinations with no rows are null.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Widgets","type":"number"},{"name":"Gadgets","type":"number"},{"name":"Misc","type":"number"}],"rows":[{"Region":"East","Widgets":14,"Gadgets":null,"Misc":1},{"Region":"West","Widgets":6,"Gadgets":5,"Misc":null},{"Region":"North","Widgets":8,"Gadgets":1,"Misc":null}]}
+    }
+  ]
+}
+-->

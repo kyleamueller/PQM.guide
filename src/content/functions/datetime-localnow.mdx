@@ -64,3 +64,20 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DaysSinceOrder","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DaysSinceOrder":182},{"OrderID":2,"OrderDate":"2024-01-18","DaysSinceOrder":179},{"OrderID":3,"OrderDate":"2024-02-01","DaysSinceOrder":165},{"OrderID":4,"OrderDate":"2024-02-10","DaysSinceOrder":156}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Now",
+      "description": "A fixed stand-in for DateTime.LocalNow(): 15 July 2024 at 10:30 AM.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2024-07-15T10:30:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the first 4 Sales rows trimmed to OrderID and OrderDate, plus DaysSinceOrder counting whole days from each OrderDate to Now (182, 179, 165 and 156).",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"DaysSinceOrder","type":"number"}],"rows":[{"OrderID":1,"OrderDate":"2024-01-15","DaysSinceOrder":182},{"OrderID":2,"OrderDate":"2024-01-18","DaysSinceOrder":179},{"OrderID":3,"OrderDate":"2024-02-01","DaysSinceOrder":165},{"OrderID":4,"OrderDate":"2024-02-10","DaysSinceOrder":156}]}
+    }
+  ]
+}
+-->

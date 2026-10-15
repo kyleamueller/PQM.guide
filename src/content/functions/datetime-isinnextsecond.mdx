@@ -57,6 +57,23 @@ in
 {"columns":[{"name":"Description","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"IsNextSecond","type":"logical"}],"rows":[{"Description":"Previous second","Timestamp":"2026-03-08T09:59:59","IsNextSecond":false},{"Description":"Current second","Timestamp":"2026-03-08T10:00:00","IsNextSecond":false},{"Description":"Next second","Timestamp":"2026-03-08T10:00:01","IsNextSecond":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Now",
+      "description": "Captures the current local datetime once with DateTime.FixedLocalNow(), shown here as 2026-03-08 10:00:00.",
+      "output": {"columns":[{"name":"Value","type":"datetime"}],"rows":[{"Value":"2026-03-08T10:00:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a 3-row table with timestamps one second before, at, and one second after Now; only the 10:00:01 row is flagged by DateTime.IsInNextSecond.",
+      "output": {"columns":[{"name":"Description","type":"text"},{"name":"Timestamp","type":"datetime"},{"name":"IsNextSecond","type":"logical"}],"rows":[{"Description":"Previous second","Timestamp":"2026-03-08T09:59:59","IsNextSecond":false},{"Description":"Current second","Timestamp":"2026-03-08T10:00:00","IsNextSecond":false},{"Description":"Next second","Timestamp":"2026-03-08T10:00:01","IsNextSecond":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Flag next-second entries in log data
 
 Add a boolean column for log entries in the next clock second (typically all false in batch data).

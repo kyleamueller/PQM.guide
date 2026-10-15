@@ -77,3 +77,35 @@ in
 <!--output
 {"columns":[{"name":"a","type":"number"},{"name":"b","type":"number"},{"name":"Product","type":"number"}],"rows":[{"a":1,"b":2,"Product":2},{"a":3,"b":4,"Product":12}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "MultiplyScalar",
+      "description": "Defines a row-by-row function that multiplies its left and right arguments.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "MultiplyVector",
+      "description": "Defines a batch function that takes a table of left/right rows and returns a list of their products.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Multiply",
+      "description": "Wraps MultiplyVector with Function.ScalarVector, producing a scalar function of type (left as number, right as number) as number whose calls are evaluated in batches.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Source",
+      "description": "Builds a 2-row table with columns a and b: (1, 2) and (3, 4).",
+      "output": {"columns":[{"name":"a","type":"number"},{"name":"b","type":"number"}],"rows":[{"a":1,"b":2},{"a":3,"b":4}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adds a Product column by calling Multiply on each row, giving 1 × 2 = 2 and 3 × 4 = 12.",
+      "output": {"columns":[{"name":"a","type":"number"},{"name":"b","type":"number"},{"name":"Product","type":"number"}],"rows":[{"a":1,"b":2,"Product":2},{"a":3,"b":4,"Product":12}]}
+    }
+  ]
+}
+-->

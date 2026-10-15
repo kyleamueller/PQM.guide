@@ -63,3 +63,30 @@ in
 <!--output
 {"columns":[{"name":"Value Type","type":"text"},{"name":"M Representation","type":"text"}],"rows":[{"Value Type":"Number (123)","M Representation":"123"},{"Value Type":"Date (2035-01-02)","M Representation":"#date(2035, 1, 2)"},{"Value Type":"Text (abc)","M Representation":"\"abc\""}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "NumRepr",
+      "description": "Converts the number 123 into its M source text, \"123\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"123"}]}
+    },
+    {
+      "name": "DateRepr",
+      "description": "Converts #date(2035, 1, 2) into its M source text, \"#date(2035, 1, 2)\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"#date(2035, 1, 2)"}]}
+    },
+    {
+      "name": "TextRepr",
+      "description": "Converts the text abc into its M source text, a quoted literal \"\"abc\"\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"\"abc\""}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a three-row table pairing each value type with its M representation.",
+      "output": {"columns":[{"name":"Value Type","type":"text"},{"name":"M Representation","type":"text"}],"rows":[{"Value Type":"Number (123)","M Representation":"123"},{"Value Type":"Date (2035-01-02)","M Representation":"#date(2035, 1, 2)"},{"Value Type":"Text (abc)","M Representation":"\"abc\""}]}
+    }
+  ]
+}
+-->

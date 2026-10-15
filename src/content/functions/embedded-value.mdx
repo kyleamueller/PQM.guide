@@ -61,3 +61,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Resource",
+      "description": "Defines a nested record whose config field is itself a record holding timeout = 30 and retries = 3.",
+      "output": {"columns":[{"name":"config","type":"record"}],"rows":[{"config":"[Record]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "Navigates Resource[config][timeout] to read the nested timeout setting, returning 30.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":30}]}
+    }
+  ]
+}
+-->

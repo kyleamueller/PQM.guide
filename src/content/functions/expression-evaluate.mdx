@@ -65,6 +65,23 @@ in
 {"columns":[{"name":"Expression","type":"text"},{"name":"Result","type":"number"}],"rows":[{"Expression":"a * b + c  (a=5, b=4, c=3)","Result":23}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Result",
+      "description": "Evaluates the text \"a * b + c\" against the environment [a = 5, b = 4, c = 3], giving 5 * 4 + 3 = 23.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":23}]}
+    },
+    {
+      "name": "Output",
+      "description": "The final output — a one-row table pairing the expression text with its evaluated result of 23.",
+      "output": {"columns":[{"name":"Expression","type":"text"},{"name":"Result","type":"number"}],"rows":[{"Expression":"a * b + c  (a=5, b=4, c=3)","Result":23}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Evaluate with standard library functions
 
 Use `#shared` to make library functions available.
@@ -78,4 +95,21 @@ in
 
 <!--output
 {"columns":[{"name":"Input","type":"text"},{"name":"Reversed","type":"text"}],"rows":[{"Input":"Power Query","Reversed":"yreuQ rewoP"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Result",
+      "description": "Evaluates Text.Reverse(\"Power Query\") with #shared as the environment so the library function resolves, returning \"yreuQ rewoP\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"yreuQ rewoP"}]}
+    },
+    {
+      "name": "Output",
+      "description": "The final output — a one-row table showing the input text \"Power Query\" next to its reversed form.",
+      "output": {"columns":[{"name":"Input","type":"text"},{"name":"Reversed","type":"text"}],"rows":[{"Input":"Power Query","Reversed":"yreuQ rewoP"}]}
+    }
+  ]
+}
 -->

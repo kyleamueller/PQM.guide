@@ -72,3 +72,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "RT",
+      "description": "Builds a closed record type with one required field, Name of type text.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type [Name = text]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.IsOpenRecord returns false because RT was created with open set to false.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+    }
+  ]
+}
+-->

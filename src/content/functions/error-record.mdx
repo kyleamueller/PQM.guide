@@ -85,6 +85,23 @@ in
 {"columns":[{"name":"HasError","type":"logical"},{"name":"Reason","type":"text"},{"name":"Message","type":"text"}],"rows":[{"HasError":true,"Reason":"DivideByZero","Message":"You attempted to divide by zero."}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Result",
+      "description": "Raises the custom DivideByZero error with error Error.Record and catches it with try, producing a record with HasError = true and an Error record holding the Reason and Message.",
+      "output": {"columns":[{"name":"HasError","type":"logical"},{"name":"Error","type":"record"}],"rows":[{"HasError":true,"Error":"[Record]"}]}
+    },
+    {
+      "name": "Output",
+      "description": "The final output — a one-row table pulling HasError, Reason (\"DivideByZero\"), and Message out of the try record.",
+      "output": {"columns":[{"name":"HasError","type":"logical"},{"name":"Reason","type":"text"},{"name":"Message","type":"text"}],"rows":[{"HasError":true,"Reason":"DivideByZero","Message":"You attempted to divide by zero."}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Error record with all fields
 
 Create an error record with reason, message, detail, parameters, and error code.
@@ -107,4 +124,21 @@ in
 
 <!--output
 {"columns":[{"name":"Reason","type":"text"},{"name":"Message","type":"text"},{"name":"ErrorCode","type":"text"}],"rows":[{"Reason":"CustomerNotFound","Message":"Customer ID 12345 was not found.","ErrorCode":"ERR404"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Result",
+      "description": "Raises a CustomerNotFound error carrying a message, detail, two message parameters, and error code \"ERR404\", then catches it with try into a record with HasError = true and an Error record.",
+      "output": {"columns":[{"name":"HasError","type":"logical"},{"name":"Error","type":"record"}],"rows":[{"HasError":true,"Error":"[Record]"}]}
+    },
+    {
+      "name": "Output",
+      "description": "The final output — a one-row table with the Reason (\"CustomerNotFound\"), Message, and ErrorCode (\"ERR404\") read from the caught Error record.",
+      "output": {"columns":[{"name":"Reason","type":"text"},{"name":"Message","type":"text"},{"name":"ErrorCode","type":"text"}],"rows":[{"Reason":"CustomerNotFound","Message":"Customer ID 12345 was not found.","ErrorCode":"ERR404"}]}
+    }
+  ]
+}
 -->

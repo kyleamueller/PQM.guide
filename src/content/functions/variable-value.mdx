@@ -54,3 +54,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "x",
+      "description": "Binds the variable x to the number 10.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":10}]}
+    },
+    {
+      "name": "Result",
+      "description": "References x directly, which is what Variable.Value(\"x\") would conceptually resolve to: 10.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":10}]}
+    }
+  ]
+}
+-->

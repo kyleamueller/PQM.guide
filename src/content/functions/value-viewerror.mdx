@@ -59,3 +59,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"DataSource.Error"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "ErrorRec",
+      "description": "Defines an error record with Reason \"DataSource.Error\", Message \"Could not connect\" and a null Detail.",
+      "output": {"columns":[{"name":"Reason","type":"text"},{"name":"Message","type":"text"},{"name":"Detail","type":"any"}],"rows":[{"Reason":"DataSource.Error","Message":"Could not connect","Detail":null}]}
+    },
+    {
+      "name": "ViewErr",
+      "description": "Passes the record through Value.ViewError, which marks it as a view error so a view handler can throw it without triggering a fallback; the fields are unchanged.",
+      "output": {"columns":[{"name":"Reason","type":"text"},{"name":"Message","type":"text"},{"name":"Detail","type":"any"}],"rows":[{"Reason":"DataSource.Error","Message":"Could not connect","Detail":null}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the Reason field of the view error record, \"DataSource.Error\".",
+      "output": {"columns":[{"name":"Result","type":"text"}],"rows":[{"Result":"DataSource.Error"}]}
+    }
+  ]
+}
+-->

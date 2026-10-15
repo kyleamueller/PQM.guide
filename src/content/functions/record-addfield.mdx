@@ -70,6 +70,23 @@ in
 {"columns":[{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Total","type":"number"}],"rows":[{"UnitPrice":25,"Quantity":4,"Total":100}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "R",
+      "description": "Defines a record with UnitPrice = 25 and Quantity = 4.",
+      "output": {"columns":[{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"UnitPrice":25,"Quantity":4}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adds a Total field computed as 25 × 4 = 100.",
+      "output": {"columns":[{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"Total","type":"number"}],"rows":[{"UnitPrice":25,"Quantity":4,"Total":100}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Add a "Status" field to the first row of the Sales table
 
 Input: `Sales`

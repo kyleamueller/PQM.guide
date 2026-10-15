@@ -59,6 +59,23 @@ in
 {"columns":[{"name":"Dept","type":"any"},{"name":"Count","type":"number"}],"rows":[{"Dept":"HR","Count":"2"},{"Dept":"IT","Count":"1"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Groups the three-row inline table by Dept, producing one row per department with its rows nested in an Employees table column (HR has 2 rows, IT has 1).",
+      "output": {"columns":[{"name":"Dept","type":"any"},{"name":"Employees","type":"table"}],"rows":[{"Dept":"HR","Employees":"[Table]"},{"Dept":"IT","Employees":"[Table]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.AggregateTableColumn replaces the Employees column with a Count column holding Table.RowCount of each nested table: 2 for HR and 1 for IT.",
+      "output": {"columns":[{"name":"Dept","type":"any"},{"name":"Count","type":"number"}],"rows":[{"Dept":"HR","Count":"2"},{"Dept":"IT","Count":"1"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Sum a column in each nested table
 
 ```powerquery
@@ -74,4 +91,21 @@ in
 
 <!--output
 {"columns":[{"name":"Region","type":"any"},{"name":"TotalSales","type":"number"}],"rows":[{"Region":"North","TotalSales":"300"},{"Region":"South","TotalSales":"150"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Grouped",
+      "description": "Groups the three-row inline table by Region, nesting each region's rows in a Data table column (North has 100 and 200, South has 150).",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"Data","type":"table"}],"rows":[{"Region":"North","Data":"[Table]"},{"Region":"South","Data":"[Table]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.AggregateTableColumn replaces the Data column with TotalSales, the sum of Sales in each nested table: 300 for North and 150 for South.",
+      "output": {"columns":[{"name":"Region","type":"any"},{"name":"TotalSales","type":"number"}],"rows":[{"Region":"North","TotalSales":"300"},{"Region":"South","TotalSales":"150"}]}
+    }
+  ]
+}
 -->

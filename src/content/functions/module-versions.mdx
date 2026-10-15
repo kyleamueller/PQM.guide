@@ -49,3 +49,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Versions",
+      "description": "Calls Module.Versions() to get a record of module names and their version strings; the field names and values depend on the host environment.",
+      "output": {"columns":[{"name":"Value","type":"record"}],"rows":[{"Value":"[Record]"}]}
+    },
+    {
+      "name": "FieldCount",
+      "description": "Counts the fields of the Versions record with Record.FieldCount, returning 1 in this example environment.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+    }
+  ]
+}
+-->

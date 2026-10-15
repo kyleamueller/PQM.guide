@@ -50,3 +50,20 @@ in
 <!--output
 {"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Optimized",
+      "description": "Value.Optimize(42) returns the constant 42; there is no query plan to optimize, so no alternates are introduced.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Expr",
+      "description": "Value.Expression returns the expression tree for the optimized value, a single node with Kind \"Constant\" and Value 42.",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
+    }
+  ]
+}
+-->

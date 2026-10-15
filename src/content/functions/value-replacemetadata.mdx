@@ -132,3 +132,20 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":105}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Annotated",
+      "description": "Attaches the metadata record [Note = \"special\"] to the number 100; the value itself is still 100.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":100}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adding 5 to the annotated value works on the plain number, giving 105.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":105}]}
+    }
+  ]
+}
+-->

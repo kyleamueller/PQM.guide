@@ -76,3 +76,20 @@ in
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"City","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","City":"New York"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","City":"Chicago"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","City":"Houston"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North","City":"New York"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Joined",
+      "description": "Left-joins the first four Sales rows to Customers on CustomerName = Name, adding a CustomerInfo column that holds each row's matching Customers rows as a nested table.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"CustomerInfo","type":"table"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.0,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","CustomerInfo":"[Table]"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.0,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","CustomerInfo":"[Table]"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.0,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","CustomerInfo":"[Table]"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.0,"Quantity":1,"OrderDate":"2024-02-10","Region":"North","CustomerInfo":"[Table]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.ExpandTableColumn expands City from CustomerInfo: New York for Alice, Chicago for Bob, and Houston for Charlie.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"},{"name":"City","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.0,"Quantity":4,"OrderDate":"2024-01-15","Region":"East","City":"New York"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.0,"Quantity":2,"OrderDate":"2024-01-18","Region":"West","City":"Chicago"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.0,"Quantity":10,"OrderDate":"2024-02-01","Region":"East","City":"Houston"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.0,"Quantity":1,"OrderDate":"2024-02-10","Region":"North","City":"New York"}]}
+    }
+  ]
+}
+-->

@@ -74,6 +74,23 @@ in
 {"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalAmount","type":"number"},{"name":"OrderCount","type":"number"}],"rows":[{"CustomerName":"Alice","TotalAmount":"430","OrderCount":"2"},{"CustomerName":"Bob","TotalAmount":"520","OrderCount":"2"},{"CustomerName":"Charlie","TotalAmount":"300","OrderCount":"1"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "Defines an inline five-row Orders table with CustomerName and Amount columns, including the misspellings \"Alise\" and \"Bobb\".",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"CustomerName":"Alice","Amount":"250"},{"CustomerName":"Alise","Amount":"180"},{"CustomerName":"Bob","Amount":"400"},{"CustomerName":"Bobb","Amount":"120"},{"CustomerName":"Charlie","Amount":"300"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FuzzyGroup merges similar names at Threshold 0.8 (ignoring case) into Alice (250 + 180 = 430, 2 orders), Bob (400 + 120 = 520, 2 orders), and Charlie (300, 1 order).",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"TotalAmount","type":"number"},{"name":"OrderCount","type":"number"}],"rows":[{"CustomerName":"Alice","TotalAmount":"430","OrderCount":"2"},{"CustomerName":"Bob","TotalAmount":"520","OrderCount":"2"},{"CustomerName":"Charlie","TotalAmount":"300","OrderCount":"1"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Use a TransformationTable to handle known brand variants
 
 A `TransformationTable` with `From` and `To` columns maps known aliases before fuzzy scoring.
@@ -138,4 +155,21 @@ in
 
 <!--output
 {"columns":[{"name":"City","type":"any"},{"name":"Total","type":"number"}],"rows":[{"City":"New York","Total":"20"},{"City":"London","Total":"8"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Cities",
+      "description": "Defines an inline five-row Cities table with City and Count columns, including four spelling variants of New York.",
+      "output": {"columns":[{"name":"City","type":"any"},{"name":"Count","type":"any"}],"rows":[{"City":"New York","Count":"10"},{"City":"New-York","Count":"5"},{"City":"Newyork","Count":"3"},{"City":"NY City","Count":"2"},{"City":"London","Count":"8"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FuzzyGroup at Threshold 0.6 groups the New York variants under \"New York\" with a Total of 20 (10 + 5 + 3 + 2), while London stays on its own with 8.",
+      "output": {"columns":[{"name":"City","type":"any"},{"name":"Total","type":"number"}],"rows":[{"City":"New York","Total":"20"},{"City":"London","Total":"8"}]}
+    }
+  ]
+}
 -->

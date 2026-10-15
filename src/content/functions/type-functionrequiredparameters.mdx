@@ -47,6 +47,23 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Defines a function type with two required number parameters, x and y, returning number.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (x as number, y as number) as number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.FunctionRequiredParameters returns 2 because both x and y are required.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":2}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Optional parameters are not counted
 
 ```powerquery
@@ -58,6 +75,23 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Defines a function type with a required x parameter and an optional nullable y parameter.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (x as number, optional y as nullable number) as number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.FunctionRequiredParameters returns 1 because only x is required; the optional y is not counted.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":1}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Check required parameters of Number.Round

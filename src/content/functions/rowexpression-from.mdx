@@ -65,3 +65,20 @@ in
 <!--output
 {"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"}],"rows":[{"Kind":"Binary","Operator":"Equals"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AST",
+      "description": "Converts each [CustomerName] = \"ALFKI\" into an expression AST record: a Binary node with Operator \"Equals\", the CustomerName field access as Left, and the constant \"ALFKI\" as Right.",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"},{"name":"Left","type":"record"},{"name":"Right","type":"record"}],"rows":[{"Kind":"Binary","Operator":"Equals","Left":"[Record]","Right":"[Record]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the AST root's Kind (\"Binary\") and Operator (\"Equals\").",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Operator","type":"text"}],"rows":[{"Kind":"Binary","Operator":"Equals"}]}
+    }
+  ]
+}
+-->
