@@ -158,6 +158,25 @@ export default function ResourcesPage() {
             error handling, and query optimization.
           </p>
         </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
+              href="https://bpbonline.com/products/the-ultimate-power-query-cookbook-for-power-bi-and-excel"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              The Ultimate Power Query Cookbook for Power BI and Excel — Dominick Raimato
+            </a>
+          </h3>
+          <p>
+            A recipe-style collection of 100+ practical Power Query solutions,
+            from connecting to files, databases, web pages, and APIs to
+            cleaning, combining, and shaping data and optimizing refresh
+            performance. A great companion when you know what you want to do
+            and need a proven pattern to get there.
+          </p>
+        </div>
       </section>
 
       <section style={{ marginBottom: 40 }}>
@@ -317,7 +336,10 @@ export default function ResourcesPage() {
               rel="noopener noreferrer"
             >
               Microsoft Fabric Community — Power Query Forum
-            </a>
+            </a>{" "}
+            <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.7 }}>
+              (Microsoft sign-in required)
+            </span>
           </h3>
           <p>
             The official community forum for Power Query questions, hosted on
