@@ -56,6 +56,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Region":"North"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a 4-row Sales table with orders 1 through 4.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Region":"North"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes the first 2 rows (Alice and Bob), leaving orders 3 and 4.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Diana","Product":"Widget A","Region":"North"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Remove leading rows where the order date is in January
 
 Remove rows while OrderDate is in January 2024, keeping rows from February onwards.
@@ -74,6 +91,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","OrderDate":"2024-02-01"},{"OrderID":"8","CustomerName":"Diana","OrderDate":"2024-04-15"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a 4-row Sales table whose first two orders (1 and 2) are dated January 2024.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","OrderDate":"2024-01-15"},{"OrderID":"2","CustomerName":"Bob","OrderDate":"2024-01-18"},{"OrderID":"3","CustomerName":"Charlie","OrderDate":"2024-02-01"},{"OrderID":"8","CustomerName":"Diana","OrderDate":"2024-04-15"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes leading rows while Date.Month([OrderDate]) = 1, stopping at Charlie's February order and keeping orders 3 and 8.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":"3","CustomerName":"Charlie","OrderDate":"2024-02-01"},{"OrderID":"8","CustomerName":"Diana","OrderDate":"2024-04-15"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Strip leading comment rows from a flat-file import
 
 ```powerquery
@@ -88,4 +122,21 @@ in
 
 <!--output
 {"columns":[{"name":"Content","type":"any"}],"rows":[{"Content":"OrderID,Customer,Amount"},{"Content":"1,Alice,100"},{"Content":"2,Bob,200"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Raw",
+      "description": "Defines a single-column table of 5 raw lines, the first two of which are comment lines starting with \"#\".",
+      "output": {"columns":[{"name":"Content","type":"any"}],"rows":[{"Content":"# Generated: 2024-01-01"},{"Content":"# Version: 2.0"},{"Content":"OrderID,Customer,Amount"},{"Content":"1,Alice,100"},{"Content":"2,Bob,200"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — removes the two leading \"#\" lines, keeping the header line and the two data lines.",
+      "output": {"columns":[{"name":"Content","type":"any"}],"rows":[{"Content":"OrderID,Customer,Amount"},{"Content":"1,Alice,100"},{"Content":"2,Bob,200"}]}
+    }
+  ]
+}
 -->

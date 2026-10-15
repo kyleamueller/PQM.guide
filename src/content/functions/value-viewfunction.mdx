@@ -59,3 +59,25 @@ in
 <!--output
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Original",
+      "description": "Defines a function that takes a number x and returns x * 2.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Wrapped",
+      "description": "Wraps Original with Value.ViewFunction, producing a view function that behaves the same when called.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"[Function]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — calls Wrapped(21), which evaluates 21 * 2 and returns 42.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":42}]}
+    }
+  ]
+}
+-->

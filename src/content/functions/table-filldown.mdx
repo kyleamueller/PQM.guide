@@ -37,42 +37,44 @@ This function is commonly used after operations like unpivoting or when importin
 
 ### Example 1: Fill down a single column
 
-Sort Sales by Region, then replace "North" with null to simulate a grouped report where region headers only appear once. Table.FillDown restores the missing values from the nearest non-null value above.
-
-Input: `Sales`
+A grouped report export often prints each Region label only on the first row of its group, leaving the rows below it blank. Table.FillDown copies each non-null value down into the null cells beneath it, so every row gets its Region back — including the two "North" rows.
 
 ```powerquery
 let
-    Source = Table.SelectColumns(
-        Table.Sort(Sales, "Region"),
-        {"Region", "Product", "Quantity"}
+    // A grouped report export: each Region appears only on the first row of its group
+    Source = #table(
+        type table [Region = nullable text, Product = text, Quantity = number],
+        {
+            {"East", "Widget A", 4},
+            {null, "Widget C", 10},
+            {null, "Thingamajig E", 1},
+            {"North", "Gadget D", 1},
+            {null, "Widget C", 8},
+            {"West", "Gadget B", 2},
+            {null, "Widget A", 6},
+            {null, "Gadget B", 3}
+        }
     ),
-    // Simulate a grouped export where "North" labels are missing
-    WithBlanks = Table.ReplaceValue(Source, "North", null, Replacer.ReplaceValue, {"Region"})
+    FilledDown = Table.FillDown(Source, {"Region"})
 in
-    Table.FillDown(WithBlanks, {"Region"})
+    FilledDown
 ```
 
 <!--output
-{"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+{"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"North","Product":"Gadget D","Quantity":1},{"Region":"North","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
 -->
 <!--steps
 {
   "steps": [
     {
       "name": "Source",
-      "description": "Sorts the Sales table by Region ascending, then selects only Region, Product, and Quantity columns, producing an 8-row table grouped by region.",
-      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"North","Product":"Gadget D","Quantity":1},{"Region":"North","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+      "description": "A grouped export of the Sales orders by region: \"East\", \"North\", and \"West\" each appear only on the first row of their group, and the rows below are null.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":null,"Product":"Widget C","Quantity":10},{"Region":null,"Product":"Thingamajig E","Quantity":1},{"Region":"North","Product":"Gadget D","Quantity":1},{"Region":null,"Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":null,"Product":"Widget A","Quantity":6},{"Region":null,"Product":"Gadget B","Quantity":3}]}
     },
     {
-      "name": "WithBlanks",
-      "description": "Replaces every occurrence of \"North\" in the Region column with null, simulating a grouped export where region labels appear only on the first row of each group.",
-      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":null,"Product":"Gadget D","Quantity":1},{"Region":null,"Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
-    },
-    {
-      "name": "Result",
-      "description": "The final output — applies Table.FillDown on the Region column, propagating the last non-null value downward so the null \"North\" rows are restored.",
-      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"East","Product":"Gadget D","Quantity":1},{"Region":"East","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
+      "name": "FilledDown",
+      "description": "The final output — Table.FillDown replaces each null Region with the nearest non-null value above it, so the East, North, and West labels fill their whole groups.",
+      "output": {"columns":[{"name":"Region","type":"text"},{"name":"Product","type":"text"},{"name":"Quantity","type":"number"}],"rows":[{"Region":"East","Product":"Widget A","Quantity":4},{"Region":"East","Product":"Widget C","Quantity":10},{"Region":"East","Product":"Thingamajig E","Quantity":1},{"Region":"North","Product":"Gadget D","Quantity":1},{"Region":"North","Product":"Widget C","Quantity":8},{"Region":"West","Product":"Gadget B","Quantity":2},{"Region":"West","Product":"Widget A","Quantity":6},{"Region":"West","Product":"Gadget B","Quantity":3}]}
     }
   ]
 }

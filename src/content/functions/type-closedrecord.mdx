@@ -51,6 +51,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Closed",
+      "description": "Type.ClosedRecord converts the open base type record (type [...]) into a closed record type with no fields.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type []"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.IsOpenRecord returns false, confirming the record type is now closed.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":false}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Close a typed record with declared fields
 
 ```powerquery

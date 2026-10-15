@@ -49,6 +49,23 @@ in
 {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"10"},{"ID":"3","Value":"30"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines an inline three-row table where the Value cell for ID 2 is an error (error \"bad\").",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"10"},{"ID":"2","Value":"[Error]"},{"ID":"3","Value":"30"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.RemoveRowsWithErrors drops the ID 2 row because it contains an error, leaving IDs 1 and 3.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"10"},{"ID":"3","Value":"30"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Only remove rows with errors in a specific column
 
 ```powerquery
@@ -60,4 +77,21 @@ in
 
 <!--output
 {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"2","Value":"20"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines an inline three-row table where the Value cells for IDs 1 and 3 are errors.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"[Error]"},{"ID":"2","Value":"20"},{"ID":"3","Value":"[Error]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.RemoveRowsWithErrors checks only the Value column and drops IDs 1 and 3, leaving the single ID 2 row.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"2","Value":"20"}]}
+    }
+  ]
+}
 -->

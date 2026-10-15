@@ -60,6 +60,23 @@ in
 {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[ProductID = 3, ProductName = \"Widget C\", Category = \"Widgets\", Price = 15, InStock = false]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Builds a typed five-row product catalog with prices of 25, 50, 15, 75 and 120.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Category":"Widgets","Price":25,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Category":"Gadgets","Price":50,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Category":"Widgets","Price":15,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Category":"Gadgets","Price":75,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Category":"Misc","Price":120,"InStock":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Min returns the whole row with the smallest Price as a record: Widget C at 15.",
+      "output": {"columns":[{"name":"Result","type":"record"}],"rows":[{"Result":"[ProductID = 3, ProductName = \"Widget C\", Category = \"Widgets\", Price = 15, InStock = false]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Extract the earliest order date as a scalar
 
 ```powerquery
@@ -75,6 +92,23 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-15"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Builds a four-row orders table with order dates of 2024-01-15, 2024-01-18, 2024-02-01 and 2024-04-15.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"OrderDate","type":"any"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","OrderDate":"2024-01-15"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","OrderDate":"2024-01-18"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","OrderDate":"2024-02-01"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","OrderDate":"2024-04-15"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Min finds the row with the earliest OrderDate (Alice's order 1) and [OrderDate] pulls out the date 2024-01-15.",
+      "output": {"columns":[{"name":"Result","type":"date"}],"rows":[{"Result":"2024-01-15"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Return a safe default when the filtered table is empty

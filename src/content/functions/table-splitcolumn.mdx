@@ -78,6 +78,23 @@ in
 {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FirstName","type":"any"},{"name":"LastName","type":"any"},{"name":"Department","type":"any"},{"name":"Salary","type":"any"}],"rows":[{"EmployeeID":"E001","FirstName":"alice","LastName":"smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FirstName":"BOB","LastName":"JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E003","FirstName":"Charlie","LastName":"Brown","Department":"Marketing","Salary":"72000"},{"EmployeeID":"E004","FirstName":"diana","LastName":"PRINCE","Department":"Engineering","Salary":"68000"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Builds a four-row employees table with EmployeeID, FullName, Department and Salary.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"},{"name":"Salary","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing","Salary":"72000"},{"EmployeeID":"E004","FullName":"diana PRINCE","Department":"Engineering","Salary":"68000"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — FullName is split on the space into FirstName and LastName, which take its place between EmployeeID and Department.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FirstName","type":"any"},{"name":"LastName","type":"any"},{"name":"Department","type":"any"},{"name":"Salary","type":"any"}],"rows":[{"EmployeeID":"E001","FirstName":"alice","LastName":"smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FirstName":"BOB","LastName":"JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E003","FirstName":"Charlie","LastName":"Brown","Department":"Marketing","Salary":"72000"},{"EmployeeID":"E004","FirstName":"diana","LastName":"PRINCE","Department":"Engineering","Salary":"68000"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Split a fixed-width employee ID code into prefix and number
 
 ```powerquery
@@ -97,6 +114,23 @@ in
 
 <!--output
 {"columns":[{"name":"IDPrefix","type":"any"},{"name":"IDNumber","type":"any"},{"name":"FullName","type":"any"}],"rows":[{"IDPrefix":"E","IDNumber":"001","FullName":"alice smith"},{"IDPrefix":"E","IDNumber":"002","FullName":"BOB JONES"},{"IDPrefix":"E","IDNumber":"003","FullName":"Charlie Brown"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Builds a three-row table with EmployeeID codes E001, E002 and E003 and their FullName.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith"},{"EmployeeID":"E002","FullName":"BOB JONES"},{"EmployeeID":"E003","FullName":"Charlie Brown"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — each EmployeeID is cut into a 1-character IDPrefix (\"E\") and a 3-character IDNumber (\"001\", \"002\", \"003\").",
+      "output": {"columns":[{"name":"IDPrefix","type":"any"},{"name":"IDNumber","type":"any"},{"name":"FullName","type":"any"}],"rows":[{"IDPrefix":"E","IDNumber":"001","FullName":"alice smith"},{"IDPrefix":"E","IDNumber":"002","FullName":"BOB JONES"},{"IDPrefix":"E","IDNumber":"003","FullName":"Charlie Brown"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Split a delimited email field and use a default for rows with no delimiter
@@ -122,4 +156,21 @@ in
 
 <!--output
 {"columns":[{"name":"Name","type":"any"},{"name":"LocalPart","type":"any"},{"name":"Domain","type":"any"}],"rows":[{"Name":"Alice","LocalPart":"alice","Domain":"example.com"},{"Name":"Bob","LocalPart":"bob","Domain":"example.com"},{"Name":"Charlie","LocalPart":"charlie","Domain":"example.com"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Builds a three-row table of customer names and email addresses, each containing an @ delimiter.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"Email","type":"any"}],"rows":[{"Name":"Alice","Email":"alice@example.com"},{"Name":"Bob","Email":"bob@example.com"},{"Name":"Charlie","Email":"charlie@example.com"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Email is split on \"@\" into LocalPart and Domain; every row has a delimiter, so the \"unknown\" default is never needed.",
+      "output": {"columns":[{"name":"Name","type":"any"},{"name":"LocalPart","type":"any"},{"name":"Domain","type":"any"}],"rows":[{"Name":"Alice","LocalPart":"alice","Domain":"example.com"},{"Name":"Bob","LocalPart":"bob","Domain":"example.com"},{"Name":"Charlie","LocalPart":"charlie","Domain":"example.com"}]}
+    }
+  ]
+}
 -->

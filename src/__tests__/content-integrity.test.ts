@@ -114,6 +114,78 @@ describe("Function MDX integrity", () => {
 // Concepts
 // ---------------------------------------------------------------------------
 
+describe("Function example step chips", () => {
+  const slugs = getAllFunctionSlugs();
+  const exampleRegex = /### Example \d+:\s*(.+?)\n([\s\S]*?)(?=### Example \d+:|## |$)/g;
+  const stepNameRegex = /^ {4}(#"[^"]+"|[A-Za-z_][\w.]*)\s*=(?![=>])/;
+
+  // Top-level step names of an outer `let ... in` block, plus whether the
+  // `in` clause is an expression rather than a bare step name.
+  function parseLetSteps(code: string) {
+    const lines = code.split("\n");
+    if (lines[0]?.trim() !== "let") return null;
+    const inIndex = lines.findIndex((l) => l.trim() === "in" && !l.startsWith(" "));
+    if (inIndex < 0) return null;
+    const names = lines
+      .slice(1, inIndex)
+      .map((l) => l.match(stepNameRegex)?.[1])
+      .filter((n): n is string => !!n)
+      .map((n) => (n.startsWith("#") ? n.slice(2, -1) : n));
+    const inExpr = lines.slice(inIndex + 1).join(" ").trim().replace(/^#"(.*)"$/, "$1");
+    return { names, inIsExpression: !names.includes(inExpr) };
+  }
+
+  function examplesOf(slug: string) {
+    const { content } = getFunctionBySlug(slug);
+    return [...content.matchAll(exampleRegex)].map((m) => {
+      const body = m[2];
+      return {
+        id: `${slug} / ${m[1].trim()}`,
+        code: body.match(/```powerquery\n([\s\S]*?)```/)?.[1].trim() ?? "",
+        output: body.match(/<!--output\n([\s\S]*?)-->/)?.[1],
+        steps: body.match(/<!--steps\n([\s\S]*?)-->/)?.[1],
+      };
+    });
+  }
+
+  it("every steps block is valid JSON with a unique name and output per step", () => {
+    for (const slug of slugs) {
+      for (const ex of examplesOf(slug)) {
+        if (!ex.steps) continue;
+        const parsed = JSON.parse(ex.steps) as { steps: { name: string; output: unknown }[] };
+        expect(Array.isArray(parsed.steps), ex.id).toBe(true);
+        const names = parsed.steps.map((s) => s.name);
+        // Chip names are React keys in ExampleSection, so they must be unique.
+        expect(new Set(names).size, `${ex.id} has duplicate chip names`).toBe(names.length);
+        for (const step of parsed.steps) {
+          expect(step.name, ex.id).toBeTruthy();
+          expect(step.output, `${ex.id} / ${step.name}`).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  it("every multi-step example with an output table has step chips matching its let steps", () => {
+    for (const slug of slugs) {
+      for (const ex of examplesOf(slug)) {
+        const let_ = parseLetSteps(ex.code);
+        if (!let_ || !ex.output) continue;
+        const stepCount = let_.names.length + (let_.inIsExpression ? 1 : 0);
+        if (stepCount < 2) continue;
+        expect(ex.steps, `${ex.id} is multi-step but has no <!--steps--> block`).toBeTruthy();
+        const chips = (JSON.parse(ex.steps!) as { steps: { name: string; output: unknown }[] }).steps;
+        const chipNames = chips.map((c) => c.name);
+        for (const name of let_.names) {
+          expect(chipNames, `${ex.id} has no chip for step "${name}"`).toContain(name);
+        }
+        expect(chips[chips.length - 1].output, `${ex.id} last chip should match the output table`).toEqual(
+          JSON.parse(ex.output)
+        );
+      }
+    }
+  });
+});
+
 describe("Concept MDX integrity", () => {
   const slugs = getAllConceptSlugs();
 

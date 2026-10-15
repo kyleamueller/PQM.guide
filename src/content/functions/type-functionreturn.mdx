@@ -53,6 +53,23 @@ in
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Defines a function type that takes a number parameter x and declares a text return type.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (x as number) as text"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.FunctionReturn extracts the declared return type, type text.",
+      "output": {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type text"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Return type of a built-in function
 
 ```powerquery
@@ -74,4 +91,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type any"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FType",
+      "description": "Defines a function type that takes a number parameter x and declares its return type as any.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type function (x as number) as any"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Type.FunctionReturn extracts the return type, type any.",
+      "output": {"columns":[{"name":"Result","type":"type"}],"rows":[{"Result":"type any"}]}
+    }
+  ]
+}
 -->

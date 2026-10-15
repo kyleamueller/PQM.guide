@@ -61,6 +61,23 @@ in
 {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Customers",
+      "description": "Defines an inline four-row Customers table with CustomerID, Name, and City columns.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"2","Name":"Bob","City":"Chicago"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.RemoveRows removes 1 row at offset 1 (Bob, Chicago), leaving Alice, Charlie, and Diana.",
+      "output": {"columns":[{"name":"CustomerID","type":"any"},{"name":"Name","type":"any"},{"name":"City","type":"any"}],"rows":[{"CustomerID":"1","Name":"Alice","City":"New York"},{"CustomerID":"3","Name":"Charlie","City":"Houston"},{"CustomerID":"4","Name":"Diana","City":"Seattle"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Remove a block of rows in the middle
 
 Remove 3 rows starting at offset 2 from an 8-row Sales table.
@@ -77,6 +94,23 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Charlie"},{"OrderID":"8","CustomerName":"Diana"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline eight-row Sales table with OrderID and CustomerName columns for orders 1 through 8.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"3","CustomerName":"Charlie"},{"OrderID":"4","CustomerName":"Alice"},{"OrderID":"5","CustomerName":"Diana"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Charlie"},{"OrderID":"8","CustomerName":"Diana"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.RemoveRows removes 3 rows starting at offset 2 (orders 3, 4, and 5), leaving orders 1, 2, 6, 7, and 8.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice"},{"OrderID":"2","CustomerName":"Bob"},{"OrderID":"6","CustomerName":"Bob"},{"OrderID":"7","CustomerName":"Charlie"},{"OrderID":"8","CustomerName":"Diana"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Dynamically locate a row by content, then remove it

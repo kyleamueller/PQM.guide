@@ -132,7 +132,7 @@ in
       "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"columns","Value":"[List]"},{"Field":"rows","Value":"[List]"}]}
     },
     {
-      "name": "Result",
+      "name": "AsTable",
       "description": "The final output — a five-row table built from the rows field of the parsed JSON using Table.FromRecords.",
       "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Category":"Widgets","Price":25.00,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Category":"Gadgets","Price":50.00,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Category":"Widgets","Price":15.00,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Category":"Gadgets","Price":75.00,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Category":"Misc","Price":120.00,"InStock":false}]}
     }
@@ -158,6 +158,33 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.00,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.00,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.00,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.00,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.00,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "TableName",
+      "description": "Holds the dynamic part of the request, the table name \"Sales\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Sales"}]}
+    },
+    {
+      "name": "Response",
+      "description": "Calls Web.Contents with the static base URL https://pqm.guide and RelativePath \"api/tables/Sales\", returning the raw HTTP response as a binary value.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Binary.FromText(...)"}]}
+    },
+    {
+      "name": "Parsed",
+      "description": "Parses the binary response as JSON, producing an M record with columns and rows fields.",
+      "output": {"columns":[{"name":"Field","type":"text"},{"name":"Value","type":"text"}],"rows":[{"Field":"columns","Value":"[List]"},{"Field":"rows","Value":"[List]"}]}
+    },
+    {
+      "name": "AsTable",
+      "description": "The final output — an eight-row Sales table built from the rows field of the parsed JSON using Table.FromRecords.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"},{"name":"OrderDate","type":"date"},{"name":"Region","type":"text"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25.0,"Quantity":4,"OrderDate":"2024-01-15","Region":"East"},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.0,"Quantity":2,"OrderDate":"2024-01-18","Region":"West"},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":15.0,"Quantity":10,"OrderDate":"2024-02-01","Region":"East"},{"OrderID":4,"CustomerName":"Alice","Product":"Gadget D","Category":"Gadgets","UnitPrice":75.0,"Quantity":1,"OrderDate":"2024-02-10","Region":"North"},{"OrderID":5,"CustomerName":"Diana","Product":"Widget A","Category":"Widgets","UnitPrice":25.0,"Quantity":6,"OrderDate":"2024-03-05","Region":"West"},{"OrderID":6,"CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":120.0,"Quantity":1,"OrderDate":"2024-03-12","Region":"East"},{"OrderID":7,"CustomerName":"Charlie","Product":"Gadget B","Category":"Gadgets","UnitPrice":50.0,"Quantity":3,"OrderDate":"2024-04-01","Region":"West"},{"OrderID":8,"CustomerName":"Diana","Product":"Widget C","Category":"Widgets","UnitPrice":15.0,"Quantity":8,"OrderDate":"2024-04-15","Region":"North"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Handle a 404 with ManualStatusHandling

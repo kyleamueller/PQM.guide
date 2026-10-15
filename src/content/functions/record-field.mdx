@@ -50,3 +50,20 @@ in
 <!--output
 {"columns":[{"name":"Product","type":"text"}],"rows":[{"Product":"Widget A"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "ProductValue",
+      "description": "Takes the first Sales row (Sales{0}, order 1) and reads its Product field with Record.Field, returning \"Widget A\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget A"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the product name placed in a one-row, one-column table named Product.",
+      "output": {"columns":[{"name":"Product","type":"text"}],"rows":[{"Product":"Widget A"}]}
+    }
+  ]
+}
+-->

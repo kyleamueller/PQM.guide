@@ -53,6 +53,23 @@ in
 {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Builds a three-row product table: Widget A, Gadget B and Widget C.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the three rows are repeated 3 times in order, giving 9 rows.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Category","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"},{"ProductID":"1","ProductName":"Widget A","Category":"Widgets"},{"ProductID":"2","ProductName":"Gadget B","Category":"Gadgets"},{"ProductID":"3","ProductName":"Widget C","Category":"Widgets"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Build a repeating status cycle and add a sequence index
 
 Combine `Table.Repeat` with `Table.AddIndexColumn` to create an indexed round-robin assignment.

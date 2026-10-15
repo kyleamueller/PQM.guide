@@ -57,6 +57,23 @@ in
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Order #1: Alice — Widget A x4\", \"Order #2: Bob — Gadget B x2\", \"Order #3: Charlie — Widget C x10\"}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a five-column inline table with OrderID, CustomerName, Product, UnitPrice, and Quantity for three orders.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","UnitPrice":25,"Quantity":4},{"OrderID":2,"CustomerName":"Bob","Product":"Gadget B","UnitPrice":50,"Quantity":2},{"OrderID":3,"CustomerName":"Charlie","Product":"Widget C","UnitPrice":15,"Quantity":10}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.TransformRows turns each row into a label such as \"Order #1: Alice — Widget A x4\", returning a list of three text values.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"Order #1: Alice — Widget A x4\", \"Order #2: Bob — Gadget B x2\", \"Order #3: Charlie — Widget C x10\"}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Compute derived records including Revenue per row
 
 Transform rows into enriched records and use `Table.FromRecords` to reconstruct a table.
@@ -119,4 +136,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"alice smith (Sales)\", \"BOB JONES (Engineering)\", \"Charlie Brown (Marketing)\", \"Eve Martinez (Sales)\"}"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Defines a typed four-row Employees table with EmployeeID, FullName, Department, and Salary columns.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":55000},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":95000},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing","Salary":72000},{"EmployeeID":"E005","FullName":"Eve Martinez","Department":"Sales","Salary":88000}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.TransformRows combines FullName and Department for each row, returning a list of four text values such as \"alice smith (Sales)\".",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{\"alice smith (Sales)\", \"BOB JONES (Engineering)\", \"Charlie Brown (Marketing)\", \"Eve Martinez (Sales)\"}"}]}
+    }
+  ]
+}
 -->

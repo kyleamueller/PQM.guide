@@ -50,3 +50,20 @@ in
 <!--output
 {"columns":[{"name":"TotalQuantity","type":"number"}],"rows":[{"TotalQuantity":35}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Total",
+      "description": "Pulls the Quantity column from Sales as a list {4, 2, 10, 1, 6, 1, 3, 8} and sums it to 35.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":35}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table with the total in a TotalQuantity column.",
+      "output": {"columns":[{"name":"TotalQuantity","type":"number"}],"rows":[{"TotalQuantity":35}]}
+    }
+  ]
+}
+-->

@@ -54,6 +54,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines an inline five-row Products table with ProductID values 1 through 5.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Price":25.0,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Price":50.0,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Price":15.0,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Price":75.0,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Price":120.0,"InStock":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.IsDistinct checks the ProductID column and returns true because every ID from 1 to 5 appears exactly once.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Detect duplicate OrderIDs before joining
 
 ```powerquery
@@ -68,6 +85,23 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline three-row Sales table in which OrderID 2 appears twice (Bob's Gadget B and Widget C orders).",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"2","CustomerName":"Bob","Product":"Widget C"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.IsDistinct returns false because OrderID 2 is duplicated, so OrderID is not safe to use as a unique join key.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Check uniqueness on a composite key
@@ -86,4 +120,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline four-row Sales table where Alice and Bob each appear twice, but always with a different Product.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Quantity":"4"},{"CustomerName":"Alice","Product":"Gadget D","Quantity":"1"},{"CustomerName":"Bob","Product":"Gadget B","Quantity":"2"},{"CustomerName":"Bob","Product":"Widget C","Quantity":"10"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.IsDistinct checks the CustomerName and Product pair and returns true because no combination repeats.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
 -->

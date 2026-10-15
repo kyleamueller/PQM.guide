@@ -10,13 +10,12 @@ Use WebFetch to retrieve live content from all URLs listed below. Do not rely on
 
 Fetch all of the following pages and scan for any Power Query-related announcements — especially deprecations, retirements, preview-to-GA transitions, new environments, connector changes, or breaking changes:
 
-- **Power BI blog index**: `https://powerbi.microsoft.com/en-us/blog/`
-- **Fabric blog index**: `https://blog.fabric.microsoft.com/en-us/blog/`
+- **Fabric & Power BI updates blog index**: `https://community.fabric.microsoft.com/category/fabricupdatesblogs` (the Power BI and Fabric blogs moved here in 2026; the old `powerbi.microsoft.com/en-us/blog/` and `blog.fabric.microsoft.com` URLs no longer list current posts)
 - **Power BI monthly release notes**: `https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-latest-update`
 - **Fabric Data Factory what's new**: `https://learn.microsoft.com/en-us/fabric/data-factory/whats-new`
 - **Power Query connector release notes**: `https://learn.microsoft.com/en-us/power-query/connectors/`
 
-**Important:** The blog index pages only show titles and excerpts. Most Power Query changes are buried inside monthly "Feature Summary" posts. After scanning the index, also fetch the **latest 2–3 monthly feature summary posts** — they follow a predictable URL pattern (e.g. `https://powerbi.microsoft.com/en-us/blog/power-bi-march-2026-feature-summary/`). Adjust the month/year to match the current date and the two preceding months.
+**Important:** The blog index pages only show titles and excerpts. Most Power Query changes are buried inside monthly "Feature Summary" posts. After scanning the index, also fetch the **latest 2–3 monthly feature summary posts** — find them by title in the blog index (e.g. "Power BI September 2026 Feature Summary", "Fabric August 2026 Feature Summary"). Their URLs end in a numeric post ID (e.g. `https://community.fabric.microsoft.com/blog/fbc_pbiupdatesblog/power-bi-september-2026-feature-summary/5325831`), so they can't be guessed; take them from the index. Cover the current month and the two preceding months.
 
 On each page, look for:
 - Retirement or deprecation announcements (e.g. "Gen1 is retiring", "connector X is being removed")

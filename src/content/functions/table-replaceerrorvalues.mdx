@@ -94,6 +94,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Unknown","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","UnitPrice":"0","Quantity":"10"},{"OrderID":"4","CustomerName":"Alice","UnitPrice":"75","Quantity":"0"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a 4-row Sales table with an error in CustomerName (order 2), UnitPrice (order 3), and Quantity (order 4).",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"[Error]","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","UnitPrice":"[Error]","Quantity":"10"},{"OrderID":"4","CustomerName":"Alice","UnitPrice":"75","Quantity":"[Error]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — replaces the CustomerName error with \"Unknown\" and the UnitPrice and Quantity errors with 0.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Unknown","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","UnitPrice":"0","Quantity":"10"},{"OrderID":"4","CustomerName":"Alice","UnitPrice":"75","Quantity":"0"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Replace price errors with null to distinguish missing from zero
 
 Using `null` as the replacement is appropriate when `0` has a real business meaning and you want to distinguish "missing" from "zero".
@@ -110,4 +127,21 @@ in
 
 <!--output
 {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":null},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"5","ProductName":"Thingamajig E","Price":null}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines a 4-row Products table where the Price of Gadget B and Thingamajig E is an error.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":"[Error]"},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"5","ProductName":"Thingamajig E","Price":"[Error]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — replaces both Price errors with null, leaving the valid prices 25 and 15 unchanged.",
+      "output": {"columns":[{"name":"ProductID","type":"any"},{"name":"ProductName","type":"any"},{"name":"Price","type":"any"}],"rows":[{"ProductID":"1","ProductName":"Widget A","Price":"25"},{"ProductID":"2","ProductName":"Gadget B","Price":null},{"ProductID":"3","ProductName":"Widget C","Price":"15"},{"ProductID":"5","ProductName":"Thingamajig E","Price":null}]}
+    }
+  ]
+}
 -->

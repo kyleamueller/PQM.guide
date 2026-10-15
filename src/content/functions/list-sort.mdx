@@ -50,3 +50,20 @@ in
 <!--output
 {"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":120},{"Price":75},{"Price":50},{"Price":25},{"Price":15}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Prices",
+      "description": "Extracts the Price column from Products as a list ({25, 50, 15, 75, 120}) and sorts it with Order.Descending.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":120},{"Value":75},{"Value":50},{"Value":25},{"Value":15}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — each sorted price is wrapped in a single-item list and turned into a one-column Price table.",
+      "output": {"columns":[{"name":"Price","type":"number"}],"rows":[{"Price":120},{"Price":75},{"Price":50},{"Price":25},{"Price":15}]}
+    }
+  ]
+}
+-->

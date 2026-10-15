@@ -51,6 +51,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "equalIgnoreCase",
+      "description": "Wraps Comparer.OrdinalIgnoreCase with Comparer.Equals, producing a two-argument function that returns true when its inputs are equal ignoring case.",
+      "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"function"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — true, because \"hello\" and \"HELLO\" are equal under the case-insensitive comparer.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":true}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Use as a predicate to filter a list case-insensitively
 
 Filter department names regardless of how the source data was cased, matching against the Employees sample data.

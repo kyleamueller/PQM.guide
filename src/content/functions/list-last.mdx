@@ -50,3 +50,20 @@ in
 <!--output
 {"columns":[{"name":"LastProduct","type":"text"}],"rows":[{"LastProduct":"Widget C"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "LastProduct",
+      "description": "Extracts the Product column from Sales as a list and returns its last item, \"Widget C\" (order 8).",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Widget C"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps LastProduct in a one-row table with a LastProduct column.",
+      "output": {"columns":[{"name":"LastProduct","type":"text"}],"rows":[{"LastProduct":"Widget C"}]}
+    }
+  ]
+}
+-->

@@ -61,3 +61,20 @@ in
 <!--output
 {"columns":[{"name":"Product","type":"text"},{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Product":"Widget A","Measure":"UnitPrice","Value":25},{"Product":"Widget A","Measure":"Quantity","Value":4},{"Product":"Gadget B","Measure":"UnitPrice","Value":50},{"Product":"Gadget B","Measure":"Quantity","Value":2},{"Product":"Widget C","Measure":"UnitPrice","Value":15},{"Product":"Widget C","Measure":"Quantity","Value":10}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Takes the first 3 Sales rows and keeps only Product, UnitPrice and Quantity.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"Product":"Widget A","UnitPrice":25,"Quantity":4},{"Product":"Gadget B","UnitPrice":50,"Quantity":2},{"Product":"Widget C","UnitPrice":15,"Quantity":10}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — UnitPrice and Quantity are unpivoted into Measure/Value pairs, giving two rows per product.",
+      "output": {"columns":[{"name":"Product","type":"text"},{"name":"Measure","type":"text"},{"name":"Value","type":"number"}],"rows":[{"Product":"Widget A","Measure":"UnitPrice","Value":25},{"Product":"Widget A","Measure":"Quantity","Value":4},{"Product":"Gadget B","Measure":"UnitPrice","Value":50},{"Product":"Gadget B","Measure":"Quantity","Value":2},{"Product":"Widget C","Measure":"UnitPrice","Value":15},{"Product":"Widget C","Measure":"Quantity","Value":10}]}
+    }
+  ]
+}
+-->

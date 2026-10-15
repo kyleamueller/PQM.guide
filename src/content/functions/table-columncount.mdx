@@ -50,6 +50,23 @@ in
 {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"6"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Defines a typed one-row Employees table with 6 columns: EmployeeID, FullName, Department, Title, HireDate, and Salary.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Title","type":"text"},{"name":"HireDate","type":"date"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Title":"Sales Rep","HireDate":"2021-03-15","Salary":"55000"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.ColumnCount returns 6.",
+      "output": {"columns":[{"name":"Result","type":"number"}],"rows":[{"Result":"6"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Assert expected column count as a data quality check
 
 ```powerquery

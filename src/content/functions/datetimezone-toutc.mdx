@@ -57,6 +57,23 @@ in
 {"columns":[{"name":"City","type":"text"},{"name":"LocalTime","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"City":"New York","LocalTime":"2024-01-15T09:30:00-05:00","UTC":"2024-01-15T14:30:00+00:00"},{"City":"London","LocalTime":"2024-01-15T14:30:00+00:00","UTC":"2024-01-15T14:30:00+00:00"},{"City":"Tokyo","LocalTime":"2024-01-15T23:30:00+09:00","UTC":"2024-01-15T14:30:00+00:00"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Defines a three-row table of local times: 09:30 in New York (-05:00), 14:30 in London (+00:00), and 23:30 in Tokyo (+09:00), all on 2024-01-15.",
+      "output": {"columns":[{"name":"City","type":"text"},{"name":"LocalTime","type":"datetimezone"}],"rows":[{"City":"New York","LocalTime":"2024-01-15T09:30:00-05:00"},{"City":"London","LocalTime":"2024-01-15T14:30:00+00:00"},{"City":"Tokyo","LocalTime":"2024-01-15T23:30:00+09:00"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — adds a UTC column using DateTimeZone.ToUtc; all three local times resolve to the same instant, 2024-01-15T14:30:00+00:00.",
+      "output": {"columns":[{"name":"City","type":"text"},{"name":"LocalTime","type":"datetimezone"},{"name":"UTC","type":"datetimezone"}],"rows":[{"City":"New York","LocalTime":"2024-01-15T09:30:00-05:00","UTC":"2024-01-15T14:30:00+00:00"},{"City":"London","LocalTime":"2024-01-15T14:30:00+00:00","UTC":"2024-01-15T14:30:00+00:00"},{"City":"Tokyo","LocalTime":"2024-01-15T23:30:00+09:00","UTC":"2024-01-15T14:30:00+00:00"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Convert a single datetimezone to UTC
 
 Convert a single EST datetimezone value to UTC.

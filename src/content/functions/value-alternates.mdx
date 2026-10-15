@@ -35,9 +35,9 @@ If you encounter `Value.Alternates` in a query plan expression returned by `Valu
 
 ## Examples
 
-### Example 1: Inspect an optimized expression that may contain alternates
+### Example 1: Inspect an optimized expression (a constant has no alternates)
 
-Use `Value.Expression` and `Value.Optimize` together to observe how the engine structures query plans.
+`Value.Expression(Value.Optimize(...))` is where `Value.Alternates` can appear, but only for queries the engine can fold to a data source. A plain constant has a single plan, so its optimized expression is just one Constant node with no alternates.
 
 ```powerquery
 let
@@ -49,4 +49,21 @@ in
 
 <!--output
 {"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Optimized",
+      "description": "Value.Optimize(42) returns the constant 42; there is no query plan to optimize, so no alternates are introduced.",
+      "output": {"columns":[{"name":"Value","type":"number"}],"rows":[{"Value":42}]}
+    },
+    {
+      "name": "Expr",
+      "description": "Value.Expression returns the expression tree for the optimized value, a single node with Kind \"Constant\" and Value 42.",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Kind":"Constant","Value":42}]}
+    }
+  ]
+}
 -->

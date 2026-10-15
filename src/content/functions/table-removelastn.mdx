@@ -56,6 +56,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a 6-row Sales table with OrderID, CustomerName, Product, and Region columns (orders 1 through 6).",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","Region":"North"},{"OrderID":"5","CustomerName":"Diana","Product":"Widget A","Region":"West"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","Region":"East"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.RemoveLastN drops the last 3 rows (orders 4, 5, and 6), leaving orders 1 through 3.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Region","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Region":"East"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Region":"West"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Region":"East"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Strip trailing summary rows from a report export
 
 Remove rows at the bottom that contain "Total" in the Product column.
@@ -75,6 +92,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Raw",
+      "description": "Creates a 5-row report export: three order rows followed by a \"Total\" row and a \"Grand Total\" row with null OrderID and CustomerName.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"},{"OrderID":null,"CustomerName":null,"Product":"Total","Amount":"450"},{"OrderID":null,"CustomerName":null,"Product":"Grand Total","Amount":"450"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — rows are removed from the bottom while Product is \"Total\" or \"Grand Total\", stopping at Widget C and leaving the three order rows.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Amount","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Amount":"100"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Amount":"200"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Amount":"150"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Remove trailing employees hired in 2024
 
 ```powerquery
@@ -90,4 +124,21 @@ in
 
 <!--output
 {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","HireDate":"2019-07-01"},{"EmployeeID":"E005","FullName":"Eve Martinez","HireDate":"2018-11-05"},{"EmployeeID":"E003","FullName":"Charlie Brown","HireDate":"2022-01-10"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Creates a typed 4-row Employees table with EmployeeID, FullName, and HireDate; only the last row (frank lee, hired 2024-02-14) is from 2024.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","HireDate":"2019-07-01"},{"EmployeeID":"E005","FullName":"Eve Martinez","HireDate":"2018-11-05"},{"EmployeeID":"E003","FullName":"Charlie Brown","HireDate":"2022-01-10"},{"EmployeeID":"E006","FullName":"frank lee","HireDate":"2024-02-14"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the trailing frank lee row (hired 2024) is removed, and removal stops at Charlie Brown (hired 2022), leaving 3 rows.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"HireDate","type":"date"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","HireDate":"2019-07-01"},{"EmployeeID":"E005","FullName":"Eve Martinez","HireDate":"2018-11-05"},{"EmployeeID":"E003","FullName":"Charlie Brown","HireDate":"2022-01-10"}]}
+    }
+  ]
+}
 -->

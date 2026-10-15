@@ -61,6 +61,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75","Quantity":"1"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Builds a five-row orders table with OrderID, CustomerName, Product, UnitPrice and Quantity, with unit prices ranging from 15 to 120.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","UnitPrice":"15","Quantity":"10"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75","Quantity":"1"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.MaxN sorts by UnitPrice descending and keeps the top 3 rows: 120, 75 and 50.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120","Quantity":"1"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75","Quantity":"1"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50","Quantity":"2"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: All orders with unit price at or above 50
 
 Using a condition function instead of a count retrieves all leading rows above a threshold.
@@ -80,6 +97,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Builds a four-row orders table with unit prices of 25, 50, 75 and 120.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","UnitPrice":"25"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — rows sorted by UnitPrice descending are taken while UnitPrice >= 50, so 120, 75 and 50 are kept and the 25 row stops the scan.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","UnitPrice":"120"},{"OrderID":"4","CustomerName":"Alice","Product":"Gadget D","UnitPrice":"75"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","UnitPrice":"50"}]}
+    }
+  ]
+}
+-->
+
 ### Example 3: Top 2 highest-paid employees
 
 ```powerquery
@@ -95,4 +129,21 @@ in
 
 <!--output
 {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E005","FullName":"Eve Martinez","Department":"Sales","Salary":"88000"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Builds a typed four-row employees table with salaries of 55000, 95000, 72000 and 88000.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales","Salary":"55000"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing","Salary":"72000"},{"EmployeeID":"E005","FullName":"Eve Martinez","Department":"Sales","Salary":"88000"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — the two rows with the highest Salary, BOB JONES (95000) and Eve Martinez (88000), in descending order.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Department","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering","Salary":"95000"},{"EmployeeID":"E005","FullName":"Eve Martinez","Department":"Sales","Salary":"88000"}]}
+    }
+  ]
+}
 -->

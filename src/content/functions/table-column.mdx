@@ -56,6 +56,23 @@ in
 {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{25, 50, 15, 75, 120}"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Defines an inline five-row Products table with ProductID, ProductName, Category, Price, and InStock columns.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Category","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Category":"Widgets","Price":25.0,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Category":"Gadgets","Price":50.0,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Category":"Widgets","Price":15.0,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Category":"Gadgets","Price":75.0,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Category":"Misc","Price":120.0,"InStock":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.Column returns the Price column as a list: {25, 50, 15, 75, 120}.",
+      "output": {"columns":[{"name":"Result","type":"list"}],"rows":[{"Result":"{25, 50, 15, 75, 120}"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Sum all order quantities
 
 Use the extracted list directly in an aggregation function.

@@ -54,6 +54,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Products",
+      "description": "Creates a typed 5-row Products table with ProductID, ProductName, Price, and InStock columns; Widget C and Thingamajig E have InStock = false.",
+      "output": {"columns":[{"name":"ProductID","type":"number"},{"name":"ProductName","type":"text"},{"name":"Price","type":"number"},{"name":"InStock","type":"logical"}],"rows":[{"ProductID":1,"ProductName":"Widget A","Price":25,"InStock":true},{"ProductID":2,"ProductName":"Gadget B","Price":50,"InStock":true},{"ProductID":3,"ProductName":"Widget C","Price":15,"InStock":false},{"ProductID":4,"ProductName":"Gadget D","Price":75,"InStock":true},{"ProductID":5,"ProductName":"Thingamajig E","Price":120,"InStock":false}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — true, because at least one row (Widget C, the first out-of-stock product) satisfies [InStock] = false.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Check whether any high-value orders exist
 
 ```powerquery
@@ -63,11 +80,27 @@ let
         {{1,"Alice",25.00,4},{2,"Bob",50.00,2},{3,"Charlie",15.00,10},{6,"Bob",120.00,1}}
     )
 in
-    Table.MatchesAnyRows(Sales, each [UnitPrice] * [Quantity] > 200)
+    Table.MatchesAnyRows(Sales, each [UnitPrice] * [Quantity] > 140)
 ```
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines a 4-row orders table; the order totals (UnitPrice \u00d7 Quantity) are 100, 100, 150, and 120.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","UnitPrice":25,"Quantity":4},{"OrderID":2,"CustomerName":"Bob","UnitPrice":50,"Quantity":2},{"OrderID":3,"CustomerName":"Charlie","UnitPrice":15,"Quantity":10},{"OrderID":6,"CustomerName":"Bob","UnitPrice":120,"Quantity":1}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 true, because order 3's total of 150 exceeds 140.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: No row meets the threshold — returns false
@@ -84,4 +117,21 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Creates a typed 3-row Employees table with EmployeeID, FullName, and Salary columns; the highest salary is 72000.",
+      "output": {"columns":[{"name":"EmployeeID","type":"text"},{"name":"FullName","type":"text"},{"name":"Salary","type":"number"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Salary":55000},{"EmployeeID":"E003","FullName":"Charlie Brown","Salary":72000},{"EmployeeID":"E006","FullName":"frank lee","Salary":52000}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — false, because no salary (55000, 72000, 52000) exceeds 100000.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+    }
+  ]
+}
 -->

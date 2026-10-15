@@ -14,7 +14,7 @@ parameters:
   - name: "facets"
     type: "record"
     required: true
-    description: "A record specifying the facet values to set (e.g., [Precision = 10, Scale = 2])."
+    description: "A record specifying the facet values to set (e.g., [NumericPrecision = 10, NumericScale = 2])."
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -29,11 +29,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.ReplaceFacets` returns a new type value that is identical to the input type except that the facets specified in the `facets` record are replaced with the provided values. **Facets** are type constraint properties beyond the base kind — for example, `Precision` and `Scale` for numeric types, or `MaxLength` for text types.
+`Type.ReplaceFacets` returns a new type value that is identical to the input type except that the facets specified in the `facets` record are replaced with the provided values. **Facets** are type constraint properties beyond the base kind — for example, `NumericPrecision` and `NumericScale` for numeric types, or `MaxLength` and `IsVariableLength` for text types. The facet names are the nine fields returned by `Type.Facets`.
 
-The `facets` record only needs to include the fields you want to set. Any facets not mentioned in the record retain their values from the source type. To inspect the current facets of a type before replacing them, use `Type.Facets`.
+The `facets` record lists the facets to set, using the same field names that `Type.Facets` returns. To inspect a type's current facets, use `Type.Facets`.
 
-`Type.ReplaceFacets` is most useful in custom connector development, where you need to construct M type values that carry database-level schema constraints (such as `DECIMAL(10, 2)` precision from a SQL source). It is the write-side counterpart to the read-side `Type.Facets`. The resulting type can be applied to a value with `Value.ReplaceType`.
+`Type.ReplaceFacets` is most useful in custom connector development, where you need to construct M type values that carry database-level schema constraints (such as `DECIMAL(10, 2)` precision or `NVARCHAR(50)` length from a SQL source). It is the write-side counterpart to the read-side `Type.Facets`. The resulting type can be applied to a value with `Value.ReplaceType`.
 
 Note that setting facets does not validate or constrain actual data values at runtime — M's type system uses facets as metadata, not as enforcement mechanisms during evaluation.
 
@@ -44,71 +44,95 @@ Note that setting facets does not validate or constrain actual data values at ru
 ```powerquery
 let
     BaseType = type number,
-    Constrained = Type.ReplaceFacets(BaseType, [Precision = 10, Scale = 2])
+    Constrained = Type.ReplaceFacets(BaseType, [NumericPrecision = 10, NumericScale = 2])
 in
     Type.Facets(Constrained)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":10},{"Name":"NumericScale","Value":2},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
 -->
-
 <!--steps
 {
   "steps": [
     {
       "name": "BaseType",
-      "description": "Stores the base type number as the starting point for facet customization.",
+      "description": "Stores type number as the starting point; it has no facets yet.",
       "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
     },
     {
       "name": "Constrained",
-      "description": "The final output — applies Precision = 10 and Scale = 2 facets to the number type using Type.ReplaceFacets, then calls Type.Facets to inspect the resulting facet values.",
-      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+      "description": "Applies NumericPrecision = 10 and NumericScale = 2 with Type.ReplaceFacets. The type still displays as type number, but now carries the facets.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 Type.Facets shows NumericPrecision 10 and NumericScale 2, with every other facet null.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":10},{"Name":"NumericScale","Value":2},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
     }
   ]
 }
 -->
 
-### Example 2: Set MaxLength on a text type
+### Example 2: Describe a SQL nvarchar(50) column on a text type
 
 ```powerquery
 let
-    T = Type.ReplaceFacets(type text, [MaxLength = 100])
+    T = Type.ReplaceFacets(type text, [MaxLength = 50, IsVariableLength = true, NativeTypeName = "nvarchar"])
 in
     Type.Facets(T)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"MaxLength","Value":100}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":null},{"Name":"NumericScale","Value":null},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":50},{"Name":"IsVariableLength","Value":true},{"Name":"NativeTypeName","Value":"nvarchar"},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
+-->
+<!--steps
+{
+  "steps": [
+    {
+      "name": "T",
+      "description": "Applies MaxLength = 50, IsVariableLength = true, and NativeTypeName = \"nvarchar\" to type text, mirroring a SQL Server nvarchar(50) column. The type still displays as type text.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type text"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 Type.Facets reads the facets of T: MaxLength 50, IsVariableLength true, NativeTypeName \"nvarchar\", and the rest null.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":null},{"Name":"NumericScale","Value":null},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":50},{"Name":"IsVariableLength","Value":true},{"Name":"NativeTypeName","Value":"nvarchar"},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
+    }
+  ]
+}
 -->
 
-### Example 3: Clear a facet by setting it to null
+### Example 3: Clear facets by setting them to null
 
 ```powerquery
 let
-    Constrained = Type.ReplaceFacets(type number, [Precision = 10, Scale = 2]),
-    Cleared = Type.ReplaceFacets(Constrained, [Precision = null, Scale = null])
+    Constrained = Type.ReplaceFacets(type number, [NumericPrecision = 10, NumericScale = 2]),
+    Cleared = Type.ReplaceFacets(Constrained, [NumericPrecision = null, NumericScale = null])
 in
     Type.Facets(Cleared)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":null},{"Name":"Scale","Value":null}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":null},{"Name":"NumericScale","Value":null},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
 -->
-
 <!--steps
 {
   "steps": [
     {
       "name": "Constrained",
-      "description": "Creates a number type with Precision = 10 and Scale = 2 facets applied using Type.ReplaceFacets.",
-      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+      "description": "Creates a number type with NumericPrecision = 10 and NumericScale = 2.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
     },
     {
       "name": "Cleared",
-      "description": "The final output — removes both facets by setting them to null with another call to Type.ReplaceFacets, then calls Type.Facets to confirm the facet values are now null.",
-      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":null},{"Name":"Scale","Value":null}]}
+      "description": "Sets both facets back to null with a second Type.ReplaceFacets call.",
+      "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output \u2014 Type.Facets confirms every facet is null again.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":null},{"Name":"NumericScale","Value":null},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
     }
   ]
 }

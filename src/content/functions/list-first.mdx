@@ -50,3 +50,20 @@ in
 <!--output
 {"columns":[{"name":"FirstCustomer","type":"text"}],"rows":[{"FirstCustomer":"Alice"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "FirstCustomer",
+      "description": "Extracts the CustomerName column from Sales as a list and List.First returns its first item, \"Alice\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"Alice"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — wraps FirstCustomer in a one-row table with a FirstCustomer column.",
+      "output": {"columns":[{"name":"FirstCustomer","type":"text"}],"rows":[{"FirstCustomer":"Alice"}]}
+    }
+  ]
+}
+-->

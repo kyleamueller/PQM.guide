@@ -58,3 +58,25 @@ in
 <!--output
 {"columns":[{"name":"Input","type":"text"},{"name":"M Representation","type":"text"}],"rows":[{"Input":"MyIdentifier","M Representation":"MyIdentifier"},{"Input":"My Identifier","M Representation":"#\"My Identifier\""}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Simple",
+      "description": "Calls Expression.Identifier on \"MyIdentifier\"; it is already a valid regular identifier, so it is returned unchanged.",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"MyIdentifier"}]}
+    },
+    {
+      "name": "WithSpace",
+      "description": "Calls Expression.Identifier on \"My Identifier\"; the space makes it a non-regular identifier, so it is returned as the quoted form #\"My Identifier\".",
+      "output": {"columns":[{"name":"Value","type":"text"}],"rows":[{"Value":"#\"My Identifier\""}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a two-row table pairing each input with its M representation.",
+      "output": {"columns":[{"name":"Input","type":"text"},{"name":"M Representation","type":"text"}],"rows":[{"Input":"MyIdentifier","M Representation":"MyIdentifier"},{"Input":"My Identifier","M Representation":"#\"My Identifier\""}]}
+    }
+  ]
+}
+-->

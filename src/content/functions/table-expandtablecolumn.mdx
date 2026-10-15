@@ -65,3 +65,20 @@ in
 <!--output
 {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Customer City","type":"text"},{"name":"Customer State","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Customer City":"New York","Customer State":"NY"},{"CustomerName":"Bob","Product":"Gadget B","Customer City":"Chicago","Customer State":"IL"},{"CustomerName":"Charlie","Product":"Widget C","Customer City":"Houston","Customer State":"TX"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Joined",
+      "description": "Takes the first 3 Sales rows (CustomerName and Product only) and left-joins them to Customers on CustomerName = Name, adding a nested CustData table column.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"CustData","type":"table"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","CustData":"[Table]"},{"CustomerName":"Bob","Product":"Gadget B","CustData":"[Table]"},{"CustomerName":"Charlie","Product":"Widget C","CustData":"[Table]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — City and State are expanded out of CustData and renamed to Customer City and Customer State.",
+      "output": {"columns":[{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Customer City","type":"text"},{"name":"Customer State","type":"text"}],"rows":[{"CustomerName":"Alice","Product":"Widget A","Customer City":"New York","Customer State":"NY"},{"CustomerName":"Bob","Product":"Gadget B","Customer City":"Chicago","Customer State":"IL"},{"CustomerName":"Charlie","Product":"Widget C","Customer City":"Houston","Customer State":"TX"}]}
+    }
+  ]
+}
+-->

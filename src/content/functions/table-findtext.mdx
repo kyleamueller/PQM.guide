@@ -58,6 +58,23 @@ in
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline four-row Sales table with OrderID, CustomerName, Product, Category, UnitPrice, and Quantity columns (orders 1, 2, 3, and 6).",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B","Category":"Gadgets","UnitPrice":"50","Quantity":"2"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10"},{"OrderID":"6","CustomerName":"Bob","Product":"Thingamajig E","Category":"Misc","UnitPrice":"120","Quantity":"1"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FindText keeps only the rows where some cell contains \"Widget\", returning orders 1 (Widget A) and 3 (Widget C) and dropping the Gadget B and Thingamajig E orders.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"},{"name":"Category","type":"any"},{"name":"UnitPrice","type":"any"},{"name":"Quantity","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":"25","Quantity":"4"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C","Category":"Widgets","UnitPrice":"15","Quantity":"10"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Case-insensitive search matches upper and lower case
 
 ```powerquery
@@ -72,6 +89,23 @@ in
 
 <!--output
 {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Employees",
+      "description": "Defines an inline three-row Employees table with EmployeeID, FullName, and Department columns.",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales"},{"EmployeeID":"E002","FullName":"BOB JONES","Department":"Engineering"},{"EmployeeID":"E003","FullName":"Charlie Brown","Department":"Marketing"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FindText searches every cell for \"alice\" and returns the single matching row, E001 (alice smith).",
+      "output": {"columns":[{"name":"EmployeeID","type":"any"},{"name":"FullName","type":"any"},{"name":"Department","type":"any"}],"rows":[{"EmployeeID":"E001","FullName":"alice smith","Department":"Sales"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Numeric values are matched as text — search across all column types
@@ -90,4 +124,21 @@ in
 
 <!--output
 {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East","UnitPrice":"25"},{"OrderID":"6","CustomerName":"Bob","Region":"East","UnitPrice":"120"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Defines an inline three-row Sales table mixing numeric (OrderID, UnitPrice) and text (CustomerName, Region) columns.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East","UnitPrice":"25"},{"OrderID":"2","CustomerName":"Bob","Region":"West","UnitPrice":"50"},{"OrderID":"6","CustomerName":"Bob","Region":"East","UnitPrice":"120"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Table.FindText returns the two rows whose Region cell contains \"East\" (orders 1 and 6); order 2 in the West region is dropped.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Region","type":"any"},{"name":"UnitPrice","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Region":"East","UnitPrice":"25"},{"OrderID":"6","CustomerName":"Bob","Region":"East","UnitPrice":"120"}]}
+    }
+  ]
+}
 -->

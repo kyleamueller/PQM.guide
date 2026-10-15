@@ -49,6 +49,23 @@ in
 {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"2","Value":"[Error]"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Builds a three-row table where the Value cell in row 2 is an error raised with the message \"bad\".",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"10"},{"ID":"2","Value":"[Error]"},{"ID":"3","Value":"30"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — only row 2, the one row with an error in any column, is kept.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"2","Value":"[Error]"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Only check a specific column for errors
 
 ```powerquery
@@ -60,4 +77,21 @@ in
 
 <!--output
 {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"[Error]"},{"ID":"3","Value":"[Error]"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Source",
+      "description": "Builds a three-row table where the Value cells in rows 1 and 3 are errors.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"[Error]"},{"ID":"2","Value":"20"},{"ID":"3","Value":"[Error]"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — rows 1 and 3 are kept because their Value column contains an error.",
+      "output": {"columns":[{"name":"ID","type":"any"},{"name":"Value","type":"any"}],"rows":[{"ID":"1","Value":"[Error]"},{"ID":"3","Value":"[Error]"}]}
+    }
+  ]
+}
 -->

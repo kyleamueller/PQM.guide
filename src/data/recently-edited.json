@@ -1,38 +1,38 @@
 [
   {
-    "slug": "power-query-environments",
-    "type": "concept",
-    "date": "2026-10-15",
-    "description": "October 2026 freshness pass: Gen1 Upgrade Wizard, 100+ Gen2 connectors, CI/CD by default, new Desktop editor preview, Execute Query API auth details"
-  },
-  {
-    "slug": "common-errors",
-    "type": "concept",
-    "date": "2026-10-15",
-    "description": "Added the 'references other queries or steps' Formula.Firewall error and the July 2026 Desktop change"
-  },
-  {
-    "slug": "exchange-contents",
+    "slug": "type-facets",
     "type": "function",
     "date": "2026-10-15",
-    "description": "Noted the new Microsoft Outlook Mail connector (Preview) as the modern alternative"
+    "description": "Corrected facet names (NumericPrecision, NumericScale, and the rest) and showed the full facets record"
   },
   {
-    "slug": "web-contents",
+    "slug": "table-alternaterows",
     "type": "function",
-    "date": "2026-04-07",
-    "description": "Added RelativePath, ManualStatusHandling options and 3 real examples"
+    "date": "2026-10-15",
+    "description": "Fixed the parameter order (offset, skip, take) and rebuilt the examples to match how the function really behaves"
   },
   {
-    "slug": "api-authentication",
-    "type": "pattern",
-    "date": "2026-04-07",
-    "description": "Added 6 new Web.Contents options, RelativePath/ManualStatusHandling sections"
+    "slug": "date-isincurrentmonth",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Replaced example rows that didn't exist in the Sales table with an inline Orders table"
   },
   {
-    "slug": "m-paradigm",
-    "type": "concept",
-    "date": "2026-03-11",
-    "description": "Overhauled for UI-to-M beginner learning path"
+    "slug": "table-filldown",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Rewrote the example so the output actually shows null Region values filled down (including North)"
+  },
+  {
+    "slug": "value-subtract",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Corrected example dates to match the Sales sample table; added Applied Steps chips"
+  },
+  {
+    "slug": "table-matchesanyrows",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Fixed an example whose output contradicted its code; added Applied Steps chips"
   }
 ]

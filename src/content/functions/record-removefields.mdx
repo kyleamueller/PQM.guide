@@ -54,3 +54,20 @@ in
 <!--output
 {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Trimmed",
+      "description": "Takes the first Sales row as a record and drops its OrderDate and Region fields, leaving six fields.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"CustomerName","type":"text"},{"name":"Product","type":"text"},{"name":"Category","type":"text"},{"name":"UnitPrice","type":"number"},{"name":"Quantity","type":"number"}],"rows":[{"OrderID":1,"CustomerName":"Alice","Product":"Widget A","Category":"Widgets","UnitPrice":25,"Quantity":4}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — Record.ToTable turns the trimmed record into a Name/Value table with one row per remaining field.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"OrderID","Value":1},{"Name":"CustomerName","Value":"Alice"},{"Name":"Product","Value":"Widget A"},{"Name":"Category","Value":"Widgets"},{"Name":"UnitPrice","Value":25},{"Name":"Quantity","Value":4}]}
+    }
+  ]
+}
+-->

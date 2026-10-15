@@ -54,3 +54,20 @@ in
 <!--output
 {"columns":[{"name":"Kind","type":"text"},{"name":"MemberName","type":"text"}],"rows":[{"Kind":"FieldAccess","MemberName":"CustomerName"}]}
 -->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "AST",
+      "description": "Builds a FieldAccess AST record whose Expression is the row (RowExpression.Row) and whose MemberName is \"CustomerName\".",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"Expression","type":"record"},{"name":"MemberName","type":"text"}],"rows":[{"Kind":"FieldAccess","Expression":"[Record]","MemberName":"CustomerName"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — a one-row table showing the AST node's Kind and MemberName fields.",
+      "output": {"columns":[{"name":"Kind","type":"text"},{"name":"MemberName","type":"text"}],"rows":[{"Kind":"FieldAccess","MemberName":"CustomerName"}]}
+    }
+  ]
+}
+-->

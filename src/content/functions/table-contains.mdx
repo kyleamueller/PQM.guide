@@ -59,6 +59,23 @@ in
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
 -->
 
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a 3-row Sales table with OrderID, CustomerName, and Product columns for Alice, Bob, and Charlie.",
+      "output": {"columns":[{"name":"OrderID","type":"any"},{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"OrderID":"1","CustomerName":"Alice","Product":"Widget A"},{"OrderID":"2","CustomerName":"Bob","Product":"Gadget B"},{"OrderID":"3","CustomerName":"Charlie","Product":"Widget C"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — true, because comparing only the CustomerName column finds Bob in row 2.",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"true"}]}
+    }
+  ]
+}
+-->
+
 ### Example 2: Check for an exact row match (all fields)
 
 Both the CustomerName and Product must match.
@@ -75,6 +92,23 @@ in
 
 <!--output
 {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Sales",
+      "description": "Creates a 3-row Sales table with CustomerName and Product columns: Alice/Widget A, Bob/Gadget B, Diana/Widget A.",
+      "output": {"columns":[{"name":"CustomerName","type":"any"},{"name":"Product","type":"any"}],"rows":[{"CustomerName":"Alice","Product":"Widget A"},{"CustomerName":"Bob","Product":"Gadget B"},{"CustomerName":"Diana","Product":"Widget A"}]}
+    },
+    {
+      "name": "Result",
+      "description": "The final output — false, because no single row has both CustomerName = \"Alice\" and Product = \"Gadget B\" (Alice bought Widget A).",
+      "output": {"columns":[{"name":"Result","type":"logical"}],"rows":[{"Result":"false"}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Guard a lookup before accessing a record
