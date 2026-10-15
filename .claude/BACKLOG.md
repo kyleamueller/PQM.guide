@@ -13,9 +13,13 @@
 
 ---
 
+- [ ] **Verify Fabric community link on Resources** — `community.fabric.microsoft.com/t5/Power-Query/bd-p/power_query_en` redirected to a Microsoft sign-in page during the Oct 2026 link check. Confirm in a browser; replace with a public URL if it now requires sign-in.
+- [ ] **Re-check Dataflow Gen2 output destinations** — Oct 2026 freshness pass couldn't load the destinations doc; the Sept 2026 Fabric summary mentions "New data destinations (GA)". Verify the list in `power-query-environments.mdx`.
+- [ ] **Update refresh-site blog URLs** — the Power BI blog moved to `community.fabric.microsoft.com`; the `powerbi.microsoft.com/.../feature-summary` URL pattern in `.claude/commands/refresh-site.md` and the review template now fails.
+
 ## P3 — Valuable features, more design work
 
-- [ ] **Resources: add Dom's book + Alex Powers articles** — Add Dom's Power Query book and Alex Powers' query folding articles to the Resources page. Find other high-quality additions too. *(Kerski)*
+- [ ] **Resources: add Dom's book** — Alex Powers' query folding articles were added in the Oct 2026 freshness pass. Dom's Power Query book still needs its title/ISBN (a search for Dominik Petri found no PQ-specific book; ask Kerski). Find other high-quality additions too. *(Kerski)*
 - [ ] **Schema/data view toggle** — Inspired by the Power BI Dataflows UI: add a toggle on sample tables (and/or function pages) to switch between a data view and a schema view (column names, types, icons). Makes the site feel more like it's teaching Power Query end-to-end. *(Alex)*
 - [ ] **Revisit `format_m_code` input handling strategy** — v1 relies on `@microsoft/powerquery-formatter` accepting both documents and bare expressions natively. Confirm this holds across real usage; consider an explicit `mode: "document" | "expression"` arg if ambiguity shows up.
 - [ ] **Enforce canonical M formatting in CI** — Add a pre-commit / CI check that every ` ```powerquery ` block in `src/content/` round-trips unchanged through `formatMCode`. Natural follow-up to the formatter work.

@@ -110,6 +110,12 @@ Sorted = Table.Sort(#"Filtered Rows", {"UnitPrice", Order.Descending})
 
 **Fix for published reports:** Restructure the query to avoid mixing data sources inline. Use a Power Query parameter (a static value defined in the query parameters list) instead of pulling a filter value dynamically from another source at runtime.
 
+### `Formula.Firewall: Query 'X' (step 'Y') references other queries or steps, so it may not directly access a data source`
+
+**Cause:** The firewall splits your queries into partitions, and by default a partition that references another partition may not also access a data source directly. This typically appears when one step both calls a source (such as `Web.Contents`) and uses a value from another query.
+
+**Fix:** Starting with the July 2026 release, Power BI Desktop enables a preview setting by default that lets such partitions access data sources when their privacy levels are compatible, so many of these errors no longer appear. On older versions or other hosts, restructure the query so the data source access and the cross-query reference happen in separate queries. The "Ignore the Privacy Levels" option described above also avoids it during development.
+
 ### `The key didn't match any rows in the table`
 
 **Full message:** `Expression.Error: The key didn't match any rows in the table.`

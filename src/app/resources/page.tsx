@@ -226,6 +226,33 @@ export default function ResourcesPage() {
         <div className="resource-card">
           <h3>
             <a
+              href="https://itsnotaboutthecell.com/2023/01/the-almost-definitive-guide-to-query-folding/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              It&apos;s Not About The Cell — Alex Powers
+            </a>
+          </h3>
+          <p>
+            Alex Powers&apos; blog is home to two standout query folding
+            references: <em>The (Almost) Definitive Guide to Query
+            Folding</em>, a lookup table of which M functions fold to SQL and
+            the SQL each one produces, and{" "}
+            <a
+              href="https://itsnotaboutthecell.com/2025/08/introduction-to-practical-query-folding/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Introduction to Practical Query Folding
+            </a>
+            , a hands-on walkthrough of folding indicators, query plans, and
+            fixing steps that break folding.
+          </p>
+        </div>
+
+        <div className="resource-card">
+          <h3>
+            <a
               href="https://gorilla.bi"
               target="_blank"
               rel="noopener noreferrer"
