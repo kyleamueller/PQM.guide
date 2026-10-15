@@ -7,7 +7,7 @@
 
 ## P2 — High impact, moderate effort
 
-- [ ] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
+- [x] **GitHub link → direct source file** — The GitHub icon in the bottom-right of each page should link directly to the source MDX file for that page in GitHub (for easy contribution), not just the repo homepage.
 - [ ] **Sample tables: surface the M code** — The M code on the sample tables page is too hidden; make it more discoverable/visible. *(Alex)*
 - [x] **Add M formatting to the MCP Server** — Enhance the MCP server to enable it to automatically format M code *(Bernat)*
 
