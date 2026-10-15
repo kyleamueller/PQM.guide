@@ -54,13 +54,13 @@ relatedConcepts: []
 
 ### Example 1: Batch-multiply two columns
 
-Create a scalar multiplication function backed by batch processing.
+Create a scalar multiplication function backed by batch processing. MultiplyScalar holds the per-row logic, and MultiplyVector applies it to a whole batch of rows at once.
 
 ```powerquery
 let
     MultiplyScalar = (left, right) => left * right,
     MultiplyVector = (input) =>
-        Table.TransformRows(input, each [left] * [right]),
+        Table.TransformRows(input, each MultiplyScalar([left], [right])),
     Multiply = Function.ScalarVector(
         type function (left as number, right as number) as number,
         MultiplyVector
@@ -88,7 +88,7 @@ in
     },
     {
       "name": "MultiplyVector",
-      "description": "Defines a batch function that takes a table of left/right rows and returns a list of their products.",
+      "description": "Defines a batch function that takes a table of left/right rows and returns a list of products, calling MultiplyScalar once per row of the batch.",
       "output": {"columns":[{"name":"Value","type":"function"}],"rows":[{"Value":"[Function]"}]}
     },
     {

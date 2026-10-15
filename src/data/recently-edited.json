@@ -1,5 +1,23 @@
 [
   {
+    "slug": "type-facets",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Corrected facet names (NumericPrecision, NumericScale, and the rest) and showed the full facets record"
+  },
+  {
+    "slug": "table-alternaterows",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Fixed the parameter order (offset, skip, take) and rebuilt the examples to match how the function really behaves"
+  },
+  {
+    "slug": "date-isincurrentmonth",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Replaced example rows that didn't exist in the Sales table with an inline Orders table"
+  },
+  {
     "slug": "table-filldown",
     "type": "function",
     "date": "2026-10-15",
@@ -16,23 +34,5 @@
     "type": "function",
     "date": "2026-10-15",
     "description": "Fixed an example whose output contradicted its code; added Applied Steps chips"
-  },
-  {
-    "slug": "power-query-environments",
-    "type": "concept",
-    "date": "2026-10-15",
-    "description": "October 2026 freshness pass: Gen1 Upgrade Wizard, 100+ Gen2 connectors, CI/CD by default, new Desktop editor preview, Execute Query API auth details"
-  },
-  {
-    "slug": "common-errors",
-    "type": "concept",
-    "date": "2026-10-15",
-    "description": "Added the 'references other queries or steps' Formula.Firewall error and the July 2026 Desktop change"
-  },
-  {
-    "slug": "exchange-contents",
-    "type": "function",
-    "date": "2026-10-15",
-    "description": "Noted the new Microsoft Outlook Mail connector (Preview) as the modern alternative"
   }
 ]

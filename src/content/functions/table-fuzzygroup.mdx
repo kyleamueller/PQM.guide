@@ -22,7 +22,7 @@ parameters:
   - name: "options"
     type: "record"
     required: false
-    description: "Optional record with fuzzy options: Threshold, IgnoreCase, IgnoreSpace, NumberOfMatches, TransformationTable."
+    description: "Optional record with fuzzy options: Threshold, IgnoreCase, IgnoreSpace, Culture, SimilarityColumnName, TransformationTable."
 compatibility:
   pbiDesktop: true
   pbiService: true
@@ -46,8 +46,11 @@ The representative value chosen for each cluster is typically the first or most 
 - `Threshold` (number, 0.0–1.0): the minimum similarity score required for a match. Default is `0.8`. Lower values match more loosely; `1.0` requires exact equality.
 - `IgnoreCase` (logical): ignore case differences. Default `true`.
 - `IgnoreSpace` (logical): ignore whitespace differences. Default `true`.
-- `NumberOfMatches` (number): maximum right-side matches per cluster group.
+- `Culture` (text): culture-specific matching rules, such as `"ja-JP"`. Default `""` (invariant).
+- `SimilarityColumnName` (text): adds a column showing each row's similarity to its group's representative value. Default `null` (no column).
 - `TransformationTable` (table): a custom mapping table with `From` and `To` columns to explicitly map known variants before fuzzy matching.
+
+As with `Table.Group`, each aggregation function receives the rows of its group as a **table**, so write aggregations like `each List.Sum([Amount])` or `each Table.RowCount(_)` rather than passing `List.Sum` directly.
 
 For inspecting cluster assignments without aggregating, use `Table.AddFuzzyClusterColumn` instead. `Table.FuzzyGroup` does not fold to data sources. On large datasets, consider pre-filtering to reduce the candidate space before applying fuzzy operations.
 
@@ -65,7 +68,7 @@ in
     Table.FuzzyGroup(
         Orders,
         "CustomerName",
-        {{"TotalAmount", List.Sum, type number}, {"OrderCount", List.Count, type number}},
+        {{"TotalAmount", each List.Sum([Amount]), type number}, {"OrderCount", each Table.RowCount(_), type number}},
         [Threshold = 0.8, IgnoreCase = true]
     )
 ```
@@ -106,7 +109,7 @@ in
     Table.FuzzyGroup(
         Orders,
         "Vendor",
-        {{"TotalSpend", List.Sum, type number}},
+        {{"TotalSpend", each List.Sum([Spend]), type number}},
         [Threshold = 0.6, TransformationTable = Mapping]
     )
 ```
@@ -142,13 +145,13 @@ in
 let
     Cities = #table(
         {"City", "Count"},
-        {{"New York", 10}, {"New-York", 5}, {"Newyork", 3}, {"NY City", 2}, {"London", 8}}
+        {{"New York", 10}, {"New-York", 5}, {"Newyork", 3}, {"New Yrok", 2}, {"London", 8}}
     )
 in
     Table.FuzzyGroup(
         Cities,
         "City",
-        {{"Total", List.Sum, type number}},
+        {{"Total", each List.Sum([Count]), type number}},
         [Threshold = 0.6]
     )
 ```
@@ -162,8 +165,8 @@ in
   "steps": [
     {
       "name": "Cities",
-      "description": "Defines an inline five-row Cities table with City and Count columns, including four spelling variants of New York.",
-      "output": {"columns":[{"name":"City","type":"any"},{"name":"Count","type":"any"}],"rows":[{"City":"New York","Count":"10"},{"City":"New-York","Count":"5"},{"City":"Newyork","Count":"3"},{"City":"NY City","Count":"2"},{"City":"London","Count":"8"}]}
+      "description": "Defines an inline five-row Cities table with City and Count columns, including four variants of New York: a hyphen, a missing space, and a transposed-letter typo.",
+      "output": {"columns":[{"name":"City","type":"any"},{"name":"Count","type":"any"}],"rows":[{"City":"New York","Count":"10"},{"City":"New-York","Count":"5"},{"City":"Newyork","Count":"3"},{"City":"New Yrok","Count":"2"},{"City":"London","Count":"8"}]}
     },
     {
       "name": "Result",

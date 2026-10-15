@@ -34,21 +34,52 @@ Note that this function includes future dates in the current month. If you need 
 
 In Power BI Service scheduled refreshes and cloud Dataflows, the "local" time is the server's timezone (usually UTC). If your data dates are in a different timezone, the month boundary may not align with what you expect. This is the same caveat that applies to all `Date.IsIn*` functions.
 
+The examples below assume today is March 8, 2026, so the current month is March 2026. On a different day, the same code returns different rows.
+
 ## Examples
 
 ### Example 1: Filter this month's orders
 
-Keep only rows where OrderDate falls in the current calendar month.
+Keep only rows where OrderDate falls in the current calendar month. Order 43 is later this month, so it is included too.
 
 ```powerquery
-Table.SelectRows(
-    Sales,
-    each Date.IsInCurrentMonth([OrderDate])
-)
+let
+    Orders = #table(
+        type table [OrderID = number, OrderDate = date],
+        {
+            {38, #date(2026, 2, 20)},
+            {39, #date(2026, 2, 27)},
+            {40, #date(2026, 3, 1)},
+            {41, #date(2026, 3, 7)},
+            {42, #date(2026, 3, 8)},
+            {43, #date(2026, 3, 21)},
+            {44, #date(2026, 4, 2)}
+        }
+    ),
+    Result = Table.SelectRows(Orders, each Date.IsInCurrentMonth([OrderDate]))
+in
+    Result
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"},{"OrderID":43,"OrderDate":"2026-03-21"}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "An inline Orders table spanning late February to early April 2026.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20"},{"OrderID":39,"OrderDate":"2026-02-27"},{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"},{"OrderID":43,"OrderDate":"2026-03-21"},{"OrderID":44,"OrderDate":"2026-04-02"}]}
+    },
+    {
+      "name": "Result",
+      "description": "Keeps the orders dated in March 2026, including order 43 later in the month.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"},{"OrderID":43,"OrderDate":"2026-03-21"}]}
+    }
+  ]
+}
 -->
 
 ### Example 2: Flag current-month rows
@@ -56,44 +87,95 @@ Table.SelectRows(
 Add a boolean column identifying rows in the current month.
 
 ```powerquery
-Table.AddColumn(
-    Sales,
-    "IsCurrentMonth", each Date.IsInCurrentMonth([OrderDate]), type logical
-)
+let
+    Orders = #table(
+        type table [OrderID = number, OrderDate = date],
+        {
+            {38, #date(2026, 2, 20)},
+            {39, #date(2026, 2, 27)},
+            {40, #date(2026, 3, 1)},
+            {41, #date(2026, 3, 7)},
+            {42, #date(2026, 3, 8)},
+            {43, #date(2026, 3, 21)},
+            {44, #date(2026, 4, 2)}
+        }
+    ),
+    Result = Table.AddColumn(
+        Orders,
+        "IsCurrentMonth", each Date.IsInCurrentMonth([OrderDate]), type logical
+    )
+in
+    Result
 ```
 
 <!--output
-{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentMonth","type":"logical"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20","IsCurrentMonth":false},{"OrderID":40,"OrderDate":"2026-03-01","IsCurrentMonth":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentMonth":true}]}
+{"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentMonth","type":"logical"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20","IsCurrentMonth":false},{"OrderID":39,"OrderDate":"2026-02-27","IsCurrentMonth":false},{"OrderID":40,"OrderDate":"2026-03-01","IsCurrentMonth":true},{"OrderID":41,"OrderDate":"2026-03-07","IsCurrentMonth":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentMonth":true},{"OrderID":43,"OrderDate":"2026-03-21","IsCurrentMonth":true},{"OrderID":44,"OrderDate":"2026-04-02","IsCurrentMonth":false}]}
+-->
+
+<!--steps
+{
+  "steps": [
+    {
+      "name": "Orders",
+      "description": "An inline Orders table spanning late February to early April 2026.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20"},{"OrderID":39,"OrderDate":"2026-02-27"},{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"},{"OrderID":43,"OrderDate":"2026-03-21"},{"OrderID":44,"OrderDate":"2026-04-02"}]}
+    },
+    {
+      "name": "Result",
+      "description": "Adds IsCurrentMonth, which is true only for the March 2026 orders.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"},{"name":"IsCurrentMonth","type":"logical"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20","IsCurrentMonth":false},{"OrderID":39,"OrderDate":"2026-02-27","IsCurrentMonth":false},{"OrderID":40,"OrderDate":"2026-03-01","IsCurrentMonth":true},{"OrderID":41,"OrderDate":"2026-03-07","IsCurrentMonth":true},{"OrderID":42,"OrderDate":"2026-03-08","IsCurrentMonth":true},{"OrderID":43,"OrderDate":"2026-03-21","IsCurrentMonth":true},{"OrderID":44,"OrderDate":"2026-04-02","IsCurrentMonth":false}]}
+    }
+  ]
+}
 -->
 
 ### Example 3: Filter month-to-date orders only (excluding future dates this month)
 
-Restrict current month results to dates up to and including today.
+Restrict current month results to dates up to and including today, which drops order 43.
 
 ```powerquery
 let
-    Today = Date.From(DateTime.LocalNow())
-in
-    Table.SelectRows(
-        Sales,
+    Today = Date.From(DateTime.LocalNow()),
+    Orders = #table(
+        type table [OrderID = number, OrderDate = date],
+        {
+            {38, #date(2026, 2, 20)},
+            {39, #date(2026, 2, 27)},
+            {40, #date(2026, 3, 1)},
+            {41, #date(2026, 3, 7)},
+            {42, #date(2026, 3, 8)},
+            {43, #date(2026, 3, 21)},
+            {44, #date(2026, 4, 2)}
+        }
+    ),
+    Result = Table.SelectRows(
+        Orders,
         each Date.IsInCurrentMonth([OrderDate]) and [OrderDate] <= Today
     )
+in
+    Result
 ```
 
 <!--output
 {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
 -->
+
 <!--steps
 {
   "steps": [
     {
       "name": "Today",
-      "description": "Today's date from the system clock. This illustration assumes today is March 8, 2026.",
+      "description": "Today's date from the system clock, assumed here to be March 8, 2026.",
       "output": {"columns":[{"name":"Value","type":"date"}],"rows":[{"Value":"2026-03-08"}]}
     },
     {
+      "name": "Orders",
+      "description": "An inline Orders table spanning late February to early April 2026.",
+      "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":38,"OrderDate":"2026-02-20"},{"OrderID":39,"OrderDate":"2026-02-27"},{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"},{"OrderID":43,"OrderDate":"2026-03-21"},{"OrderID":44,"OrderDate":"2026-04-02"}]}
+    },
+    {
       "name": "Result",
-      "description": "The final output \u2014 Sales orders dated in the current month (March 2026) on or before Today.",
+      "description": "Keeps March 2026 orders dated on or before Today, so order 43 (March 21) is dropped.",
       "output": {"columns":[{"name":"OrderID","type":"number"},{"name":"OrderDate","type":"date"}],"rows":[{"OrderID":40,"OrderDate":"2026-03-01"},{"OrderID":41,"OrderDate":"2026-03-07"},{"OrderID":42,"OrderDate":"2026-03-08"}]}
     }
   ]

@@ -25,9 +25,11 @@ relatedFunctions:
 
 ## Remarks
 
-`Type.Facets` returns a record describing the **facets** of a type — the additional constraints or properties associated with the type beyond its base kind. Facets are type-specific: for `number` types, relevant facets include `Precision` and `Scale`; for `text` types, `MaxLength` is a relevant facet.
+`Type.Facets` returns a record describing the **facets** of a type: optional annotations that describe a type in more detail than its base kind, such as a text column's maximum length or a decimal column's precision. The record always has the same nine fields: `NumericPrecisionBase`, `NumericPrecision`, `NumericScale`, `DateTimePrecision`, `MaxLength`, `IsVariableLength`, `NativeTypeName`, `NativeDefaultExpression`, and `NativeExpression`. These match the facet columns that `Table.Schema` reports.
 
-For most primitive M types created with literal type expressions (like `type number` or `type text`), facets are present in the record but their values are `null`, meaning no constraint has been applied. Facets become meaningful when working with types derived from data sources — for example, a SQL Server column typed as `DECIMAL(10, 2)` will expose `Precision = 10` and `Scale = 2` through its type facets.
+For types written as literals (like `type number` or `type text`), every field is `null`, meaning no facet has been set. Facets become meaningful on types that come from data sources. For example, a SQL Server `nvarchar(50)` column's type can carry `MaxLength = 50`, `IsVariableLength = true`, and `NativeTypeName = "nvarchar"`.
+
+Facets are informational only: M does not enforce them when values are created or converted.
 
 `Type.Facets` is used in advanced introspection scenarios: custom connectors, schema comparison tools, or type annotation pipelines. The output of `Type.Facets` is a standard record that you can inspect with record field access or convert to a table with `Record.ToTable`. The complement function `Type.ReplaceFacets` creates a new type with modified facets.
 
@@ -37,49 +39,54 @@ Note that `Type.Facets` operates on a **type value**, not a data value. Use `Val
 
 ### Example 1: Facets of a plain number type — all null
 
+A type written as a literal carries no facets, so every field in the record is null.
+
 ```powerquery
 Type.Facets(type number)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":null},{"Name":"Scale","Value":null}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":null},{"Name":"NumericScale","Value":null},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
 -->
 
 ### Example 2: Facets of a nullable text type
+
+Nullability isn't a facet, so `type nullable text` also returns a record of nulls.
 
 ```powerquery
 Type.Facets(type nullable text)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"MaxLength","Value":null}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":null},{"Name":"NumericScale","Value":null},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
 -->
 
 ### Example 3: Facets after applying precision and scale with Type.ReplaceFacets
 
+Attach `NumericPrecision` and `NumericScale` facets (like a SQL `DECIMAL(10, 2)` column), then read them back.
+
 ```powerquery
 let
-    Constrained = Type.ReplaceFacets(type number, [Precision = 10, Scale = 2])
+    Constrained = Type.ReplaceFacets(type number, [NumericPrecision = 10, NumericScale = 2])
 in
     Type.Facets(Constrained)
 ```
 
 <!--output
-{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+{"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":10},{"Name":"NumericScale","Value":2},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
 -->
-
 <!--steps
 {
   "steps": [
     {
       "name": "Constrained",
-      "description": "Applies Precision = 10 and Scale = 2 facets to type number with Type.ReplaceFacets; the base type is still number.",
+      "description": "Applies NumericPrecision = 10 and NumericScale = 2 to type number with Type.ReplaceFacets; the base type is still number.",
       "output": {"columns":[{"name":"Value","type":"type"}],"rows":[{"Value":"type number"}]}
     },
     {
       "name": "Result",
-      "description": "The final output — Type.Facets returns the facets now attached to the type: Precision 10 and Scale 2.",
-      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"Precision","Value":10},{"Name":"Scale","Value":2}]}
+      "description": "The final output \u2014 Type.Facets returns the full facet record, with NumericPrecision 10, NumericScale 2, and every other facet null.",
+      "output": {"columns":[{"name":"Name","type":"text"},{"name":"Value","type":"any"}],"rows":[{"Name":"NumericPrecisionBase","Value":null},{"Name":"NumericPrecision","Value":10},{"Name":"NumericScale","Value":2},{"Name":"DateTimePrecision","Value":null},{"Name":"MaxLength","Value":null},{"Name":"IsVariableLength","Value":null},{"Name":"NativeTypeName","Value":null},{"Name":"NativeDefaultExpression","Value":null},{"Name":"NativeExpression","Value":null}]}
     }
   ]
 }
