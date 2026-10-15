@@ -74,7 +74,7 @@ In Power Query tables, errors can exist at the cell level. A column might have v
 To find error rows, use:
 
 ```powerquery
-Table.SelectRows(Source, each try [ColumnName] is error otherwise false)
+Table.SelectRows(Source, each (try [ColumnName])[HasError])
 ```
 
 To replace errors with a default value across an entire column:

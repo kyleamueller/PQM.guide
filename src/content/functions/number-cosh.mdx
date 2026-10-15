@@ -63,7 +63,7 @@ Number.Cosh(1)
 ```powerquery
 let
     X = 3,
-    Identity = Number.Cosh(X)^2 - Number.Sinh(X)^2
+    Identity = Number.Power(Number.Cosh(X), 2) - Number.Power(Number.Sinh(X), 2)
 in
     Number.Round(Identity, 10)
 ```

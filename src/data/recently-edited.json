@@ -1,5 +1,17 @@
 [
   {
+    "slug": "web-headers",
+    "type": "function",
+    "date": "2026-10-15",
+    "description": "Fixed header access: hyphenated names need a quoted identifier, like Headers[#\"Content-Type\"]"
+  },
+  {
+    "slug": "error-handling",
+    "type": "concept",
+    "date": "2026-10-15",
+    "description": "Fixed the find-error-rows example, which wasn't valid M"
+  },
+  {
     "slug": "type-facets",
     "type": "function",
     "date": "2026-10-15",
@@ -22,17 +34,5 @@
     "type": "function",
     "date": "2026-10-15",
     "description": "Rewrote the example so the output actually shows null Region values filled down (including North)"
-  },
-  {
-    "slug": "value-subtract",
-    "type": "function",
-    "date": "2026-10-15",
-    "description": "Corrected example dates to match the Sales sample table; added Applied Steps chips"
-  },
-  {
-    "slug": "table-matchesanyrows",
-    "type": "function",
-    "date": "2026-10-15",
-    "description": "Fixed an example whose output contradicted its code; added Applied Steps chips"
   }
 ]
