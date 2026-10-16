@@ -4,7 +4,7 @@ import { categories } from "@/data/categories";
 import { getAllFunctions } from "@/lib/mdx";
 
 export const metadata: Metadata = {
-  title: "Function Categories — PQM.guide",
+  title: "Function Categories",
   description: "Browse all Power Query M function categories.",
 };
 
