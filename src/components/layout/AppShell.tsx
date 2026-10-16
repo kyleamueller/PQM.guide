@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
+import { FunctionSlugsContext } from "./FunctionSlugsContext";
 import SearchDialog from "@/components/search/SearchDialog";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { FunctionIndexEntry, SearchIndexEntry } from "@/lib/types";
@@ -20,6 +21,7 @@ export default function AppShell({ functions, searchItems, children }: AppShellP
   const [searchOpen, setSearchOpen] = useState(false);
   const [showCookieBtn, setShowCookieBtn] = useState(false);
   const pathname = usePathname();
+  const functionSlugs = useMemo(() => new Set(functions.map((f) => f.slug)), [functions]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -56,7 +58,7 @@ export default function AppShell({ functions, searchItems, children }: AppShellP
               <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
-          {children}
+          <FunctionSlugsContext value={functionSlugs}>{children}</FunctionSlugsContext>
         </main>
       </div>
       <SearchDialog

@@ -105,7 +105,7 @@ function parseRemarks(content: string): string | null {
 
 // parseInlineMarkdown imported from @/lib/markdown
 
-function renderRemarks(remarks: string) {
+function renderRemarks(remarks: string, functionSlugs: ReadonlySet<string>) {
   const elements: React.ReactElement[] = [];
   const lines = remarks.split("\n");
   let i = 0;
@@ -115,7 +115,7 @@ function renderRemarks(remarks: string) {
     const line = lines[i];
 
     if (line.startsWith("### ")) {
-      elements.push(<h3 key={key++} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(line.slice(4)) }} />);
+      elements.push(<h3 key={key++} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(line.slice(4), functionSlugs) }} />);
       i++;
       continue;
     }
@@ -148,11 +148,11 @@ function renderRemarks(remarks: string) {
       elements.push(
         <table key={key++} className="markdown-table">
           <thead>
-            <tr>{headers.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(h) }} />)}</tr>
+            <tr>{headers.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(h, functionSlugs) }} />)}</tr>
           </thead>
           <tbody>
             {rows.map((row, ri) => (
-              <tr key={ri}>{row.map((cell, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(cell) }} />)}</tr>
+              <tr key={ri}>{row.map((cell, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(cell, functionSlugs) }} />)}</tr>
             ))}
           </tbody>
         </table>
@@ -169,7 +169,7 @@ function renderRemarks(remarks: string) {
       elements.push(
         <ul key={key++} className="concept-list">
           {listItems.map((item, j) => (
-            <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item) }} />
+            <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item, functionSlugs) }} />
           ))}
         </ul>
       );
@@ -194,7 +194,7 @@ function renderRemarks(remarks: string) {
       i++;
     }
     elements.push(
-      <p key={key++} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(paraLines.join(" ")) }} />
+      <p key={key++} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(paraLines.join(" "), functionSlugs) }} />
     );
   }
 
@@ -215,6 +215,7 @@ export default async function FunctionPage({ params }: PageProps) {
   const examples = parseExamples(content);
   const remarks = parseRemarks(content);
   const allFunctions = buildSearchIndex();
+  const functionSlugs = new Set(allFunctions.map((f) => f.slug));
   const contributors = getContributors("functions", slug);
 
   const categorySlug = frontmatter.category.toLowerCase().replace(/\s+/g, "-");
@@ -279,7 +280,7 @@ export default async function FunctionPage({ params }: PageProps) {
       {remarks && (
         <section className="remarks-section" style={{ margin: "24px 0" }}>
           <h2>Remarks</h2>
-          {renderRemarks(remarks)}
+          {renderRemarks(remarks, functionSlugs)}
         </section>
       )}
 
