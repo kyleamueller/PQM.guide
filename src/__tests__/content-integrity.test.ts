@@ -10,7 +10,7 @@ import {
   getPatternBySlug,
 } from "@/lib/mdx";
 import { parseInlineMarkdown } from "@/lib/markdown";
-import { linkHighlightedCode } from "@/lib/function-links";
+import { linkHighlightedCode, M_NAME_PATTERN } from "@/lib/function-links";
 import officialSpecSlugs from "./fixtures/official-spec-slugs.json";
 import recentlyEditedData from "@/data/recently-edited.json";
 import type { RecentlyEditedEntry } from "@/lib/types";
@@ -277,13 +277,31 @@ describe("Generated function links", () => {
   const functionSlugs = new Set(getAllFunctionSlugs());
   const conceptSlugs = new Set(getAllConceptSlugs());
 
+  // Names in a function namespace (Table., Number., ...) that have no page on
+  // purpose. Any other such name renders as plain code and is most likely a
+  // function M doesn't have, like Table.RemoveDuplicates.
+  const KNOWN_NAMES_WITHOUT_PAGES = new Set([
+    // Constants and types
+    "Number.PI", "Number.E", "ItemExpression.Item", "RowExpression.Row",
+    "Byte.Type", "Currency.Type", "Date.Type", "Logical.Type", "Number.Type", "Percentage.Type", "Table.Type", "Text.Type",
+    // Record fields returned by Binary.InferContentType
+    "Csv.PotentialDelimiter", "Csv.PotentialPositions",
+    // Named to say M doesn't have them
+    "List.Flatten", "Number.Log2", "Type.Nullable",
+    // Custom and connector function examples
+    "GoogleAnalytics.Data", "Salesforce.Accounts", "Table.GenerateByPage", "Table.SolveParentChild", "Text.RemoveHtmlTags",
+    // Not real functions. datetimezone-torecord should name Date.Year, Time.Hour
+    // and so on instead; remove these once that page is fixed.
+    "DateTimeZone.Year", "DateTimeZone.Month", "DateTimeZone.Day",
+    "DateTimeZone.Hour", "DateTimeZone.Minute", "DateTimeZone.Second",
+  ]);
+
   // Renders a page body the way the site does: fenced code through Prism and
   // linkHighlightedCode (SyntaxBlock), everything else through
   // parseInlineMarkdown. Every block is highlighted as Power Query, since
   // concept pages do that whatever the fence says.
-  // Returns the href of every generated function link.
-  function functionLinksIn(body: string): string[] {
-    const html = body
+  function renderBody(body: string): string {
+    return body
       .split(/(```\w*\n[\s\S]*?```)/)
       .map((part) => {
         const fence = part.match(/^```\w*\n([\s\S]*?)```$/);
@@ -292,7 +310,20 @@ describe("Generated function links", () => {
         return linkHighlightedCode(highlighted, functionSlugs);
       })
       .join("");
+  }
+
+  // The href of every generated function link.
+  function functionLinksIn(html: string): string[] {
     return [...html.matchAll(/<a href="([^"]+)" class="[^"]*fn-link"/g)].map((m) => m[1]);
+  }
+
+  // M names left as plain code, in text and in code blocks.
+  function unlinkedNamesIn(html: string): string[] {
+    const inline = [...html.matchAll(/(?<!fn-link">)<code>([^<]+)<\/code>/g)]
+      .map((m) => m[1])
+      .filter((name) => M_NAME_PATTERN.test(name));
+    const builtins = [...html.matchAll(/<span class="token builtin">([^<]+)<\/span>/g)].map((m) => m[1]);
+    return [...inline, ...builtins];
   }
 
   const pages = [
@@ -302,13 +333,25 @@ describe("Generated function links", () => {
     }),
     ...getAllConceptSlugs().map((slug) => ({ id: `concepts/${slug}`, body: getConceptBySlug(slug).content })),
     ...getAllPatternSlugs().map((slug) => ({ id: `patterns/${slug}`, body: getPatternBySlug(slug).content })),
-  ];
+  ].map((page) => ({ id: page.id, html: renderBody(page.body) }));
+
+  it("every M name in a function namespace has a page or is a known non-function", () => {
+    const namespaces = new Set([...functionSlugs].map((slug) => slug.split("-")[0]));
+    const unknown: string[] = [];
+    for (const page of pages) {
+      for (const name of unlinkedNamesIn(page.html)) {
+        const namespace = name.split(".")[0].toLowerCase();
+        if (namespaces.has(namespace) && !KNOWN_NAMES_WITHOUT_PAGES.has(name)) unknown.push(`${page.id}: ${name}`);
+      }
+    }
+    expect(unknown, `not an M function? (add real constants to KNOWN_NAMES_WITHOUT_PAGES)\n${unknown.join("\n")}`).toEqual([]);
+  });
 
   it("every generated function link points to an existing page", () => {
     const broken: string[] = [];
     let linkCount = 0;
     for (const page of pages) {
-      for (const href of functionLinksIn(page.body)) {
+      for (const href of functionLinksIn(page.html)) {
         linkCount++;
         const [, type, slug] = href.match(/^\/(functions|concepts)\/(.+)$/) ?? [];
         const exists = type === "functions" ? functionSlugs.has(slug) : conceptSlugs.has(slug);
