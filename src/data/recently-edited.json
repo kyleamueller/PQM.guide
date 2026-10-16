@@ -1,5 +1,11 @@
 [
   {
+    "slug": "query-performance",
+    "type": "pattern",
+    "date": "2026-10-16",
+    "description": "Fixed the dedupe example, which called Table.RemoveDuplicates; M's function is Table.Distinct"
+  },
+  {
     "slug": "web-headers",
     "type": "function",
     "date": "2026-10-15",
@@ -28,11 +34,5 @@
     "type": "function",
     "date": "2026-10-15",
     "description": "Replaced example rows that didn't exist in the Sales table with an inline Orders table"
-  },
-  {
-    "slug": "table-filldown",
-    "type": "function",
-    "date": "2026-10-15",
-    "description": "Rewrote the example so the output actually shows null Region values filled down (including North)"
   }
 ]
