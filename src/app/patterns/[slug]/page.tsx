@@ -137,6 +137,7 @@ export default async function PatternPage({ params }: PageProps) {
   const bodyElements = renderBody(content);
   const allConcepts = getAllConcepts();
   const allFunctions = buildSearchIndex();
+  const functionSlugs = new Set(allFunctions.map((f) => f.slug));
   const contributors = getContributors("patterns", slug);
 
   const conceptTitleMap = new Map(allConcepts.map((c) => [c.slug, c.title]));
@@ -212,7 +213,7 @@ export default async function PatternPage({ params }: PageProps) {
             return (
               <ul key={i} className="concept-list">
                 {el.content.split("\n").map((item, j) => (
-                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item) }} />
+                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item, functionSlugs) }} />
                 ))}
               </ul>
             );
@@ -221,7 +222,7 @@ export default async function PatternPage({ params }: PageProps) {
             return (
               <ol key={i} className="concept-list">
                 {el.content.split("\n").map((item, j) => (
-                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item) }} />
+                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item, functionSlugs) }} />
                 ))}
               </ol>
             );
@@ -230,7 +231,7 @@ export default async function PatternPage({ params }: PageProps) {
             <p
               key={i}
               style={{ lineHeight: 1.7, marginBottom: 16 }}
-              dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(el.content) }}
+              dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(el.content, functionSlugs) }}
             />
           );
         })}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PQTableData, ExampleStep } from "@/lib/types";
 import { sampleTables } from "@/data/sample-tables";
 import { parseInlineMarkdown } from "@/lib/markdown";
+import { useFunctionSlugs } from "@/components/layout/FunctionSlugsContext";
 import PQTable from "@/components/pq-table/PQTable";
 import SyntaxBlock from "./SyntaxBlock";
 
@@ -29,6 +30,7 @@ export default function ExampleSection({
   index,
 }: ExampleSectionProps) {
   const [showInput, setShowInput] = useState(false);
+  const functionSlugs = useFunctionSlugs();
   const [activeStep, setActiveStep] = useState<number>(() =>
     steps ? steps.length - 1 : 0
   );
@@ -43,7 +45,7 @@ export default function ExampleSection({
       <h3>
         Example {index + 1}: {title}
       </h3>
-      {description && <p className="example-description" dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(description) }} />}
+      {description && <p className="example-description" dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(description, functionSlugs) }} />}
 
       <div className="example-code">
         <SyntaxBlock code={code} />
@@ -97,7 +99,7 @@ export default function ExampleSection({
           {currentStep && (
             <div className="step-output">
               {currentStep.description && (
-                <p className="step-description" dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(currentStep.description) }} />
+                <p className="step-description" dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(currentStep.description, functionSlugs) }} />
               )}
               <div className="example-table">
                 <PQTable data={currentStep.output} />
