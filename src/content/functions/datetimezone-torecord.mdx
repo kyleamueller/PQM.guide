@@ -30,7 +30,7 @@ relatedFunctions:
 
 `DateTimeZone.ToRecord` decomposes a `datetimezone` value into a record with eight numeric fields: `Year`, `Month`, `Day`, `Hour`, `Minute`, `Second`, `ZoneHours`, and `ZoneMinutes`. The `ZoneHours` and `ZoneMinutes` fields reflect the UTC offset — for example, a value with offset `+05:30` returns `ZoneHours=5` and `ZoneMinutes=30`. For a `-05:00` offset, `ZoneHours=-5` and `ZoneMinutes=0`.
 
-This function is most useful when you need to expand multiple components into separate table columns at once using `Table.ExpandRecordColumn`, instead of calling `DateTimeZone.Year`, `DateTimeZone.Month`, `DateTimeZone.Day`, `DateTimeZone.Hour`, `DateTimeZone.Minute`, `DateTimeZone.Second`, `DateTimeZone.ZoneHours`, and `DateTimeZone.ZoneMinutes` separately in eight `Table.AddColumn` calls.
+This function is most useful when you need to expand multiple components into separate table columns at once using `Table.ExpandRecordColumn`, instead of calling `Date.Year`, `Date.Month`, `Date.Day`, `Time.Hour`, `Time.Minute`, `Time.Second`, `DateTimeZone.ZoneHours`, and `DateTimeZone.ZoneMinutes` separately in eight `Table.AddColumn` calls.
 
 For selective access to just the offset components, use `DateTimeZone.ZoneHours` and `DateTimeZone.ZoneMinutes` directly rather than decomposing the entire record. For `datetime` decomposition (without zone fields), use `DateTime.ToRecord`. For `date`-only decomposition, use `Date.ToRecord`.
 

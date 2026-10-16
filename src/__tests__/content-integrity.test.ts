@@ -290,10 +290,6 @@ describe("Generated function links", () => {
     "List.Flatten", "Number.Log2", "Type.Nullable",
     // Custom and connector function examples
     "GoogleAnalytics.Data", "Salesforce.Accounts", "Table.GenerateByPage", "Table.SolveParentChild", "Text.RemoveHtmlTags",
-    // Not real functions. datetimezone-torecord should name Date.Year, Time.Hour
-    // and so on instead; remove these once that page is fixed.
-    "DateTimeZone.Year", "DateTimeZone.Month", "DateTimeZone.Day",
-    "DateTimeZone.Hour", "DateTimeZone.Minute", "DateTimeZone.Second",
   ]);
 
   // Renders a page body the way the site does: fenced code through Prism and
