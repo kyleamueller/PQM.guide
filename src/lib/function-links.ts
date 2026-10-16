@@ -6,7 +6,7 @@
  * stays plain code instead of linking to a page that doesn't exist.
  */
 
-export const M_NAME_PATTERN = /^[A-Z][a-zA-Z]*\.[A-Z0-9][a-zA-Z0-9]*$/;
+export const M_NAME_PATTERN = /^[A-Z][a-zA-Z0-9]*\.[A-Z0-9][a-zA-Z0-9]*$/;
 
 // Enum values have no page of their own, so link them to the page that explains them.
 const ENUM_PAGES: Record<string, string> = {

@@ -283,7 +283,7 @@ describe("Generated function links", () => {
   const KNOWN_NAMES_WITHOUT_PAGES = new Set([
     // Constants and types
     "Number.PI", "Number.E", "ItemExpression.Item", "RowExpression.Row",
-    "Byte.Type", "Currency.Type", "Date.Type", "Logical.Type", "Number.Type", "Percentage.Type", "Table.Type", "Text.Type",
+    "Byte.Type", "Currency.Type", "Date.Type", "Int8.Type", "Int16.Type", "Int32.Type", "Int64.Type", "Logical.Type", "Number.Type", "Percentage.Type", "Table.Type", "Text.Type",
     // Record fields returned by Binary.InferContentType
     "Csv.PotentialDelimiter", "Csv.PotentialPositions",
     // Named to say M doesn't have them
