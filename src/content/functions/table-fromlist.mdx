@@ -14,7 +14,7 @@ parameters:
   - name: "splitter"
     type: "function"
     required: false
-    description: "A function that splits each list item into column values. Defaults to Splitter.SplitByNothing()."
+    description: "A function that splits each list item into column values. If omitted, each item is split by comma."
   - name: "columns"
     type: "any"
     required: false
@@ -44,9 +44,10 @@ relatedFunctions:
 
 `Table.FromList` is the standard way to convert a list of values into a table. The `splitter` parameter determines how each list element maps to columns:
 
-- `Splitter.SplitByNothing()` (default) — each element becomes the single value in `Column1`. Use `Table.ExpandRecordColumn` afterwards if elements are records.
-- `Splitter.SplitByComma()` — splits text by comma into multiple columns.
-- `Splitter.SplitTextByDelimiter(...)` — splits by any delimiter.
+- `Splitter.SplitByNothing()` — each element becomes the single value in `Column1`. Use `Table.ExpandRecordColumn` afterwards if elements are records.
+- `Splitter.SplitTextByDelimiter(",")` — splits each text element by comma into multiple columns. Pass a different delimiter to split on something else.
+
+If you leave out the splitter, `Table.FromList` splits each element by comma, so the list must contain text. Pass `Splitter.SplitByNothing()` for lists of numbers, records or other values.
 
 ## Examples
 
@@ -65,7 +66,7 @@ Table.FromList({1, 2, 3, 4, 5}, Splitter.SplitByNothing(), {"Number"})
 ```powerquery
 Table.FromList(
     {"Alice,30,Engineer", "Bob,25,Designer"},
-    Splitter.SplitByComma(),
+    Splitter.SplitTextByDelimiter(","),
     {"Name", "Age", "Role"}
 )
 ```

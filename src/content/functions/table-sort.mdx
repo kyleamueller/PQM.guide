@@ -33,7 +33,7 @@ relatedFunctions:
 
 If only a column name is provided, the sort defaults to ascending order.
 
-If you use `Table.Sort` before `Table.RemoveDuplicates` or `Table.Group`, wrap the sorted table in `Table.Buffer` first. Without buffering, the sort order is not guaranteed to be preserved by downstream operations, which can lead to unexpected results (e.g., keeping the wrong duplicate row).
+If you use `Table.Sort` before `Table.Distinct` or `Table.Group`, wrap the sorted table in `Table.Buffer` first. Without buffering, the sort order is not guaranteed to be preserved by downstream operations, which can lead to unexpected results (e.g., keeping the wrong duplicate row).
 
 ## Examples
 
