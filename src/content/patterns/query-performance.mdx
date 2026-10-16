@@ -76,14 +76,14 @@ in
     Grouped
 ```
 
-Buffer before `Table.Sort` + `Table.RemoveDuplicates` for the same reason — deduplication requires multiple passes over the sorted output:
+Buffer before `Table.Sort` + `Table.Distinct` for the same reason — deduplication requires multiple passes over the sorted output:
 
 ```powerquery
 let
     Source = RawData,
     Buffered = Table.Buffer(Source),
     Sorted = Table.Sort(Buffered, {{"ID", Order.Ascending}, {"Timestamp", Order.Descending}}),
-    Deduped = Table.RemoveDuplicates(Sorted, {"ID"})
+    Deduped = Table.Distinct(Sorted, {"ID"})
 in
     Deduped
 ```
