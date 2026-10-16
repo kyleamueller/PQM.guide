@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import Prism from "prismjs";
+import "@/lib/prism-powerquery";
 import {
   getAllFunctionSlugs,
   getFunctionBySlug,
@@ -7,9 +9,27 @@ import {
   getAllPatternSlugs,
   getPatternBySlug,
 } from "@/lib/mdx";
+import { parseInlineMarkdown } from "@/lib/markdown";
+import { linkHighlightedCode, M_NAME_PATTERN } from "@/lib/function-links";
 import officialSpecSlugs from "./fixtures/official-spec-slugs.json";
 import recentlyEditedData from "@/data/recently-edited.json";
 import type { RecentlyEditedEntry } from "@/lib/types";
+
+// Concept and pattern pages link their relatedConcepts and relatedFunctions,
+// so every entry must be an existing page.
+function expectRelatedPagesExist(
+  id: string,
+  frontmatter: { relatedConcepts?: string[]; relatedFunctions?: string[] }
+) {
+  const conceptSlugs = new Set(getAllConceptSlugs());
+  const functionSlugs = new Set(getAllFunctionSlugs());
+  for (const ref of frontmatter.relatedConcepts ?? []) {
+    expect(conceptSlugs.has(ref), `${id} references unknown concept: "${ref}"`).toBe(true);
+  }
+  for (const ref of frontmatter.relatedFunctions ?? []) {
+    expect(functionSlugs.has(ref), `${id} references unknown function: "${ref}"`).toBe(true);
+  }
+}
 
 // All 661 official spec slugs are now documented — relatedFunctions must
 // reference existing documented slugs only (no forward-reference fallback).
@@ -203,6 +223,12 @@ describe("Concept MDX integrity", () => {
       expect(frontmatter.slug, `${slug}: slug mismatch`).toBe(slug);
     }
   });
+
+  it("every concept relatedConcepts and relatedFunctions reference existing pages", () => {
+    for (const slug of slugs) {
+      expectRelatedPagesExist(`concepts/${slug}`, getConceptBySlug(slug).frontmatter);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -234,6 +260,115 @@ describe("Pattern MDX integrity", () => {
       expect(frontmatter.title, `${slug}: title`).toBeTruthy();
       expect(frontmatter.description, `${slug}: description`).toBeTruthy();
     }
+  });
+
+  it("every pattern relatedConcepts and relatedFunctions reference existing pages", () => {
+    for (const slug of slugs) {
+      expectRelatedPagesExist(`patterns/${slug}`, getPatternBySlug(slug).frontmatter);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Function links in inline code and code blocks
+// ---------------------------------------------------------------------------
+
+describe("Generated function links", () => {
+  const functionSlugs = new Set(getAllFunctionSlugs());
+  const conceptSlugs = new Set(getAllConceptSlugs());
+
+  // Names in a function namespace (Table., Number., ...) that have no page on
+  // purpose. Any other such name renders as plain code and is most likely a
+  // function M doesn't have, like Table.RemoveDuplicates.
+  const KNOWN_NAMES_WITHOUT_PAGES = new Set([
+    // Constants and types
+    "Number.PI", "Number.E", "ItemExpression.Item", "RowExpression.Row",
+    "Byte.Type", "Currency.Type", "Date.Type", "Int8.Type", "Int16.Type", "Int32.Type", "Int64.Type", "Logical.Type", "Number.Type", "Percentage.Type", "Table.Type", "Text.Type",
+    // Record fields returned by Binary.InferContentType
+    "Csv.PotentialDelimiter", "Csv.PotentialPositions",
+    // Named to say M doesn't have them
+    "List.Flatten", "Number.Log2", "Type.Nullable",
+    // Custom and connector function examples
+    "GoogleAnalytics.Data", "Salesforce.Accounts", "Table.GenerateByPage", "Table.SolveParentChild", "Text.RemoveHtmlTags",
+  ]);
+
+  // Renders a page body the way the site does: fenced code through Prism and
+  // linkHighlightedCode (SyntaxBlock), everything else through
+  // parseInlineMarkdown. Every block is highlighted as Power Query, since
+  // concept pages do that whatever the fence says.
+  function renderBody(body: string): string {
+    return body
+      .split(/(```\w*\n[\s\S]*?```)/)
+      .map((part) => {
+        const fence = part.match(/^```\w*\n([\s\S]*?)```$/);
+        if (!fence) return parseInlineMarkdown(part, functionSlugs);
+        const highlighted = Prism.highlight(fence[1], Prism.languages.powerquery, "powerquery");
+        return linkHighlightedCode(highlighted, functionSlugs);
+      })
+      .join("");
+  }
+
+  // The href of every generated function link.
+  function functionLinksIn(html: string): string[] {
+    return [...html.matchAll(/<a href="([^"]+)" class="[^"]*fn-link"/g)].map((m) => m[1]);
+  }
+
+  // M names left as plain code, in text and in code blocks.
+  function unlinkedNamesIn(html: string): string[] {
+    const inline = [...html.matchAll(/(?<!fn-link">)<code>([^<]+)<\/code>/g)]
+      .map((m) => m[1])
+      .filter((name) => M_NAME_PATTERN.test(name));
+    const builtins = [...html.matchAll(/<span class="token builtin">([^<]+)<\/span>/g)].map((m) => m[1]);
+    return [...inline, ...builtins];
+  }
+
+  const pages = [
+    ...getAllFunctionSlugs().map((slug) => {
+      const { frontmatter, content } = getFunctionBySlug(slug);
+      return { id: `functions/${slug}`, body: `\`\`\`powerquery\n${frontmatter.syntax}\n\`\`\`\n${content}` };
+    }),
+    ...getAllConceptSlugs().map((slug) => ({ id: `concepts/${slug}`, body: getConceptBySlug(slug).content })),
+    ...getAllPatternSlugs().map((slug) => ({ id: `patterns/${slug}`, body: getPatternBySlug(slug).content })),
+  ].map((page) => ({ id: page.id, html: renderBody(page.body) }));
+
+  it("every M name in a function namespace has a page or is a known non-function", () => {
+    const namespaces = new Set([...functionSlugs].map((slug) => slug.split("-")[0]));
+    const unknown: string[] = [];
+    for (const page of pages) {
+      for (const name of unlinkedNamesIn(page.html)) {
+        const namespace = name.split(".")[0].toLowerCase();
+        if (namespaces.has(namespace) && !KNOWN_NAMES_WITHOUT_PAGES.has(name)) unknown.push(`${page.id}: ${name}`);
+      }
+    }
+    expect(unknown, `not an M function? (add real constants to KNOWN_NAMES_WITHOUT_PAGES)\n${unknown.join("\n")}`).toEqual([]);
+  });
+
+  it("every generated function link points to an existing page", () => {
+    const broken: string[] = [];
+    let linkCount = 0;
+    for (const page of pages) {
+      for (const href of functionLinksIn(page.html)) {
+        linkCount++;
+        const [, type, slug] = href.match(/^\/(functions|concepts)\/(.+)$/) ?? [];
+        const exists = type === "functions" ? functionSlugs.has(slug) : conceptSlugs.has(slug);
+        if (!exists) broken.push(`${page.id} -> ${href}`);
+      }
+    }
+    expect(linkCount, "no function links were generated").toBeGreaterThan(0);
+    expect(broken, broken.join("\n")).toEqual([]);
+  });
+
+  it("names without a page render as plain code", () => {
+    const inline = parseInlineMarkdown("`Table.AddColumn` `Number.PI` `CustomerID.1` `JoinKind.Inner`", functionSlugs);
+    expect(inline).toContain('<a href="/functions/table-addcolumn" class="fn-link"><code>Table.AddColumn</code></a>');
+    expect(inline).toContain('<a href="/functions/table-join" class="fn-link"><code>JoinKind.Inner</code></a>');
+    expect(inline).toContain("<code>Number.PI</code>");
+    expect(inline).toContain("<code>CustomerID.1</code>");
+
+    const code = "Table.AddColumn(Source, \"Area\", each Number.PI * [r] * [r])";
+    const block = linkHighlightedCode(Prism.highlight(code, Prism.languages.powerquery, "powerquery"), functionSlugs);
+    expect(block).toContain('<a href="/functions/table-addcolumn" class="token builtin fn-link"');
+    expect(block).toContain('<span class="token builtin">Number.PI</span>');
   });
 });
 

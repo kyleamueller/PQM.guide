@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/concepts`, priority: 0.9, changeFrequency: "weekly" },
     { url: `${BASE_URL}/patterns`, priority: 0.9, changeFrequency: "weekly" },
     { url: `${BASE_URL}/categories`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/format-m`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/mcp`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/resources`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/sample-tables`, priority: 0.6, changeFrequency: "monthly" },

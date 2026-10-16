@@ -76,14 +76,15 @@ in
     Grouped
 ```
 
-Buffer before `Table.Sort` + `Table.RemoveDuplicates` for the same reason — deduplication requires multiple passes over the sorted output:
+Buffer between `Table.Sort` and `Table.Distinct` when the sort decides which duplicate to keep. The buffer locks in the sort order, so `Table.Distinct` keeps the first (latest) row for each ID:
 
 ```powerquery
 let
     Source = RawData,
-    Buffered = Table.Buffer(Source),
-    Sorted = Table.Sort(Buffered, {{"ID", Order.Ascending}, {"Timestamp", Order.Descending}}),
-    Deduped = Table.RemoveDuplicates(Sorted, {"ID"})
+    Sorted = Table.Sort(Source, {{"ID", Order.Ascending}, {"Timestamp", Order.Descending}}),
+    // Buffer the sorted table, not the source, so the sort order holds
+    Buffered = Table.Buffer(Sorted),
+    Deduped = Table.Distinct(Buffered, {"ID"})
 in
     Deduped
 ```

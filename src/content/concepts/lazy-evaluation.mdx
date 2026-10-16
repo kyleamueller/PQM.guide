@@ -35,7 +35,7 @@ Without `Table.Buffer` in the example above, `Table.Group` might re-evaluate the
 ### When to Use Table.Buffer
 
 - **Before `Table.Group`** if you sorted the table and need the sort order to affect grouping behavior.
-- **Before `Table.RemoveDuplicates`** if you sorted first to control which duplicate row is kept.
+- **Before `Table.Distinct`** if you sorted first to control which duplicate row is kept.
 - **When referencing the same table multiple times** in a query — buffering avoids re-evaluating the table for each reference.
 
 ### When Not to Use Table.Buffer

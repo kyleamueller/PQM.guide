@@ -31,7 +31,7 @@ relatedFunctions:
 
 `Table.Distinct` removes duplicate rows from a table. Without `equationCriteria`, rows must match on every column to be considered duplicates. Pass a column name or list of column names to deduplicate based on specific columns only — the first occurrence of each unique value is kept.
 
-`Table.Distinct` is similar to `Table.RemoveDuplicates`. The key difference is that `Table.Distinct` supports comparer functions in its criteria (e.g., `Comparer.OrdinalIgnoreCase` for case-insensitive matching), while `Table.RemoveDuplicates` takes a simple list of column names.
+`Table.Distinct` is the function the **Remove Duplicates** command in the Power Query editor writes; M has no separate Table.RemoveDuplicates function. Besides column names, `equationCriteria` can include a comparer such as `Comparer.OrdinalIgnoreCase`, so values that differ only in case count as duplicates.
 
 ## Examples
 

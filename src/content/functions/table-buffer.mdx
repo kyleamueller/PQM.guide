@@ -32,7 +32,7 @@ relatedFunctions:
 
 `Table.Buffer` forces Power Query to fully evaluate a table and store it in memory. This is essential when you need to guarantee that the current row order is preserved by downstream operations, because M uses [lazy evaluation](/concepts/lazy-evaluation) and does not guarantee row order between steps by default.
 
-The most common use case is placing `Table.Buffer` between a `Table.Sort` and a subsequent `Table.Group` or `Table.RemoveDuplicates`. Without buffering, the sort order may not be preserved, leading to unexpected results.
+The most common use case is placing `Table.Buffer` between a `Table.Sort` and a subsequent `Table.Group` or `Table.Distinct`. Without buffering, the sort order may not be preserved, leading to unexpected results.
 
 Be mindful of memory usage — `Table.Buffer` loads the entire table into memory. Avoid using it on very large datasets unless necessary. Use `BufferMode.Delayed` in the options record to defer buffering until the table is actually accessed, which can improve performance when the buffered table may not always be needed.
 

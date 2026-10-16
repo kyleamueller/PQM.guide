@@ -142,6 +142,7 @@ export default async function ConceptPage({ params }: PageProps) {
   const bodyElements = renderConceptBody(content);
   const allConcepts = getAllConcepts();
   const allFunctions = buildSearchIndex();
+  const functionSlugs = new Set(allFunctions.map((f) => f.slug));
   const contributors = getContributors("concepts", slug);
 
   const conceptTitleMap = new Map(allConcepts.map((c) => [c.slug, c.title]));
@@ -204,11 +205,11 @@ export default async function ConceptPage({ params }: PageProps) {
             return (
               <table key={i} className="markdown-table">
                 <thead>
-                  <tr>{headers.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(h) }} />)}</tr>
+                  <tr>{headers.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(h, functionSlugs) }} />)}</tr>
                 </thead>
                 <tbody>
                   {rows.map((row, ri) => (
-                    <tr key={ri}>{row.map((cell, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(cell) }} />)}</tr>
+                    <tr key={ri}>{row.map((cell, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(cell, functionSlugs) }} />)}</tr>
                   ))}
                 </tbody>
               </table>
@@ -235,7 +236,7 @@ export default async function ConceptPage({ params }: PageProps) {
                   <li
                     key={j}
                     dangerouslySetInnerHTML={{
-                      __html: parseInlineMarkdown(item),
+                      __html: parseInlineMarkdown(item, functionSlugs),
                     }}
                   />
                 ))}
@@ -247,7 +248,7 @@ export default async function ConceptPage({ params }: PageProps) {
               key={i}
               style={{ lineHeight: 1.7, marginBottom: 16 }}
               dangerouslySetInnerHTML={{
-                __html: parseInlineMarkdown(el.content),
+                __html: parseInlineMarkdown(el.content, functionSlugs),
               }}
             />
           );

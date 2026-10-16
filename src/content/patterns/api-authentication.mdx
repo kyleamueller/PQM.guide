@@ -4,7 +4,8 @@ slug: "api-authentication"
 description: "Pass API keys, Bearer tokens, and query parameters to authenticated REST APIs using the Web.Contents options record — including how to handle token refresh and avoid hardcoding secrets."
 difficulty: "advanced"
 relatedFunctions:
-  - "table-addcolumn"
+  - "web-contents"
+  - "web-headers"
 relatedConcepts:
   - "custom-functions"
   - "m-paradigm"
@@ -170,7 +171,7 @@ Without `ManualStatusHandling`, any of these status codes would immediately halt
 
 ### Paginating Through Results
 
-Combine authentication with pagination using a recursive or `List.Generate` approach:
+Combine authentication with [pagination](/patterns/pagination-web-contents) using a recursive or `List.Generate` approach:
 
 ```powerquery
 let

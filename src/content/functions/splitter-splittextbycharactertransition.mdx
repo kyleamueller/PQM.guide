@@ -29,7 +29,7 @@ relatedFunctions:
 
 ## Remarks
 
-`Splitter.SplitTextByCharacterTransition` returns a **function** that splits text at the boundary where one character type transitions to another. You specify the `before` and `after` character classifications using functions like `Character.IsLetter` and `Character.IsNumber`, or by providing lists of characters.
+`Splitter.SplitTextByCharacterTransition` returns a **function** that splits text at the boundary where one character type transitions to another. You specify the `before` and `after` character classes as lists of characters, such as `{"a".."z", "A".."Z"}` for letters and `{"0".."9"}` for digits, or as functions that take a single character and return `true` or `false`. M has no built-in functions that classify characters as letters or digits, so you build these lists yourself.
 
 This is especially useful for splitting strings that combine letters and digits without a delimiter — for example, splitting "ABC123" into "ABC" and "123".
 
@@ -43,7 +43,7 @@ Input: `Sales`
 
 ```powerquery
 let
-    SplitFn = Splitter.SplitTextByCharacterTransition(Character.IsLetter, Character.IsNumber),
+    SplitFn = Splitter.SplitTextByCharacterTransition({"a".."z", "A".."Z"}, {"0".."9"}),
     Parts = SplitFn("WidgetA100")
 in
     #table({"TextPart", "NumberPart"}, {{Parts{0}, Parts{1}}})

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Prism from "prismjs";
 import "@/lib/prism-powerquery";
+import { linkHighlightedCode } from "@/lib/function-links";
+import { useFunctionSlugs } from "@/components/layout/FunctionSlugsContext";
 
 interface SyntaxBlockProps {
   code: string;
@@ -11,16 +13,11 @@ interface SyntaxBlockProps {
 
 export default function SyntaxBlock({ code, language = "powerquery" }: SyntaxBlockProps) {
   const [copied, setCopied] = useState(false);
+  const functionSlugs = useFunctionSlugs();
 
   const grammar = Prism.languages[language];
   const rawHtml = grammar ? Prism.highlight(code, grammar, language) : code;
-  const html = rawHtml.replace(
-    /<span class="token builtin">([^<]+)<\/span>/g,
-    (_, funcName: string) => {
-      const slug = funcName.toLowerCase().replace(".", "-");
-      return `<a href="/functions/${slug}" class="token builtin fn-link" title="View ${funcName}">${funcName}</a>`;
-    }
-  );
+  const html = linkHighlightedCode(rawHtml, functionSlugs);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code).then(() => {

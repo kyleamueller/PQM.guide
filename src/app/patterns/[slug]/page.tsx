@@ -42,12 +42,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // parseInlineMarkdown imported from @/lib/markdown
 
 function renderBody(content: string) {
-  const elements: { type: "p" | "h3" | "code" | "ul" | "ol"; content: string; lang?: string }[] = [];
+  const elements: { type: "p" | "h3" | "code" | "ul" | "ol" | "table"; content: string; lang?: string }[] = [];
   const lines = content.split("\n");
   let i = 0;
 
   while (i < lines.length) {
     const line = lines[i];
+
+    if (line.startsWith("|")) {
+      const tableLines: string[] = [];
+      while (i < lines.length && lines[i].startsWith("|")) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      elements.push({ type: "table", content: tableLines.join("\n") });
+      continue;
+    }
 
     if (line.startsWith("```")) {
       const lang = line.slice(3).trim() || "powerquery";
@@ -137,6 +147,7 @@ export default async function PatternPage({ params }: PageProps) {
   const bodyElements = renderBody(content);
   const allConcepts = getAllConcepts();
   const allFunctions = buildSearchIndex();
+  const functionSlugs = new Set(allFunctions.map((f) => f.slug));
   const contributors = getContributors("patterns", slug);
 
   const conceptTitleMap = new Map(allConcepts.map((c) => [c.slug, c.title]));
@@ -198,6 +209,25 @@ export default async function PatternPage({ params }: PageProps) {
 
       <div className="concept-body">
         {bodyElements.map((el, i) => {
+          if (el.type === "table") {
+            const tableLines = el.content.split("\n");
+            const nonSep = tableLines.filter((l) => !/^\|[\s\-:|]+\|$/.test(l.trim()));
+            const toCell = (l: string) => l.split("|").map((s) => s.trim()).filter(Boolean);
+            const headers = toCell(nonSep[0] ?? "");
+            const rows = nonSep.slice(1).map(toCell);
+            return (
+              <table key={i} className="markdown-table">
+                <thead>
+                  <tr>{headers.map((h, j) => <th key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(h, functionSlugs) }} />)}</tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, ri) => (
+                    <tr key={ri}>{row.map((cell, ci) => <td key={ci} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(cell, functionSlugs) }} />)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            );
+          }
           if (el.type === "h3") {
             return <h3 key={i} style={{ fontSize: 18, marginTop: 28, marginBottom: 12 }}>{el.content}</h3>;
           }
@@ -212,7 +242,7 @@ export default async function PatternPage({ params }: PageProps) {
             return (
               <ul key={i} className="concept-list">
                 {el.content.split("\n").map((item, j) => (
-                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item) }} />
+                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item, functionSlugs) }} />
                 ))}
               </ul>
             );
@@ -221,7 +251,7 @@ export default async function PatternPage({ params }: PageProps) {
             return (
               <ol key={i} className="concept-list">
                 {el.content.split("\n").map((item, j) => (
-                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item) }} />
+                  <li key={j} dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(item, functionSlugs) }} />
                 ))}
               </ol>
             );
@@ -230,7 +260,7 @@ export default async function PatternPage({ params }: PageProps) {
             <p
               key={i}
               style={{ lineHeight: 1.7, marginBottom: 16 }}
-              dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(el.content) }}
+              dangerouslySetInnerHTML={{ __html: parseInlineMarkdown(el.content, functionSlugs) }}
             />
           );
         })}

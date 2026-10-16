@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import recentlyEditedData from "@/data/recently-edited.json";
+import { learningPath } from "@/data/learning-path";
 import { getAllFunctions, getFunctionBySlug, getConceptBySlug, getPatternBySlug, getAllPatterns } from "@/lib/mdx";
 import { PatternDifficulty } from "@/lib/types";
 import type { RecentlyEditedEntry } from "@/lib/types";
@@ -106,7 +107,8 @@ export default function Home() {
         >
           <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>New to M? Start Here →</div>
           <div style={{ fontSize: 13, opacity: 0.88, lineHeight: 1.5 }}>
-            An 8-step learning path from the M paradigm to query folding.
+            A {learningPath.length}-step learning path from {learningPath[0].title} to{" "}
+            {learningPath[learningPath.length - 1].title}.
           </div>
         </Link>
         <Link

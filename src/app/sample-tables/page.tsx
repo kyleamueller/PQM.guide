@@ -5,7 +5,7 @@ import SampleTableCode from "@/components/sample-tables/SampleTableCode";
 import CopyCodeBlock from "@/components/sample-tables/CopyCodeBlock";
 
 export const metadata: Metadata = {
-  title: "Sample Tables - PQM.guide",
+  title: "Sample Tables",
   description:
     "Shared sample tables used throughout PQM.guide examples. These tables serve as the starting point for all function demonstrations.",
 };
