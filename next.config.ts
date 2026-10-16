@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import path from "path";
+import { legacyRedirects } from "./src/data/legacy-redirects";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
@@ -14,6 +15,9 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  async redirects() {
+    return legacyRedirects;
   },
 };
 
