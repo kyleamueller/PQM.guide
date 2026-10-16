@@ -100,7 +100,7 @@ function redirectsTo(destination: string, sources: string[]): LegacyRedirect[] {
 const constantNamesByDestination = new Map<string, string[]>();
 for (const [name, destination] of Object.entries(LEGACY_CONSTANTS)) {
   const names = constantNamesByDestination.get(destination) ?? [];
-  names.push(name.replace("*", "[^/]+"));
+  names.push(name.replace(/\*/g, "[^/]+"));
   constantNamesByDestination.set(destination, names);
 }
 
